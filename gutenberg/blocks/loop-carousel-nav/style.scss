@@ -122,10 +122,10 @@
 // the drawing being a file rather than a length.
 .vp-block-loop-carousel-previous,
 .vp-block-loop-carousel-next {
-	--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='m9.5 4.5 7.5 7.5-7.5 7.5' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+	--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='m9.5 4.5 7.5 7.5-7.5 7.5' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 
 	&.has-arrow-icon {
-		--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M3.75 12h16.5m-7-7 7 7-7 7' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+		--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M3.75 12h16.5m-7-7 7 7-7 7' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 	}
 }
 
@@ -142,7 +142,7 @@
 // glyph: two bars while the carousel is running, a triangle once it has been
 // stopped.
 .vp-block-loop-carousel-autoplay {
-	--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 4.75v14.5M15 4.75v14.5' fill='none' stroke='black' stroke-width='2.75' stroke-linecap='round'/></svg>");
+	--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 4.75v14.5M15 4.75v14.5' fill='none' stroke='black' stroke-width='3'/></svg>");
 
 	// A square for a gallery that reads better with one.
 	&.has-stop-icon {
@@ -153,7 +153,7 @@
 // Stopped: the button offers the way back, so it becomes a play triangle
 // whichever glyph it was drawn with.
 .vp-carousel-is-stopped .vp-block-loop-carousel-autoplay {
-	--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.5 5.5 19 12 8.5 18.5Z' fill='black' stroke='black' stroke-width='2' stroke-linejoin='round'/></svg>");
+	--vp-carousel-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.5 5.5 19 12 8.5 18.5Z' fill='black' stroke='black' stroke-width='2.5' stroke-linejoin='round'/></svg>");
 }
 
 
@@ -438,12 +438,6 @@
 	}
 }
 
-// Held under a pointer or a focus. The wait is not running, and the pill says
-// so instead of looking like a carousel that has stalled.
-.vp-carousel-is-playing.vp-carousel-is-paused .vp-block-loop-carousel-dot-worm {
-	opacity: 0.65;
-}
-
 // Stopped by the visitor: nothing is running down, so the pill is the slide on
 // screen and nothing else - a half filled pill would be a wait that never ends.
 .vp-carousel-is-stopped .vp-block-loop-carousel-dot-worm {
@@ -539,7 +533,7 @@
 	// Smaller than the text around it and set heavier to hold its own at that
 	// size: a pair of numbers beside two arrows is a caption, not a heading.
 	font-size: 0.6875em;
-	font-weight: 600;
+	font-weight: 500;
 	font-variant-numeric: tabular-nums;
 	line-height: 1;
 }
