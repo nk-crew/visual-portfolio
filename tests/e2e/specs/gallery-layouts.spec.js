@@ -2351,9 +2351,9 @@ test.describe('Gallery Item Template layouts', () => {
 		);
 		await editor.openDocumentSettingsSidebar();
 
-		await page
-			.getByRole('combobox', { name: 'Type' })
-			.selectOption('tiles');
+		// The layout is a block variation, switched in the row of icons the
+		// editor draws above the settings.
+		await page.getByRole('radio', { name: 'Transform to Tiles' }).click();
 
 		// The preview is the same items rearranged - the endpoint is not asked
 		// again, and the pattern is applied straight to the boxes.

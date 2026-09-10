@@ -29,14 +29,17 @@ the block. Visual Portfolio Pro adds social networks and taxonomy sources to the
 same picker.
 
 **Layouts.** The item template offers grid, masonry, tiles, justified and
-carousel.
+carousel — a block variation each, the way the Group block offers Group, Row,
+Stack and Grid. The editor draws the switcher itself: a row of icons above the
+settings, and an entry in the block switcher of the toolbar. Tiles adds a
+*Pattern* picker to the settings once it is the layout.
 
 Columns come in the two shapes the core grid layout offers, and are edited with
-the same controls. **Auto** asks for a minimum column width and fits as many
-columns as the container holds, up to a maximum count — zero lifts the maximum,
-and *Fill available space* drops the empty tracks of a row that cannot be
-filled. **Manual** asks for a count and keeps it. Tiles take their columns from
-the tiles notation, and justified has none.
+the same controls under the same names. **Auto** asks for a *Min. column width*
+and fits as many columns as the container holds, up to *Max. columns* — zero
+lifts the maximum, and *Fill available space* drops the empty tracks of a row
+that cannot be filled. **Manual** asks for a count and keeps it. Tiles take
+their columns from the tiles notation, and justified has none.
 
 A count is not a promise to show that many on a phone. The stylesheet caps it at
 the plugin's breakpoints — four below 1200px, three below 992px, two below 768px
@@ -132,7 +135,8 @@ switch that fades it in while the pointer rests on the carousel (touch screens,
 which have no hover, always show it). The editor draws the same blocks inside
 the item being edited, positioned against the same frame.
 
-The arrows carry an *Icon* — chevron or arrow — and three block styles:
+The arrows come in two variations — *Chevron* and *Arrow*, switched in the row
+of icons above the settings — and three block styles:
 *Plain*, *Outlined* and *Filled* (a dark pill with a white glyph). The indicator
 carries block styles of its own: *Plain*, *Outlined* and *Filled*, the box
 around the dots or the bar. Selecting the row offers the same
@@ -186,8 +190,14 @@ A control is rendered switched off and stays that way until a carousel is
 running under it, so one that ended up beside a grid — or on a page whose module
 never loaded — never appears.
 
+*Container width* holds the slides to a width while the carousel itself keeps
+the full one, so a full-width gallery starts where the text above it does. It is
+switched in the toolbar of the item template, in the menu and the words the
+editor uses for the width of any block — *None* is the content width, then
+*Wide width*, *Full width* and *Custom*, whose width is typed in the menu.
+
 The carousel panel of the item template carries the rest: *Effect*, *Autoplay*
-and its delay, *Repeat*, *Container width*, *Peek*, *Slides per step* (zero
+and its delay, *Repeat*, *Peek*, *Slides per step* (zero
 moves a whole screen at a time, and a swipe comes to rest on the same frames an
 arrow does), *Slide height* and *Blocks fill the slide*,
 *Fade the edges*, *Slide width from content* and *Free scrolling*.

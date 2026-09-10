@@ -147,7 +147,7 @@
 		"spacing": {
 			"padding": true,
 			"margin": ["top", "bottom"],
-			"blockGap": true,
+			"blockGap": ["horizontal"],
 			"__experimentalDefaultControls": {
 				"blockGap": true
 			}

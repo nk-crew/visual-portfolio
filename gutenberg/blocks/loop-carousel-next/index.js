@@ -9,6 +9,7 @@ import { ReactComponent as BlockIcon } from '../../block-icons/loop-carousel-nex
 import registerLoopBlock from '../../utils/register-loop-block';
 import metadata from './block.json';
 import edit from './edit';
+import variations from './variations';
 
 /**
  * Register block
@@ -20,4 +21,5 @@ registerLoopBlock(metadata.name, {
 		src: <BlockIcon width="20" height="20" />,
 	},
 	edit,
+	variations,
 });

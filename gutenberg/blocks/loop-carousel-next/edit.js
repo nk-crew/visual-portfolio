@@ -12,7 +12,6 @@ import {
 	VisibilityToolbar,
 } from '../../utils/block-visibility';
 import {
-	ArrowControls,
 	arrowClassNames,
 	ControlPanel,
 	ShowOnHoverControl,
@@ -49,23 +48,21 @@ export default function CarouselNextEdit({
 				isHidden={isHidden}
 				setAttributes={setAttributes}
 			/>
-			<InspectorControls>
-				<ControlPanel title={__('Arrow', 'visual-portfolio')}>
-					<ArrowControls
-						attributes={attributes}
-						onChange={setAttributes}
-					/>
-					{/* An arrow in a row leaves the fade to the row. */}
-					{isOverlay && !isInRow ? (
+			{/* An arrow in a row leaves the fade to the row, and the glyph
+			    is a block variation - switched above the settings, where the
+			    editor switches every other kind of block. */}
+			{isOverlay && !isInRow ? (
+				<InspectorControls>
+					<ControlPanel title={__('Arrow', 'visual-portfolio')}>
 						<ShowOnHoverControl
 							value={showOnHover}
 							onChange={(value) =>
 								setAttributes({ showOnHover: value })
 							}
 						/>
-					) : null}
-				</ControlPanel>
-			</InspectorControls>
+					</ControlPanel>
+				</InspectorControls>
+			) : null}
 			<button
 				type="button"
 				aria-label={__('Next slide', 'visual-portfolio')}

@@ -153,3 +153,27 @@
 .wp-block-visual-portfolio-item-template__carousel-frame .is-shown-on-hover {
 	opacity: 1;
 }
+
+// A pair of controls under one legend, the way the core grid layout asks for a
+// column width and a column count. The fieldset is only there to carry the
+// legend, and core strips the same three properties off its own.
+.vpf-columns-control {
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+
+// The width of a carousel container, asked for in the menu that switches it:
+// a menu is where the setting is, so a number typed for it belongs there too.
+.vpf-container-width__custom {
+	padding: 8px 12px 12px;
+	border-top: 1px solid #e0e0e0;
+}
+
+// Why a carousel has no container to hold its slides to, where the help of the
+// setting would be.
+.vpf-container-width__help {
+	margin: 8px 12px;
+	color: #757575;
+	font-size: 12px;
+}
