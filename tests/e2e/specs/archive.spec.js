@@ -604,9 +604,23 @@ test.describe('archive pages', () => {
 					state: 'visible',
 				});
 
+				// Bringing the trigger into view is what starts an infinite
+				// load, and the load replaces the trigger while it is still
+				// being scrolled to - so the scroll must not wait for the
+				// element to hold still, and one that lost its element has
+				// done its job.
 				await page
 					.locator('a.vp-pagination__load-more')
-					.scrollIntoViewIfNeeded();
+					.evaluate(
+						(element) => element.scrollIntoView(),
+						undefined,
+						{
+							timeout: 5000,
+						}
+					)
+					.catch(() => {
+						/* the load it started took the trigger away */
+					});
 
 				const nextPageAttribute = await pagination
 					.locator('a.vp-pagination__load-more')
