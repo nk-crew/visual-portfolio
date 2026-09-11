@@ -20,6 +20,7 @@ import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
+import { useIsPreview } from '../../utils/use-is-preview';
 
 const DEFAULT_PREFIX = __('by ', 'visual-portfolio');
 
@@ -36,9 +37,19 @@ export default function ItemAuthorEdit({
 	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 
+	// The placeholder stands in on the item being edited and nowhere else:
+	// the read-only copies of the item, and every other preview, show what
+	// the page will show - and an item without a author shows nothing.
+	const isPreview = useIsPreview();
 	const author = itemAuthor
 		? decodeEntities(itemAuthor)
-		: __('Gallery item author', 'visual-portfolio');
+		: isPreview
+			? ''
+			: __('Gallery item author', 'visual-portfolio');
+
+	if (!author) {
+		return null;
+	}
 
 	return (
 		<>

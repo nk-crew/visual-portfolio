@@ -171,6 +171,71 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
+	 * The blocks a carousel is steered with.
+	 *
+	 * Dropped inside the item template they are not items: the template renders
+	 * each of them once, beside the list rather than in it, and inside the
+	 * frame the list scrolls in - which is what lays them over the slides.
+	 *
+	 * @var array
+	 */
+	const CONTROL_BLOCKS = array(
+		'visual-portfolio/loop-carousel-nav',
+		'visual-portfolio/loop-carousel-previous',
+		'visual-portfolio/loop-carousel-next',
+		'visual-portfolio/loop-carousel-indicator',
+		'visual-portfolio/loop-carousel-autoplay',
+		'visual-portfolio/loop-carousel-thumbnails',
+	);
+
+	/**
+	 * Take the carousel controls out of a parsed item template.
+	 *
+	 * `innerContent` is the inner blocks in order with the markup between
+	 * them, so both lists are walked together: a control leaves both, and
+	 * everything else keeps its place.
+	 *
+	 * @param array $parsed_block - parsed block of the item template.
+	 *
+	 * @return array The parsed block without its controls, and the controls.
+	 */
+	private static function split_controls( $parsed_block ) {
+		$inner_blocks  = $parsed_block['innerBlocks'] ?? array();
+		$inner_content = $parsed_block['innerContent'] ?? array_fill( 0, count( $inner_blocks ), null );
+		$kept          = array();
+		$content       = array();
+		$controls      = array();
+		$index         = 0;
+
+		foreach ( $inner_content as $chunk ) {
+			if ( null !== $chunk ) {
+				$content[] = $chunk;
+				continue;
+			}
+
+			$inner = $inner_blocks[ $index ] ?? null;
+			++$index;
+
+			if ( ! $inner ) {
+				continue;
+			}
+
+			if ( in_array( $inner['blockName'] ?? '', self::CONTROL_BLOCKS, true ) ) {
+				$controls[] = $inner;
+				continue;
+			}
+
+			$kept[]    = $inner;
+			$content[] = null;
+		}
+
+		$parsed_block['innerBlocks']  = $kept;
+		$parsed_block['innerContent'] = $content;
+
+		return array( $parsed_block, $controls );
+	}
+
+	/**
 	 * Whether anything inside the item opens the lightbox.
 	 *
 	 * Asked once for the list rather than per item: resolving the popup payload
@@ -407,6 +472,39 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
+	 * How many slides of a repeating carousel sit at its seam.
+	 *
+	 * The loop is carried by moving trailing slides round to the front, and
+	 * the library moves as many of them as it takes to cover the padding it
+	 * rests behind - half the width of the list, which is roughly half a
+	 * screenful of slides and one more. Those are the slides drawn before the
+	 * first one, where nothing that loads an image on sight will look.
+	 *
+	 * Sized by the frame rather than by the gallery, so forty slides at four
+	 * across warm three images and not forty.
+	 *
+	 * @param array $attributes - block attributes.
+	 * @param int   $columns    - slides across the frame.
+	 * @param int   $total      - slides in the gallery.
+	 *
+	 * @return int Slides at the end of the list to load up front.
+	 */
+	private function get_seam_size( $attributes, $columns, $total ) {
+		// Two answers the server cannot work out: auto columns with no maximum
+		// come back as one column, and slides of their own width have no count
+		// at all. Three across is the shape of the default gallery, and it is
+		// the honest guess for both.
+		if (
+			! empty( $attributes['carouselAutoWidth'] ) ||
+			( 'auto' === ( $attributes['layoutColumnsMode'] ?? 'auto' ) && empty( $attributes['layoutColumnCount'] ) )
+		) {
+			$columns = 3;
+		}
+
+		return max( 1, min( $total, (int) ceil( $columns / 2 ) + 1 ) );
+	}
+
+	/**
 	 * Loading attributes the image of an item should carry.
 	 *
 	 * The first row is above the fold whatever the page around it looks like, so
@@ -423,12 +521,13 @@ class Visual_Portfolio_Block_Item_Template {
 	 * `fetchpriority="high"` doubles as the marker that keeps our own lazy
 	 * loading off the image, see `get_image_blocked_attributes()`.
 	 *
-	 * @param int $index     - position of the item on the rendered page, from zero.
-	 * @param int $first_row - number of items in the first row.
+	 * @param int  $index     - position of the item on the rendered page, from zero.
+	 * @param int  $first_row - number of items in the first row.
+	 * @param bool $up_front    - whether this image is loaded up front regardless.
 	 *
 	 * @return array Attributes to merge into the image, possibly empty.
 	 */
-	private function get_image_loading_attributes( $index, $first_row ) {
+	private function get_image_loading_attributes( $index, $first_row, $up_front = false ) {
 		// Core's own flag rather than a counter of ours: it is per request, so a
 		// second gallery does not split the priority budget with the first, and
 		// it is the same flag a hero image above the loop claims - whoever comes
@@ -439,6 +538,17 @@ class Visual_Portfolio_Block_Item_Template {
 			return array(
 				'loading'       => 'eager',
 				'fetchpriority' => 'high',
+			);
+		}
+
+		// A carousel that repeats shows its last slides before its first,
+		// moved there by a transform - which is where nothing that loads an
+		// image on sight looks. Those are loaded up front, and kept from the
+		// plugin's own lazy loading.
+		if ( $up_front ) {
+			return array(
+				'loading'        => 'eager',
+				'data-skip-lazy' => 'true',
 			);
 		}
 
@@ -468,6 +578,25 @@ class Visual_Portfolio_Block_Item_Template {
 		$maximum = $is_auto && empty( $attributes['layoutColumnCount'] ) ? 0 : $columns;
 
 		$styles = sprintf( '--vp-layout-columns:%d;', $maximum );
+
+		// A count of its own for a narrower screen. Left at zero the count
+		// steps down the ladder the stylesheet walks, which is what a gallery
+		// has always done; a number set here is the answer for that screen
+		// instead. Only in manual mode - the width of a column is what decides
+		// the count in auto mode, and a second answer would fight it.
+		if ( ! $is_auto ) {
+			foreach ( array(
+				'tablet' => 'layoutColumnCountTablet',
+				'mobile' => 'layoutColumnCountMobile',
+			) as $screen => $attribute ) {
+				$count = max( 0, min( Visual_Portfolio_Tiles_Parser::MAX_COLUMNS, (int) ( $attributes[ $attribute ] ?? 0 ) ) );
+
+				if ( $count ) {
+					$classes[] = 'vp-has-' . $screen . '-columns';
+					$styles   .= sprintf( '--vp-layout-columns-%1$s:%2$d;', $screen, $count );
+				}
+			}
+		}
 
 		if ( '' !== $gap ) {
 			$styles .= sprintf( '--vp-layout-gap:%s;', $gap );
@@ -505,13 +634,70 @@ class Visual_Portfolio_Block_Item_Template {
 		}
 
 		if ( 'carousel' === $layout_type ) {
-			$styles .= sprintf(
-				'--vp-carousel-snap-align:%s;',
-				'center' === ( $attributes['carouselSnapAlign'] ?? 'start' ) ? 'center' : 'start'
-			);
+			$styles .= sprintf( '--vp-carousel-snap-align:%s;', $this->get_carousel_snap_align( $attributes ) );
 		}
 
 		return array( $classes, $styles );
+	}
+
+	/**
+	 * Where a slide of a carousel comes to rest.
+	 *
+	 * @param array $attributes - block attributes.
+	 *
+	 * @return string `start` or `center`.
+	 */
+	private function get_carousel_snap_align( $attributes ) {
+		return 'center' === ( $attributes['carouselSnapAlign'] ?? 'start' ) ? 'center' : 'start';
+	}
+
+	/**
+	 * The room a carousel keeps beside its slides, so that a gallery running
+	 * the full width of the page still starts where the text above it does.
+	 *
+	 * A container is a width, and the room beside it is whatever the frame has
+	 * over that width, halved. Never negative: a frame no wider than the
+	 * container - a gallery that is not full width, a phone - is left alone,
+	 * and a theme that names no width of its own is read as the frame itself,
+	 * which comes to the same thing.
+	 *
+	 * The slides are not clipped to it. The scroll container keeps the whole
+	 * width, so the slides that have not been reached yet run on past the
+	 * container and off the edge of the page, which is the point of a full
+	 * width carousel.
+	 *
+	 * @param array $attributes - block attributes.
+	 *
+	 * @return string CSS length, or an empty string for no room at all.
+	 */
+	private function get_carousel_inset( $attributes ) {
+		// A container is the edge a slide starts from, and two carousels have
+		// no such edge: a centred one rests every slide in the middle of the
+		// frame, and one that repeats is padded by half its width at each end
+		// to carry the loop.
+		if ( ! empty( $attributes['carouselRepeat'] ) || 'center' === $this->get_carousel_snap_align( $attributes ) ) {
+			return '';
+		}
+
+		switch ( (string) ( $attributes['carouselContainer'] ?? 'none' ) ) {
+			case 'content':
+				$width = 'var(--wp--style--global--content-size, 100cqw)';
+				break;
+
+			case 'wide':
+				$width = 'var(--wp--style--global--wide-size, 100cqw)';
+				break;
+
+			case 'custom':
+				$width = $this->get_css_length( $attributes['carouselContainerWidth'] ?? '', '' );
+				break;
+
+			default:
+				$width = '';
+				break;
+		}
+
+		return '' === $width ? '' : sprintf( 'max(0px, (100cqw - %s) / 2)', $width );
 	}
 
 	/**
@@ -594,84 +780,6 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
-	 * Arrows of a carousel.
-	 *
-	 * They sit inside the frame that wraps the list, over the slides at either
-	 * edge, which is where a visitor reaches for them. The frame is the only
-	 * reason that wrapper exists: the list itself scrolls, so anything placed
-	 * inside it would scroll away.
-	 *
-	 * @return string
-	 */
-	private function get_carousel_arrows() {
-		$arrows = array(
-			'prev' => __( 'Previous slide', 'visual-portfolio' ),
-			'next' => __( 'Next slide', 'visual-portfolio' ),
-		);
-
-		$output = '';
-
-		foreach ( $arrows as $direction => $label ) {
-			$output .= sprintf(
-				'<button type="button" class="wp-block-visual-portfolio-item-template__carousel-arrow wp-block-visual-portfolio-item-template__carousel-arrow--%1$s" aria-label="%2$s" data-wp-on--click="actions.%3$s"><span aria-hidden="true"></span></button>',
-				esc_attr( $direction ),
-				esc_attr( $label ),
-				'prev' === $direction ? 'carouselPrev' : 'carouselNext'
-			);
-		}
-
-		return $output;
-	}
-
-	/**
-	 * The indicator under a carousel.
-	 *
-	 * Dots, one per slide, or a single bar that fills as the carousel scrolls.
-	 * Server rendered so that a region swap brings it back with the items, and
-	 * hidden until the module is running - both move the scroll container
-	 * through the scroll API, and there is nothing to fall back to when that
-	 * API has nobody calling it.
-	 *
-	 * @param string $indicator - selected indicator.
-	 * @param int    $count     - number of items rendered.
-	 *
-	 * @return string
-	 */
-	private function get_carousel_indicator( $indicator, $count ) {
-		if ( 'progress' === $indicator ) {
-			return sprintf(
-				'<div class="wp-block-visual-portfolio-item-template__carousel-progress" role="progressbar" aria-label="%1$s"><span class="wp-block-visual-portfolio-item-template__carousel-progress-value"></span></div>',
-				esc_attr__( 'Carousel position', 'visual-portfolio' )
-			);
-		}
-
-		if ( 'dots' !== $indicator ) {
-			return '';
-		}
-
-		/* translators: %d: slide number. */
-		$label = __( 'Go to slide %d', 'visual-portfolio' );
-		$dots  = '';
-
-		for ( $index = 0; $index < $count; $index++ ) {
-			$dots .= sprintf(
-				'<button type="button" class="wp-block-visual-portfolio-item-template__carousel-dot" data-vp-slide="%1$d" aria-label="%2$s"><span class="wp-block-visual-portfolio-item-template__carousel-dot-progress"></span></button>',
-				$index,
-				esc_attr( sprintf( $label, $index + 1 ) )
-			);
-		}
-
-		// One listener for the row rather than one per dot: a Load More brings
-		// more slides, and a dot appended after hydration would carry no
-		// directive of its own.
-		return sprintf(
-			'<div class="wp-block-visual-portfolio-item-template__carousel-dots" data-vp-dot-label="%1$s" data-wp-on--click="actions.carouselGoTo">%2$s</div>',
-			esc_attr( $label ),
-			$dots
-		);
-	}
-
-	/**
 	 * The effects a carousel can be drawn with.
 	 *
 	 * Every one of them is a pair of scroll driven animations over two boxes
@@ -749,40 +857,6 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
-	 * Controls of a carousel, and the frame the arrows need.
-	 *
-	 * @param array $attributes - block attributes.
-	 * @param int   $count      - number of items rendered.
-	 *
-	 * @return array `[ before, after ]` markup around the list.
-	 */
-	private function get_carousel_chrome( $attributes, $count ) {
-		$store     = esc_attr( self::VIEW_MODULE_STORE );
-		$arrows    = empty( $attributes['carouselShowArrows'] ) ? '' : $this->get_carousel_arrows();
-		$indicator = $this->get_carousel_indicator( $attributes['carouselIndicator'] ?? 'none', $count );
-
-		// The controls are hidden until the module is running, and the class
-		// that says so is on the box that holds all of them - the countdown of
-		// autoplay is drawn on the dots, which sit outside the frame the arrows
-		// are pinned to, so both have to read it from the same place.
-		$before = sprintf(
-			'<div class="wp-block-visual-portfolio-item-template__carousel" data-wp-interactive="%1$s" data-wp-class--vp-carousel-has-controls="%1$s::state.hasScript"><div class="wp-block-visual-portfolio-item-template__carousel-frame">',
-			$store
-		);
-
-		$after = sprintf( '%s</div>', $arrows );
-
-		if ( '' !== $indicator ) {
-			$after .= sprintf(
-				'<div class="wp-block-visual-portfolio-item-template__carousel-nav">%s</div>',
-				$indicator
-			);
-		}
-
-		return array( $before, $after . '</div>' );
-	}
-
-	/**
 	 * Block output
 	 *
 	 * @param array    $attributes - block attributes.
@@ -841,18 +915,31 @@ class Visual_Portfolio_Block_Item_Template {
 
 		// The widest the layout ever gets, which is the row a desktop sees first.
 		$first_row = $this->get_layout_columns( $attributes, $layout_type );
+		$repeats   = 'carousel' === $layout_type && ! empty( $attributes['carouselRepeat'] );
+		$last      = count( $items ) - 1;
+		$warm      = $repeats ? $this->get_seam_size( $attributes, $first_row, count( $items ) ) : 0;
 
 		$with_popup = self::opens_a_popup( $block->parsed_block['innerBlocks'] ?? array() );
+
+		// The controls are rendered once, after the list, with the context of
+		// the gallery rather than of an item.
+		list( $template, $controls ) = self::split_controls( $block->parsed_block );
+
+		$controls_content = '';
+
+		foreach ( $controls as $control ) {
+			$controls_content .= ( new WP_Block( $control, $block->context ) )->render();
+		}
 
 		foreach ( $items as $item ) {
 			$item_context = array_merge(
 				self::map_item_to_context( $item, $result['options'], 'vp/', $with_popup ),
-				array( 'vp/itemImageLoading' => $this->get_image_loading_attributes( $index, $first_row ) )
+				array( 'vp/itemImageLoading' => $this->get_image_loading_attributes( $index, $first_row, $warm && $index > $last - $warm ) )
 			);
 
 			++$index;
 
-			$block_instance = $block->parsed_block;
+			$block_instance = $template;
 
 			// A name no block is registered under, so that the per item copies of
 			// the inner blocks do not render the block supports of this one.
@@ -891,7 +978,11 @@ class Visual_Portfolio_Block_Item_Template {
 		$classes = array_merge( array( 'vp-layout-' . $layout_type ), $layout_classes );
 		$extra   = array();
 		$before  = '';
-		$after   = '';
+
+		// A control beside a list that is not a carousel is rendered switched
+		// off and stays that way - see the nav block - so it is printed all
+		// the same, and comes back when the layout does.
+		$after = $controls_content;
 
 		// Masonry is the family store's: it is the one layout the store also
 		// has to lay out again after a Load More, and splitting init from
@@ -953,6 +1044,12 @@ class Visual_Portfolio_Block_Item_Template {
 					$classes[] = 'vp-carousel-edge-fade';
 				}
 
+				// A centred carousel is padded so that its first and its last
+				// slide can reach the middle - see the stylesheet.
+				if ( 'center' === $this->get_carousel_snap_align( $attributes ) ) {
+					$classes[] = 'vp-carousel-snap-center';
+				}
+
 				if ( $effect ) {
 					$classes[] = 'vp-carousel-effect';
 					$classes[] = 'vp-carousel-' . $effect;
@@ -965,6 +1062,35 @@ class Visual_Portfolio_Block_Item_Template {
 					// over the wrapper attributes and would drop the layout
 					// variables with it.
 					$layout_styles .= sprintf( '--vp-carousel-peek:%dpx;', $peek );
+				}
+
+				// The height of the frame a slide is drawn in, which is not
+				// the shape of the picture inside it - that is the image
+				// block's own aspect ratio. Empty leaves the slide as tall as
+				// its contents, which is what a carousel of cards wants.
+				$slide_height = $this->get_css_length( $attributes['carouselSlideHeight'] ?? '', '' );
+
+				if ( '' !== $slide_height ) {
+					$layout_styles .= sprintf( '--vp-carousel-slide-height:%s;', $slide_height );
+				}
+
+				// Every slide is already as tall as the tallest - the list is a
+				// flex row and stretches them. What this asks for is the blocks
+				// inside a slide filling the height they were given, rather
+				// than sitting at the top of it.
+				if ( ! empty( $attributes['carouselStretchSlides'] ) ) {
+					$classes[] = 'vp-carousel-stretch-slides';
+				}
+
+				// How many slides an arrow moves at a press. One is what a
+				// carousel has always done, so it is written only when it is
+				// something else - the markup of every gallery already out
+				// there stays exactly as it was. Zero asks for a whole screen,
+				// which the module measures.
+				$group = max( 0, min( 6, (int) ( $attributes['carouselSlidesPerGroup'] ?? 1 ) ) );
+
+				if ( 1 !== $group ) {
+					$extra['data-vp-carousel-group'] = $group;
 				}
 
 				if ( ! empty( $attributes['carouselRepeat'] ) ) {
@@ -990,7 +1116,27 @@ class Visual_Portfolio_Block_Item_Template {
 
 				$extra['data-wp-class--vp-has-script'] = self::VIEW_MODULE_STORE . '::state.hasScript';
 
-				list( $before, $after ) = $this->get_carousel_chrome( $attributes, count( $items ) );
+				// The frame the list scrolls inside. It clips: dragging past the
+				// last slide pulls the whole scroll container along as a rubber
+				// band, and a scroll container carries its own clipping with it -
+				// so without a box that stays put, the slides walked out of the
+				// gallery instead of stretching inside it. It is also the width a
+				// slide is measured against.
+				//
+				// The controls go inside it, after the list: over the slides,
+				// pinned to the box that stays put.
+				//
+				// The room a container keeps is carried here rather than on the
+				// list: the list inherits it, and so do the controls pinned to
+				// the frame, which line up with the slides instead of with the
+				// edge of the page.
+				$inset = $this->get_carousel_inset( $attributes );
+
+				$before = sprintf(
+					'<div class="wp-block-visual-portfolio-item-template__carousel-frame"%s>',
+					'' === $inset ? '' : sprintf( ' style="%s"', esc_attr( '--vp-carousel-inset:' . $inset . ';' ) )
+				);
+				$after  = $controls_content . '</div>';
 				break;
 		}
 

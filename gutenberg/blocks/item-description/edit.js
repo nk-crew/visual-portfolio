@@ -18,6 +18,7 @@ import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
+import { useIsPreview } from '../../utils/use-is-preview';
 
 // Keep in sync with `Visual_Portfolio_Block_Item_Description::DEFAULT_EXCERPT_LENGTH`.
 const DEFAULT_EXCERPT_LENGTH = 15;
@@ -75,9 +76,20 @@ export default function ItemDescriptionEdit({
 		preview = trimWords(stripTags(raw || ''), excerptLength);
 	}
 
+	// The placeholder stands in on the item being edited and nowhere else:
+	// the read-only copies of the item show what the page will show, and an
+	// item without a description shows nothing.
+	const isPreview = useIsPreview();
+
 	preview = preview
 		? decodeEntities(preview)
-		: __('Gallery item description', 'visual-portfolio');
+		: isPreview
+			? ''
+			: __('Gallery item description', 'visual-portfolio');
+
+	if (!preview) {
+		return null;
+	}
 
 	// The render callback prints the whole content in a `div`, the way core's
 	// Post Content block does, and only an excerpt in a `p`.

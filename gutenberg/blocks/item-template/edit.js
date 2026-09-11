@@ -6,14 +6,21 @@ import {
 	BlockContextProvider,
 	BlockControls,
 	store as blockEditorStore,
-	__experimentalGetGapCSSValue as getGapCSSValue,
 	InspectorControls,
 	__experimentalUseBlockPreview as useBlockPreview,
 	useBlockProps,
 	useInnerBlocksProps,
+	useSettings,
 } from '@wordpress/block-editor';
 import {
+	BaseControl,
+	Flex,
+	FlexItem,
+	MenuGroup,
+	MenuItem,
 	Notice,
+	__experimentalNumberControl as NumberControl,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	RangeControl,
 	SelectControl,
 	Spinner,
@@ -29,17 +36,20 @@ import {
 import { useSelect } from '@wordpress/data';
 import { memo, useEffect, useMemo, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
-	gallery,
-	grid,
-	image,
-	postFeaturedImage,
+	alignNone,
+	justifyCenter,
+	justifyLeft,
+	settings,
+	stretchFullWidth,
 	stretchWide,
 } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import getBlockGapValue from '../../utils/block-gap';
+import { CONTROL_BLOCKS } from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import {
 	getResetAllValues,
@@ -57,34 +67,9 @@ const ITEM_CLASS_NAME = 'wp-block-visual-portfolio-item-template__item';
 const SLIDE_CLASS_NAME = 'wp-block-visual-portfolio-item-template__slide';
 const CARD_CLASS_NAME = 'wp-block-visual-portfolio-item-template__card';
 
-const LAYOUT_OPTIONS = [
-	{ label: __('Grid', 'visual-portfolio'), value: 'grid' },
-	{ label: __('Masonry', 'visual-portfolio'), value: 'masonry' },
-	{ label: __('Tiles', 'visual-portfolio'), value: 'tiles' },
-	{ label: __('Justified', 'visual-portfolio'), value: 'justified' },
-	{ label: __('Carousel', 'visual-portfolio'), value: 'carousel' },
-];
-
-// One line each, in the editor's own voice: what the layout does to the items.
-const LAYOUT_DESCRIPTIONS = {
-	grid: __('Equal cells in a fixed grid.', 'visual-portfolio'),
-	masonry: __(
-		'Columns of equal width, items keep their own height.',
-		'visual-portfolio'
-	),
-	tiles: __(
-		'A repeating pattern of differently sized cells.',
-		'visual-portfolio'
-	),
-	justified: __(
-		'Rows of equal height, items keep their own aspect ratio.',
-		'visual-portfolio'
-	),
-	carousel: __(
-		'A single row the visitor scrolls through.',
-		'visual-portfolio'
-	),
-};
+// The layout a gallery is, is a block variation - see `variations.js`. The
+// editor draws the switcher for it, above the settings and in the block
+// switcher, the same way it does for the Group block.
 
 // Layouts whose column count is chosen rather than derived.
 const COLUMN_LAYOUTS = ['grid', 'masonry', 'carousel'];
@@ -95,14 +80,6 @@ const COLUMN_LAYOUTS = ['grid', 'masonry', 'carousel'];
 const PREVIEW_ROWS = 3;
 const PREVIEW_MAX_REPEATS = 6;
 
-const LAYOUT_ICONS = {
-	grid,
-	masonry: gallery,
-	tiles: postFeaturedImage,
-	justified: stretchWide,
-	carousel: image,
-};
-
 const LAST_ROW_OPTIONS = [
 	{ label: __('Left', 'visual-portfolio'), value: 'left' },
 	{ label: __('Center', 'visual-portfolio'), value: 'center' },
@@ -110,16 +87,154 @@ const LAST_ROW_OPTIONS = [
 	{ label: __('Hide', 'visual-portfolio'), value: 'hide' },
 ];
 
+// Where a slide comes to rest. Switched in the toolbar beside the layout,
+// with the icons the editor draws horizontal alignment with everywhere else.
 const SNAP_OPTIONS = [
-	{ label: __('Start', 'visual-portfolio'), value: 'start' },
-	{ label: __('Center', 'visual-portfolio'), value: 'center' },
+	{
+		label: __('Start', 'visual-portfolio'),
+		value: 'start',
+		icon: justifyLeft,
+	},
+	{
+		label: __('Center', 'visual-portfolio'),
+		value: 'center',
+		icon: justifyCenter,
+	},
 ];
 
-const INDICATOR_OPTIONS = [
-	{ label: __('None', 'visual-portfolio'), value: 'none' },
-	{ label: __('Dots', 'visual-portfolio'), value: 'dots' },
-	{ label: __('Progress bar', 'visual-portfolio'), value: 'progress' },
+const SNAP_ICONS = {
+	start: justifyLeft,
+	center: justifyCenter,
+};
+
+// The widths a carousel can rest its slides inside, named and drawn the way the
+// editor names and draws the width of a block: the two the theme declares are
+// its content and wide sizes, and no container at all is the full width of the
+// gallery. Lives in the toolbar, where every other width switcher of the editor
+// lives, and the typed width of a custom one is asked for there as well.
+const CONTAINER_OPTIONS = [
+	{
+		value: 'content',
+		label: _x('None', 'Alignment option', 'visual-portfolio'),
+		icon: alignNone,
+	},
+	{
+		value: 'wide',
+		label: __('Wide width', 'visual-portfolio'),
+		icon: stretchWide,
+	},
+	{
+		value: 'none',
+		label: __('Full width', 'visual-portfolio'),
+		icon: stretchFullWidth,
+	},
+	{
+		value: 'custom',
+		label: __('Custom', 'visual-portfolio'),
+		icon: settings,
+	},
 ];
+
+const CONTAINER_ICONS = Object.fromEntries(
+	CONTAINER_OPTIONS.map(({ value, icon }) => [value, icon])
+);
+
+// A length the editor is willing to put a number on, the same shapes core's own
+// alignment menu writes `Max 640px wide` under.
+const SIZE_PATTERN =
+	/^(?!0)\d+(\.\d+)?(px|em|rem|vw|vh|svw|lvw|dvw|svh|lvh|dvh|vmin|vmax|%)?$/i;
+
+/**
+ * What a width says under its name in the menu.
+ *
+ * @param {string} size - CSS length.
+ *
+ * @return {string|undefined} The line, or nothing for a width there is no number for.
+ */
+function getSizeInfo(size) {
+	return SIZE_PATTERN.test(String(size ?? '').trim())
+		? sprintf(
+				// translators: %s: a CSS length, such as 640px.
+				__('Max %s wide', 'visual-portfolio'),
+				size
+			)
+		: undefined;
+}
+
+/**
+ * Why a carousel has no container to hold its slides to.
+ *
+ * A container is the edge a slide starts from, and two carousels have no such
+ * edge. The control stays where it was, switched off and saying why, rather
+ * than disappearing: a setting that vanishes reads as a setting that was never
+ * there. The same shape the image block locks its alternative text in - the
+ * control disabled, and the reason where its help would be.
+ *
+ * @param {Object} attributes - block attributes.
+ *
+ * @return {string|undefined} The reason, or nothing when there is a container.
+ */
+function getCarouselContainerReason(attributes) {
+	if (attributes.carouselRepeat) {
+		return __(
+			'A carousel that repeats has no edge for its slides to start from.',
+			'visual-portfolio'
+		);
+	}
+
+	if ('center' === attributes.carouselSnapAlign) {
+		return __(
+			'Slides that rest in the middle have no edge to start from.',
+			'visual-portfolio'
+		);
+	}
+
+	return undefined;
+}
+
+/**
+ * Whether a carousel has a container to hold its slides to.
+ *
+ * @param {Object} attributes - block attributes.
+ *
+ * @return {boolean} True where the container is worth having.
+ */
+function hasCarouselContainer(attributes) {
+	return !getCarouselContainerReason(attributes);
+}
+
+/**
+ * The room a carousel keeps beside its slides.
+ *
+ * A mirror of `Visual_Portfolio_Block_Item_Template::get_carousel_inset()`,
+ * which stays the source of truth for what a page renders.
+ *
+ * @param {Object} attributes - block attributes.
+ *
+ * @return {string|undefined} CSS length, or nothing when there is no container.
+ */
+function getCarouselInset(attributes) {
+	const { carouselContainer, carouselContainerWidth } = attributes;
+
+	let size;
+
+	if (!hasCarouselContainer(attributes)) {
+		return undefined;
+	}
+
+	if ('content' === carouselContainer) {
+		size = 'var(--wp--style--global--content-size, 100cqw)';
+	} else if ('wide' === carouselContainer) {
+		size = 'var(--wp--style--global--wide-size, 100cqw)';
+	} else if ('custom' === carouselContainer) {
+		size = String(carouselContainerWidth ?? '').replace(
+			/[^0-9a-z.%-]/gi,
+			''
+		);
+	}
+
+	return size ? `max(0px, (100cqw - ${size}) / 2)` : undefined;
+}
 
 // `columns: false` says the effect spreads one slide over the width of the
 // gallery and owns that width, so the columns control is not offered beside it.
@@ -169,6 +284,155 @@ const CSS_UNITS = [
 	{ value: 'rem', label: 'rem', default: 20 },
 	{ value: 'em', label: 'em', default: 20 },
 	{ value: 'vw', label: 'vw', default: 20 },
+];
+
+// How far the slider beside a typed column width reaches, per unit. The core
+// grid layout draws the same pair, and stops its slider at the same numbers.
+const WIDTH_SLIDER_MAX = { px: 1000, em: 50, rem: 50, vw: 100 };
+
+// Where a column count stops. Six columns of a gallery is already a thumbnail
+// strip, and the legacy control never offered more.
+const MAX_COLUMN_COUNT = 6;
+
+/**
+ * The narrowest a column may get, typed and dragged.
+ *
+ * A number the eye picks better than it types and the keyboard types better
+ * than it drags, so the core grid layout offers both at once. The same pair,
+ * under the same name.
+ *
+ * @param {Object}   props          - component props.
+ * @param {string}   props.value    - CSS length.
+ * @param {Function} props.onChange - value setter.
+ *
+ * @return {Element} component.
+ */
+function MinimumColumnWidthControl({ value, onChange }) {
+	const label = __('Min. column width', 'visual-portfolio');
+	const [quantity, unit = 'rem'] = parseQuantityAndUnitFromRawValue(value);
+
+	return (
+		<fieldset className="vpf-columns-control">
+			<BaseControl.VisualLabel as="legend">
+				{label}
+			</BaseControl.VisualLabel>
+			<Flex gap={4}>
+				<FlexItem isBlock>
+					<UnitControl
+						label={label}
+						hideLabelFromVision
+						value={value}
+						onChange={(next) => onChange(next || '16rem')}
+						units={CSS_UNITS}
+						min={0}
+					/>
+				</FlexItem>
+				<FlexItem isBlock>
+					<RangeControl
+						label={label}
+						hideLabelFromVision
+						withInputField={false}
+						value={quantity || 0}
+						onChange={(next) => onChange([next, unit].join(''))}
+						min={0}
+						max={WIDTH_SLIDER_MAX[unit] || 600}
+					/>
+				</FlexItem>
+			</Flex>
+			<p className="components-base-control__help">
+				{__(
+					'Columns wrap to fewer per row when they can no longer keep the minimum width.',
+					'visual-portfolio'
+				)}
+			</p>
+		</fieldset>
+	);
+}
+
+/**
+ * How many columns a row may reach.
+ *
+ * @param {Object}   props          - component props.
+ * @param {number}   props.value    - column count.
+ * @param {Function} props.onChange - value setter.
+ *
+ * @return {Element} component.
+ */
+function MaximumColumnsControl({ value, onChange }) {
+	const label = __('Max. columns', 'visual-portfolio');
+
+	return (
+		<fieldset className="vpf-columns-control">
+			<BaseControl.VisualLabel as="legend">
+				{label}
+			</BaseControl.VisualLabel>
+			<Flex gap={4}>
+				<FlexItem isBlock>
+					<NumberControl
+						label={label}
+						hideLabelFromVision
+						value={value}
+						onChange={(next) =>
+							onChange(
+								Math.min(
+									MAX_COLUMN_COUNT,
+									Math.max(0, parseInt(next, 10) || 0)
+								)
+							)
+						}
+						min={0}
+						max={MAX_COLUMN_COUNT}
+					/>
+				</FlexItem>
+				<FlexItem isBlock>
+					<RangeControl
+						label={label}
+						hideLabelFromVision
+						withInputField={false}
+						value={value}
+						onChange={(next) => onChange(next ?? 0)}
+						min={0}
+						max={MAX_COLUMN_COUNT}
+					/>
+				</FlexItem>
+			</Flex>
+			<p className="components-base-control__help">
+				{__(
+					'Zero lets the gallery use every column that fits.',
+					'visual-portfolio'
+				)}
+			</p>
+		</fieldset>
+	);
+}
+
+// The count is set for one screen at a time, and the screen is the one the
+// editor is already previewing - the switcher in its own toolbar, rather than a
+// second set of tabs in the sidebar saying the same thing. Keyed by the names
+// the editor calls its devices.
+const SCREEN_ATTRIBUTES = {
+	Tablet: 'layoutColumnCountTablet',
+	Mobile: 'layoutColumnCountMobile',
+};
+
+const SCREEN_LABELS = {
+	Tablet: __(
+		'The count for a tablet, 992px and narrower. Zero steps the desktop count down on its own, the way it always has.',
+		'visual-portfolio'
+	),
+	Mobile: __(
+		'The count for a phone, 576px and narrower. Zero steps the desktop count down on its own, the way it always has.',
+		'visual-portfolio'
+	),
+};
+
+// A slide height is typed in the same units, and in `vh` besides: a share of
+// the screen is what the legacy slider offered as a percentage height.
+const SLIDE_HEIGHT_UNITS = [
+	{ value: 'px', label: 'px', default: 320 },
+	{ value: 'rem', label: 'rem', default: 20 },
+	{ value: 'em', label: 'em', default: 20 },
+	{ value: 'vh', label: 'vh', default: 60 },
 ];
 
 const TEMPLATE = [
@@ -234,73 +498,31 @@ function ItemTemplateInnerBlocks({ style, effect, index }) {
 }
 
 /**
- * The controls of a carousel, drawn for the preview.
+ * The frame a carousel is drawn inside.
  *
- * The same markup the render callback prints, minus everything that would need
- * a scroll position to answer: the arrows are switched off and the indicator
- * says the carousel is at its first slide, which is where a preview always is.
- * What they are here for is the shape of the gallery - a carousel with dots
- * under it is taller than one without, and the editor used to keep that hidden
- * until the post was published.
+ * The list itself scrolls, so it is the one box of a carousel that stays
+ * put, and the same box the render callback prints. A control dropped into
+ * the template is laid over the slides against this box: on the page it is
+ * printed inside the frame, and in the editor it is drawn inside the item
+ * being edited - the one place the block editor can put it - with nothing
+ * positioned between the two.
  *
- * @param {Object}  props           - component props.
- * @param {boolean} props.arrows    - whether the gallery renders arrows.
- * @param {string}  props.indicator - the indicator the gallery renders.
- * @param {number}  props.count     - number of slides.
- * @param {Element} props.children  - the list itself.
+ * The room a container keeps is carried here rather than on the list, the
+ * same way the render callback prints it: the list inherits it, and so do the
+ * controls pinned to the frame.
+ *
+ * @param {Object}  props          - component props.
+ * @param {Element} props.children - the list itself.
+ * @param {string}  props.inset    - room kept beside the slides.
  * @return {Element} component.
  */
-function CarouselChrome({ arrows, indicator, count, children }) {
-	const name = 'wp-block-visual-portfolio-item-template__carousel';
-
+function CarouselFrame({ children, inset }) {
 	return (
-		<div className={`${name} vp-carousel-has-controls`}>
-			<div className={`${name}-frame`}>
-				{children}
-				{arrows
-					? ['prev', 'next'].map((direction) => (
-							<button
-								key={direction}
-								type="button"
-								className={`${name}-arrow ${name}-arrow--${direction}`}
-								// Drawn, not offered: a preview has no scroll
-								// position for them to move.
-								disabled={'prev' === direction}
-								tabIndex={-1}
-								aria-hidden="true"
-							>
-								<span />
-							</button>
-						))
-					: null}
-			</div>
-			{'none' !== indicator ? (
-				<div className={`${name}-nav`}>
-					{'dots' === indicator ? (
-						<div className={`${name}-dots`}>
-							{Array.from({ length: count }, (dot, index) => (
-								<button
-									// Dots differ in nothing but their place.
-									key={index}
-									type="button"
-									className={`${name}-dot`}
-									aria-current={
-										0 === index ? 'true' : 'false'
-									}
-									tabIndex={-1}
-									aria-hidden="true"
-								>
-									<span className={`${name}-dot-progress`} />
-								</button>
-							))}
-						</div>
-					) : (
-						<div className={`${name}-progress`}>
-							<span className={`${name}-progress-value`} />
-						</div>
-					)}
-				</div>
-			) : null}
+		<div
+			className="wp-block-visual-portfolio-item-template__carousel-frame"
+			style={{ '--vp-carousel-inset': inset }}
+		>
+			{children}
 		</div>
 	);
 }
@@ -460,9 +682,26 @@ export default function BlockEdit({
 		carouselAutoplayDelay,
 		carouselPeek,
 		carouselEdgeFade,
-		carouselShowArrows,
-		carouselIndicator,
+		carouselContainer,
+		carouselContainerWidth,
+		carouselSlideHeight,
+		carouselStretchSlides,
+		carouselSlidesPerGroup,
 	} = attributes;
+	// Which screen the columns control is answering for. A view of the editor
+	// rather than anything saved with the post.
+	// Which screen the count is being set for: whichever one the editor is
+	// previewing. Switching the preview switches the control, so there is one
+	// answer to "what does this gallery look like on a phone" and not two.
+	const deviceType = useSelect(
+		(select) =>
+			select('core/editor')?.getDeviceType?.() ??
+			select('core/edit-post')?.__experimentalGetPreviewDeviceType?.() ??
+			select('core/edit-site')?.__experimentalGetPreviewDeviceType?.() ??
+			'Desktop',
+		[]
+	);
+	const screenAttribute = SCREEN_ATTRIBUTES[deviceType];
 	const {
 		'vp/queryType': queryType,
 		'vp/baseQuery': baseQuery,
@@ -551,8 +790,13 @@ export default function BlockEdit({
 		};
 	}, [query]);
 
+	// The read-only copies show the item and nothing else: a carousel control
+	// dropped in the template is drawn once, by the item being edited.
 	const blocks = useSelect(
-		(select) => select(blockEditorStore).getBlocks(clientId),
+		(select) =>
+			select(blockEditorStore)
+				.getBlocks(clientId)
+				.filter((block) => !CONTROL_BLOCKS.includes(block.name)),
 		[clientId]
 	);
 
@@ -606,7 +850,7 @@ export default function BlockEdit({
 					layoutMinimumColumnWidth,
 					layoutAutoFit,
 				},
-				getGapCSSValue(attributes.style?.spacing?.blockGap) || ''
+				getBlockGapValue(attributes.style?.spacing?.blockGap)
 			),
 		[
 			layoutType,
@@ -653,6 +897,14 @@ export default function BlockEdit({
 				classes.push('vp-carousel-edge-fade');
 			}
 
+			if ('center' === carouselSnapAlign) {
+				classes.push('vp-carousel-snap-center');
+			}
+
+			if (carouselStretchSlides) {
+				classes.push('vp-carousel-stretch-slides');
+			}
+
 			if ('none' !== carouselEffect) {
 				classes.push('vp-carousel-effect');
 				classes.push(`vp-carousel-${carouselEffect}`);
@@ -666,6 +918,8 @@ export default function BlockEdit({
 		carouselAutoWidth,
 		carouselFreeScroll,
 		carouselEdgeFade,
+		carouselSnapAlign,
+		carouselStretchSlides,
 		carouselEffect,
 	]);
 
@@ -700,6 +954,8 @@ export default function BlockEdit({
 						'--vp-layout-row-height': `${justifiedRowHeight}px`,
 						'--vp-carousel-snap-align': carouselSnapAlign,
 						'--vp-carousel-peek': `${Math.max(0, Math.min(200, carouselPeek))}px`,
+						'--vp-carousel-slide-height':
+							carouselSlideHeight || undefined,
 						// A preview rests where the carousel starts, and the
 						// end that has been reached carries no fade.
 						'--vp-carousel-fade-left': carouselEdgeFade
@@ -711,92 +967,9 @@ export default function BlockEdit({
 
 	const isAuto = 'auto' === layoutColumnsMode;
 
-	// The two shapes the core grid layout offers, in its own words: a count, or
-	// a minimum width the container fits as many of as it can.
+	// Layouts whose column count is chosen rather than derived, and an effect
+	// that spreads one slide over the gallery is not one of them.
 	const hasColumns = COLUMN_LAYOUTS.includes(layoutType) && !singleSlide;
-	const columnsControls = hasColumns ? (
-		<>
-			<ToggleGroupControl
-				isBlock
-				label={__('Columns', 'visual-portfolio')}
-				help={__(
-					'Auto fits as many columns as the width allows. Manual keeps the count you set.',
-					'visual-portfolio'
-				)}
-				value={layoutColumnsMode}
-				onChange={(value) =>
-					setAttributes({ layoutColumnsMode: value })
-				}
-			>
-				<ToggleGroupControlOption
-					value="auto"
-					label={__('Auto', 'visual-portfolio')}
-				/>
-				<ToggleGroupControlOption
-					value="manual"
-					label={__('Manual', 'visual-portfolio')}
-				/>
-			</ToggleGroupControl>
-
-			{isAuto ? (
-				<>
-					<UnitControl
-						label={__('Minimum column width', 'visual-portfolio')}
-						help={__(
-							'The narrowest a column may get before the row drops one.',
-							'visual-portfolio'
-						)}
-						value={layoutMinimumColumnWidth}
-						onChange={(value) =>
-							setAttributes({
-								layoutMinimumColumnWidth: value || '16rem',
-							})
-						}
-						units={CSS_UNITS}
-						min={0}
-					/>
-					<RangeControl
-						label={__('Maximum columns', 'visual-portfolio')}
-						help={__(
-							'Zero lets the gallery use every column that fits.',
-							'visual-portfolio'
-						)}
-						value={layoutColumnCount}
-						onChange={(value) =>
-							setAttributes({ layoutColumnCount: value })
-						}
-						min={0}
-						max={6}
-					/>
-					<ToggleControl
-						label={__('Fill available space', 'visual-portfolio')}
-						help={__(
-							'A row that cannot be filled drops its empty columns instead of keeping them.',
-							'visual-portfolio'
-						)}
-						checked={layoutAutoFit}
-						onChange={(value) =>
-							setAttributes({ layoutAutoFit: value })
-						}
-					/>
-				</>
-			) : (
-				<RangeControl
-					label={
-						'carousel' === layoutType
-							? __('Slides per view', 'visual-portfolio')
-							: __('Columns', 'visual-portfolio')
-					}
-					value={layoutColumnCount}
-					onChange={(value) =>
-						setAttributes({ layoutColumnCount: value })
-					}
-					min={1}
-					max={6}
-				/>
-			)}
-		</>
-	) : null;
 
 	const layoutControls = (
 		<ToolsPanel
@@ -805,38 +978,28 @@ export default function BlockEdit({
 			resetAll={(filters) =>
 				setAttributes(
 					getResetAllValues(filters, {
-						layoutType: 'grid',
 						layoutTiles: '3|1,1|',
 						layoutColumnsMode: 'auto',
 						layoutColumnCount: 3,
+						layoutColumnCountTablet: 0,
+						layoutColumnCountMobile: 0,
 						layoutMinimumColumnWidth: '16rem',
 						layoutAutoFit: false,
 					})
 				)
 			}
 		>
-			<ToolsPanelItem
-				isShownByDefault
-				hasValue={() =>
-					'grid' !== layoutType || '3|1,1|' !== layoutTiles
-				}
-				label={__('Type', 'visual-portfolio')}
-				onDeselect={() =>
-					setAttributes({ layoutType: 'grid', layoutTiles: '3|1,1|' })
-				}
-			>
-				<VStack spacing={4}>
-					<SelectControl
-						label={__('Type', 'visual-portfolio')}
-						help={LAYOUT_DESCRIPTIONS[layoutType]}
-						value={layoutType}
-						options={LAYOUT_OPTIONS}
-						onChange={(value) =>
-							setAttributes({ layoutType: value })
-						}
-					/>
-
-					{'tiles' === layoutType && (
+			{'tiles' === layoutType && (
+				<ToolsPanelItem
+					isShownByDefault
+					hasValue={() => '3|1,1|' !== layoutTiles}
+					label={__('Pattern', 'visual-portfolio')}
+					onDeselect={() => setAttributes({ layoutTiles: '3|1,1|' })}
+				>
+					<VStack spacing={2}>
+						<BaseControl.VisualLabel as="legend">
+							{__('Pattern', 'visual-portfolio')}
+						</BaseControl.VisualLabel>
 						<div className="vp-tiles-presets">
 							{tilesPresets.map((preset) => (
 								<TilesPreset
@@ -849,30 +1012,138 @@ export default function BlockEdit({
 								/>
 							))}
 						</div>
-					)}
-				</VStack>
-			</ToolsPanelItem>
+					</VStack>
+				</ToolsPanelItem>
+			)}
 
-			{columnsControls && (
+			{hasColumns && (
 				<ToolsPanelItem
 					isShownByDefault
 					hasValue={() =>
 						'auto' !== layoutColumnsMode ||
-						3 !== layoutColumnCount ||
-						'16rem' !== layoutMinimumColumnWidth ||
-						layoutAutoFit
+						!!attributes.layoutColumnCountTablet ||
+						!!attributes.layoutColumnCountMobile
 					}
 					label={__('Columns', 'visual-portfolio')}
 					onDeselect={() =>
 						setAttributes({
 							layoutColumnsMode: 'auto',
-							layoutColumnCount: 3,
-							layoutMinimumColumnWidth: '16rem',
-							layoutAutoFit: false,
+							layoutColumnCountTablet: 0,
+							layoutColumnCountMobile: 0,
 						})
 					}
 				>
-					<VStack spacing={4}>{columnsControls}</VStack>
+					{/* The two shapes the core grid layout offers, in its own
+					    words: a count, or a minimum width the container fits as
+					    many of as it can. */}
+					<VStack spacing={4}>
+						<ToggleGroupControl
+							isBlock
+							label={__('Columns', 'visual-portfolio')}
+							help={__(
+								'Auto fits as many columns as the width allows. Manual keeps the count you set.',
+								'visual-portfolio'
+							)}
+							value={layoutColumnsMode}
+							onChange={(value) =>
+								setAttributes({ layoutColumnsMode: value })
+							}
+						>
+							<ToggleGroupControlOption
+								value="auto"
+								label={__('Auto', 'visual-portfolio')}
+							/>
+							<ToggleGroupControlOption
+								value="manual"
+								label={__('Manual', 'visual-portfolio')}
+							/>
+						</ToggleGroupControl>
+
+						{isAuto ? null : (
+							<RangeControl
+								label={
+									'carousel' === layoutType
+										? __(
+												'Slides per view',
+												'visual-portfolio'
+											)
+										: __('Columns', 'visual-portfolio')
+								}
+								help={SCREEN_LABELS[deviceType]}
+								value={
+									screenAttribute
+										? attributes[screenAttribute] || 0
+										: layoutColumnCount
+								}
+								onChange={(value) =>
+									setAttributes(
+										screenAttribute
+											? { [screenAttribute]: value ?? 0 }
+											: {
+													layoutColumnCount:
+														value ?? 1,
+												}
+									)
+								}
+								min={screenAttribute ? 0 : 1}
+								max={MAX_COLUMN_COUNT}
+							/>
+						)}
+					</VStack>
+				</ToolsPanelItem>
+			)}
+
+			{hasColumns && isAuto && (
+				<ToolsPanelItem
+					isShownByDefault
+					hasValue={() => 3 !== layoutColumnCount}
+					label={__('Max. columns', 'visual-portfolio')}
+					onDeselect={() => setAttributes({ layoutColumnCount: 3 })}
+				>
+					<MaximumColumnsControl
+						value={layoutColumnCount}
+						onChange={(value) =>
+							setAttributes({ layoutColumnCount: value })
+						}
+					/>
+				</ToolsPanelItem>
+			)}
+
+			{hasColumns && isAuto && (
+				<ToolsPanelItem
+					isShownByDefault
+					hasValue={() => '16rem' !== layoutMinimumColumnWidth}
+					label={__('Min. column width', 'visual-portfolio')}
+					onDeselect={() =>
+						setAttributes({ layoutMinimumColumnWidth: '16rem' })
+					}
+				>
+					<MinimumColumnWidthControl
+						value={layoutMinimumColumnWidth}
+						onChange={(value) =>
+							setAttributes({ layoutMinimumColumnWidth: value })
+						}
+					/>
+				</ToolsPanelItem>
+			)}
+
+			{hasColumns && isAuto && (
+				<ToolsPanelItem
+					hasValue={() => layoutAutoFit}
+					label={__('Fill available space', 'visual-portfolio')}
+					onDeselect={() => setAttributes({ layoutAutoFit: false })}
+				>
+					<ToggleControl
+						label={__('Fill available space', 'visual-portfolio')}
+						help={__(
+							'A row that cannot be filled drops its empty columns instead of keeping them.',
+							'visual-portfolio'
+						)}
+						checked={layoutAutoFit}
+						onChange={(value) =>
+							setAttributes({ layoutAutoFit: value })
+						}
+					/>
 				</ToolsPanelItem>
 			)}
 		</ToolsPanel>
@@ -978,6 +1249,37 @@ export default function BlockEdit({
 		</ToolsPanel>
 	);
 
+	// A carousel with no edge for its slides to start from says why, and the
+	// container control is left in place, greyed.
+	const containerReason = getCarouselContainerReason(attributes);
+
+	// Two of the widths are the theme's own - what `theme.json` declares as its
+	// content and wide sizes, read the way the editor reads every setting, so a
+	// block-level override counts too. The menu says what each one comes to,
+	// the line core's alignment menu carries under every name, and the page
+	// holds the slides to the same numbers through the custom properties the
+	// theme prints them under.
+	const [contentSize, wideSize] = useSettings(
+		'layout.contentSize',
+		'layout.wideSize'
+	);
+
+	const containerInfo = {
+		content: getSizeInfo(contentSize),
+		wide: getSizeInfo(wideSize),
+		custom: getSizeInfo(carouselContainerWidth),
+	};
+
+	// A width the theme never declared is not offered, the way core's
+	// alignment menu drops Wide width on a theme with no wide size: there
+	// would be nothing to hold the slides to. The theme prints the content
+	// size from the wide one when only that is set, so None follows either.
+	const containerOptions = CONTAINER_OPTIONS.filter(
+		({ value }) =>
+			('content' !== value || !!(contentSize || wideSize)) &&
+			('wide' !== value || !!wideSize)
+	);
+
 	const carouselControls = 'carousel' === layoutType && (
 		<ToolsPanel
 			label={__('Carousel', 'visual-portfolio')}
@@ -986,7 +1288,6 @@ export default function BlockEdit({
 				setAttributes(
 					getResetAllValues(filters, {
 						carouselAutoWidth: false,
-						carouselSnapAlign: 'start',
 						carouselFreeScroll: false,
 						carouselEffect: 'none',
 						carouselRepeat: false,
@@ -994,47 +1295,13 @@ export default function BlockEdit({
 						carouselAutoplayDelay: 5,
 						carouselPeek: 0,
 						carouselEdgeFade: false,
-						carouselShowArrows: true,
-						carouselIndicator: 'none',
+						carouselSlideHeight: '',
+						carouselStretchSlides: false,
+						carouselSlidesPerGroup: 1,
 					})
 				)
 			}
 		>
-			<ToolsPanelItem
-				isShownByDefault
-				hasValue={() => !carouselShowArrows}
-				label={__('Arrows', 'visual-portfolio')}
-				onDeselect={() => setAttributes({ carouselShowArrows: true })}
-			>
-				<ToggleControl
-					label={__('Arrows', 'visual-portfolio')}
-					checked={carouselShowArrows}
-					onChange={(value) =>
-						setAttributes({ carouselShowArrows: value })
-					}
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				isShownByDefault
-				hasValue={() => 'none' !== carouselIndicator}
-				label={__('Indicator', 'visual-portfolio')}
-				onDeselect={() => setAttributes({ carouselIndicator: 'none' })}
-			>
-				<SelectControl
-					label={__('Indicator', 'visual-portfolio')}
-					help={__(
-						"What marks the visitor's place in the carousel.",
-						'visual-portfolio'
-					)}
-					value={carouselIndicator}
-					options={INDICATOR_OPTIONS}
-					onChange={(value) =>
-						setAttributes({ carouselIndicator: value })
-					}
-				/>
-			</ToolsPanelItem>
-
 			<ToolsPanelItem
 				hasValue={() => 'none' !== carouselEffect}
 				label={__('Effect', 'visual-portfolio')}
@@ -1142,6 +1409,66 @@ export default function BlockEdit({
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
+				hasValue={() => 1 !== carouselSlidesPerGroup}
+				label={__('Slides per step', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselSlidesPerGroup: 1 })}
+			>
+				<RangeControl
+					label={__('Slides per step', 'visual-portfolio')}
+					help={__(
+						'How many slides an arrow moves at a press. Zero moves a whole screen at a time, however many slides that is.',
+						'visual-portfolio'
+					)}
+					value={carouselSlidesPerGroup}
+					onChange={(value) =>
+						setAttributes({ carouselSlidesPerGroup: value ?? 1 })
+					}
+					min={0}
+					max={6}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => '' !== carouselSlideHeight}
+				label={__('Slide height', 'visual-portfolio')}
+				onDeselect={() => setAttributes({ carouselSlideHeight: '' })}
+			>
+				<UnitControl
+					label={__('Slide height', 'visual-portfolio')}
+					help={__(
+						'The height of the box a slide is drawn in. Left empty, a slide is as tall as the tallest one beside it.',
+						'visual-portfolio'
+					)}
+					value={carouselSlideHeight}
+					onChange={(value) =>
+						setAttributes({ carouselSlideHeight: value || '' })
+					}
+					units={SLIDE_HEIGHT_UNITS}
+					min={0}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={() => carouselStretchSlides}
+				label={__('Blocks fill the slide', 'visual-portfolio')}
+				onDeselect={() =>
+					setAttributes({ carouselStretchSlides: false })
+				}
+			>
+				<ToggleControl
+					label={__('Blocks fill the slide', 'visual-portfolio')}
+					help={__(
+						'The image grows to take whatever the title and the text leave, so every slide ends at the same line. The shape of the picture itself is the image block’s own aspect ratio.',
+						'visual-portfolio'
+					)}
+					checked={carouselStretchSlides}
+					onChange={(value) =>
+						setAttributes({ carouselStretchSlides: value })
+					}
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
 				hasValue={() => carouselEdgeFade}
 				label={__('Fade the edges', 'visual-portfolio')}
 				onDeselect={() => setAttributes({ carouselEdgeFade: false })}
@@ -1178,25 +1505,6 @@ export default function BlockEdit({
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
-				hasValue={() => 'start' !== carouselSnapAlign}
-				label={__('Snap slides to', 'visual-portfolio')}
-				onDeselect={() => setAttributes({ carouselSnapAlign: 'start' })}
-			>
-				<SelectControl
-					label={__('Snap slides to', 'visual-portfolio')}
-					help={__(
-						'Where a slide comes to rest when scrolling stops.',
-						'visual-portfolio'
-					)}
-					value={carouselSnapAlign}
-					options={SNAP_OPTIONS}
-					onChange={(value) =>
-						setAttributes({ carouselSnapAlign: value })
-					}
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
 				hasValue={() => carouselFreeScroll}
 				label={__('Free scrolling', 'visual-portfolio')}
 				onDeselect={() => setAttributes({ carouselFreeScroll: false })}
@@ -1224,34 +1532,113 @@ export default function BlockEdit({
 		</InspectorControls>
 	);
 
-	// The layout a gallery is, switched where the other view switchers of the
-	// editor are rather than only in the sidebar.
+	// Where the slides of a carousel come to rest, and the width they rest
+	// inside, switched where the editor keeps its other view and width
+	// switchers. The layout itself is a block variation and needs nothing here.
 	const blockControls = (
 		<BlockControls group="block">
-			<ToolbarDropdownMenu
-				icon={LAYOUT_ICONS[layoutType]}
-				label={__('Layout', 'visual-portfolio')}
-				controls={LAYOUT_OPTIONS.map((option) => ({
-					title: option.label,
-					icon: LAYOUT_ICONS[option.value],
-					isActive: option.value === layoutType,
-					onClick: () => setAttributes({ layoutType: option.value }),
-				}))}
-			/>
+			{'carousel' === layoutType && (
+				<ToolbarDropdownMenu
+					icon={SNAP_ICONS[carouselSnapAlign]}
+					label={__('Snap slides to', 'visual-portfolio')}
+					controls={SNAP_OPTIONS.map((option) => ({
+						title: option.label,
+						icon: option.icon,
+						isActive: option.value === carouselSnapAlign,
+						onClick: () =>
+							setAttributes({ carouselSnapAlign: option.value }),
+					}))}
+				/>
+			)}
+			{'carousel' === layoutType && (
+				<ToolbarDropdownMenu
+					icon={CONTAINER_ICONS[carouselContainer]}
+					label={__('Container width', 'visual-portfolio')}
+					toggleProps={{
+						description: __(
+							'Hold the slides to a width while the carousel keeps the full one, so a full-width gallery starts where the text above it does.',
+							'visual-portfolio'
+						),
+					}}
+				>
+					{({ onClose }) => (
+						<>
+							{/* A carousel with no edge for its slides to start
+							    from says why, and the menu is left in place,
+							    greyed: a setting that vanishes reads as a
+							    setting that was never there. */}
+							{containerReason ? (
+								<p className="vpf-container-width__help">
+									{containerReason}
+								</p>
+							) : null}
+							<MenuGroup className="block-editor-block-alignment-control__menu-group">
+								{containerOptions.map(
+									({ value, label, icon }) => {
+										const isSelected =
+											value === carouselContainer;
+
+										return (
+											<MenuItem
+												key={value}
+												icon={icon}
+												iconPosition="left"
+												className={
+													isSelected
+														? 'components-dropdown-menu__menu-item is-active'
+														: 'components-dropdown-menu__menu-item'
+												}
+												isSelected={isSelected}
+												disabled={!!containerReason}
+												role="menuitemradio"
+												info={containerInfo[value]}
+												onClick={() => {
+													setAttributes({
+														carouselContainer:
+															value,
+													});
+
+													if ('custom' !== value) {
+														onClose();
+													}
+												}}
+											>
+												{label}
+											</MenuItem>
+										);
+									}
+								)}
+							</MenuGroup>
+							{'custom' === carouselContainer &&
+							!containerReason ? (
+								<div className="vpf-container-width__custom">
+									<UnitControl
+										label={__('Width', 'visual-portfolio')}
+										value={carouselContainerWidth}
+										onChange={(value) =>
+											setAttributes({
+												carouselContainerWidth:
+													value || '1200px',
+											})
+										}
+										units={CSS_UNITS}
+										min={0}
+									/>
+								</div>
+							) : null}
+						</>
+					)}
+				</ToolbarDropdownMenu>
+			)}
 		</BlockControls>
 	);
 
-	// The controls of a carousel go around the list, and only a carousel has
-	// them.
-	const withChrome = (list, count) =>
+	// A carousel is drawn inside a frame, and only a carousel has one.
+	const withChrome = (list) =>
 		'carousel' === layoutType ? (
-			<CarouselChrome
-				arrows={carouselShowArrows}
-				indicator={carouselIndicator}
-				count={count}
-			>
+			<CarouselFrame inset={getCarouselInset(attributes)}>
 				{list}
-			</CarouselChrome>
+			</CarouselFrame>
 		) : (
 			list
 		);
@@ -1297,8 +1684,7 @@ export default function BlockEdit({
 								/>
 							)
 						)}
-					</ul>,
-					skeletonCount
+					</ul>
 				)}
 			</>
 		);
@@ -1366,8 +1752,7 @@ export default function BlockEdit({
 							</BlockContextProvider>
 						);
 					})}
-				</ul>,
-				blockContexts.length
+				</ul>
 			)}
 		</>
 	);

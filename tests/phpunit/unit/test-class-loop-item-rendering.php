@@ -71,7 +71,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	 *
 	 * @return string
 	 */
-	private function render_loop( $item_blocks, $layout = array() ) {
+	private function render_loop( $item_blocks, $layout = array(), $siblings = '' ) {
 		$loop = array(
 			'block_id'    => 'render-test',
 			'queryId'     => 1,
@@ -82,10 +82,11 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 
 		return do_blocks(
 			sprintf(
-				'<!-- wp:visual-portfolio/loop %1$s --><div class="wp-block-visual-portfolio-loop vp-block-loop"><!-- wp:visual-portfolio/item-template %2$s -->%3$s<!-- /wp:visual-portfolio/item-template --></div><!-- /wp:visual-portfolio/loop -->',
+				'<!-- wp:visual-portfolio/loop %1$s --><div class="wp-block-visual-portfolio-loop vp-block-loop"><!-- wp:visual-portfolio/item-template %2$s -->%3$s<!-- /wp:visual-portfolio/item-template -->%4$s</div><!-- /wp:visual-portfolio/loop -->',
 				wp_json_encode( $loop ),
 				wp_json_encode( $layout ),
-				$item_blocks
+				$item_blocks,
+				$siblings
 			)
 		);
 	}
@@ -291,28 +292,469 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The controls of a carousel sit in one box, so that the countdown of
-	 * autoplay - drawn on the dots - can be published where the frame the
-	 * arrows are pinned to and the dots under it both read it.
+	 * A carousel is drawn inside the one box of it that stays put, and the
+	 * controls are blocks beside that box rather than markup inside it.
 	 *
 	 * @return void
 	 */
-	public function test_the_carousel_controls_share_one_box() {
+	public function test_the_carousel_is_drawn_inside_a_frame() {
 		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-nav --><!-- wp:visual-portfolio/loop-carousel-previous /--><!-- wp:visual-portfolio/loop-carousel-indicator /--><!-- wp:visual-portfolio/loop-carousel-next /--><!-- /wp:visual-portfolio/loop-carousel-nav -->'
+		);
+
+		$frame = strpos( $output, 'wp-block-visual-portfolio-item-template__carousel-frame' );
+
+		$this->assertNotFalse( $frame );
+
+		// The controls come after the gallery here, and nothing but their own
+		// place in the post says so - they are siblings of the item template.
+		$this->assertGreaterThan(
+			$frame,
+			strpos( $output, 'vp-block-loop-carousel-nav' )
+		);
+
+		// Every one of them moves the scroll container through the scroll API,
+		// so every one of them is rendered switched off.
+		$this->assertSame( 4, substr_count( $output, 'vp-carousel-control-idle' ) );
+
+		$this->assertStringContainsString( 'data-wp-on--click="actions.carouselPrev"', $output );
+		$this->assertStringContainsString( 'data-wp-on--click="actions.carouselNext"', $output );
+
+		// The dots are the view module's: how many slides there are is the item
+		// template's answer, and a Load More changes it afterwards anyway.
+		$this->assertStringContainsString( 'vp-block-loop-carousel-indicator--dots', $output );
+		$this->assertStringNotContainsString( 'vp-block-loop-carousel-dot"', $output );
+	}
+
+	/**
+	 * A count of its own for a narrower screen is written only when it was
+	 * asked for, so a gallery that never opened the setting is drawn exactly
+	 * as it was.
+	 *
+	 * @return void
+	 */
+	public function test_a_narrow_screen_can_be_given_a_column_count_of_its_own() {
+		$plain = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
 			array(
-				'layoutType'        => 'carousel',
-				'carouselIndicator' => 'dots',
+				'layoutType'        => 'grid',
+				'layoutColumnsMode' => 'manual',
+				'layoutColumnCount' => 4,
 			)
 		);
 
-		$position = strpos( $output, 'wp-block-visual-portfolio-item-template__carousel"' );
+		$this->assertStringNotContainsString( '--vp-layout-columns-tablet', $plain );
+		$this->assertStringNotContainsString( 'vp-has-tablet-columns', $plain );
 
-		$this->assertNotFalse( $position );
-		$this->assertGreaterThan(
-			$position,
-			strpos( $output, 'wp-block-visual-portfolio-item-template__carousel-nav' )
+		$responsive = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'              => 'grid',
+				'layoutColumnsMode'       => 'manual',
+				'layoutColumnCount'       => 4,
+				'layoutColumnCountTablet' => 2,
+				'layoutColumnCountMobile' => 1,
+			)
 		);
-		$this->assertStringContainsString( 'data-wp-class--vp-carousel-has-controls', $output );
+
+		$this->assertStringContainsString( '--vp-layout-columns-tablet:2', $responsive );
+		$this->assertStringContainsString( '--vp-layout-columns-mobile:1', $responsive );
+		$this->assertStringContainsString( 'vp-has-tablet-columns', $responsive );
+		$this->assertStringContainsString( 'vp-has-mobile-columns', $responsive );
+
+		// Auto mode has no use for it: the width of a column is what decides
+		// the count there, and a second answer would fight it.
+		$auto = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'              => 'grid',
+				'layoutColumnsMode'       => 'auto',
+				'layoutColumnCountTablet' => 2,
+			)
+		);
+
+		$this->assertStringNotContainsString( '--vp-layout-columns-tablet', $auto );
+	}
+
+	/**
+	 * The thumbnails are a strip of buttons naming a slide each, in the order
+	 * the slides are in - an item with no picture keeps its place, or every
+	 * press after it would reach the wrong slide.
+	 *
+	 * @return void
+	 */
+	public function test_the_thumbnails_name_every_slide_in_order() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-thumbnails /-->'
+		);
+
+		// Five items, five thumbnails, numbered from zero.
+		$this->assertSame( 5, substr_count( $output, 'vp-block-loop-carousel-thumb"' ) );
+
+		foreach ( range( 0, 4 ) as $index ) {
+			$this->assertStringContainsString( 'data-vp-slide="' . $index . '"', $output );
+		}
+
+		$this->assertStringContainsString( 'data-wp-on--click="actions.carouselGoTo"', $output );
+		$this->assertStringContainsString( '--vp-carousel-thumb-height:72px', $output );
+
+		// Switched off until a carousel is running under it, like every other
+		// control.
+		$this->assertStringContainsString( 'vp-carousel-control-idle', $output );
+	}
+
+	/**
+	 * The progress bar can be dragged, so it is a slider and not a progress
+	 * bar: ARIA gives `progressbar` no way to set a value, and nothing would
+	 * offer a visitor the arrow keys it answers to.
+	 *
+	 * @return void
+	 */
+	public function test_the_progress_bar_is_a_slider() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-indicator {"indicator":"progress"} /-->'
+		);
+
+		$this->assertStringContainsString( 'role="slider"', $output );
+		$this->assertStringNotContainsString( 'role="progressbar"', $output );
+		$this->assertStringContainsString( 'aria-orientation="horizontal"', $output );
+		$this->assertStringContainsString( 'aria-valuemin="0"', $output );
+		$this->assertStringContainsString( 'aria-valuemax="100"', $output );
+		$this->assertStringContainsString( 'data-vp-position-label', $output );
+
+		// Focusable without a script running is safe: every control is
+		// rendered switched off, and a control that is not drawn cannot take
+		// focus.
+		$this->assertStringContainsString( 'tabindex="0"', $output );
+		$this->assertStringContainsString( 'vp-carousel-control-idle', $output );
+	}
+
+	/**
+	 * A bar that may not be dragged is a progress bar again: nothing offers a
+	 * visitor keys it does not answer.
+	 *
+	 * @return void
+	 */
+	public function test_a_progress_bar_that_cannot_be_dragged_is_not_a_slider() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-indicator {"indicator":"progress","isDraggable":false} /-->'
+		);
+
+		$this->assertStringContainsString( 'role="progressbar"', $output );
+		$this->assertStringNotContainsString( 'role="slider"', $output );
+		$this->assertStringNotContainsString( 'is-draggable', $output );
+
+		// The carousel itself is still reachable by keyboard; the bar is not.
+		$this->assertSame( 1, substr_count( $output, 'tabindex' ) );
+	}
+
+	/**
+	 * The play and pause button carries both of its names on the markup, so
+	 * the module needs no translations of its own, and is rendered as though
+	 * the carousel were running.
+	 *
+	 * @return void
+	 */
+	public function test_the_play_and_pause_button_carries_both_of_its_names() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'       => 'carousel',
+				'carouselAutoplay' => true,
+			),
+			'<!-- wp:visual-portfolio/loop-carousel-autoplay /-->'
+		);
+
+		$this->assertStringContainsString( 'data-wp-on--click="actions.carouselAutoplayToggle"', $output );
+		$this->assertStringContainsString( 'data-vp-play-label', $output );
+		$this->assertStringContainsString( 'data-vp-pause-label', $output );
+		$this->assertStringContainsString( 'aria-pressed="false"', $output );
+
+		// Switched off until a carousel is running under it, like every other
+		// control - and a carousel with no autoplay never wakes this one.
+		$this->assertStringContainsString( 'vp-carousel-control-idle', $output );
+	}
+
+	/**
+	 * The settings of the button become classes, the way an arrow's do.
+	 *
+	 * @return void
+	 */
+	public function test_the_play_and_pause_button_settings_become_classes() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'       => 'carousel',
+				'carouselAutoplay' => true,
+			),
+			'<!-- wp:visual-portfolio/loop-carousel-autoplay {"icon":"play-stop","showOnHover":true} /-->'
+		);
+
+		$this->assertStringContainsString( 'has-stop-icon', $output );
+		$this->assertStringContainsString( 'is-shown-on-hover', $output );
+	}
+
+	/**
+	 * The counter is rendered as an empty pair of numbers, and out of the
+	 * reach of a screen reader: the arrows and the dots already say where the
+	 * carousel is.
+	 *
+	 * @return void
+	 */
+	public function test_a_counter_is_rendered_empty_and_hidden_from_a_reader() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-indicator {"indicator":"counter"} /-->'
+		);
+
+		$this->assertStringContainsString( 'vp-block-loop-carousel-indicator--counter', $output );
+		$this->assertStringContainsString( 'aria-hidden="true"', $output );
+		$this->assertStringContainsString( '<span class="vp-block-loop-carousel-counter-current"></span>', $output );
+		$this->assertStringContainsString( '<span class="vp-block-loop-carousel-counter-total"></span>', $output );
+
+		// Switched off until a carousel is running under it, like every other
+		// control.
+		$this->assertStringContainsString( 'vp-carousel-control-idle', $output );
+	}
+
+	/**
+	 * How many slides an arrow moves is written only when it is not the one
+	 * slide a carousel has always moved, so the markup of a gallery already
+	 * published stays exactly as it was.
+	 *
+	 * @return void
+	 */
+	public function test_a_step_of_one_writes_nothing_and_a_bigger_step_writes_itself() {
+		$plain = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' )
+		);
+
+		$this->assertStringNotContainsString( 'data-vp-carousel-group', $plain );
+
+		$grouped = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'             => 'carousel',
+				'carouselSlidesPerGroup' => 4,
+			)
+		);
+
+		$this->assertStringContainsString( 'data-vp-carousel-group="4"', $grouped );
+
+		// Zero asks for a whole screen, which the module measures.
+		$screen = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'             => 'carousel',
+				'carouselSlidesPerGroup' => 0,
+			)
+		);
+
+		$this->assertStringContainsString( 'data-vp-carousel-group="0"', $screen );
+	}
+
+	/**
+	 * A slide takes the height it was given, and the blocks inside it fill
+	 * that height rather than sitting at the top of it.
+	 *
+	 * @return void
+	 */
+	public function test_a_slide_takes_a_height_and_its_blocks_fill_it() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'            => 'carousel',
+				'carouselSlideHeight'   => '420px',
+				'carouselStretchSlides' => true,
+			)
+		);
+
+		$this->assertStringContainsString( '--vp-carousel-slide-height:420px', $output );
+		$this->assertStringContainsString( 'vp-carousel-stretch-slides', $output );
+	}
+
+	/**
+	 * The height is typed, so it is reduced to what a CSS length can be made
+	 * of before it reaches an inline style, and nothing is printed when there
+	 * is nothing usable left.
+	 *
+	 * @return void
+	 */
+	public function test_a_typed_slide_height_is_reduced_to_a_length() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'          => 'carousel',
+				'carouselSlideHeight' => '420px;background:url(javascript:alert(1))',
+			)
+		);
+
+		// What is left is a nonsense identifier rather than a declaration:
+		// with no colon, no brackets and no semicolon there is nothing to end
+		// the height with and nothing to fetch.
+		$this->assertStringContainsString(
+			'--vp-carousel-slide-height:420pxbackgroundurljavascriptalert1',
+			$output
+		);
+		$this->assertStringNotContainsString( 'url(', $output );
+		$this->assertStringNotContainsString( 'javascript:', $output );
+
+		$empty = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'          => 'carousel',
+				'carouselSlideHeight' => '',
+			)
+		);
+
+		$this->assertStringNotContainsString( '--vp-carousel-slide-height', $empty );
+	}
+
+	/**
+	 * A control dropped inside the item template is not an item: it is
+	 * rendered once, after the list and inside the frame, which is what lays
+	 * it over the slides.
+	 *
+	 * @return void
+	 */
+	public function test_controls_inside_the_template_are_rendered_once_inside_the_frame() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /--><!-- wp:visual-portfolio/loop-carousel-nav {"showOnHover":true} --><!-- wp:visual-portfolio/loop-carousel-previous {"icon":"arrow","className":"is-style-filled"} /--><!-- wp:visual-portfolio/loop-carousel-next /--><!-- /wp:visual-portfolio/loop-carousel-nav --><!-- wp:visual-portfolio/loop-carousel-indicator {"className":"is-style-filled"} /-->',
+			array( 'layoutType' => 'carousel' )
+		);
+
+		// Five items, one row and one indicator.
+		$this->assertSame( 1, substr_count( $output, 'vp-block-loop-carousel-nav' ) );
+		$this->assertSame( 1, substr_count( $output, 'vp-block-loop-carousel-indicator--dots' ) );
+		$this->assertSame( 5, substr_count( $output, 'wp-block-visual-portfolio-item-template__item' ) );
+
+		// After the list and before the frame closes.
+		$list_end  = strpos( $output, '</ul>' );
+		$frame_end = strpos( $output, '</div>', $list_end );
+		$nav       = strpos( $output, 'vp-block-loop-carousel-nav' );
+
+		$this->assertGreaterThan( $list_end, $nav );
+		$this->assertLessThan( $frame_end, $nav );
+
+		// The settings become classes.
+		$this->assertStringContainsString( 'vp-block-loop-carousel-nav is-shown-on-hover', $output );
+		$this->assertStringContainsString( 'vp-block-loop-carousel-previous has-arrow-icon', $output );
+		$this->assertStringContainsString( 'is-style-filled', $output );
+		$this->assertSame( 2, substr_count( $output, 'is-style-filled' ) );
+	}
+
+	/**
+	 * A carousel that repeats loads the slides at its seam up front: they are
+	 * shown before the first slide, moved there by a transform, where nothing
+	 * that loads an image on sight looks. The rest load as they always did.
+	 *
+	 * @return void
+	 */
+	public function test_a_repeating_carousel_loads_the_slides_at_its_seam_up_front() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'     => 'carousel',
+				'carouselRepeat' => true,
+			)
+		);
+
+		// Three across, so the seam holds three slides: half a screenful and
+		// one more. With five images that is the last three, plus the two of
+		// the first row that are not among them.
+		$this->assertSame( 5, substr_count( $output, 'loading="eager"' ) );
+		$this->assertSame( 3, substr_count( $output, 'data-skip-lazy' ) );
+
+		// The seam is at the end of the list, so the first slide is never one
+		// of them - it is the one the others are drawn in front of.
+		$first = strpos( $output, 'wp-block-visual-portfolio-item-template__item' );
+		$second = strpos( $output, 'wp-block-visual-portfolio-item-template__item', $first + 1 );
+
+		$this->assertGreaterThan( $second, strpos( $output, 'data-skip-lazy' ) );
+	}
+
+	/**
+	 * The seam is sized by the frame and not by the gallery, so a long
+	 * carousel does not load every image it has.
+	 *
+	 * @return void
+	 */
+	public function test_the_seam_is_sized_by_the_frame_rather_than_the_gallery() {
+		$narrow = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'        => 'carousel',
+				'layoutColumnsMode' => 'manual',
+				'layoutColumnCount' => 1,
+				'carouselRepeat'    => true,
+			)
+		);
+
+		// One slide across: the seam is the last two.
+		$this->assertSame( 2, substr_count( $narrow, 'data-skip-lazy' ) );
+
+		$wide = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'        => 'carousel',
+				'layoutColumnsMode' => 'manual',
+				'layoutColumnCount' => 6,
+				'carouselRepeat'    => true,
+			)
+		);
+
+		// Six across, so four - and never more than there are images.
+		$this->assertSame( 4, substr_count( $wide, 'data-skip-lazy' ) );
+
+		// A carousel that does not repeat has no seam at all.
+		$plain = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' )
+		);
+
+		$this->assertStringNotContainsString( 'data-skip-lazy', $plain );
+	}
+
+	/**
+	 * A control that was switched off renders nothing at all. It cannot be
+	 * deleted, so hiding is the only way one is taken off a page.
+	 *
+	 * @return void
+	 */
+	public function test_a_hidden_carousel_control_renders_nothing() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-previous {"isHidden":true} /--><!-- wp:visual-portfolio/loop-carousel-next /-->'
+		);
+
+		$this->assertStringNotContainsString( 'vp-block-loop-carousel-previous', $output );
+		$this->assertStringContainsString( 'vp-block-loop-carousel-next', $output );
+	}
+
+	/**
+	 * A row whose every control was switched off is not a row at all: the gap
+	 * its layout draws and the margin around it would be left behind.
+	 *
+	 * @return void
+	 */
+	public function test_an_empty_carousel_nav_renders_nothing() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-nav --><!-- wp:visual-portfolio/loop-carousel-previous {"isHidden":true} /--><!-- /wp:visual-portfolio/loop-carousel-nav -->'
+		);
+
+		$this->assertStringNotContainsString( 'vp-block-loop-carousel-nav', $output );
 	}
 }

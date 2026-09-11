@@ -22,6 +22,14 @@
 			"type": "number",
 			"default": 3
 		},
+		"layoutColumnCountTablet": {
+			"type": "number",
+			"default": 0
+		},
+		"layoutColumnCountMobile": {
+			"type": "number",
+			"default": 0
+		},
 		"layoutMinimumColumnWidth": {
 			"type": "string",
 			"default": "16rem"
@@ -89,14 +97,26 @@
 			"type": "boolean",
 			"default": false
 		},
-		"carouselShowArrows": {
-			"type": "boolean",
-			"default": true
-		},
-		"carouselIndicator": {
+		"carouselContainer": {
 			"type": "string",
 			"default": "none",
-			"enum": ["none", "dots", "progress"]
+			"enum": ["none", "content", "wide", "custom"]
+		},
+		"carouselContainerWidth": {
+			"type": "string",
+			"default": "1200px"
+		},
+		"carouselSlideHeight": {
+			"type": "string",
+			"default": ""
+		},
+		"carouselStretchSlides": {
+			"type": "boolean",
+			"default": false
+		},
+		"carouselSlidesPerGroup": {
+			"type": "number",
+			"default": 1
 		}
 	},
 	"supports": {
@@ -127,7 +147,7 @@
 		"spacing": {
 			"padding": true,
 			"margin": ["top", "bottom"],
-			"blockGap": true,
+			"blockGap": ["horizontal"],
 			"__experimentalDefaultControls": {
 				"blockGap": true
 			}

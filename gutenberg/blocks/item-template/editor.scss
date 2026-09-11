@@ -93,8 +93,13 @@
 }
 
 // The read-only copy of the item sits between the tile and the blocks, so the
-// height chain a tile needs runs through it as well.
-.vp-layout-tiles > .wp-block-visual-portfolio-item-template__item > .wp-block-visual-portfolio-item-template__preview {
+// height chain a tile needs runs through it as well - and so does the one a
+// carousel needs when its blocks fill the slide. Without it the copy is as
+// tall as its contents and the picture inside it grows to match, so a slide
+// changed height the moment it was selected and the copy gave way to the
+// blocks themselves.
+.vp-layout-tiles > .wp-block-visual-portfolio-item-template__item > .wp-block-visual-portfolio-item-template__preview,
+.vp-carousel-stretch-slides > .wp-block-visual-portfolio-item-template__item > .wp-block-visual-portfolio-item-template__preview {
 	display: flex;
 	flex: 1 1 auto;
 	flex-direction: column;
@@ -116,4 +121,59 @@
 // height of the cell rather than a square of its own.
 .vp-layout-tiles > .wp-block-visual-portfolio-item-template__skeleton {
 	aspect-ratio: auto;
+}
+
+// Controls over the slides, in the editor.
+//
+// A carousel control dropped into the template is drawn inside the item being
+// edited - the one place the block editor can put it - and positioned against
+// the frame, the way the page pins it. Nothing between the two may be
+// positioned, or the control would be placed against that instead and scroll
+// away with the list. The block editor positions every block, the list
+// included, so the list is put back.
+.block-editor-block-list__layout .wp-block-visual-portfolio-item-template.vp-layout-carousel {
+	position: static;
+}
+
+// An effect turns the card and gives the slide a perspective, and either
+// makes the card the box the control is placed against. The item being
+// edited is drawn flat while it holds a control - at the first slide, which
+// is where the editor rests a carousel, that is how an effect draws it
+// anyway.
+.wp-block-visual-portfolio-item-template__item:has(> .wp-block-visual-portfolio-item-template__slide > .wp-block-visual-portfolio-item-template__card > [class*="vp-block-loop-carousel-"]) {
+	> .wp-block-visual-portfolio-item-template__slide,
+	> .wp-block-visual-portfolio-item-template__slide > .wp-block-visual-portfolio-item-template__card {
+		perspective: none;
+		animation: none;
+	}
+}
+
+// Always shown on the canvas: a control the pointer has to find is a control
+// that cannot be selected.
+.wp-block-visual-portfolio-item-template__carousel-frame .is-shown-on-hover {
+	opacity: 1;
+}
+
+// A pair of controls under one legend, the way the core grid layout asks for a
+// column width and a column count. The fieldset is only there to carry the
+// legend, and core strips the same three properties off its own.
+.vpf-columns-control {
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+
+// The width of a carousel container, asked for in the menu that switches it:
+// a menu is where the setting is, so a number typed for it belongs there too.
+.vpf-container-width__custom {
+	padding: 8px 12px 12px;
+	border-top: 1px solid #e0e0e0;
+}
+
+// Why a carousel has no container to hold its slides to, where the help of the
+// setting would be.
+.vpf-container-width__help {
+	margin: 8px 12px;
+	color: #757575;
+	font-size: 12px;
 }

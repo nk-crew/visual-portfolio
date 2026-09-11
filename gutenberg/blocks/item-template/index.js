@@ -6,6 +6,7 @@ import registerLoopBlock from '../../utils/register-loop-block';
 import metadata from './block.json';
 import BlockEdit from './edit';
 import BlockSave from './save';
+import variations from './variations';
 
 registerLoopBlock(metadata.name, {
 	...metadata,
@@ -15,4 +16,5 @@ registerLoopBlock(metadata.name, {
 	},
 	edit: BlockEdit,
 	save: BlockSave,
+	variations,
 });

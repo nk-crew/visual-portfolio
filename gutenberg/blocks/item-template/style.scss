@@ -180,6 +180,21 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		}
 	}
 
+	// A gallery that was given a count of its own for a narrower screen says
+	// it outright rather than walking the ladder. After the ladder on purpose:
+	// the two are of the same weight, and the later one is meant to win.
+	@media (max-width: 992px) {
+		&.vp-has-tablet-columns {
+			--vp-layout-current-columns: var(--vp-layout-columns-tablet);
+		}
+	}
+
+	@media (max-width: 576px) {
+		&.vp-has-mobile-columns {
+			--vp-layout-current-columns: var(--vp-layout-columns-mobile);
+		}
+	}
+
 	&.vp-layout-grid {
 		display: grid;
 		grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
@@ -327,7 +342,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		// carousel that repeats is padded by half its width at each end - that
 		// is how the library carries the loop - and a slide sized against what
 		// the padding leaves came out at nothing at all.
-		--vp-carousel-slide-width: calc((100cqw - var(--vp-carousel-peek, 0px) - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
+		--vp-carousel-slide-width: calc((100cqw - var(--vp-carousel-inset, 0px) * 2 - var(--vp-carousel-peek, 0px) - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
 
 		// Makes the list the box an item measures its `offsetLeft` from, which
 		// is how the module reads slide positions: a layout number, and so the
@@ -347,13 +362,19 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		}
 
 		// A slide of the next one showing at the edge, as an invitation to
-		// scroll on.
-		scroll-padding-inline: var(--vp-carousel-peek, 0);
-		padding-inline-end: var(--vp-carousel-peek, 0);
+		// scroll on, and beside it the room a container keeps: the list still
+		// scrolls the whole width, the slides only come to rest inside it.
+		padding-inline-start: var(--vp-carousel-inset, 0);
+		padding-inline-end: calc(var(--vp-carousel-inset, 0px) + var(--vp-carousel-peek, 0px));
+		scroll-padding-inline: calc(var(--vp-carousel-inset, 0px) + var(--vp-carousel-peek, 0px));
 
 		> #{$item} {
 			flex: 0 0 auto;
 			width: var(--vp-carousel-slide-width);
+			// The frame a slide is drawn in. Unset it is `auto`, and the row
+			// still stretches every slide to the tallest of them - a flex row
+			// with no `align-items` of its own already does that.
+			height: var(--vp-carousel-slide-height, auto);
 			scroll-snap-align: var(--vp-carousel-snap-align, start);
 		}
 
@@ -361,8 +382,62 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			width: auto;
 		}
 
+		// A carousel whose arrows move a whole frame answers a finger the same
+		// way: the slides between one frame and the next are scrolled past
+		// rather than rested on, so a swipe lands where an arrow would.
+		> #{$item}.vp-carousel-no-snap {
+			scroll-snap-align: none;
+		}
+
+		// The blocks of a slide fill the height the slide was given rather
+		// than sitting at the top of it: the item becomes a column, and the
+		// picture takes what the rest of the blocks leave - the same chain a
+		// justified row needs, for the same reason.
+		&.vp-carousel-stretch-slides {
+			> #{$item} {
+				display: flex;
+				flex-direction: column;
+			}
+
+			#{$item} .wp-block-visual-portfolio-item-image {
+				flex: 1 1 auto;
+				min-height: 0;
+
+				> a {
+					height: 100%;
+				}
+
+				img {
+					height: 100%;
+					object-fit: cover;
+				}
+			}
+		}
+
+		// A centred carousel rests every slide in the middle, the first and
+		// the last included: padded by the room a centred slide leaves on
+		// either side, so that the start of the list is where the first
+		// slide is centred and the end where the last one is. Without it
+		// neither could reach the middle, and every slide that could not
+		// rested where the one before it did - a press on the arrow, and on
+		// the dot of such a slide, went nowhere. Not for slides of their own
+		// width, which the padding cannot be worked out from.
+		&.vp-carousel-snap-center:not(.vp-carousel-auto-width) {
+			padding-inline: calc((100cqw - var(--vp-carousel-slide-width)) / 2);
+			scroll-padding-inline: 0;
+		}
 		&.vp-carousel-free-scroll {
 			scroll-snap-type: none;
+		}
+
+		// Held off while the progress bar is being dragged, so the carousel
+		// follows the finger instead of being pulled back to the nearest slide
+		// on every move. Blossom writes the snap type into a custom property
+		// and reads it back with `!important`, so the module sets that too -
+		// this is the switch for a carousel that never loaded it.
+		&.vp-carousel-is-scrubbing {
+			scroll-snap-type: none;
+			scroll-behavior: auto;
 		}
 
 		// The edges dissolve rather than cut, so a half slide reads as more
@@ -415,6 +490,17 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	// the rules never apply and the carousel is exactly the carousel it was
 	// without them.
 	@supports (animation-timeline: view()) {
+		// The scroll of the list, named for the slides a repeating carousel
+		// has moved round. Their own view timelines are measured from where
+		// they were laid out, not from where the transform put them, so a
+		// moved slide is animated from the scroll instead, over the range of
+		// it the slide is in view for - which the module works out from the
+		// move and writes on the slide.
+		&.vp-layout-carousel.vp-carousel-effect {
+			scroll-timeline-name: --vp-carousel-scroll;
+			scroll-timeline-axis: inline;
+		}
+
 		// Cards one whole slide wide over boxes half that, so every card
 		// overhangs its neighbours by a quarter of itself on each side. The
 		// overlap is what makes a cover flow read as a stack seen edge on,
@@ -462,6 +548,14 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 				animation-range: contain;
 				animation-timeline: --vp-carousel-slide;
 			}
+
+			> #{$item}.vp-carousel-moved-round {
+				#{$slide},
+				#{$card} {
+					animation-range: var(--vp-carousel-copy-contain);
+					animation-timeline: --vp-carousel-scroll;
+				}
+			}
 		}
 
 		// One slide riding over the one it replaces. The picture travels at half
@@ -482,6 +576,11 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 				animation: vp-carousel-slideshow-card linear both;
 				animation-range: cover;
 				animation-timeline: --vp-carousel-slide;
+			}
+
+			> #{$item}.vp-carousel-moved-round #{$card} {
+				animation-range: var(--vp-carousel-copy-cover);
+				animation-timeline: --vp-carousel-scroll;
 			}
 		}
 	}
@@ -560,17 +659,9 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	min-width: 0;
 }
 
-// One box around the list and everything that drives it. The autoplay
-// indicator is drawn on the dots and the dots sit below the frame the arrows
-// are pinned to, so the countdown has to be published where both can read it.
-.wp-block-visual-portfolio-item-template__carousel {
-	--vp-carousel-track: color-mix(in oklab, currentcolor 10%, transparent 90%);
-}
-
-// The frame the arrows are pinned to. The list itself scrolls, so an arrow
-// inside it would scroll away with the slides.
+// The one box of a carousel that stays put while the list inside it scrolls.
 //
-// It clips as well: dragging past the last slide pulls the whole scroll
+// It clips: dragging past the last slide pulls the whole scroll
 // container along as a rubber band, and a scroll container carries its own
 // clipping with it - so without a box that stays put, the slides walked out of
 // the gallery instead of stretching inside it.
@@ -582,171 +673,6 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	// endless mode pads the list by half its width, and a percentage of what
 	// that leaves is nothing.
 	container-type: inline-size;
-}
-
-// Controls of a carousel. Server rendered so that a region swap brings them
-// back with the items, and hidden until the module is running - they move the
-// scroll container through the scroll API, and there is nothing to fall back to
-// when that API has nobody calling it. The editor draws the same controls and
-// shows them the same way, so a carousel looks in the editor the way it will
-// look on the page.
-.wp-block-visual-portfolio-item-template__carousel-arrow {
-	position: absolute;
-	top: 50%;
-	z-index: 2;
-	display: none;
-	align-items: center;
-	justify-content: center;
-	width: 36px;
-	height: 36px;
-	padding: 0;
-	color: #fff;
-	cursor: pointer;
-	background: rgba(0, 0, 0, 0.5);
-	border: 0;
-	border-radius: 50%;
-	transform: translateY(-50%);
-	transition: background-color 0.2s ease, opacity 0.2s ease;
-
-	.vp-carousel-has-controls & {
-		display: flex;
-	}
-
-	&:hover:not([disabled]) {
-		background: rgba(0, 0, 0, 0.7);
-	}
-
-	&[disabled] {
-		cursor: default;
-		opacity: 0.25;
-	}
-
-	// A pointer never draws the ring; the keyboard always does.
-	&:focus {
-		outline: none;
-	}
-
-	&:focus-visible {
-		outline: 2px solid currentcolor;
-		outline-offset: 2px;
-	}
-
-	// The chevron is drawn rather than shipped: two borders on a rotated square
-	// weigh nothing and take the colour of the button around them.
-	> span {
-		width: 7px;
-		height: 7px;
-		border-top: 2px solid currentcolor;
-		border-right: 2px solid currentcolor;
-	}
-
-	&--prev {
-		left: 12px;
-
-		> span {
-			margin-left: 3px;
-			transform: rotate(-135deg);
-		}
-	}
-
-	&--next {
-		right: 12px;
-
-		> span {
-			margin-right: 3px;
-			transform: rotate(45deg);
-		}
-	}
-}
-
-.wp-block-visual-portfolio-item-template__carousel-nav {
-	display: none;
-	align-items: center;
-	justify-content: center;
-	margin-top: var(--vp-layout-gap, 1.5rem);
-
-	.vp-carousel-has-controls & {
-		display: flex;
-	}
-}
-
-.wp-block-visual-portfolio-item-template__carousel-dots {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-}
-
-// A dot is the progress bar in miniature, and it is built the same way: a track
-// that is always there and a fill that says how far along the carousel is. Six
-// pixels while it waits, a twenty four pixel pill while it is the slide on
-// screen - filled to the end at rest, and filled as the delay runs down when
-// autoplay is what moves the carousel on.
-.wp-block-visual-portfolio-item-template__carousel-dot {
-	position: relative;
-	// The pill grows through `min-width`: `width` on a flex item is a base size
-	// the flex algorithm is free to overrule, and the transition never landed.
-	min-width: 6px;
-	width: 6px;
-	height: 6px;
-	padding: 0;
-	overflow: hidden;
-	cursor: pointer;
-	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
-	border: 0;
-	border-radius: 3px;
-	transition: min-width 0.25s ease, background-color 0.25s ease;
-
-	&:focus {
-		outline: none;
-	}
-
-	&:focus-visible {
-		outline: 2px solid currentcolor;
-		outline-offset: 2px;
-	}
-
-	&[aria-current="true"] {
-		min-width: 24px;
-	}
-}
-
-.wp-block-visual-portfolio-item-template__carousel-dot-progress {
-	position: absolute;
-	inset-block: 0;
-	inset-inline-start: 0;
-	width: 0;
-	background-color: currentcolor;
-	border-radius: inherit;
-	transition: width 0.25s ease;
-
-	[aria-current="true"] > & {
-		width: 100%;
-	}
-}
-
-// While autoplay runs the fill is the wait rather than the place, and it is
-// redrawn every frame - a transition would leave it a frame behind for the
-// whole of the delay.
-.vp-carousel-is-playing .wp-block-visual-portfolio-item-template__carousel-dot[aria-current="true"] > .wp-block-visual-portfolio-item-template__carousel-dot-progress {
-	width: var(--vp-carousel-autoplay-progress, 0%);
-	transition: none;
-}
-
-.wp-block-visual-portfolio-item-template__carousel-progress {
-	width: min(180px, 60%);
-	height: 4px;
-	overflow: hidden;
-	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
-	border-radius: 2px;
-}
-
-.wp-block-visual-portfolio-item-template__carousel-progress-value {
-	display: block;
-	width: var(--vp-carousel-progress, 0%);
-	height: 100%;
-	background-color: currentcolor;
-	border-radius: inherit;
-	transition: width 0.15s linear;
 }
 
 // The loop is fetching its next state. The controls stay clickable - a second
@@ -768,4 +694,48 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	white-space: nowrap;
 	border: 0;
 	clip-path: inset(50%);
+}
+
+// A carousel that repeats is padded by half its width at each end - that is
+// how the library carries the loop - and the slides it moves round to the far
+// end are moved by the scrollable width, which is the slides and the gaps
+// between them and not a gap after the last one: the first slide landed flush
+// against the last. One more gap at the end of the list gives the seam its
+// gap. It is a box rather than padding or a margin: the padding is a share of
+// the frame, and a list padded by more than the frame grows by the excess,
+// which leaves the scrollable width where it was - and the browser does not
+// scroll as far as the end margin of the last slide, which left the seam
+// out of reach. A box the width of the gap, pulled back over the gap the
+// list draws before it, is scrolled to and counted.
+.wp-block-visual-portfolio-item-template.vp-layout-carousel[data-vp-carousel-repeat="true"]::after {
+	flex: 0 0 var(--vp-layout-gap, 1.5rem);
+	margin-inline-start: calc(-1 * var(--vp-layout-gap, 1.5rem));
+	content: "";
+
+	// Not a place to rest: the loop wraps at the far end of the range, and a
+	// carousel that snapped to the box just short of it never got there.
+	scroll-snap-align: none;
+}
+
+// The padding Blossom carries the loop with, restated in the length of the
+// frame rather than as a share of it: the library reads `scroll-padding`
+// back to place its snaps, and a percentage it reads as that many pixels, so
+// its snaps sat 370px off the browser's and a drag settled twice.
+//
+// The scroll padding itself is down to the room a container keeps, and to
+// nothing at all without one. Half the frame of it lines a slide up with the
+// middle of the frame, which is where a centred slide belongs and where a
+// slide aligned to the start does not: a carousel of whole-width slides
+// opened on the second half of one. This way a slide rests where its
+// alignment says, and the padding is only the room the copies moved round
+// from the far end are drawn in. The view module reads the padding back to
+// place the slides on the loop.
+//
+// In the library's own layer, since that is where both are written with
+// `!important`, and a rule outside it would lose.
+@layer blossom-carousel {
+	.wp-block-visual-portfolio-item-template.vp-layout-carousel[data-vp-carousel-repeat="true"] {
+		padding-inline: 50cqw !important;
+		scroll-padding-inline: var(--vp-carousel-inset, 0) !important;
+	}
 }

@@ -52,9 +52,20 @@ jobs:
       # behind `@webkit` and `@firefox` tags and no spec carries either, so the
       # other two browsers were downloaded on every run and never launched. Tag a
       # spec and add the browser back here if that changes.
+      #
+      # The browser comes from Playwright's own CDN and the libraries it needs
+      # from Ubuntu's mirrors, which the runner cannot always reach: a day of
+      # `Connection failed` on every mirror failed this step twice, twelve
+      # minutes of timeouts each, without a test being run. The two are asked
+      # for separately, and the libraries are best effort under a cap - the
+      # runner image already carries a Chrome, and so the libraries Chromium
+      # loads, and the xvfb the tests run under. A library that really is
+      # missing fails the first test, not the install.
       - name: Install Playwright dependencies
         run: |
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
+          timeout 6m npx playwright install-deps chromium \
+            || echo "::warning::System packages did not install; running on what the runner image carries"
 
       # The Gallery Loop family registers on WordPress 7.1 and above, so the
       # end-to-end suite has to meet a build that carries it. `.wp-env.json`

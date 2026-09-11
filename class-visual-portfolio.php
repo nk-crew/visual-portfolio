@@ -343,6 +343,12 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-numbers/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-previous/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-pagination-trigger/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-carousel-nav/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-carousel-previous/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-carousel-next/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-carousel-indicator/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-carousel-autoplay/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-carousel-thumbnails/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-sort/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-no-results/index.php';
 

@@ -15,6 +15,12 @@ WordPress plugin: portfolio / gallery layouts and Gutenberg integration. PHP bac
 ## Rules
 
 - Minimal diffs; follow existing file layout and prefixes (`Visual_Portfolio_*`).
+- Reuse before writing. If the plugin already ships something for the job, use it
+  rather than hand-rolling a second one: `@blossom-carousel/core` for pointer
+  dragging, `Visual_Portfolio_Images` for attachments, `Visual_Portfolio_Get` for
+  queries, the helpers in `gutenberg/utils/` and `gutenberg/components/`. A new
+  script is worth writing only when nothing in the plugin, WordPress or the
+  browser already does it — say so in the code when that is the case.
 - WordPress: sanitize/escape; AJAX with nonces; capability checks.
 - `build/` is generated — edit sources, never the bundles.
 - Do not run packaging/release commands (`build:prod`, `zip`, `bump:*`) unless the user asks.
