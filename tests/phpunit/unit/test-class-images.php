@@ -145,7 +145,7 @@ class ClassImages extends WP_UnitTestCase {
         $this->assertTrue( is_int( $attach_id ) );
 
         $image_string = '<img width="150" height="150" src="' . esc_url( wp_get_attachment_image_url( $attach_id ) ) . '" class="wp-image-' . esc_attr( $attach_id ) . '" alt="" decoding="async" loading="lazy" />';
-        $lazy_string  = '<img width="150" height="150" src="' . $placeholder . '" class="wp-image-' . $attach_id  . ' vp-lazyload" alt decoding="async" loading="eager" data-src="' . esc_url( wp_get_attachment_image_url( $attach_id ) ) . '" data-sizes="auto">';
+        $lazy_string  = '<img width="150" height="150" src="' . $placeholder . '" class="wp-image-' . $attach_id  . ' vp-lazyload" alt="" decoding="async" loading="eager" data-src="' . esc_url( wp_get_attachment_image_url( $attach_id ) ) . '" data-sizes="auto">';
 
         $this->assertEquals(
             $this->get_noscript_image( $image_string ) . $lazy_string,
@@ -168,6 +168,16 @@ class ClassImages extends WP_UnitTestCase {
             Visual_Portfolio_Images::add_image_placeholders(
                 $image_string
             )
+        );
+
+        // Skip `data-no-lazy` written without a value, which is how most plugins mark an image.
+        $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" data-no-lazy>';
+        $this->assertEquals(
+            $image_string,
+            Visual_Portfolio_Images::add_image_placeholders(
+                $image_string
+            ),
+            'A valueless skip marker must still skip the image'
         );
 
         // Skip `vp-lazyload` class name. Means - already lazy loaded.
@@ -258,6 +268,57 @@ class ClassImages extends WP_UnitTestCase {
                 $image_string
             ),
             'Images with data-no-lazy attribute (any value) should be skipped'
+        );
+    }
+
+    /**
+     * Empty attribute values have to survive the rewrite.
+     *
+     * `alt=""` is how a decorative image is marked. Printing it back as a bare `alt` is still
+     * valid HTML, but SEO crawlers look for the string `alt=` and report such images as having
+     * no alt text at all.
+     */
+    public function test_lazy_loading_keeps_empty_attribute_values() {
+        // Enable lazy load in settings.
+        Visual_Portfolio_Images::$allow_vp_lazyload = true;
+        Visual_Portfolio_Images::$allow_wp_lazyload = true;
+
+        $placeholder = Visual_Portfolio_Images::get_image_placeholder( 10, 10 );
+
+        // An empty value stays an empty value.
+        $image_string = '<img src="image.jpg" alt="" width="10" height="10">';
+        $lazy_string  = '<img src="' . $placeholder . '" alt="" width="10" height="10" data-src="image.jpg" data-sizes="auto" loading="eager" class="vp-lazyload">';
+
+        $this->assertEquals(
+            $this->get_noscript_image( $image_string ) . $lazy_string,
+            Visual_Portfolio_Images::add_image_placeholders(
+                $image_string
+            ),
+            'alt="" must not come back as a bare alt'
+        );
+
+        // An attribute written without a value stays without one.
+        $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" data-custom>';
+        $lazy_string  = '<img src="' . $placeholder . '" alt="Test Image" width="10" height="10" data-custom data-src="image.jpg" data-sizes="auto" loading="eager" class="vp-lazyload">';
+
+        $this->assertEquals(
+            $this->get_noscript_image( $image_string ) . $lazy_string,
+            Visual_Portfolio_Images::add_image_placeholders(
+                $image_string
+            ),
+            'A valueless attribute must not gain an empty value'
+        );
+
+        // A valueless `sizes` is still dropped, the same as one that carries a value.
+        $image_string = '<img src="image.jpg" alt="Test Image" width="10" height="10" sizes>';
+        $lazy_string  = '<img src="' . $placeholder . '" alt="Test Image" width="10" height="10" data-src="image.jpg" data-sizes="auto" loading="eager" class="vp-lazyload">';
+
+        $this->assertEquals(
+            $this->get_noscript_image( $image_string ) . $lazy_string,
+            Visual_Portfolio_Images::add_image_placeholders(
+                $image_string
+            ),
+            'A valueless sizes attribute must still be dropped'
         );
     }
 

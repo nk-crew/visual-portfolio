@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.8.2 - Sep 10, 2026 =
+
+* fixed images with empty alt text being written with a valueless attribute, which SEO crawlers counted as missing alt text
+* **Pro:**
+* fixed Click Action set to Disabled still linking gallery items that carry an audio or a local video URL
+* fixed one failed plugin update leaving the rest of the queue stalled until the page was reloaded
+
 = 3.8.1 - Aug 31, 2026 =
 
 * changed Visual Portfolio to stay active next to Visual Portfolio Pro instead of being deactivated

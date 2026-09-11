@@ -33,15 +33,16 @@ build/**/*.hot-update.js.map
 build/Release
 
 # Composer directories. Anchored: an unanchored `vendor` also swallows
-# `assets/vendor/`, where the vendored front-end libraries live.
-/vendor/
+# `assets/vendor/`, where the vendored front-end libraries live. No trailing
+# slash, so the symlink a worktree puts here is ignored as well.
+/vendor
 
 # Custom PHPCS configs
 .phpcs.xml
 phpcs.xml
 
-# Dependency directories
-node_modules/
+# Dependency directories. No trailing slash, for the symlink case above.
+node_modules
 
 # Optional npm cache directory
 .npm
@@ -73,4 +74,5 @@ Thumbs.db
 
 # Local compatibility planning and automation artifacts
 .spec/
+.specs/
 output/
