@@ -1253,8 +1253,12 @@ export default function BlockEdit({
 	// container control is left in place, greyed.
 	const containerReason = getCarouselContainerReason(attributes);
 
-	// Two of the widths are the theme's own, so the menu says what each one
-	// comes to - the line core's own alignment menu carries under every name.
+	// Two of the widths are the theme's own - what `theme.json` declares as its
+	// content and wide sizes, read the way the editor reads every setting, so a
+	// block-level override counts too. The menu says what each one comes to,
+	// the line core's alignment menu carries under every name, and the page
+	// holds the slides to the same numbers through the custom properties the
+	// theme prints them under.
 	const [contentSize, wideSize] = useSettings(
 		'layout.contentSize',
 		'layout.wideSize'
@@ -1265,6 +1269,16 @@ export default function BlockEdit({
 		wide: getSizeInfo(wideSize),
 		custom: getSizeInfo(carouselContainerWidth),
 	};
+
+	// A width the theme never declared is not offered, the way core's
+	// alignment menu drops Wide width on a theme with no wide size: there
+	// would be nothing to hold the slides to. The theme prints the content
+	// size from the wide one when only that is set, so None follows either.
+	const containerOptions = CONTAINER_OPTIONS.filter(
+		({ value }) =>
+			('content' !== value || !!(contentSize || wideSize)) &&
+			('wide' !== value || !!wideSize)
+	);
 
 	const carouselControls = 'carousel' === layoutType && (
 		<ToolsPanel
@@ -1559,7 +1573,7 @@ export default function BlockEdit({
 								</p>
 							) : null}
 							<MenuGroup className="block-editor-block-alignment-control__menu-group">
-								{CONTAINER_OPTIONS.map(
+								{containerOptions.map(
 									({ value, label, icon }) => {
 										const isSelected =
 											value === carouselContainer;
