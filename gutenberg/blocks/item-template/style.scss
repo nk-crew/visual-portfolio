@@ -613,6 +613,19 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			scroll-behavior: auto;
 		}
 
+		// A carousel that repeats is padded by half its width at each end to
+		// carry the loop, so it is laid out off its snap positions: the first
+		// slide rests half a frame in, and the list starts at nothing. Firefox
+		// snaps to the slide at load, and with a smooth scroll it does not
+		// give up when the module opens the carousel there outright - the
+		// animation went on from where the module had put the list, and
+		// carried it half a frame past the slide. Every move of a repeating
+		// carousel is drawn by the module frame by frame anyway, so the
+		// browser is left nothing to smooth.
+		&[data-vp-carousel-repeat="true"] {
+			scroll-behavior: auto;
+		}
+
 		// The edges dissolve rather than cut, so a half slide reads as more
 		// carousel rather than as a mistake. Three layers: a ramp at each edge
 		// and the solid middle between them, which is what lets one side be

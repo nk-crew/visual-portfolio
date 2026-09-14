@@ -2699,10 +2699,17 @@ function initCarousel(list) {
 				carousels.set(list, carousel);
 				carousel.init();
 
-				// Taken again once the library has laid the loop out, in
-				// case its first pass moved the scroll - and the loop is
-				// measured once more after that, with the copies in place.
+				// Measured before anything can scroll it: the library reads
+				// the loop at its first resize callback, and until then
+				// answers a scroll with the range it was born with - a few
+				// hundred pixels, past which it throws the scroll to the
+				// start. The measurement is asked for now, and arrives as a
+				// mutation callback, ahead of any scroll event. Taken again
+				// once the library has laid the loop out, in case its first
+				// pass moved the scroll - and the loop is measured once more
+				// after that, with the copies in place.
 				if (repeats) {
+					remeasureLoop(list);
 					openOnFirstSlide(list);
 					window.requestAnimationFrame(() => {
 						window.requestAnimationFrame(() => {
