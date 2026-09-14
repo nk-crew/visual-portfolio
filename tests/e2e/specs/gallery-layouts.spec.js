@@ -2521,4 +2521,88 @@ test.describe('Gallery Item Template layouts', () => {
 				.toBe(columns);
 		});
 	}
+
+	// An install adds an effect with a name on each side and a stylesheet,
+	// which is what the test plugin does without the stylesheet. The schema
+	// the server sends the editor is widened to the name, and that is the
+	// schema the editor has to keep: parsed against the bundled list instead,
+	// the value is dropped the moment the page is opened, and gone at the
+	// next save.
+	test('an effect an install adds survives the editor', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await requestUtils.activatePlugin('vpf-test-carousel-effect');
+
+		await admin.createNewPost({
+			title: 'Layouts - added effect',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'visual-portfolio/loop',
+			attributes: {
+				baseQuery: { perPage: IMAGES_COUNT, maxPages: 1 },
+				queryType: 'images',
+				imagesQuery: { images },
+			},
+			innerBlocks: [
+				{
+					name: 'visual-portfolio/item-template',
+					attributes: {
+						layoutType: 'carousel',
+						carouselEffect: 'acme-flip',
+					},
+					innerBlocks: [
+						{
+							name: 'visual-portfolio/item-image',
+							attributes: { aspectRatio: '1' },
+						},
+					],
+				},
+			],
+		});
+
+		const postId = await editor.publishPost();
+
+		pageIds.push(postId);
+
+		// Opened again, the page is parsed from its markup, which is where
+		// the schema is applied.
+		await admin.editPost(postId);
+
+		await expect
+			.poll(async () => {
+				const blocks = await editor.getBlocks();
+
+				return blocks[0]?.innerBlocks[0]?.attributes.carouselEffect;
+			})
+			.toBe('acme-flip');
+
+		// The control names it too, from the option the install added.
+		const canvas = getEditorCanvas(page, editor);
+
+		await editor.selectBlocks(
+			canvas.locator('[data-type="visual-portfolio/item-template"]')
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		await expect(
+			page.getByRole('combobox', { name: 'Effect' })
+		).toHaveValue('acme-flip');
+
+		// And the page is drawn with it, which is the class the stylesheet of
+		// the install would hang its animations on.
+		const { link } = await requestUtils.rest({
+			path: `/wp/v2/pages/${postId}`,
+		});
+
+		await page.goto(link, { waitUntil: 'domcontentloaded' });
+
+		await expect(page.locator(LIST)).toHaveClass(/vp-carousel-acme-flip/);
+	});
 });

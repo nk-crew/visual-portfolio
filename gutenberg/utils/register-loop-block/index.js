@@ -10,13 +10,17 @@ const { loop_blocks: loopBlocksSupported } = window.VPGutenbergVariables;
  * does not register these blocks at all, and a block registered on the client
  * alone would let the editor save markup that nothing renders.
  *
- * @param {string} name     Block name.
- * @param {Object} settings Block settings.
+ * Given the metadata rather than a name, the settings only add to what the
+ * server registered the block with, the way `registerBlockType()` treats it.
+ * That is the form for a block whose schema the server adjusts per install.
+ *
+ * @param {string|Object} nameOrMetadata Block name, or its `block.json`.
+ * @param {Object}        settings       Block settings.
  */
-export default function registerLoopBlock(name, settings) {
+export default function registerLoopBlock(nameOrMetadata, settings) {
 	if (!loopBlocksSupported) {
 		return;
 	}
 
-	registerBlockType(name, settings);
+	registerBlockType(nameOrMetadata, settings);
 }

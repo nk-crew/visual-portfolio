@@ -110,7 +110,8 @@
 	"nkPluginToolkit": {
 		"plugins": [
 			"visual-portfolio",
-			"gutenberg-test-plugin-disables-the-css-animations"
+			"gutenberg-test-plugin-disables-the-css-animations",
+			"vpf-test-carousel-effect"
 		]
 	}
 }
