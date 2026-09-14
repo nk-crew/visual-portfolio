@@ -957,7 +957,7 @@ export default function BlockEdit({
 			lastRow: justifiedLastRow,
 		},
 		itemsCount: blockContexts.length,
-		signature: `${columnsProps.className}|${JSON.stringify(columnsProps.style)}|${justifiedRowHeight}|${justifiedRowHeightTolerance}|${justifiedMaxRowsCount}|${justifiedLastRow}`,
+		signature: `${columnsProps.className}|${JSON.stringify(columnsProps.style)}|${justifiedRowHeight}|${justifiedRowHeightTolerance}|${justifiedMaxRowsCount}|${justifiedLastRow}|${carouselEffect}`,
 	});
 
 	// The layout describes a list of items; the empty state is a single notice

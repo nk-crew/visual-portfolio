@@ -8,6 +8,7 @@ import { useEffect, useRef } from '@wordpress/element';
  */
 import { syncColumns } from './auto-columns';
 import { layoutJustified, layoutMasonry, startLayout } from './layouts';
+import { driveTimelines } from './timelines';
 
 /**
  * Keep the editor preview laid out.
@@ -55,8 +56,16 @@ export default function useEditorLayout({
 
 		// The carousel is drawn by the stylesheet, but its slide width is a
 		// `calc()` over the column count, and both the container and the
-		// breakpoints can move it.
-		return syncColumns(list);
+		// breakpoints can move it. An effect is drawn from timelines the
+		// browser may not have, in which case the preview keeps them the way
+		// the page does.
+		const stopColumns = syncColumns(list);
+		const stopTimelines = driveTimelines(list);
+
+		return () => {
+			stopTimelines();
+			stopColumns();
+		};
 	}, [layoutType, itemsCount, signature]);
 
 	return ref;

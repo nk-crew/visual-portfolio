@@ -95,6 +95,187 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	initial-value: 0;
 }
 
+// What an effect would set as `view-timeline-inset` on a slide, for the
+// module that keeps the timelines where the browser has none - see
+// `timelines.js`. Registered as a length so that the module reads it back
+// in pixels, whatever unit the effect wrote it in.
+@property --vp-carousel-timeline-inset {
+	syntax: "<length>";
+	inherits: false;
+	// A registered length has to be a length: a bare zero is not one here.
+	// stylelint-disable-next-line length-zero-no-unit
+	initial-value: 0px;
+}
+
+// The range of a view timeline an animation is played over, and the timeline.
+//
+// Natively that is `animation-range` and `animation-timeline`, stated in the
+// two named ranges: `cover`, from the box's first edge entering the frame to
+// its last edge leaving, and `contain`, from the whole box being inside to its
+// first edge leaving. `$start` and `$end` are fractions of that range, and may
+// reach past it.
+//
+// Driven by the module there is no timeline. The animation is a second long
+// and paused, and its delay is set backwards by the fraction of the range the
+// item has covered, which the module publishes on it - so the animation is
+// held at the same time the timeline would have played it at, and the fill
+// mode holds an item past either end of the range where the timeline would
+// have held it. Reaching before a range is written as a sum with its own
+// sign: the minifier does not read a subtracted negative.
+//
+// @param {boolean} $native   Whether the browser drives the animation.
+// @param {string}  $timeline The view timeline, natively.
+// @param {string}  $range    `cover` or `contain`.
+// @param {number}  $start    Where the animation begins, as a fraction of the range.
+// @param {number}  $end      Where it ends, as a fraction of the range.
+@mixin scrubbed($native, $timeline, $range: cover, $start: 0, $end: 1) {
+	@if $native {
+		@if $start == 0 and $end == 1 {
+			animation-range: $range;
+		} @else {
+			animation-range: #{$range} #{$start * 100%} #{$range} #{$end * 100%};
+		}
+
+		animation-timeline: $timeline;
+	} @else {
+		$covered: "var(--vp-carousel-#{$range})";
+
+		@if $start < 0 {
+			$covered: "(#{$covered} + #{-$start})";
+		} @else if $start > 0 {
+			$covered: "(#{$covered} - #{$start})";
+		}
+
+		@if $end - $start != 1 {
+			$covered: "#{$covered} / #{$end - $start}";
+		}
+
+		animation-duration: 1s;
+		animation-play-state: paused;
+		animation-delay: calc(#{$covered} * -1s);
+	}
+}
+
+// The two carousel effects, for one of the two ways of driving them. Both
+// draw each card from where its own slide is in the frame - the timeline of
+// the slide, natively, or the numbers the module writes on it - so both run
+// round a repeating carousel: a slide the loop has moved round is animated
+// from the scroll of the list instead, over the range the module writes on
+// it, and the module reads such a slide where it is drawn.
+//
+// @param {boolean} $native Whether the browser drives the animations.
+@mixin carousel-effects($native) {
+	// Any carousel where the browser has the timelines, and one the module
+	// has marked where it has not.
+	$scripted: if($native, "", ".vp-carousel-scripted");
+
+	// Cards one whole slide wide over boxes half that, so every card
+	// overhangs its neighbours by a quarter of itself on each side. The
+	// overlap is what makes a cover flow read as a stack seen edge on,
+	// rather than as a row of pictures that happen to be tilted.
+	&.vp-layout-carousel#{$scripted}.vp-carousel-coverflow {
+		// The list is narrowed to one snapping box and the rest of the
+		// width is padding, so the first and the last card can come to the
+		// middle like any other. Stated against the block rather than
+		// against the narrowed list, which is the one way of writing it
+		// that does not depend on its own outcome.
+		gap: 0;
+		padding-inline: calc(50cqw - 25cqw / max(var(--vp-layout-current-columns), 2));
+		scroll-padding-inline: 0;
+
+		> #{$item} {
+			// The one snapping box the padding narrows the list to, stated
+			// against the frame for the same reason a plain slide is: a
+			// repeating carousel is padded by half its width at each end
+			// instead, and a box sized against what that padding leaves
+			// came out at nothing at all.
+			width: calc(50cqw / max(var(--vp-layout-current-columns), 2));
+			scroll-snap-align: center;
+
+			// The window the turn is played over: a little under three
+			// quarters of a card to each side of the middle. Beyond it a
+			// card is already as far on its edge as it goes.
+			@if $native {
+				view-timeline-name: --vp-carousel-slide;
+				view-timeline-axis: inline;
+				view-timeline-inset: calc(50cqw - 70cqw / max(var(--vp-layout-current-columns), 2));
+			} @else {
+				--vp-carousel-timeline-inset: calc(50cqw - 70cqw / max(var(--vp-layout-current-columns), 2));
+			}
+		}
+
+		#{$slide} {
+			position: relative;
+			width: 200%;
+			margin-inline: -50%;
+			// One vanishing point per card, at its own middle, so a card
+			// turns on the spot instead of being seen from the side of the
+			// gallery. Stated in card widths rather than in pixels, so the
+			// depth of the turn is the same whatever the gallery is sized
+			// at - and so the card it foreshortens grows by the same
+			// fraction every time, which is what the compensating scale in
+			// the keyframes is worked out from.
+			perspective: calc(var(--vp-carousel-slide-width) * 5);
+			animation-name: vp-carousel-coverflow-slide;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+
+			@include scrubbed($native, --vp-carousel-slide, contain);
+		}
+
+		#{$card} {
+			animation-name: vp-carousel-coverflow-card;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+
+			@include scrubbed($native, --vp-carousel-slide, contain);
+		}
+
+		@if $native {
+			> #{$item}.vp-carousel-moved-round {
+				#{$slide},
+				#{$card} {
+					animation-range: var(--vp-carousel-copy-contain);
+					animation-timeline: --vp-carousel-scroll;
+				}
+			}
+		}
+	}
+
+	// One slide riding over the one it replaces. The picture travels at half
+	// the speed of the carousel, so the arriving slide covers the leaving
+	// one rather than dissolving into it - nothing here touches opacity.
+	&.vp-layout-carousel#{$scripted}.vp-carousel-slideshow {
+		// Slides that touch, so the arriving one meets the leaving one
+		// rather than following it across a gutter.
+		gap: 0;
+
+		#{$slide} {
+			overflow: hidden;
+
+			@if $native {
+				view-timeline-name: --vp-carousel-slide;
+				view-timeline-axis: inline;
+			}
+		}
+
+		#{$card} {
+			animation-name: vp-carousel-slideshow-card;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+
+			@include scrubbed($native, --vp-carousel-slide);
+		}
+
+		@if $native {
+			> #{$item}.vp-carousel-moved-round #{$card} {
+				animation-range: var(--vp-carousel-copy-cover);
+				animation-timeline: --vp-carousel-scroll;
+			}
+		}
+	}
+}
+
 // The layout Masonry positions by hand. Item widths come from here - Masonry
 // reads them, it does not calculate them. The gap is declared as `column-gap`
 // for the same reason: it does nothing to a block container, it is where the
@@ -486,7 +667,11 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 
 	// Scroll driven effects, and nothing else - where the timeline is missing
 	// the rules never apply and the carousel is exactly the carousel it was
-	// without them.
+	// without them. Unless the module keeps the timelines itself, which it
+	// does where the browser has none - see `timelines.js`: then the same
+	// effects apply to the list it has marked, held still at the time it
+	// names, and to no other. Both sets of rules come out of one mixin, so
+	// an effect is described once and the two cannot drift.
 	@supports (animation-timeline: view()) {
 		// The scroll of the list, named for the slides a repeating carousel
 		// has moved round. Their own view timelines are measured from where
@@ -499,93 +684,11 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			scroll-timeline-axis: inline;
 		}
 
-		// Cards one whole slide wide over boxes half that, so every card
-		// overhangs its neighbours by a quarter of itself on each side. The
-		// overlap is what makes a cover flow read as a stack seen edge on,
-		// rather than as a row of pictures that happen to be tilted.
-		&.vp-layout-carousel.vp-carousel-coverflow {
-			// The list is narrowed to one snapping box and the rest of the
-			// width is padding, so the first and the last card can come to the
-			// middle like any other. Stated against the block rather than
-			// against the narrowed list, which is the one way of writing it
-			// that does not depend on its own outcome.
-			gap: 0;
-			padding-inline: calc(50cqw - 25cqw / max(var(--vp-layout-current-columns), 2));
-			scroll-padding-inline: 0;
+		@include carousel-effects(true);
+	}
 
-			> #{$item} {
-				// The one snapping box the padding narrows the list to, stated
-				// against the frame for the same reason a plain slide is: a
-				// repeating carousel is padded by half its width at each end
-				// instead, and a box sized against what that padding leaves
-				// came out at nothing at all.
-				width: calc(50cqw / max(var(--vp-layout-current-columns), 2));
-				scroll-snap-align: center;
-				view-timeline-name: --vp-carousel-slide;
-				view-timeline-axis: inline;
-				// The window the turn is played over: a little under three
-				// quarters of a card to each side of the middle. Beyond it a
-				// card is already as far on its edge as it goes.
-				view-timeline-inset: calc(50cqw - 70cqw / max(var(--vp-layout-current-columns), 2));
-			}
-
-			#{$slide} {
-				position: relative;
-				width: 200%;
-				margin-inline: -50%;
-				// One vanishing point per card, at its own middle, so a card
-				// turns on the spot instead of being seen from the side of the
-				// gallery. Stated in card widths rather than in pixels, so the
-				// depth of the turn is the same whatever the gallery is sized
-				// at - and so the card it foreshortens grows by the same
-				// fraction every time, which is what the compensating scale in
-				// the keyframes is worked out from.
-				perspective: calc(var(--vp-carousel-slide-width) * 5);
-				animation: vp-carousel-coverflow-slide linear both;
-				animation-range: contain;
-				animation-timeline: --vp-carousel-slide;
-			}
-
-			#{$card} {
-				animation: vp-carousel-coverflow-card linear both;
-				animation-range: contain;
-				animation-timeline: --vp-carousel-slide;
-			}
-
-			> #{$item}.vp-carousel-moved-round {
-				#{$slide},
-				#{$card} {
-					animation-range: var(--vp-carousel-copy-contain);
-					animation-timeline: --vp-carousel-scroll;
-				}
-			}
-		}
-
-		// One slide riding over the one it replaces. The picture travels at half
-		// the speed of the carousel, so the arriving slide covers the leaving
-		// one rather than dissolving into it - nothing here touches opacity.
-		&.vp-layout-carousel.vp-carousel-slideshow {
-			// Slides that touch, so the arriving one meets the leaving one
-			// rather than following it across a gutter.
-			gap: 0;
-
-			#{$slide} {
-				overflow: hidden;
-				view-timeline-name: --vp-carousel-slide;
-				view-timeline-axis: inline;
-			}
-
-			#{$card} {
-				animation: vp-carousel-slideshow-card linear both;
-				animation-range: cover;
-				animation-timeline: --vp-carousel-slide;
-			}
-
-			> #{$item}.vp-carousel-moved-round #{$card} {
-				animation-range: var(--vp-carousel-copy-cover);
-				animation-timeline: --vp-carousel-scroll;
-			}
-		}
+	@supports not (animation-timeline: view()) {
+		@include carousel-effects(false);
 	}
 }
 

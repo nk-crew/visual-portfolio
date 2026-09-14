@@ -2946,4 +2946,151 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(list).toHaveClass(/vp-carousel-acme-flip/);
 		await expect(list).not.toHaveAttribute('data-vp-carousel-repeat');
 	});
+
+	// The module keeps the timelines of an effect where the browser has none
+	// - Firefox, Safari before 26 - and the browser here has them, so the
+	// question the module asks of `CSS.supports` is answered for it before
+	// the page loads. What the stylesheet then makes of the numbers is
+	// Firefox's to show; what is checked here is the numbers. The suite runs
+	// with reduced motion, and a visitor who asked for that is left the plain
+	// carousel, so this runs without it.
+	test.describe('an effect where the browser has no timelines', () => {
+		test.use({
+			contextOptions: {
+				reducedMotion: 'no-preference',
+				strictSelectors: true,
+			},
+		});
+
+		test('the module writes where every slide is, and keeps it written', async ({
+			page,
+			requestUtils,
+		}) => {
+			await page.addInitScript(() => {
+				const supports = window.CSS.supports.bind(window.CSS);
+
+				window.CSS.supports = (...args) =>
+					!String(args[0]).includes('animation-timeline') &&
+					supports(...args);
+			});
+
+			await publishLoop(requestUtils, page, {
+				title: 'Layouts - scripted timelines',
+				blockId: 'e2e-scripted-timelines',
+				images,
+				layout: {
+					layoutType: 'carousel',
+					layoutColumnsMode: 'manual',
+					layoutColumnCount: 2,
+					carouselEffect: 'slideshow',
+				},
+			});
+
+			const list = page.locator(LIST);
+
+			// The mark the scripted rules apply to.
+			await expect(list).toHaveClass(/vp-carousel-scripted/);
+
+			// How far through `cover` each slide is: from its first edge
+			// entering the frame at 0 to its last edge leaving at 1. A
+			// slideshow shows one slide over the frame, so at rest the first
+			// is halfway through, the next is waiting at the edge, and the
+			// one after that is a whole slide off.
+			const covered = () =>
+				list.evaluate((node) =>
+					Array.from(
+						node.querySelectorAll(
+							'.wp-block-visual-portfolio-item-template__item'
+						),
+						(item) =>
+							parseFloat(
+								item.style.getPropertyValue(
+									'--vp-carousel-cover'
+								)
+							)
+					).slice(0, 3)
+				);
+
+			await expect
+				.poll(covered, { timeout: 10000 })
+				.toEqual([0.5, 0, -0.5]);
+
+			// Scrolled a slide on, every number moves a half with it.
+			await list.evaluate((node) => {
+				node.scrollTo({ left: node.clientWidth, behavior: 'instant' });
+			});
+
+			await expect.poll(covered, { timeout: 10000 }).toEqual([1, 0.5, 0]);
+		});
+
+		test('the editor preview keeps them the same way', async ({
+			page,
+			admin,
+			editor,
+		}) => {
+			await page.addInitScript(() => {
+				const supports = window.CSS.supports.bind(window.CSS);
+
+				window.CSS.supports = (...args) =>
+					!String(args[0]).includes('animation-timeline') &&
+					supports(...args);
+			});
+
+			await admin.createNewPost({
+				title: 'Layouts - scripted timelines in the editor',
+				postType: 'page',
+				showWelcomeGuide: false,
+				legacyCanvas: true,
+			});
+
+			await editor.insertBlock({
+				name: 'visual-portfolio/loop',
+				attributes: {
+					baseQuery: { perPage: IMAGES_COUNT, maxPages: 1 },
+					queryType: 'images',
+					imagesQuery: { images },
+				},
+				innerBlocks: [
+					{
+						name: 'visual-portfolio/item-template',
+						attributes: {
+							layoutType: 'carousel',
+							carouselEffect: 'slideshow',
+						},
+						innerBlocks: [{ name: 'visual-portfolio/item-image' }],
+					},
+				],
+			});
+
+			const list = getEditorCanvas(page, editor).locator(LIST);
+
+			await expect(list).toHaveClass(/vp-carousel-scripted/);
+			await expect
+				.poll(
+					() =>
+						list.evaluate((node) =>
+							node
+								.querySelector(
+									'.wp-block-visual-portfolio-item-template__item'
+								)
+								.style.getPropertyValue('--vp-carousel-cover')
+						),
+					{ timeout: 10000 }
+				)
+				.toBe('0.5000');
+
+			// Switched off, the effect takes its numbers with it: the preview
+			// is a plain carousel again, the way the page would be.
+			const clientId = (await editor.getBlocks({ full: true }))[0]
+				.innerBlocks[0].clientId;
+
+			await page.evaluate((id) => {
+				window.wp.data
+					.dispatch('core/block-editor')
+					.updateBlockAttributes(id, { carouselEffect: 'none' });
+			}, clientId);
+
+			await expect(list).not.toHaveClass(/vp-carousel-scripted/);
+		});
+	});
 });

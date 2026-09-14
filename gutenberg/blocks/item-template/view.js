@@ -144,6 +144,7 @@ import { getElement, store } from '@wordpress/interactivity';
 
 import { syncColumns } from './auto-columns';
 import { getJustifiedOptions, layoutJustified, startLayout } from './layouts';
+import { driveTimelines } from './timelines';
 
 /**
  * The layouts of the Gallery Item Template that need a browser.
@@ -2721,8 +2722,12 @@ function initCarousel(list) {
 	const stopScrub = initScrub(list);
 	const stopThumbDrag = initThumbDrag(list, canDrag);
 	const stopMarking = repeats ? markMovedRound(list) : noop;
+	// An effect is drawn by the browser from its timelines, or by the module
+	// where the browser has none - see `timelines.js`.
+	const stopTimelines = driveTimelines(list);
 
 	return () => {
+		stopTimelines();
 		stopMarking();
 		stopAutoplay();
 		stopScrub();
