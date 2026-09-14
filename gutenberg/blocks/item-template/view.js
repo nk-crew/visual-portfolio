@@ -331,6 +331,22 @@ const SEAM_SHIFT_PROPERTY = '--vp-carousel-seam-shift';
 // key, which is the keyboard asking.
 const POINTER_FOCUS_CLASS = 'vp-carousel-pointer-focus';
 
+// The keys that are pressed on the way to another key, and ask nothing of
+// the carousel on their own.
+const MODIFIER_KEYS = new Set([
+	'Alt',
+	'AltGraph',
+	'CapsLock',
+	'Control',
+	'Fn',
+	'Meta',
+	'NumLock',
+	'OS',
+	'ScrollLock',
+	'Shift',
+	'Symbol',
+]);
+
 // How long a step of a repeating carousel takes, drawn by the module.
 const TRAVEL_DURATION = 450;
 
@@ -2643,10 +2659,18 @@ function initCarousel(list) {
 		list.focus({ preventScroll: true });
 	};
 	const unmarkFocus = () => list.classList.remove(POINTER_FOCUS_CLASS);
+	// A modifier on its own is not the keyboard taking over: Cmd is pressed
+	// for a shortcut that goes elsewhere, Shift for a capital in another
+	// field, and a ring drawn for either is a ring nobody asked for.
+	const onKeyDown = (event) => {
+		if (!MODIFIER_KEYS.has(event.key)) {
+			unmarkFocus();
+		}
+	};
 
 	if (canDrag) {
 		list.addEventListener('mousedown', onMouseDown);
-		list.addEventListener('keydown', unmarkFocus);
+		list.addEventListener('keydown', onKeyDown);
 		list.addEventListener('blur', unmarkFocus);
 	}
 
@@ -2702,7 +2726,7 @@ function initCarousel(list) {
 		list.removeEventListener('scroll', onScroll);
 		list.removeEventListener(GO_TO_EVENT, onGoTo);
 		list.removeEventListener('mousedown', onMouseDown);
-		list.removeEventListener('keydown', unmarkFocus);
+		list.removeEventListener('keydown', onKeyDown);
 		list.removeEventListener('blur', unmarkFocus);
 		unmarkFocus();
 		stopShifting();

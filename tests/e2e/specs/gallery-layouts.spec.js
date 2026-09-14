@@ -597,6 +597,17 @@ test.describe('Gallery Item Template layouts', () => {
 			frame: 'none',
 		});
 
+		// A modifier on its own is not the keyboard asking: Cmd is pressed for
+		// a shortcut that goes elsewhere.
+		await page.keyboard.press('Meta');
+		await page.keyboard.press('Shift');
+
+		expect(await rings()).toEqual({
+			focused: true,
+			list: 'none',
+			frame: 'none',
+		});
+
 		// A key is the keyboard asking, and the ring is drawn on the frame,
 		// where nothing clips it.
 		await page.keyboard.press('ArrowLeft');
