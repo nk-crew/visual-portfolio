@@ -879,6 +879,12 @@ function keepSeamOffTheGrid(list) {
 				period
 			);
 		}
+
+		// Blossom reads the padding when it measures and not again, so it is
+		// asked to measure once more - when it is there to ask.
+		if (carousels.has(list)) {
+			remeasureLoop(list);
+		}
 	};
 
 	update();
