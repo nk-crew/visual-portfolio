@@ -64,16 +64,19 @@ export function supportsTimelines(view = window) {
  * the carousel is scroll padding, so this is what keeps a slide resting in
  * a container halfway through its passage rather than a third of the way.
  *
- * @param {string} value - computed `scroll-padding-inline-*`.
+ * @param {string} value - computed `scroll-padding-inline-*`, or nothing in
+ *                         a browser that has no logical scroll padding.
  * @param {number} width - width of the scrollport, which a percentage is of.
  * @return {number} padding in pixels.
  */
 function getScrollPadding(value, width) {
-	if (value.endsWith('%')) {
-		return ((parseFloat(value) || 0) * width) / 100;
+	const padding = String(value || '');
+
+	if (padding.endsWith('%')) {
+		return ((parseFloat(padding) || 0) * width) / 100;
 	}
 
-	return parseFloat(value) || 0;
+	return parseFloat(padding) || 0;
 }
 
 /**
