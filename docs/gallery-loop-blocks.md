@@ -412,6 +412,12 @@ owns that width, so the count is forced to one and the control is not offered
 beside it. Cover flow is the other kind: the count is how many cards fit across
 it, and it keeps the control.
 
+`repeat` says whether the effect can be run round in a loop, and is `true`
+unless the effect says otherwise. The loop is carried by moving the slides one
+end has run out of to the other, so an effect that pins its slides in place —
+a deck — has nothing to move: with `repeat: false` on both sides the *Repeat*
+setting is left out of the page and the control is greyed with the reason.
+
 The list is given the classes `vp-carousel-effect` and `vp-carousel-acme-flip`,
 and the stylesheet is the install's own to enqueue —
 `render_block_visual-portfolio/item-template` is where Pro does it. Everything

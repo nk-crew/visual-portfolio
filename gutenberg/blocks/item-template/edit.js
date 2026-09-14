@@ -175,7 +175,7 @@ function getSizeInfo(size) {
  * @return {string|undefined} The reason, or nothing when there is a container.
  */
 function getCarouselContainerReason(attributes) {
-	if (attributes.carouselRepeat) {
+	if (attributes.carouselRepeat && effectRepeats(attributes.carouselEffect)) {
 		return __(
 			'A carousel that repeats has no edge for its slides to start from.',
 			'visual-portfolio'
@@ -272,6 +272,23 @@ function effectTakesColumns(effect) {
 	const option = getEffectOptions().find((item) => item.value === effect);
 
 	return !option || false !== option.columns;
+}
+
+/**
+ * Whether an effect can be run round in a loop.
+ *
+ * The loop moves the slides one end has run out of to the other, and an
+ * effect that pins its slides in place - a deck - has nothing to move, so the
+ * server leaves the loop out of it. `repeat: false` on the option says so.
+ *
+ * @param {string} effect - selected effect.
+ *
+ * @return {boolean} True when the repeat control does something.
+ */
+function effectRepeats(effect) {
+	const option = getEffectOptions().find((item) => item.value === effect);
+
+	return !option || false !== option.repeat;
 }
 
 // The same question the view module asks: where the browser packs masonry
@@ -833,6 +850,9 @@ export default function BlockEdit({
 	// would fight it is not offered.
 	const singleSlide =
 		'carousel' === layoutType && !effectTakesColumns(carouselEffect);
+	// And an effect that pins its slides cannot run round, so the repeat
+	// control is left in place but greyed, the way the container control is.
+	const repeatable = effectRepeats(carouselEffect);
 
 	// Tiles carry their columns in the notation, so that is where the layout
 	// reads them, whatever the columns controls say.
@@ -1373,17 +1393,30 @@ export default function BlockEdit({
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
-				hasValue={() => carouselRepeat}
+				hasValue={() => carouselRepeat && repeatable}
 				label={__('Repeat', 'visual-portfolio')}
 				onDeselect={() => setAttributes({ carouselRepeat: false })}
 			>
+				{/* Under an effect that pins its slides the control says why
+				    it does nothing and stays in place, greyed and off - the
+				    page leaves the loop out, and a switch shown on would
+				    promise one. The setting itself is kept for the next
+				    effect. */}
 				<ToggleControl
 					label={__('Repeat', 'visual-portfolio')}
-					help={__(
-						'The carousel runs on without an end, in both directions.',
-						'visual-portfolio'
-					)}
-					checked={carouselRepeat}
+					help={
+						repeatable
+							? __(
+									'The carousel runs on without an end, in both directions.',
+									'visual-portfolio'
+								)
+							: __(
+									'This effect pins its slides in place, so the carousel cannot run round.',
+									'visual-portfolio'
+								)
+					}
+					checked={carouselRepeat && repeatable}
+					disabled={!repeatable}
 					onChange={(value) =>
 						setAttributes({ carouselRepeat: value })
 					}

@@ -791,6 +791,11 @@ class Visual_Portfolio_Block_Item_Template {
 	 * a slideshow, a deck of cards - owns that width, and a count set beside it
 	 * would only cut the effect into pieces.
 	 *
+	 * `repeat` says whether the effect can be run round in a loop. A loop is
+	 * carried by moving the slides one end has run out of to the other, and an
+	 * effect that pins its slides in place - a deck - has nothing to move, so
+	 * the loop is left out of it.
+	 *
 	 * @return array effect name to its settings.
 	 */
 	public static function get_carousel_effects() {
@@ -800,7 +805,7 @@ class Visual_Portfolio_Block_Item_Template {
 		 * The key is the value of the `carouselEffect` attribute, and the class
 		 * the list is given is `vp-carousel-` and that name.
 		 *
-		 * @param array $effects effect name to `array( 'columns' => bool )`.
+		 * @param array $effects effect name to `array( 'columns' => bool, 'repeat' => bool )`.
 		 */
 		$effects = apply_filters(
 			'vpf_carousel_effects',
@@ -819,6 +824,7 @@ class Visual_Portfolio_Block_Item_Template {
 
 			$known[ $name ] = array(
 				'columns' => ! isset( $settings['columns'] ) || (bool) $settings['columns'],
+				'repeat'  => ! isset( $settings['repeat'] ) || (bool) $settings['repeat'],
 			);
 		}
 
@@ -854,6 +860,19 @@ class Visual_Portfolio_Block_Item_Template {
 		$effects = self::get_carousel_effects();
 
 		return ! isset( $effects[ $effect ] ) || $effects[ $effect ]['columns'];
+	}
+
+	/**
+	 * Whether an effect can be run round in a loop.
+	 *
+	 * @param string $effect - effect name.
+	 *
+	 * @return bool
+	 */
+	private function effect_repeats( $effect ) {
+		$effects = self::get_carousel_effects();
+
+		return ! isset( $effects[ $effect ] ) || $effects[ $effect ]['repeat'];
 	}
 
 	/**
@@ -911,6 +930,14 @@ class Visual_Portfolio_Block_Item_Template {
 		if ( $effect && ! $this->effect_takes_columns( $effect ) ) {
 			$attributes['layoutColumnsMode'] = 'manual';
 			$attributes['layoutColumnCount'] = 1;
+		}
+
+		// An effect that pins its slides in place cannot be run round: the
+		// loop moves the slides one end has run out of to the other, and a
+		// pinned slide stays where it is - so the loop was drawn as an empty
+		// list. The setting is kept and comes back with an effect that moves.
+		if ( $effect && ! $this->effect_repeats( $effect ) ) {
+			$attributes['carouselRepeat'] = false;
 		}
 
 		// The widest the layout ever gets, which is the row a desktop sees first.

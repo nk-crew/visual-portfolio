@@ -292,6 +292,66 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An effect that pins its slides in place cannot be run round.
+	 *
+	 * The loop moves the slides one end has run out of to the other, and a
+	 * pinned slide stays where it is - so a deck that repeated was drawn as
+	 * an empty list. An effect says so with `repeat => false`, and the loop
+	 * is left out along with the seam it would have loaded up front.
+	 *
+	 * @return void
+	 */
+	public function test_an_effect_that_pins_its_slides_leaves_the_loop_out() {
+		$add_deck = function ( $effects ) {
+			$effects['acme-deck'] = array(
+				'columns' => false,
+				'repeat'  => false,
+			);
+
+			return $effects;
+		};
+
+		// An install adds its effect before the block is registered, and the
+		// schema lists it from then on. A filter added here is too late for
+		// that, so the list is widened by hand the way registration does it.
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'visual-portfolio/item-template' );
+		$schema     = $block_type->attributes['carouselEffect'];
+
+		add_filter( 'vpf_carousel_effects', $add_deck );
+		$block_type->attributes['carouselEffect']['enum'] = array_merge( array( 'none' ), array_keys( Visual_Portfolio_Block_Item_Template::get_carousel_effects() ) );
+
+		try {
+			$output = $this->render_loop(
+				'<!-- wp:visual-portfolio/item-image /-->',
+				array(
+					'layoutType'     => 'carousel',
+					'carouselEffect' => 'acme-deck',
+					'carouselRepeat' => true,
+				)
+			);
+		} finally {
+			remove_filter( 'vpf_carousel_effects', $add_deck );
+			$block_type->attributes['carouselEffect'] = $schema;
+		}
+
+		$this->assertStringContainsString( 'vp-carousel-acme-deck', $output );
+		$this->assertStringNotContainsString( 'data-vp-carousel-repeat', $output );
+		$this->assertStringNotContainsString( 'data-skip-lazy', $output );
+
+		// An effect that says nothing about it repeats, the way it always did.
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'     => 'carousel',
+				'carouselEffect' => 'coverflow',
+				'carouselRepeat' => true,
+			)
+		);
+
+		$this->assertStringContainsString( 'data-vp-carousel-repeat="true"', $output );
+	}
+
+	/**
 	 * A carousel is drawn inside the one box of it that stays put, and the
 	 * controls are blocks beside that box rather than markup inside it.
 	 *

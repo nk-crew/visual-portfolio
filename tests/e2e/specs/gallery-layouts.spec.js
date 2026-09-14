@@ -1905,6 +1905,50 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(geometry).toEqual({ slide: 2, centred: true });
 	});
 
+	test('coverflow keeps the size of its cards when the carousel repeats', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel coverflow repeat',
+			blockId: 'e2e-carousel-coverflow-repeat',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselEffect: 'coverflow',
+				carouselRepeat: true,
+			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveClass(/vp-carousel-coverflow/);
+		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true');
+
+		// A repeating carousel is padded by half its width at each end to
+		// carry the loop, which leaves the list no width of its own - and a
+		// box sized against the list rather than against the frame came out
+		// at nothing at all, so the cards were not drawn.
+		const geometry = await list.evaluate((node) => {
+			const item = node.querySelector(
+				'.wp-block-visual-portfolio-item-template__item'
+			);
+
+			return {
+				box: item.offsetWidth / node.clientWidth,
+				height: node.clientHeight,
+			};
+		});
+
+		// Three across: the box is a sixth of the frame, and the card over
+		// it - twice the box - is a third.
+		expect(geometry.box).toBeCloseTo(1 / 6, 2);
+		expect(geometry.height).toBeGreaterThan(0);
+	});
+
 	test('the arrows step one slide a press, however fast they are pressed', async ({
 		page,
 		requestUtils,
@@ -2604,5 +2648,89 @@ test.describe('Gallery Item Template layouts', () => {
 		await page.goto(link, { waitUntil: 'domcontentloaded' });
 
 		await expect(page.locator(LIST)).toHaveClass(/vp-carousel-acme-flip/);
+	});
+
+	// A loop moves the slides one end has run out of to the other, and an
+	// effect that pins its slides in place has nothing to move: the test
+	// plugin's flip says so, the page leaves the loop out, and the control
+	// stays in place greyed rather than promising one.
+	test('the repeat control steps aside for an effect that pins its slides', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await requestUtils.activatePlugin('vpf-test-carousel-effect');
+
+		await admin.createNewPost({
+			title: 'Layouts - pinned effect',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'visual-portfolio/loop',
+			attributes: {
+				baseQuery: { perPage: IMAGES_COUNT, maxPages: 1 },
+				queryType: 'images',
+				imagesQuery: { images },
+			},
+			innerBlocks: [
+				{
+					name: 'visual-portfolio/item-template',
+					attributes: {
+						layoutType: 'carousel',
+						carouselEffect: 'acme-flip',
+						carouselRepeat: true,
+					},
+					innerBlocks: [
+						{
+							name: 'visual-portfolio/item-image',
+							attributes: { aspectRatio: '1' },
+						},
+					],
+				},
+			],
+		});
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await editor.selectBlocks(
+			canvas.locator('[data-type="visual-portfolio/item-template"]')
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		// Off and greyed, the setting is not counted as set, so the control
+		// is brought out through the panel menu the way any unset one is.
+		await page.getByRole('button', { name: 'Carousel options' }).click();
+		await page
+			.getByRole('menuitemcheckbox', { name: 'Show Repeat' })
+			.click();
+		await page.keyboard.press('Escape');
+
+		const repeat = page.getByRole('checkbox', { name: 'Repeat' });
+
+		await expect(repeat).toBeDisabled();
+		await expect(repeat).not.toBeChecked();
+		await expect(
+			page.getByText('This effect pins its slides in place')
+		).toBeVisible();
+
+		// And the page is drawn without the loop.
+		const postId = await editor.publishPost();
+
+		pageIds.push(postId);
+
+		const { link } = await requestUtils.rest({
+			path: `/wp/v2/pages/${postId}`,
+		});
+
+		await page.goto(link, { waitUntil: 'domcontentloaded' });
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveClass(/vp-carousel-acme-flip/);
+		await expect(list).not.toHaveAttribute('data-vp-carousel-repeat');
 	});
 });

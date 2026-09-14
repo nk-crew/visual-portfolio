@@ -516,7 +516,12 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			scroll-padding-inline: 0;
 
 			> #{$item} {
-				width: 100%;
+				// The one snapping box the padding narrows the list to, stated
+				// against the frame for the same reason a plain slide is: a
+				// repeating carousel is padded by half its width at each end
+				// instead, and a box sized against what that padding leaves
+				// came out at nothing at all.
+				width: calc(50cqw / max(var(--vp-layout-current-columns), 2));
 				scroll-snap-align: center;
 				view-timeline-name: --vp-carousel-slide;
 				view-timeline-axis: inline;

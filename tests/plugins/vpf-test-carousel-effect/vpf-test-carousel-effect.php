@@ -16,11 +16,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // The two halves an effect is registered with, and nothing else: the effect
-// has no stylesheet, so the tests can only look for its name.
+// has no stylesheet, so the tests can only look for its name. A flip pins
+// its slides in place, the way a deck does, so it owns the width and cannot
+// be run round.
 add_filter(
 	'vpf_carousel_effects',
 	function ( $effects ) {
-		$effects['acme-flip'] = array( 'columns' => false );
+		$effects['acme-flip'] = array(
+			'columns' => false,
+			'repeat'  => false,
+		);
 
 		return $effects;
 	}
@@ -31,7 +36,7 @@ add_action(
 	function () {
 		wp_add_inline_script(
 			'wp-hooks',
-			"wp.hooks.addFilter( 'vpf.carouselEffects', 'vpf-test-carousel-effect/acme-flip', ( options ) => [ ...options, { label: 'Acme flip', value: 'acme-flip', columns: false } ] );"
+			"wp.hooks.addFilter( 'vpf.carouselEffects', 'vpf-test-carousel-effect/acme-flip', ( options ) => [ ...options, { label: 'Acme flip', value: 'acme-flip', columns: false, repeat: false } ] );"
 		);
 	}
 );
