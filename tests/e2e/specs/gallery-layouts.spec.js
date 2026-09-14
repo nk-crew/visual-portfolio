@@ -984,13 +984,19 @@ test.describe('Gallery Item Template layouts', () => {
 		await page.setViewportSize({ width: 1280, height: 900 });
 		await expect.poll(columns, { timeout: 10000 }).toBe(4);
 
-		// A tablet is 992px and narrower. Without a count of its own the
-		// ladder would have stepped this down to three anyway, so the phone is
-		// what proves the setting: the ladder gives one column there.
+		// The screens are cut where the editor cuts its responsive styles: a
+		// tablet is 782px and narrower, a phone 480px and narrower. Above the
+		// tablet the count of its own does not apply, and the ladder steps
+		// the desktop count down to three on its own.
 		await page.setViewportSize({ width: 900, height: 900 });
 		await expect.poll(columns, { timeout: 10000 }).toBe(3);
 
-		await page.setViewportSize({ width: 500, height: 900 });
+		// On a tablet the ladder would have given two; three is the setting.
+		await page.setViewportSize({ width: 700, height: 900 });
+		await expect.poll(columns, { timeout: 10000 }).toBe(3);
+
+		// And on a phone the ladder would have given one.
+		await page.setViewportSize({ width: 400, height: 900 });
 		await expect.poll(columns, { timeout: 10000 }).toBe(2);
 	});
 
@@ -2491,7 +2497,7 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(drawn[0]).toBeGreaterThan(0);
 	});
 
-	test('the columns control answers for the screen the editor is previewing', async ({
+	test('a screen is given a count of its own the way the editor styles a screen', async ({
 		page,
 		admin,
 		editor,
@@ -2535,11 +2541,24 @@ test.describe('Gallery Item Template layouts', () => {
 		// The desktop count, which is what the block was given.
 		await expect(columns).toHaveValue('4');
 
-		// Switching the preview switches what the control answers for: there
-		// is one answer to what the gallery looks like on a phone, and it is
-		// the editor's own switcher rather than a second set of tabs.
-		await page.getByRole('button', { name: 'View', exact: true }).click();
-		await page.getByRole('menuitemradio', { name: 'Tablet' }).click();
+		// A narrower screen is styled the way the editor styles one: with
+		// Responsive styles on, the View switched to that screen, and the
+		// inspector showing what a viewport can be styled with - the Layout
+		// panel among it, which is where the count for the screen lives.
+		const view = page.getByRole('button', { name: 'View', exact: true });
+
+		await view.click();
+		await page
+			.getByRole('menuitemcheckbox', { name: 'Responsive styles' })
+			.click();
+
+		const tablet = page.getByRole('menuitemradio', { name: 'Tablet' });
+
+		if (!(await tablet.isVisible())) {
+			await view.click();
+		}
+
+		await tablet.click();
 
 		await expect(columns).toHaveValue('0');
 
@@ -2563,6 +2582,12 @@ test.describe('Gallery Item Template layouts', () => {
 		const blocks = await editor.getBlocks();
 
 		expect(blocks[0].innerBlocks[0].attributes.layoutColumnCount).toBe(4);
+
+		// Back on the desktop, the count is the desktop's again.
+		await view.click();
+		await page.getByRole('menuitemradio', { name: 'Desktop' }).click();
+
+		await expect(columns).toHaveValue('4');
 	});
 
 	test('the editor draws the layout the moment it is picked', async ({

@@ -43,8 +43,83 @@ class Visual_Portfolio_Block_Item_Template {
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_block' ), 11 );
 
+		// styles. On the page and in the editor canvas alike: the action runs
+		// for both, and the rules ride along with the block stylesheet.
+		add_action( 'enqueue_block_assets', array( $this, 'add_screen_columns_style' ) );
+
 		// editor. Late, so that the editor bundle it attaches to is registered.
 		add_action( 'enqueue_block_assets', array( $this, 'enqueue_tiles_presets' ), 20 );
+	}
+
+	/**
+	 * The screens a column count can be set for, and the media query each
+	 * one answers to.
+	 *
+	 * The screens are the editor's own. Since 7.1 the editor styles a block
+	 * per viewport - Responsive styles in its View menu, the Tablet and Mobile
+	 * previews cut at the breakpoints the theme declares in `settings.viewport`
+	 * of `theme.json`, or at the 782px and 480px the editor falls back to -
+	 * and a count set for a screen has to apply exactly where the editor
+	 * showed it. So the queries are asked of the editor rather than written
+	 * here, which is also what keeps them in step with a theme that moves
+	 * the breakpoints.
+	 *
+	 * The queries are ranges, the way the editor's are: the tablet count is
+	 * the tablet's alone, and a phone with no count of its own steps the
+	 * desktop count down the ladder the stylesheet walks.
+	 *
+	 * @return array screen name to media query, `@media` included.
+	 */
+	public static function get_screen_queries() {
+		$queries = method_exists( 'WP_Theme_JSON', 'get_viewport_media_queries' )
+			? WP_Theme_JSON::get_viewport_media_queries( wp_get_global_settings( array( 'viewport' ) ) )
+			: array();
+
+		$screens = array();
+
+		foreach ( array( 'tablet', 'mobile' ) as $screen ) {
+			if ( ! empty( $queries[ '@' . $screen ] ) ) {
+				$screens[ $screen ] = $queries[ '@' . $screen ];
+			}
+		}
+
+		return $screens;
+	}
+
+	/**
+	 * The rules a count set for a screen is applied by.
+	 *
+	 * Attached to the block stylesheet rather than written into it: a
+	 * stylesheet cannot read the breakpoints of a theme, and these have to.
+	 * Printed after the stylesheet, at the same weight as the ladder the
+	 * stylesheet walks, so a count set outright wins over a stepped one.
+	 *
+	 * @return void
+	 */
+	public function add_screen_columns_style() {
+		static $done = false;
+
+		if ( $done ) {
+			return;
+		}
+
+		$done = true;
+
+		$rules = '';
+
+		// The queries are built by the editor out of breakpoints it has
+		// checked are plain lengths, and the screen names are this class's own.
+		foreach ( self::get_screen_queries() as $screen => $query ) {
+			$rules .= sprintf(
+				'%1$s{.wp-block-visual-portfolio-item-template.vp-has-%2$s-columns{--vp-layout-current-columns:var(--vp-layout-columns-%2$s)}}',
+				$query,
+				$screen
+			);
+		}
+
+		if ( $rules ) {
+			wp_add_inline_style( self::STYLE, $rules );
+		}
 	}
 
 	/**
@@ -582,8 +657,10 @@ class Visual_Portfolio_Block_Item_Template {
 		// A count of its own for a narrower screen. Left at zero the count
 		// steps down the ladder the stylesheet walks, which is what a gallery
 		// has always done; a number set here is the answer for that screen
-		// instead. Only in manual mode - the width of a column is what decides
-		// the count in auto mode, and a second answer would fight it.
+		// instead - applied by the rules of `add_screen_columns_style()`, at
+		// the breakpoints the editor previews the screen at. Only in manual
+		// mode - the width of a column is what decides the count in auto
+		// mode, and a second answer would fight it.
 		if ( ! $is_auto ) {
 			foreach ( array(
 				'tablet' => 'layoutColumnCountTablet',

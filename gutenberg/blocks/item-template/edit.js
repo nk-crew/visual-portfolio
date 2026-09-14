@@ -56,7 +56,7 @@ import {
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
-import { getColumnsProps } from './columns';
+import { getColumnsProps, getViewportBreakpoints } from './columns';
 import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
 import useEditorLayout from './use-editor-layout';
 
@@ -423,25 +423,44 @@ function MaximumColumnsControl({ value, onChange }) {
 	);
 }
 
-// The count is set for one screen at a time, and the screen is the one the
-// editor is already previewing - the switcher in its own toolbar, rather than a
-// second set of tabs in the sidebar saying the same thing. Keyed by the names
-// the editor calls its devices.
+// A count of its own for a narrower screen is set the way the editor styles
+// a block for one: switch the View to Tablet or Mobile with Responsive styles
+// on, and the inspector shows the panels a viewport can be styled in, the
+// Layout panel among them - which is where the count for that screen lives.
+// Keyed by the names the editor calls its devices, and by the screen each
+// one is written for.
 const SCREEN_ATTRIBUTES = {
-	Tablet: 'layoutColumnCountTablet',
-	Mobile: 'layoutColumnCountMobile',
+	Tablet: { screen: 'tablet', attribute: 'layoutColumnCountTablet' },
+	Mobile: { screen: 'mobile', attribute: 'layoutColumnCountMobile' },
 };
 
-const SCREEN_LABELS = {
-	Tablet: __(
-		'The count for a tablet, 992px and narrower. Zero steps the desktop count down on its own, the way it always has.',
-		'visual-portfolio'
-	),
-	Mobile: __(
-		'The count for a phone, 576px and narrower. Zero steps the desktop count down on its own, the way it always has.',
-		'visual-portfolio'
-	),
-};
+/**
+ * What a count for a screen answers for, breakpoint included - the editor
+ * says what a size comes to wherever it offers one.
+ *
+ * @param {string} screen     - `tablet` or `mobile`.
+ * @param {string} breakpoint - the width the screen is previewed at.
+ * @return {string} help text.
+ */
+function getScreenHelp(screen, breakpoint) {
+	return 'tablet' === screen
+		? sprintf(
+				/* translators: %s: breakpoint, e.g. 782px. */
+				__(
+					'The count on a tablet, %s and narrower, down to a phone. Zero steps the desktop count down on its own, the way it always has.',
+					'visual-portfolio'
+				),
+				breakpoint
+			)
+		: sprintf(
+				/* translators: %s: breakpoint, e.g. 480px. */
+				__(
+					'The count on a phone, %s and narrower. Zero steps the desktop count down on its own, the way it always has.',
+					'visual-portfolio'
+				),
+				breakpoint
+			);
+}
 
 // A slide height is typed in the same units, and in `vh` besides: a share of
 // the screen is what the legacy slider offered as a percentage height.
@@ -683,6 +702,8 @@ export default function BlockEdit({
 		layoutType,
 		layoutColumnsMode,
 		layoutColumnCount,
+		layoutColumnCountTablet,
+		layoutColumnCountMobile,
 		layoutMinimumColumnWidth,
 		layoutAutoFit,
 		layoutTiles,
@@ -705,11 +726,10 @@ export default function BlockEdit({
 		carouselStretchSlides,
 		carouselSlidesPerGroup,
 	} = attributes;
-	// Which screen the columns control is answering for. A view of the editor
-	// rather than anything saved with the post.
-	// Which screen the count is being set for: whichever one the editor is
-	// previewing. Switching the preview switches the control, so there is one
-	// answer to "what does this gallery look like on a phone" and not two.
+	// Which screen a count of its own is being set for: whichever one the
+	// editor is previewing. A view of the editor rather than anything saved
+	// with the post - and only a screen the theme has a breakpoint for, since
+	// the editor previews no other.
 	const deviceType = useSelect(
 		(select) =>
 			select('core/editor')?.getDeviceType?.() ??
@@ -718,7 +738,14 @@ export default function BlockEdit({
 			'Desktop',
 		[]
 	);
-	const screenAttribute = SCREEN_ATTRIBUTES[deviceType];
+	const [viewport] = useSettings('viewport');
+	const breakpoints = useMemo(
+		() => getViewportBreakpoints(viewport),
+		[viewport]
+	);
+	const screen = SCREEN_ATTRIBUTES[deviceType];
+	const screenAttribute =
+		screen && breakpoints[screen.screen] ? screen.attribute : undefined;
 	const {
 		'vp/queryType': queryType,
 		'vp/baseQuery': baseQuery,
@@ -855,7 +882,9 @@ export default function BlockEdit({
 	const repeatable = effectRepeats(carouselEffect);
 
 	// Tiles carry their columns in the notation, so that is where the layout
-	// reads them, whatever the columns controls say.
+	// reads them, whatever the columns controls say. The counts for the
+	// narrower screens go along, so a Tablet or Mobile preview draws the
+	// gallery the way that screen will see it.
 	const columnsProps = useMemo(
 		() =>
 			getColumnsProps(
@@ -867,6 +896,12 @@ export default function BlockEdit({
 					layoutColumnCount: singleSlide
 						? 1
 						: tilesColumns || layoutColumnCount,
+					layoutColumnCountTablet: singleSlide
+						? 0
+						: layoutColumnCountTablet,
+					layoutColumnCountMobile: singleSlide
+						? 0
+						: layoutColumnCountMobile,
 					layoutMinimumColumnWidth,
 					layoutAutoFit,
 				},
@@ -876,6 +911,8 @@ export default function BlockEdit({
 			layoutType,
 			layoutColumnsMode,
 			layoutColumnCount,
+			layoutColumnCountTablet,
+			layoutColumnCountMobile,
 			layoutMinimumColumnWidth,
 			layoutAutoFit,
 			tilesColumns,
@@ -991,6 +1028,49 @@ export default function BlockEdit({
 	// that spreads one slide over the gallery is not one of them.
 	const hasColumns = COLUMN_LAYOUTS.includes(layoutType) && !singleSlide;
 
+	// What a count is called: a carousel counts the slides in its frame.
+	const countLabel =
+		'carousel' === layoutType
+			? __('Slides per view', 'visual-portfolio')
+			: __('Columns', 'visual-portfolio');
+
+	// The count for the screen being previewed, in the Layout panel: the one
+	// panel the editor keeps for the layout of a viewport, and one of the few
+	// it shows at all while Responsive styles has the inspector styling that
+	// viewport alone. Nothing here on a desktop - the desktop count is the
+	// count, and lives with the rest of the settings.
+	const screenControls = hasColumns && !isAuto && screenAttribute && (
+		<InspectorControls
+			group="layout"
+			resetAllFilter={() => ({
+				layoutColumnCountTablet: 0,
+				layoutColumnCountMobile: 0,
+			})}
+		>
+			<ToolsPanelItem
+				isShownByDefault
+				panelId={clientId}
+				hasValue={() => !!attributes[screenAttribute]}
+				label={countLabel}
+				onDeselect={() => setAttributes({ [screenAttribute]: 0 })}
+			>
+				<RangeControl
+					label={countLabel}
+					help={getScreenHelp(
+						screen.screen,
+						breakpoints[screen.screen]
+					)}
+					value={attributes[screenAttribute] || 0}
+					onChange={(value) =>
+						setAttributes({ [screenAttribute]: value ?? 0 })
+					}
+					min={0}
+					max={MAX_COLUMN_COUNT}
+				/>
+			</ToolsPanelItem>
+		</InspectorControls>
+	);
+
 	const layoutControls = (
 		<ToolsPanel
 			label={__('Settings', 'visual-portfolio')}
@@ -1001,8 +1081,6 @@ export default function BlockEdit({
 						layoutTiles: '3|1,1|',
 						layoutColumnsMode: 'auto',
 						layoutColumnCount: 3,
-						layoutColumnCountTablet: 0,
-						layoutColumnCountMobile: 0,
 						layoutMinimumColumnWidth: '16rem',
 						layoutAutoFit: false,
 					})
@@ -1039,18 +1117,10 @@ export default function BlockEdit({
 			{hasColumns && (
 				<ToolsPanelItem
 					isShownByDefault
-					hasValue={() =>
-						'auto' !== layoutColumnsMode ||
-						!!attributes.layoutColumnCountTablet ||
-						!!attributes.layoutColumnCountMobile
-					}
+					hasValue={() => 'auto' !== layoutColumnsMode}
 					label={__('Columns', 'visual-portfolio')}
 					onDeselect={() =>
-						setAttributes({
-							layoutColumnsMode: 'auto',
-							layoutColumnCountTablet: 0,
-							layoutColumnCountMobile: 0,
-						})
+						setAttributes({ layoutColumnsMode: 'auto' })
 					}
 				>
 					{/* The two shapes the core grid layout offers, in its own
@@ -1081,31 +1151,14 @@ export default function BlockEdit({
 
 						{isAuto ? null : (
 							<RangeControl
-								label={
-									'carousel' === layoutType
-										? __(
-												'Slides per view',
-												'visual-portfolio'
-											)
-										: __('Columns', 'visual-portfolio')
-								}
-								help={SCREEN_LABELS[deviceType]}
-								value={
-									screenAttribute
-										? attributes[screenAttribute] || 0
-										: layoutColumnCount
-								}
+								label={countLabel}
+								value={layoutColumnCount}
 								onChange={(value) =>
-									setAttributes(
-										screenAttribute
-											? { [screenAttribute]: value ?? 0 }
-											: {
-													layoutColumnCount:
-														value ?? 1,
-												}
-									)
+									setAttributes({
+										layoutColumnCount: value ?? 1,
+									})
 								}
-								min={screenAttribute ? 0 : 1}
+								min={1}
 								max={MAX_COLUMN_COUNT}
 							/>
 						)}
@@ -1558,11 +1611,14 @@ export default function BlockEdit({
 	);
 
 	const inspectorControls = (
-		<InspectorControls>
-			{layoutControls}
-			{justifiedControls}
-			{carouselControls}
-		</InspectorControls>
+		<>
+			<InspectorControls>
+				{layoutControls}
+				{justifiedControls}
+				{carouselControls}
+			</InspectorControls>
+			{screenControls}
+		</>
 	);
 
 	// Where the slides of a carousel come to rest, and the width they rest

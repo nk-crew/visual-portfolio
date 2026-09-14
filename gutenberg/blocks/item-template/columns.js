@@ -91,12 +91,72 @@ export function getColumnCount(attributes) {
 }
 
 // The screens a column count can be set for, and the attribute each one is
-// written to. Named after the breakpoints the plugin already carries: a tablet
-// is 992px and narrower, a phone 576px and narrower.
+// written to. The screens are the editor's own - the ones its View menu
+// previews and, with Responsive styles on, styles one at a time - and a count
+// applies where the editor showed it: at the breakpoints of
+// `getViewportBreakpoints()`, which the server turns into the media queries
+// of `vp-has-tablet-columns` and `vp-has-mobile-columns`.
 export const SCREEN_COLUMNS = [
 	{ screen: 'tablet', attribute: 'layoutColumnCountTablet' },
 	{ screen: 'mobile', attribute: 'layoutColumnCountMobile' },
 ];
+
+// The widths the editor falls back to when a theme declares none.
+export const DEFAULT_VIEWPORT_BREAKPOINTS = {
+	mobile: '480px',
+	tablet: '782px',
+};
+
+// A breakpoint is a plain length: the editor writes it into a media query.
+const VIEWPORT_SIZE = /^(?:\d+|\d*\.\d+)(?:px|em|rem)$/;
+
+/**
+ * A breakpoint in pixels, for putting two of them in order.
+ *
+ * @param {string} value - breakpoint.
+ * @return {number} pixels, `em` and `rem` at the browser's 16px.
+ */
+function toPixels(value) {
+	return parseFloat(value) * (value.endsWith('px') ? 1 : 16);
+}
+
+/**
+ * The breakpoints the editor previews a tablet and a phone at.
+ *
+ * `settings.viewport` of `theme.json`, read the way the editor reads it: a
+ * plain px, em or rem length for each screen, the defaults where a theme
+ * declares nothing usable, and a tablet no wider than a phone dropped. A
+ * screen a theme leaves out is left out - the editor offers no preview of
+ * it, so there is nothing to set a count for.
+ *
+ * @param {Object} viewport - the `viewport` setting, or nothing.
+ * @return {Object} screen name to breakpoint.
+ */
+export function getViewportBreakpoints(viewport) {
+	const breakpoints = {};
+
+	Object.keys(DEFAULT_VIEWPORT_BREAKPOINTS).forEach((screen) => {
+		const value = String(viewport?.[screen] ?? '').trim();
+
+		if (VIEWPORT_SIZE.test(value)) {
+			breakpoints[screen] = value;
+		}
+	});
+
+	if (!Object.keys(breakpoints).length) {
+		return { ...DEFAULT_VIEWPORT_BREAKPOINTS };
+	}
+
+	if (
+		breakpoints.mobile &&
+		breakpoints.tablet &&
+		toPixels(breakpoints.mobile) >= toPixels(breakpoints.tablet)
+	) {
+		return { mobile: breakpoints.mobile };
+	}
+
+	return breakpoints;
+}
 
 /**
  * Classes and custom properties the layout is drawn from.

@@ -362,19 +362,11 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	}
 
 	// A gallery that was given a count of its own for a narrower screen says
-	// it outright rather than walking the ladder. After the ladder on purpose:
-	// the two are of the same weight, and the later one is meant to win.
-	@media (max-width: 992px) {
-		&.vp-has-tablet-columns {
-			--vp-layout-current-columns: var(--vp-layout-columns-tablet);
-		}
-	}
-
-	@media (max-width: 576px) {
-		&.vp-has-mobile-columns {
-			--vp-layout-current-columns: var(--vp-layout-columns-mobile);
-		}
-	}
+	// it outright rather than walking the ladder - `vp-has-tablet-columns`
+	// and `vp-has-mobile-columns`, with the count in `--vp-layout-columns-*`.
+	// Those rules are not here: they apply at the breakpoints the editor
+	// previews a tablet and a phone at, which a theme sets, so the block
+	// prints them after this stylesheet, at the same weight as the ladder.
 
 	&.vp-layout-grid {
 		display: grid;

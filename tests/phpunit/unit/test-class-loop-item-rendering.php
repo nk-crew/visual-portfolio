@@ -439,6 +439,71 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A count set for a screen applies where the editor previews that screen:
+	 * at the breakpoints the theme declares for its responsive styles, or the
+	 * ones the editor falls back to - and as the same ranges, so the tablet
+	 * count is the tablet's alone.
+	 *
+	 * @return void
+	 */
+	public function test_a_screen_count_applies_at_the_breakpoints_the_editor_previews() {
+		$this->skip_without_loop_blocks();
+
+		$queries = Visual_Portfolio_Block_Item_Template::get_screen_queries();
+
+		$this->assertSame( array( 'tablet', 'mobile' ), array_keys( $queries ) );
+		$this->assertSame( '@media (480px < width <= 782px)', $queries['tablet'] );
+		$this->assertSame( '@media (width <= 480px)', $queries['mobile'] );
+
+		// The rules ride along with the block stylesheet, after it, so they
+		// are printed wherever the stylesheet is - the editor canvas included.
+		wp_styles()->add_data( Visual_Portfolio_Block_Item_Template::STYLE, 'after', array() );
+
+		( new Visual_Portfolio_Block_Item_Template() )->add_screen_columns_style();
+
+		$rules = implode( '', (array) wp_styles()->get_data( Visual_Portfolio_Block_Item_Template::STYLE, 'after' ) );
+
+		$this->assertStringContainsString( '@media (480px < width <= 782px){.wp-block-visual-portfolio-item-template.vp-has-tablet-columns{--vp-layout-current-columns:var(--vp-layout-columns-tablet)}}', $rules );
+		$this->assertStringContainsString( '@media (width <= 480px){.wp-block-visual-portfolio-item-template.vp-has-mobile-columns{--vp-layout-current-columns:var(--vp-layout-columns-mobile)}}', $rules );
+	}
+
+	/**
+	 * A theme that moves the breakpoints moves the counts with them.
+	 *
+	 * @return void
+	 */
+	public function test_a_screen_count_follows_the_breakpoints_of_the_theme() {
+		$this->skip_without_loop_blocks();
+
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+					'settings' => array(
+						'viewport' => array(
+							'mobile' => '600px',
+							'tablet' => '1024px',
+						),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		WP_Theme_JSON_Resolver::clean_cached_data();
+
+		try {
+			$queries = Visual_Portfolio_Block_Item_Template::get_screen_queries();
+		} finally {
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			WP_Theme_JSON_Resolver::clean_cached_data();
+		}
+
+		$this->assertSame( '@media (600px < width <= 1024px)', $queries['tablet'] );
+		$this->assertSame( '@media (width <= 600px)', $queries['mobile'] );
+	}
+
+	/**
 	 * The thumbnails are a strip of buttons naming a slide each, in the order
 	 * the slides are in - an item with no picture keeps its place, or every
 	 * press after it would reach the wrong slide.
