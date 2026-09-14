@@ -133,6 +133,29 @@ function getItemBoxes(page) {
 }
 
 /**
+ * The slide a repeating carousel is resting on, read the way the module reads
+ * it: the position on a clock one period long, one step per slide, counted
+ * from where the padding puts the first.
+ *
+ * @param {import('@playwright/test').Locator} list - the carousel.
+ * @return {Promise<number>} index of the slide.
+ */
+function getRestingSlide(list) {
+	return list.evaluate((node) => {
+		const items = node.children;
+		const step = items[1].offsetLeft - items[0].offsetLeft;
+		const period = items.length * step;
+		const origin = parseFloat(
+			window.getComputedStyle(node).paddingInlineStart
+		);
+		const position =
+			(((node.scrollLeft - origin) % period) + period) % period;
+
+		return Math.round(position / step) % items.length;
+	});
+}
+
+/**
  * Wait until a carousel has come to rest.
  *
  * A scroll asked for while the browser is running one of its own - the snap it
@@ -514,6 +537,77 @@ test.describe('Gallery Item Template layouts', () => {
 			.not.toBe('0');
 	});
 
+	test('a swipe focuses the carousel without a ring, and a key draws one', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel swipe focus',
+			blockId: 'e2e-carousel-swipe-focus',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+
+		// The drag is the library's, and a cold cache takes its time.
+		await expect(list).toHaveAttribute('blossom-carousel', 'true', {
+			timeout: 15000,
+		});
+
+		const box = await list.boundingBox();
+		const rings = () =>
+			list.evaluate((node) => ({
+				focused: document.activeElement === node,
+				list: window.getComputedStyle(node).outlineStyle,
+				frame: window.getComputedStyle(node.parentElement).outlineStyle,
+			}));
+
+		// A drag to the end, where the library pulls the list aside to say
+		// it has run out - which is where a ring drawn on the list, clipped
+		// everywhere else by the frame, used to show.
+		for (let pass = 0; pass < 3; pass += 1) {
+			await page.mouse.move(
+				box.x + box.width * 0.8,
+				box.y + box.height / 2
+			);
+			await page.mouse.down();
+
+			for (let part = 1; part <= 10; part += 1) {
+				await page.mouse.move(
+					box.x + box.width * 0.8 - (box.width * 0.7 * part) / 10,
+					box.y + box.height / 2
+				);
+			}
+
+			await page.mouse.up();
+			await settle(list);
+		}
+
+		// The list has the focus, so the keyboard can take over - and no ring,
+		// on the list or around it: the pointer asked for none.
+		expect(await rings()).toEqual({
+			focused: true,
+			list: 'none',
+			frame: 'none',
+		});
+
+		// A key is the keyboard asking, and the ring is drawn on the frame,
+		// where nothing clips it.
+		await page.keyboard.press('ArrowLeft');
+
+		await expect.poll(rings).toEqual({
+			focused: true,
+			list: 'none',
+			frame: 'solid',
+		});
+	});
+
 	test('a centred carousel rests every slide in the middle, the first and the last included', async ({
 		page,
 		requestUtils,
@@ -735,6 +829,114 @@ test.describe('Gallery Item Template layouts', () => {
 		await page.locator(PREV_ARROW).click();
 		await expect.poll(resting, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
 		await expect.poll(current, { timeout: 10000 }).toBe(IMAGES_COUNT - 1);
+	});
+
+	test('a repeating carousel rests on the slide at its seam, and steps on from it', async ({
+		page,
+		requestUtils,
+	}) => {
+		// Playwright asks for less motion by default, and a carousel that was
+		// asked for less motion never runs on its own.
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+		// Four across with no gap: the loop is padded by half the frame, which
+		// is two slides, so the third slide from the end comes to rest exactly
+		// where the loop is joined - and the library lets nothing rest within
+		// a few pixels of the join. The carousel snapped into that margin,
+		// the library threw it to the other end, and the two handed it back
+		// and forth until it fell back to the slide before: an arrow, a dot
+		// and autoplay all died there.
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel repeat seam slide',
+			blockId: 'e2e-carousel-repeat-seam-slide',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 4,
+				carouselRepeat: true,
+				carouselAutoplay: true,
+				carouselAutoplayDelay: 2,
+				style: { spacing: { blockGap: '0' } },
+			},
+			carousel: [
+				'loop-carousel-previous',
+				'loop-carousel-indicator',
+				'loop-carousel-next',
+			],
+		});
+
+		const list = page.locator(LIST);
+		const dots = page.locator(`${NAV} ${DOT}`);
+		const seamSlide = IMAGES_COUNT - 2;
+
+		await expect(list).toHaveAttribute('has-repeat', 'true', {
+			timeout: 15000,
+		});
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+
+		// The first slide still opens flush with the frame: the padding was
+		// moved from one end to the other, not added.
+		await expect
+			.poll(
+				() =>
+					list.evaluate((node) =>
+						Math.round(
+							node.children[0].getBoundingClientRect().left -
+								node.parentElement.getBoundingClientRect().left
+						)
+					),
+				{ timeout: 10000 }
+			)
+			.toBe(0);
+
+		// A dot takes the carousel to the seam slide and it stays there.
+		await dots.nth(seamSlide).click();
+		await expect
+			.poll(() => getRestingSlide(list), { timeout: 10000 })
+			.toBe(seamSlide);
+		await page.waitForTimeout(600);
+		expect(await getRestingSlide(list)).toBe(seamSlide);
+
+		// The arrow steps one slide on from it - one step, not a whole turn
+		// of the loop to a place one step ahead.
+		await list.evaluate((node) => {
+			node.dataset.farthest = String(node.scrollLeft);
+			node.addEventListener('scroll', () => {
+				node.dataset.farthest = String(
+					Math.max(parseFloat(node.dataset.farthest), node.scrollLeft)
+				);
+			});
+		});
+
+		const before = await list.evaluate((node) => node.scrollLeft);
+
+		await page.locator(NEXT_ARROW).click();
+		await expect
+			.poll(() => getRestingSlide(list), { timeout: 10000 })
+			.toBe(seamSlide + 1);
+
+		const { farthest, step } = await list.evaluate((node) => ({
+			farthest: parseFloat(node.dataset.farthest),
+			step: node.children[1].offsetLeft - node.children[0].offsetLeft,
+		}));
+
+		expect(farthest - before).toBeLessThan(2 * step);
+
+		// And autoplay walks across the seam slide on its own. The pointer
+		// and the focus are taken off the carousel, both of which hold it.
+		await dots.nth(seamSlide - 1).click();
+		await expect
+			.poll(() => getRestingSlide(list), { timeout: 10000 })
+			.toBe(seamSlide - 1);
+		await page.evaluate(() => document.activeElement?.blur());
+		await page.mouse.move(0, 0);
+
+		for (const expected of [seamSlide, seamSlide + 1]) {
+			await expect
+				.poll(() => getRestingSlide(list), { timeout: 10000 })
+				.toBe(expected);
+		}
 	});
 
 	test('a narrow screen draws the column count it was given', async ({

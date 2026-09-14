@@ -318,6 +318,19 @@ const restingPlaces = new WeakMap();
 // the margin in from both ends, and a step past it is made in two moves.
 const REPEAT_EDGE = 4;
 
+// How far from the seam of the loop a slide has to rest: the margin, and a
+// pixel for the rounding of a scroll position.
+const SEAM_CLEARANCE = REPEAT_EDGE + 1;
+
+// The padding moved from one end of a repeating list to the other to keep
+// its resting places off the seam. Read by the stylesheet.
+const SEAM_SHIFT_PROPERTY = '--vp-carousel-seam-shift';
+
+// The focus a press put on the list. The pointer's rather than the
+// keyboard's, so the stylesheet draws no ring for it; taken off on the first
+// key, which is the keyboard asking.
+const POINTER_FOCUS_CLASS = 'vp-carousel-pointer-focus';
+
 // How long a step of a repeating carousel takes, drawn by the module.
 const TRAVEL_DURATION = 450;
 
@@ -473,11 +486,22 @@ function goToRepeatingSlide(list, index, direction = 0, speed = 0) {
 
 	let target = base;
 
+	// The nearest place the way the press said, however many turns off the
+	// slide's own place is: a carousel that had just come round to the start
+	// of its range was sent a whole turn on to a slide one step ahead.
 	if (direction > 0) {
+		while (target - period > position + 1) {
+			target -= period;
+		}
+
 		while (target <= position + 1) {
 			target += period;
 		}
 	} else if (direction < 0) {
+		while (target + period < position - 1) {
+			target += period;
+		}
+
 		while (target >= position - 1) {
 			target -= period;
 		}
@@ -775,6 +799,83 @@ function landDrags(list) {
 	return () => {
 		list.removeEventListener('pointerdown', onDown);
 		stopWatching();
+	};
+}
+
+/**
+ * Keep the resting places of a repeating carousel off the seam of its loop.
+ *
+ * Blossom lets the scroll rest no nearer than a margin to either end of its
+ * range, and puts a scroll that gets nearer back at the other end - so the
+ * clock has a dead stretch as wide as the margin on either side of its seam,
+ * and a slide whose resting place falls in it can never be rested on: the
+ * browser snaps into the stretch, Blossom throws the scroll to the other
+ * end, and the two hand the carousel back and forth until it gives up on the
+ * slide before. Four columns with no gap put a slide exactly there.
+ *
+ * The slides rest one step apart from where the padding at the start puts
+ * the first, so when that lands within the clearance of a multiple of the
+ * step, twice the clearance is moved from the padding at the end to the
+ * padding at the start. Every resting place moves off the stretch, and
+ * nothing else does: the two paddings still add up to the frame, so the
+ * loop is as long as it was and the copies land where they did.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {Function} Teardown.
+ */
+function keepSeamOffTheGrid(list) {
+	const view = list.ownerDocument.defaultView || window;
+
+	const update = () => {
+		const applied =
+			parseFloat(list.style.getPropertyValue(SEAM_SHIFT_PROPERTY)) || 0;
+		const { count, step, period, origin } = getRepeatGeometry(list);
+
+		if (!count || !step) {
+			return;
+		}
+
+		// Where the first slide would rest with no shift at all, on its step.
+		const bare = origin - applied;
+		const offset = ((bare % step) + step) % step;
+		const wanted =
+			offset < SEAM_CLEARANCE || offset > step - SEAM_CLEARANCE
+				? 2 * SEAM_CLEARANCE
+				: 0;
+
+		if (wanted === applied) {
+			return;
+		}
+
+		if (wanted) {
+			list.style.setProperty(SEAM_SHIFT_PROPERTY, `${wanted}px`);
+		} else {
+			list.style.removeProperty(SEAM_SHIFT_PROPERTY);
+		}
+
+		// The slides moved with the padding, and the scroll goes with them so
+		// the carousel shows what it showed.
+		if (period) {
+			placeRepeating(
+				list,
+				getScrollPosition(list) + (wanted - applied),
+				period
+			);
+		}
+	};
+
+	update();
+
+	// The step is a share of the frame and the padding another, so where the
+	// first slide rests on its step changes with the width.
+	const observer = new view.ResizeObserver(update);
+
+	observer.observe(list);
+
+	return () => {
+		observer.disconnect();
+		list.style.removeProperty(SEAM_SHIFT_PROPERTY);
 	};
 }
 
@@ -2503,6 +2604,9 @@ function initCarousel(list) {
 	// desktop one.
 	const repeats = isRepeating(list);
 
+	// Before the first slide is looked for: the shift moves where it rests.
+	const stopShifting = repeats ? keepSeamOffTheGrid(list) : noop;
+
 	// A repeating carousel opens on its first slide. The padding the loop is
 	// carried in comes from the stylesheet, so the place is known before the
 	// library that carries the loop has loaded - and it is taken now, so
@@ -2524,17 +2628,26 @@ function initCarousel(list) {
 	// still reaches the link the ordinary way. The list takes the focus
 	// instead, which is what lets the arrow keys move the carousel after a
 	// click on it.
+	//
+	// A focus a script gives is one the browser draws a ring for, whatever
+	// the pointer was doing - so the list is marked as focused by the pointer
+	// and the stylesheet leaves the ring out, until a key says the keyboard
+	// has taken over or the focus is gone.
 	const onMouseDown = (event) => {
 		if (0 !== event.button) {
 			return;
 		}
 
 		event.preventDefault();
+		list.classList.add(POINTER_FOCUS_CLASS);
 		list.focus({ preventScroll: true });
 	};
+	const unmarkFocus = () => list.classList.remove(POINTER_FOCUS_CLASS);
 
 	if (canDrag) {
 		list.addEventListener('mousedown', onMouseDown);
+		list.addEventListener('keydown', unmarkFocus);
+		list.addEventListener('blur', unmarkFocus);
 	}
 
 	// A drag of a repeating carousel takes over from a step the module is
@@ -2589,6 +2702,10 @@ function initCarousel(list) {
 		list.removeEventListener('scroll', onScroll);
 		list.removeEventListener(GO_TO_EVENT, onGoTo);
 		list.removeEventListener('mousedown', onMouseDown);
+		list.removeEventListener('keydown', unmarkFocus);
+		list.removeEventListener('blur', unmarkFocus);
+		unmarkFocus();
+		stopShifting();
 		stopLanding();
 		stopTravel(list);
 		stopAnswering();

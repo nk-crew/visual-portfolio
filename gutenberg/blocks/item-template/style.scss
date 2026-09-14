@@ -454,16 +454,14 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			transition: --vp-carousel-fade-left 0.2s linear, --vp-carousel-fade-right 0.2s linear;
 		}
 
-		// A pointer never draws a focus ring here: the ring is for the keyboard,
-		// and a click on the scrollbar or an arrow used to light the whole
-		// gallery up.
-		&:focus {
-			outline: none;
-		}
-
+		// No ring on the list itself, whoever focused it. The frame clips the
+		// list, so a ring around the list was clipped with it - and showed
+		// only where the library pulled the list aside at the end of a drag,
+		// which read as a fault. The ring of a keyboard focus is drawn on the
+		// frame instead, below.
+		&:focus,
 		&:focus-visible {
-			outline: 2px solid currentcolor;
-			outline-offset: 2px;
+			outline: none;
 		}
 	}
 
@@ -678,6 +676,17 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	// endless mode pads the list by half its width, and a percentage of what
 	// that leaves is nothing.
 	container-type: inline-size;
+
+	// The focus ring of the list, drawn where the clip cannot reach it. For
+	// the keyboard alone: a press gives the list focus so the arrow keys move
+	// the carousel, and the module marks that focus as the pointer's until a
+	// key is pressed - a ring around a carousel that was only swiped is a
+	// ring nobody asked for, and the browser draws one for a focus a script
+	// gave whatever the pointer was doing.
+	&:has(> .wp-block-visual-portfolio-item-template:focus-visible:not(.vp-carousel-pointer-focus)) {
+		outline: 2px solid currentcolor;
+		outline-offset: 2px;
+	}
 }
 
 // The loop is fetching its next state. The controls stay clickable - a second
@@ -740,7 +749,12 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 // `!important`, and a rule outside it would lose.
 @layer blossom-carousel {
 	.wp-block-visual-portfolio-item-template.vp-layout-carousel[data-vp-carousel-repeat="true"] {
-		padding-inline: 50cqw !important;
+		// Half the frame at each end, less a shift the module moves from one
+		// end to the other when a slide would come to rest on the seam of the
+		// loop - see `keepSeamOffTheGrid` in the view module. The two still
+		// add up to the frame, so the loop is as long as it was.
+		padding-inline-start: calc(50cqw + var(--vp-carousel-seam-shift, 0px)) !important;
+		padding-inline-end: calc(50cqw - var(--vp-carousel-seam-shift, 0px)) !important;
 		scroll-padding-inline: var(--vp-carousel-inset, 0) !important;
 	}
 }
