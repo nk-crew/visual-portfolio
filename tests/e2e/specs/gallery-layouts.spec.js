@@ -2642,10 +2642,15 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(list).toHaveClass(/vp-layout-tiles/);
 
 		// The default pattern is a plain three column grid of squares, so the
-		// picker has to be able to change it. Every preset is drawn from the
-		// notation it stands for and named after it.
+		// presets have to be able to change it. They are a button of the block
+		// toolbar, and every preset is drawn from the notation it stands for
+		// and named after it.
+		await page.getByRole('button', { name: 'Pattern presets' }).click();
 		await expect(page.locator('.vp-tiles-preset')).not.toHaveCount(0);
 		await page.locator(`.vp-tiles-preset[aria-label="${TILES}"]`).click();
+
+		// Picked, the catalogue closes.
+		await expect(page.locator('.vp-tiles-preset')).toHaveCount(0);
 
 		// The editable item is shadowed by a hidden preview of itself, so the
 		// second tile of the pattern is the third node in the list.
@@ -2653,6 +2658,271 @@ test.describe('Gallery Item Template layouts', () => {
 			'grid-column-start',
 			'span 2'
 		);
+	});
+
+	/**
+	 * A tiles layout in the editor, with the pattern editor open.
+	 *
+	 * @param {Object} page   - Playwright page.
+	 * @param {Object} admin  - admin utils.
+	 * @param {Object} editor - editor utils.
+	 * @param {string} title  - title of the page.
+	 * @return {Object} the canvas.
+	 */
+	async function openTilesEditor(page, admin, editor, title) {
+		await admin.createNewPost({
+			title,
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'visual-portfolio/loop',
+			attributes: {
+				baseQuery: { perPage: IMAGES_COUNT, maxPages: 1 },
+				queryType: 'images',
+				imagesQuery: { images },
+			},
+			innerBlocks: [
+				{
+					name: 'visual-portfolio/item-template',
+					attributes: { layoutType: 'tiles' },
+					innerBlocks: [
+						{
+							name: 'visual-portfolio/item-image',
+							attributes: { aspectRatio: '1' },
+						},
+					],
+				},
+			],
+		});
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await editor.selectBlocks(
+			canvas.locator('[data-type="visual-portfolio/item-template"]')
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		return canvas;
+	}
+
+	/**
+	 * The pattern the item template holds.
+	 *
+	 * @param {Object} editor - editor utils.
+	 * @return {Promise<string>} tiles notation.
+	 */
+	function getPattern(editor) {
+		return editor
+			.getBlocks()
+			.then((blocks) => blocks[0].innerBlocks[0].attributes.layoutTiles);
+	}
+
+	test('the pattern editor builds a pattern by hand', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		const canvas = await openTilesEditor(
+			page,
+			admin,
+			editor,
+			'Layouts - pattern editor'
+		);
+		const list = canvas.locator(LIST);
+
+		// The default pattern is one square, drawn but not in hand: the tools
+		// come with the tile that is picked, the way a block's toolbar does.
+		const first = page.getByRole('button', { name: 'Tile 1' });
+		const add = page.getByRole('button', { name: 'Add tile' });
+
+		await expect(first).toHaveAttribute('aria-pressed', 'false');
+		await expect(page.getByRole('button', { name: 'Tile 2' })).toHaveCount(
+			0
+		);
+		await expect(add).toHaveCount(0);
+
+		await first.click();
+
+		await expect(first).toHaveAttribute('aria-pressed', 'true');
+		await expect(add).toBeVisible();
+
+		// A new tile is a copy of the one in hand, after it, and becomes the
+		// one in hand - so four presses are four more squares.
+		for (let i = 0; i < 4; i += 1) {
+			await add.click();
+		}
+
+		await expect(
+			page.getByRole('button', { name: 'Tile 5' })
+		).toHaveAttribute('aria-pressed', 'true');
+		await expect
+			.poll(() => getPattern(editor))
+			.toBe('3|1,1|1,1|1,1|1,1|1,1|');
+
+		// The height is measured in column widths, so a tile two columns wide
+		// and two tall is the block the reference pattern has - which the
+		// notation writes as `2,1`, a height of once its own width.
+		await page.getByRole('button', { name: 'Tile 2' }).click();
+		await page.getByRole('spinbutton', { name: 'Width' }).fill('2');
+		await page.getByRole('spinbutton', { name: 'Height' }).fill('2');
+
+		await page.getByRole('button', { name: 'Tile 4' }).click();
+		await page.getByRole('spinbutton', { name: 'Width' }).fill('2');
+
+		await expect.poll(() => getPattern(editor)).toBe(TILES);
+
+		// And the gallery is laid out by it as it is typed: the editable item
+		// is shadowed by a hidden preview of itself, so the second tile of the
+		// pattern is the third node in the list.
+		await expect(list.locator(ITEM).nth(2)).toHaveCSS(
+			'grid-column-start',
+			'span 2'
+		);
+		await expect(list.locator(ITEM).nth(2)).toHaveCSS(
+			'grid-row-start',
+			'span 2'
+		);
+
+		// A tile dragged onto another takes its place in the pattern, and
+		// stays in hand where it lands.
+		const second = page.getByRole('button', { name: 'Tile 2' });
+		const from = await second.boundingBox();
+		const to = await first.boundingBox();
+
+		await page.mouse.move(
+			from.x + from.width / 2,
+			from.y + from.height / 2
+		);
+		await page.mouse.down();
+		// The drag starts a few pixels in, so a click stays a click.
+		await page.mouse.move(
+			from.x + from.width / 2 - 10,
+			from.y + from.height / 2
+		);
+		await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, {
+			steps: 8,
+		});
+		await page.mouse.up();
+
+		await expect(first).toHaveAttribute('aria-pressed', 'true');
+		await expect
+			.poll(() => getPattern(editor))
+			.toBe('3|2,1|1,1|1,1|2,0.5|1,1|');
+
+		// `@dnd-kit` swallows the click that follows a drop for 50ms, so
+		// that a drag does not end in a click on the tile it lands on. No
+		// hand clicks the next button that soon; the test would.
+		await page.waitForTimeout(100);
+		await page.getByRole('button', { name: 'Remove tile' }).click();
+
+		await expect
+			.poll(() => getPattern(editor))
+			.toBe('3|1,1|1,1|2,0.5|1,1|');
+
+		// Fewer columns than a tile is wide: the tile is narrowed to the grid
+		// and keeps its height, the way the layout would have clamped it.
+		await page.getByRole('slider', { name: 'Columns' }).fill('1');
+
+		await expect.poll(() => getPattern(editor)).toBe('1|1,1|1,1|1,1|1,1|');
+
+		// The presets are a select above the editor. Its toggle names what is
+		// in hand - a pattern of one's own, until a preset is picked - and
+		// the preset picked is what the editor then shows.
+		const presets = page.locator('.vp-tiles-presets-select__toggle');
+
+		await expect(presets).toHaveText('Custom pattern');
+
+		await presets.click();
+		await page.locator(`.vp-tiles-preset[aria-label="${TILES}"]`).click();
+
+		await expect.poll(() => getPattern(editor)).toBe(TILES);
+		await expect(presets).toHaveText('3 columns, 5 tiles');
+		await expect(
+			page.getByRole('button', { name: 'Tile 5' })
+		).toBeVisible();
+
+		// A tile is let go of with a click beside the tiles, and its tools go
+		// with it; Escape lets go of one too.
+		await expect(first).toHaveAttribute('aria-pressed', 'true');
+
+		await page
+			.locator('.vp-tiles-editor__canvas')
+			.click({ position: { x: 4, y: 4 } });
+
+		await expect(first).toHaveAttribute('aria-pressed', 'false');
+		await expect(add).toHaveCount(0);
+
+		await first.click();
+		await expect(add).toBeVisible();
+		await first.press('Escape');
+		await expect(add).toHaveCount(0);
+	});
+
+	test('the pattern editor resizes a tile by its handles', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		const canvas = await openTilesEditor(
+			page,
+			admin,
+			editor,
+			'Layouts - pattern handles'
+		);
+		const list = canvas.locator(LIST);
+
+		// The handles come with the tile that is picked.
+		await page.getByRole('button', { name: 'Tile 1' }).click();
+
+		const tile = page.locator('.vp-tiles-editor__tile.is-selected');
+		const box = await tile.boundingBox();
+
+		// One column over, plus the gap between two: the far edge lands on the
+		// next column and snaps to it.
+		const pitch = box.width + 4;
+
+		/**
+		 * Drag a handle of the selected tile.
+		 *
+		 * @param {string} side - `right` or `bottom`.
+		 * @param {number} dx   - horizontal distance.
+		 * @param {number} dy   - vertical distance.
+		 */
+		async function drag(side, dx, dy) {
+			// The corner handle is named after both its sides.
+			const handle = tile.locator(
+				`.components-resizable-box__side-handle.components-resizable-box__handle-${side}`
+			);
+			const from = await handle.boundingBox();
+			const x = from.x + from.width / 2;
+			const y = from.y + from.height / 2;
+
+			await page.mouse.move(x, y);
+			await page.mouse.down();
+			await page.mouse.move(x + dx, y + dy, { steps: 8 });
+			await page.mouse.up();
+		}
+
+		// Widened, a tile keeps the height it had - which the notation, that
+		// measures the height against the width, writes as half.
+		await drag('right', pitch, 0);
+
+		await expect.poll(() => getPattern(editor)).toBe('3|2,0.5|');
+		await expect(list.locator(ITEM).first()).toHaveCSS(
+			'grid-column-start',
+			'span 2'
+		);
+
+		// Pulled down by a column width, it is a column width taller.
+		await drag('bottom', 0, pitch);
+
+		await expect.poll(() => getPattern(editor)).toBe('3|2,1|');
+		await expect(
+			page.getByRole('spinbutton', { name: 'Height' })
+		).toHaveValue('2');
 	});
 
 	test('the editor lays a control inside the item template over the slides', async ({

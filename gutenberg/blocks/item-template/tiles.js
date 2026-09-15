@@ -11,9 +11,9 @@
  * Keep the two in step. `test-class-tiles-parser.php` covers the presets.
  */
 
-const MAX_COLUMNS = 6;
-const MAX_TILES = 24;
-const MAX_ROW_SPAN = 6;
+export const MAX_COLUMNS = 6;
+export const MAX_TILES = 24;
+export const MAX_ROW_SPAN = 6;
 
 /**
  * Positive number out of a notation segment.
@@ -111,4 +111,49 @@ export function getTileStyles(tiles) {
 		'--vp-tile-columns': tile.width,
 		'--vp-tile-height': tile.height,
 	}));
+}
+
+/**
+ * A number the way the notation writes one.
+ *
+ * Four decimals and no trailing zeros, as `to_css_number()` prints them, so a
+ * pattern the editor writes reads back as the same pattern and a square is
+ * `1`, never `1.0000`.
+ *
+ * @param {number} value - number.
+ * @return {string} notation number.
+ */
+export function formatTilesNumber(value) {
+	return Number(value).toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
+}
+
+/**
+ * Write a pattern in the notation.
+ *
+ * The inverse of `parseTiles()`: the columns, then every tile as
+ * `width,height`, each followed by the separator - the trailing one is what
+ * the notation has always ended with. A row span is derived, so it is not
+ * written, and a width is clamped to the columns the way the parser clamps it
+ * when it reads one back.
+ *
+ * @param {Object} pattern         - pattern.
+ * @param {number} pattern.columns - columns.
+ * @param {Array}  pattern.tiles   - tiles, each `{ width, height }`.
+ * @return {string} tiles notation.
+ */
+export function serializeTiles({ columns, tiles }) {
+	const count = Math.max(1, Math.min(MAX_COLUMNS, Math.round(columns) || 1));
+
+	return [
+		count,
+		...tiles.slice(0, MAX_TILES).map((tile) => {
+			const width = Math.max(
+				1,
+				Math.min(count, Math.round(tile.width) || 1)
+			);
+
+			return `${width},${formatTilesNumber(tile.height)}`;
+		}),
+		'',
+	].join('|');
 }

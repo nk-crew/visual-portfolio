@@ -57,8 +57,11 @@ import {
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
 import { getColumnsProps, getViewportBreakpoints } from './columns';
-import { getTileStyles, getTilesColumns, parseTiles } from './tiles';
+import { getTileStyles, getTilesColumns } from './tiles';
+import TilesEditor from './tiles-editor';
+import { TilesPresetsSelect, TilesPresetsToolbarButton } from './tiles-presets';
 import useEditorLayout from './use-editor-layout';
+import variations from './variations';
 
 const ITEM_CLASS_NAME = 'wp-block-visual-portfolio-item-template__item';
 
@@ -74,11 +77,9 @@ const CARD_CLASS_NAME = 'wp-block-visual-portfolio-item-template__card';
 // Layouts whose column count is chosen rather than derived.
 const COLUMN_LAYOUTS = ['grid', 'masonry', 'carousel'];
 
-// How much of a tiles pattern a swatch shows: enough rows to read as a mosaic,
-// and a ceiling so that a pattern of a dozen small tiles does not draw a
-// hundred of them.
-const PREVIEW_ROWS = 3;
-const PREVIEW_MAX_REPEATS = 6;
+// The presets button of the block toolbar wears the icon of the layout whose
+// presets they are.
+const TILES_ICON = variations.find(({ name }) => 'tiles' === name).icon;
 
 const LAST_ROW_OPTIONS = [
 	{ label: __('Left', 'visual-portfolio'), value: 'left' },
@@ -564,68 +565,6 @@ function CarouselFrame({ children, inset }) {
 }
 
 /**
- * One preset of the tiles picker, drawn from the notation it stands for.
- *
- * @param {Object}   props           - component props.
- * @param {string}   props.value     - tiles notation.
- * @param {boolean}  props.isActive  - whether the gallery uses this pattern.
- * @param {Function} props.onSelect  - picks the pattern.
- * @return {Element} component.
- */
-function TilesPreset({ value, isActive, onSelect }) {
-	const { columns, tiles } = useMemo(() => parseTiles(value), [value]);
-
-	// A pattern repeats over the items, and a swatch that drew it once said
-	// nothing about the shape: a pattern of a single square came out as one
-	// cell, which is the one thing the gallery it stands for never looks like.
-	// Repeated until the swatch is as tall as it is wide, it reads as a mosaic.
-	const preview = useMemo(() => {
-		const area = tiles.reduce(
-			(total, tile) => total + tile.width * tile.rowSpan,
-			0
-		);
-		const repeats = Math.max(
-			1,
-			Math.min(
-				PREVIEW_MAX_REPEATS,
-				Math.ceil((columns * PREVIEW_ROWS) / area)
-			)
-		);
-
-		return Array.from({ length: repeats }, () => tiles).flat();
-	}, [columns, tiles]);
-
-	return (
-		<button
-			type="button"
-			className={`vp-tiles-preset${isActive ? ' is-active' : ''}`}
-			aria-pressed={isActive}
-			aria-label={value}
-			onClick={() => onSelect(value)}
-		>
-			<span
-				className="vp-tiles-preset__grid"
-				style={{
-					gridTemplateColumns: `repeat(${columns}, 1fr)`,
-				}}
-			>
-				{preview.map((tile, index) => (
-					<span
-						// The pattern is a list of positions, and a position is
-						// what identifies a tile in it.
-						key={index}
-						style={{
-							gridColumn: `span ${tile.width}`,
-							gridRow: `span ${tile.rowSpan}`,
-						}}
-					/>
-				))}
-			</span>
-		</button>
-	);
-}
-
-/**
  * A read-only copy of the inner blocks, rendered with the context of its item.
  *
  * @param {Object}   props                         - component props.
@@ -1094,22 +1033,25 @@ export default function BlockEdit({
 					label={__('Pattern', 'visual-portfolio')}
 					onDeselect={() => setAttributes({ layoutTiles: '3|1,1|' })}
 				>
-					<VStack spacing={2}>
+					<VStack spacing={3}>
 						<BaseControl.VisualLabel as="legend">
 							{__('Pattern', 'visual-portfolio')}
 						</BaseControl.VisualLabel>
-						<div className="vp-tiles-presets">
-							{tilesPresets.map((preset) => (
-								<TilesPreset
-									key={preset}
-									value={preset}
-									isActive={preset === layoutTiles}
-									onSelect={(value) =>
-										setAttributes({ layoutTiles: value })
-									}
-								/>
-							))}
-						</div>
+						{/* A preset is a pattern to start from: picked here, it
+						    is what the editor below then shows and edits. */}
+						<TilesPresetsSelect
+							presets={tilesPresets}
+							value={layoutTiles}
+							onChange={(value) =>
+								setAttributes({ layoutTiles: value })
+							}
+						/>
+						<TilesEditor
+							value={layoutTiles}
+							onChange={(value) =>
+								setAttributes({ layoutTiles: value })
+							}
+						/>
 					</VStack>
 				</ToolsPanelItem>
 			)}
@@ -1626,6 +1568,14 @@ export default function BlockEdit({
 	// switchers. The layout itself is a block variation and needs nothing here.
 	const blockControls = (
 		<BlockControls group="block">
+			{'tiles' === layoutType && (
+				<TilesPresetsToolbarButton
+					icon={TILES_ICON}
+					presets={tilesPresets}
+					value={layoutTiles}
+					onChange={(value) => setAttributes({ layoutTiles: value })}
+				/>
+			)}
 			{'carousel' === layoutType && (
 				<ToolbarDropdownMenu
 					icon={SNAP_ICONS[carouselSnapAlign]}

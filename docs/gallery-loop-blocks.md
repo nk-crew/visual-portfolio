@@ -32,7 +32,16 @@ same picker.
 carousel — a block variation each, the way the Group block offers Group, Row,
 Stack and Grid. The editor draws the switcher itself: a row of icons above the
 settings, and an entry in the block switcher of the toolbar. Tiles adds a
-*Pattern* picker to the settings once it is the layout.
+*Pattern* editor to the settings once it is the layout: the tiles of the
+repeating pattern are drawn on a canvas at the shape the page gives them. A
+tile is resized by its handles or by its *Width* and *Height*, dragged onto
+another tile to take its place in the pattern, and doubled or removed from the
+small toolbar that hangs over the selected tile. Width is counted in columns
+and height in column widths — `1` is as tall as a column is wide, whatever the
+width of the tile — which the block writes into the tiles notation of
+`layoutTiles`. The presets pick a whole pattern to start from: a select above
+the canvas, whose toggle shows the pattern in hand, and the same catalogue
+behind a button of the block toolbar.
 
 Columns come in the two shapes the core grid layout offers, and are edited with
 the same controls under the same names. **Auto** asks for a *Min. column width*

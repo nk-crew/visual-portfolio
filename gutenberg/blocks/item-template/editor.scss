@@ -1,13 +1,63 @@
-// The tiles picker. Every preset is drawn from the pattern it stands for, so
+// The tiles presets. Every preset is drawn from the pattern it stands for, so
 // the catalogue is whatever `vpf_loop_tiles_presets` returns and nothing here
-// has to be kept in step with it.
+// has to be kept in step with it. The grid opens in a popover, from the
+// select above the pattern editor and from the block toolbar alike.
+.vp-tiles-presets-popover .components-popover__content {
+	width: 272px;
+	padding: 8px;
+}
+
 .vp-tiles-presets {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
 	gap: 8px;
-	margin-bottom: 16px;
 	max-height: 320px;
 	overflow-y: auto;
+}
+
+// The select: the toggle is drawn as the editor draws a select, and shows
+// the pattern in hand as a swatch beside its name.
+.vp-tiles-presets-select {
+	display: block;
+	width: 100%;
+}
+
+.vp-tiles-presets-select__toggle.components-button {
+	width: 100%;
+	height: 40px;
+	padding: 0 8px 0 12px;
+	color: #1e1e1e;
+	border: 1px solid #949494;
+	border-radius: 2px;
+
+	&:hover:not(:disabled) {
+		color: #1e1e1e;
+		border-color: var(--wp-admin-theme-color, #3858e9);
+	}
+
+	&[aria-expanded="true"],
+	&:focus:not(:disabled) {
+		border-color: var(--wp-admin-theme-color, #3858e9);
+		box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #3858e9);
+	}
+}
+
+.vp-tiles-presets-select__swatch.vp-tiles-preset__grid {
+	flex: 0 0 auto;
+	width: 24px;
+	margin-right: 8px;
+
+	// A swatch that fits beside a line of text.
+	grid-auto-rows: 4px;
+	gap: 1px;
+}
+
+.vp-tiles-presets-select__label {
+	flex: 1 1 auto;
+	overflow: hidden;
+	text-align: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .vp-tiles-preset {
@@ -45,6 +95,160 @@
 
 .vp-tiles-preset.is-active .vp-tiles-preset__grid > span {
 	opacity: 1;
+}
+
+// The pattern editor. The canvas is laid out by the rules of the tiles layout
+// itself - see `.vp-layout-tiles` in style.scss - with the editor's own gap,
+// which `tiles-editor.js` sets on the canvas because its snapping counts the
+// same pixels. A tile is the shape the front end gives it, at the width the
+// sidebar has, and is drawn the way the editor draws a block: an outline,
+// which turns the accent colour when the tile is picked.
+.vp-tiles-editor__canvas {
+	// The toolbar of a picked tile sits on the tile's top edge, mostly above
+	// it; a tile in the first row needs that much room above the canvas.
+	--vp-tiles-editor-toolbar: 30px;
+	--vp-tiles-editor-toolbar-rise: 20px;
+
+	display: grid;
+	container-type: inline-size;
+	grid-auto-flow: row dense;
+	grid-template-columns: repeat(var(--vp-tiles-editor-columns, 3), minmax(0, 1fr));
+	gap: var(--vp-tiles-editor-gap, 4px);
+	padding-top: calc(var(--vp-tiles-editor-toolbar-rise) + 2px);
+}
+
+.vp-tiles-editor__tile {
+	position: relative;
+	grid-column: span var(--vp-tile-columns, 1);
+	height: calc((100cqw + var(--vp-tiles-editor-gap, 4px)) / var(--vp-tiles-editor-columns, 3) * var(--vp-tile-height, 1) * var(--vp-tile-columns, 1) - var(--vp-tiles-editor-gap, 4px));
+
+	// A tile being dragged out grows over its neighbours, not under them.
+	&.is-selected {
+		z-index: 1;
+	}
+
+	// The tile in hand is on the overlay; what stays in the grid is its
+	// place.
+	&.is-dragging {
+		opacity: 0.35;
+
+		.vp-tiles-editor__toolbar {
+			display: none;
+		}
+	}
+
+	&.is-repeat {
+		pointer-events: none;
+	}
+}
+
+// The toolbar of the selected tile, drawn the way the block toolbar is but
+// at a size that fits a tile: a bordered strip on the tile's top edge,
+// centred, with the plain buttons of the editor.
+.vp-tiles-editor__toolbar.components-accessible-toolbar {
+	position: absolute;
+	top: calc(-1 * var(--vp-tiles-editor-toolbar-rise, 20px));
+	left: 50%;
+	z-index: 2;
+	min-height: 0;
+	padding: 1px;
+	background: #fff;
+	border: 1px solid #1e1e1e;
+	border-radius: 2px;
+	transform: translateX(-50%);
+
+	// The editor gives a toolbar button the 48px of the block toolbar; over
+	// a tile the buttons are squares of the strip's own height.
+	.components-button.has-icon {
+		height: var(--vp-tiles-editor-toolbar, 30px);
+		min-width: var(--vp-tiles-editor-toolbar, 30px);
+		padding: 0;
+	}
+}
+
+// The handles are the editor's own, drawn for a box on a white canvas: the
+// line along a side lights up on hover in the accent colour, which on a tile
+// of that colour is no light at all. The line goes, and the knob answers a
+// hover the way a focused field does - its ring thickens.
+.vp-tiles-editor__box {
+	.components-resizable-box__side-handle::before {
+		display: none;
+	}
+
+	.components-resizable-box__handle:hover::after,
+	.components-resizable-box__handle:active::after {
+		box-shadow: inset 0 0 0 4px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	}
+
+	@media not (prefers-reduced-motion) {
+		.components-resizable-box__handle::after {
+			transition: box-shadow 0.1s ease-out;
+		}
+	}
+}
+
+.vp-tiles-editor__face {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1;
+	color: #757575;
+	cursor: pointer;
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 2px;
+
+	&:hover {
+		border-color: var(--wp-admin-theme-color, #3858e9);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--wp-admin-theme-color, #3858e9);
+		outline-offset: 1px;
+	}
+}
+
+.vp-tiles-editor__tile.is-selected .vp-tiles-editor__face {
+	color: var(--wp-admin-theme-color, #3858e9);
+	background: color-mix(in srgb, var(--wp-admin-theme-color, #3858e9) 8%, #fff);
+	border: 2px solid var(--wp-admin-theme-color, #3858e9);
+}
+
+// The next turn of the pattern, drawn fainter than the pattern itself.
+.vp-tiles-editor__tile.is-repeat .vp-tiles-editor__face {
+	color: #ccc;
+	border-color: #eee;
+}
+
+// The tile under the one in hand - where it lands when let go.
+.vp-tiles-editor__tile.is-drop-target .vp-tiles-editor__face {
+	background: color-mix(in srgb, var(--wp-admin-theme-color, #3858e9) 8%, #fff);
+	border: 2px dashed var(--wp-admin-theme-color, #3858e9);
+}
+
+.vp-tiles-editor__face.is-ghost {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	color: var(--wp-admin-theme-color, #3858e9);
+	cursor: grabbing;
+	background: #fff;
+	border: 2px solid var(--wp-admin-theme-color, #3858e9);
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.vp-tiles-editor__tile-settings {
+	padding: 0;
+	margin: 0;
+	border: 0;
 }
 
 // The preview is refetched on every settings change. Dimming the items in
