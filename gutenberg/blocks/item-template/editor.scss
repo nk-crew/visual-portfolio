@@ -1,3 +1,14 @@
+// The colours of the editor, read the way its own components read them: a
+// variable an install may set, the design token behind it, and last the
+// plain value the editor has always drawn with.
+$accent: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+$background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
+$foreground: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+$gray-100: var(--wp-components-color-gray-100, var(--wpds-color-stroke-surface-neutral-weak, #f0f0f0));
+$gray-300: var(--wp-components-color-gray-300, var(--wpds-color-stroke-surface-neutral, #ddd));
+$gray-600: var(--wp-components-color-gray-600, var(--wpds-color-stroke-interactive-neutral, #949494));
+$gray-700: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #757575));
+
 // The tiles presets. Every preset is drawn from the pattern it stands for, so
 // the catalogue is whatever `vpf_loop_tiles_presets` returns and nothing here
 // has to be kept in step with it. The grid opens in a popover, from the
@@ -26,19 +37,19 @@
 	width: 100%;
 	height: 40px;
 	padding: 0 8px 0 12px;
-	color: #1e1e1e;
-	border: 1px solid #949494;
+	color: $foreground;
+	border: 1px solid $gray-600;
 	border-radius: 2px;
 
 	&:hover:not(:disabled) {
-		color: #1e1e1e;
-		border-color: var(--wp-admin-theme-color, #3858e9);
+		color: $foreground;
+		border-color: $accent;
 	}
 
 	&[aria-expanded="true"],
 	&:focus:not(:disabled) {
-		border-color: var(--wp-admin-theme-color, #3858e9);
-		box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #3858e9);
+		border-color: $accent;
+		box-shadow: 0 0 0 1px $accent;
 	}
 }
 
@@ -64,17 +75,17 @@
 	padding: 4px;
 	cursor: pointer;
 	background: none;
-	border: 1px solid #ddd;
+	border: 1px solid $gray-300;
 	border-radius: 2px;
 
 	&:hover,
 	&:focus-visible {
-		border-color: var(--wp-admin-theme-color, #3858e9);
+		border-color: $accent;
 	}
 
 	&.is-active {
-		border-color: var(--wp-admin-theme-color, #3858e9);
-		box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #3858e9);
+		border-color: $accent;
+		box-shadow: 0 0 0 1px $accent;
 	}
 }
 
@@ -104,10 +115,11 @@
 // sidebar has, and is drawn the way the editor draws a block: an outline,
 // which turns the accent colour when the tile is picked.
 .vp-tiles-editor__canvas {
-	// The toolbar of a picked tile sits on the tile's top edge, mostly above
-	// it; a tile in the first row needs that much room above the canvas.
-	--vp-tiles-editor-toolbar: 30px;
-	--vp-tiles-editor-toolbar-rise: 20px;
+	// The toolbar of a picked tile sits on the tile's top edge, rising a
+	// little above it; a tile in the first row needs that much room above
+	// the canvas, which is all that keeps the label from the canvas.
+	--vp-tiles-editor-toolbar: 26px;
+	--vp-tiles-editor-toolbar-rise: 12px;
 
 	display: grid;
 	container-type: inline-size;
@@ -115,6 +127,10 @@
 	grid-template-columns: repeat(var(--vp-tiles-editor-columns, 3), minmax(0, 1fr));
 	gap: var(--vp-tiles-editor-gap, 4px);
 	padding-top: calc(var(--vp-tiles-editor-toolbar-rise) + 2px);
+}
+
+.vp-tiles-editor__tiles > legend {
+	margin-bottom: 0;
 }
 
 .vp-tiles-editor__tile {
@@ -152,8 +168,8 @@
 	z-index: 2;
 	min-height: 0;
 	padding: 1px;
-	background: #fff;
-	border: 1px solid #1e1e1e;
+	background: $background;
+	border: 1px solid $foreground;
 	border-radius: 2px;
 	transform: translateX(-50%);
 
@@ -177,7 +193,7 @@
 
 	.components-resizable-box__handle:hover::after,
 	.components-resizable-box__handle:active::after {
-		box-shadow: inset 0 0 0 4px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+		box-shadow: inset 0 0 0 4px $accent;
 	}
 
 	@media not (prefers-reduced-motion) {
@@ -198,38 +214,38 @@
 	font-size: 11px;
 	font-weight: 500;
 	line-height: 1;
-	color: #757575;
+	color: $gray-700;
 	cursor: pointer;
-	background: #fff;
-	border: 1px solid #ddd;
+	background: $background;
+	border: 1px solid $gray-300;
 	border-radius: 2px;
 
 	&:hover {
-		border-color: var(--wp-admin-theme-color, #3858e9);
+		border-color: $accent;
 	}
 
 	&:focus-visible {
-		outline: 2px solid var(--wp-admin-theme-color, #3858e9);
+		outline: 2px solid $accent;
 		outline-offset: 1px;
 	}
 }
 
 .vp-tiles-editor__tile.is-selected .vp-tiles-editor__face {
-	color: var(--wp-admin-theme-color, #3858e9);
-	background: color-mix(in srgb, var(--wp-admin-theme-color, #3858e9) 8%, #fff);
-	border: 2px solid var(--wp-admin-theme-color, #3858e9);
+	color: $accent;
+	background: color-mix(in srgb, $accent 8%, $background);
+	border: 2px solid $accent;
 }
 
 // The next turn of the pattern, drawn fainter than the pattern itself.
 .vp-tiles-editor__tile.is-repeat .vp-tiles-editor__face {
-	color: #ccc;
-	border-color: #eee;
+	color: $gray-300;
+	border-color: $gray-100;
 }
 
 // The tile under the one in hand - where it lands when let go.
 .vp-tiles-editor__tile.is-drop-target .vp-tiles-editor__face {
-	background: color-mix(in srgb, var(--wp-admin-theme-color, #3858e9) 8%, #fff);
-	border: 2px dashed var(--wp-admin-theme-color, #3858e9);
+	background: color-mix(in srgb, $accent 8%, $background);
+	border: 2px dashed $accent;
 }
 
 .vp-tiles-editor__face.is-ghost {
@@ -238,10 +254,10 @@
 	justify-content: center;
 	width: 100%;
 	height: 100%;
-	color: var(--wp-admin-theme-color, #3858e9);
+	color: $accent;
 	cursor: grabbing;
-	background: #fff;
-	border: 2px solid var(--wp-admin-theme-color, #3858e9);
+	background: $background;
+	border: 2px solid $accent;
 	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 

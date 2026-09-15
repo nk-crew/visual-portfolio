@@ -811,15 +811,28 @@ export default function BlockEdit({
 		Math.min(12, parseInt(baseQuery?.perPage, 10) || 6)
 	);
 
+	// The pattern the preview is drawn with. A screen may have a pattern of
+	// its own - Pro gives a tablet and a phone one - and the preview of that
+	// screen draws it, the way it draws that screen's column count. The
+	// settings keep editing the desktop's.
+	const previewTiles = useMemo(
+		() =>
+			applyFilters('vpf.itemTemplateTiles', layoutTiles, {
+				attributes,
+				deviceType,
+			}),
+		[layoutTiles, attributes, deviceType]
+	);
+
 	// Tiles carry their columns in the notation, so that is where the layout
 	// reads them.
 	const tileStyles = useMemo(
-		() => ('tiles' === layoutType ? getTileStyles(layoutTiles) : []),
-		[layoutType, layoutTiles]
+		() => ('tiles' === layoutType ? getTileStyles(previewTiles) : []),
+		[layoutType, previewTiles]
 	);
 	const tilesColumns = useMemo(
-		() => ('tiles' === layoutType ? getTilesColumns(layoutTiles) : 0),
-		[layoutType, layoutTiles]
+		() => ('tiles' === layoutType ? getTilesColumns(previewTiles) : 0),
+		[layoutType, previewTiles]
 	);
 	// An effect that spreads one slide over the width of the gallery owns that
 	// width, so the preview draws it the way the page will and the control that

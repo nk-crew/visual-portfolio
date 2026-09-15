@@ -70,21 +70,23 @@ of the grid. Auto mode is untouched: fitting the container is already what it
 does. The gap is **Block spacing** in the Dimensions panel, like any other block.
 
 A manual count can answer for one screen at a time, and the screen is the one
-the editor is already previewing: switch the preview to *Tablet* or *Mobile* in
-the editor's own toolbar and the columns control answers for that screen. A
-tablet is 992px and narrower, a phone 576px and narrower, which are the
-plugin's own breakpoints. Both extra counts start at zero, which is the ladder
-above, so a gallery that never touches them is drawn exactly as it was. Auto
-mode does not offer them: the width of a column is what decides the count
-there.
+the editor is already previewing: switch the View to *Tablet* or *Mobile* with
+*Responsive styles* on, and the Layout panel carries the count for that screen.
+A tablet is 782px and narrower, a phone 480px and narrower, unless the theme
+moves the breakpoints in `settings.viewport` of `theme.json` — the count applies
+where the editor previewed it. Both extra counts start at zero, which is the
+ladder above, so a gallery that never touches them is drawn exactly as it was.
+Auto mode does not offer them: the width of a column is what decides the count
+there. Tiles narrow down the ladder alone; Pro gives a tablet and a phone a
+pattern of their own, edited in the same place.
 
 What a theme overrides in CSS, without touching the markup:
 
 | Property | Meaning |
 |---|---|
 | `--vp-layout-columns` | Column count, or the maximum in auto mode |
-| `--vp-layout-columns-tablet` | Count below 992px, when one was set |
-| `--vp-layout-columns-mobile` | Count below 576px, when one was set |
+| `--vp-layout-columns-tablet` | Count on a tablet, when one was set |
+| `--vp-layout-columns-mobile` | Count on a phone, when one was set |
 | `--vp-layout-current-columns` | Columns the layout is drawn with, after narrowing |
 | `--vp-layout-min-column-width` | Minimum column width, auto mode only |
 | `--vp-layout-track` | The `minmax()` track a grid repeats, auto mode only |
@@ -503,6 +505,15 @@ the `vpf.itemCoverSettingsItems` JavaScript filter, which is given an empty arra
 and `{ attributes, setAttributes, clientId }` and returns `ToolsPanelItem`
 children — ordinary children of the block's Settings panel, registering with it
 the way the built-in ones do.
+
+The pattern the item template previews goes through the `vpf.itemTemplateTiles`
+JavaScript filter, given the desktop pattern and `{ attributes, deviceType }`;
+Pro returns the pattern of the screen the editor is previewing. What edits a
+pattern — `TilesEditor`, `TilesPresetsSelect` and the parser `parseTiles` —
+sits in the `visual-portfolio/components` store beside the other shared
+components, with `getViewportBreakpoints()` for the breakpoints the editor
+previews a tablet and a phone at, so a pattern kept in an attribute of another
+plugin's is edited the way the desktop's is.
 
 ## Block Bindings
 
