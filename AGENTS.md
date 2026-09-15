@@ -53,10 +53,13 @@ Playground (WebAssembly, ~10s). It uses SQLite and cannot run the PHP unit suite
 
 ## Worktrees
 
-Parallel work happens in `git worktree` checkouts. Run `./scripts/worktree-setup.sh`
-once in a fresh worktree; it installs dependencies and starts an isolated environment.
+Parallel work happens in `git worktree` checkouts. Run
+`npx --yes --package=@nk-crew/plugin-toolkit nk-worktree-setup` once in a fresh
+worktree; it installs dependencies and starts an isolated environment (`--no-env` skips
+the start). `.claude/worktree.json` runs it with `--no-env` for the worktrees Claude Code
+creates, so there only `npm run env:start` is left.
 
 `wp-env` already gives every checkout its own containers and database. Ports are the
 only thing that would collide, so linked worktrees automatically get their own pair
 (the main checkout keeps 8888/8889). Never hardcode a port — read it from
-`scripts/env-ports.js` or `npm run env:ports`.
+`npm run env:ports`.
