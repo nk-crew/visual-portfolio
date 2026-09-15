@@ -1,3 +1,7 @@
+import { getViewportBreakpoints } from '../../blocks/item-template/columns';
+import { parseTiles } from '../../blocks/item-template/tiles';
+import TilesEditor from '../../blocks/item-template/tiles-editor';
+import { TilesPresetsSelect } from '../../blocks/item-template/tiles-presets';
 import ClassesTree from '../../components/classes-tree';
 import ColorPicker from '../../components/color-picker';
 import ControlsRender from '../../components/controls-render';
@@ -28,5 +32,14 @@ export function get() {
 		ToggleModal,
 		ToggleGroupCategoryControl,
 		ToggleGroupButtonsControl,
+
+		// The tiles pattern of the item template, and what edits it. Pro
+		// gives a tablet and a phone a pattern of their own, edited the way
+		// the desktop's is, and reads the breakpoints the editor previews
+		// those screens at the way the block does.
+		TilesEditor,
+		TilesPresetsSelect,
+		parseTiles,
+		getViewportBreakpoints,
 	};
 }
