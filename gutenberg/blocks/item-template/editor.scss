@@ -104,10 +104,11 @@
 // sidebar has, and is drawn the way the editor draws a block: an outline,
 // which turns the accent colour when the tile is picked.
 .vp-tiles-editor__canvas {
-	// The toolbar of a picked tile sits on the tile's top edge, mostly above
-	// it; a tile in the first row needs that much room above the canvas.
-	--vp-tiles-editor-toolbar: 30px;
-	--vp-tiles-editor-toolbar-rise: 20px;
+	// The toolbar of a picked tile sits on the tile's top edge, rising a
+	// little above it; a tile in the first row needs that much room above
+	// the canvas, which is all that keeps the label from the canvas.
+	--vp-tiles-editor-toolbar: 26px;
+	--vp-tiles-editor-toolbar-rise: 12px;
 
 	display: grid;
 	container-type: inline-size;
@@ -115,6 +116,10 @@
 	grid-template-columns: repeat(var(--vp-tiles-editor-columns, 3), minmax(0, 1fr));
 	gap: var(--vp-tiles-editor-gap, 4px);
 	padding-top: calc(var(--vp-tiles-editor-toolbar-rise) + 2px);
+}
+
+.vp-tiles-editor__tiles > legend {
+	margin-bottom: 0;
 }
 
 .vp-tiles-editor__tile {
