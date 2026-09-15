@@ -3,8 +3,11 @@
  */
 import {
 	BlockControls,
+	store as blockEditorStore,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	__experimentalImageEditor as ImageEditor,
 	InspectorControls,
+	MediaReplaceFlow,
 	useBlockEditingMode,
 	useBlockProps,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
@@ -13,15 +16,19 @@ import {
 	SelectControl,
 	TextControl,
 	ToggleControl,
+	ToolbarButton,
 	ToolbarDropdownMenu,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { fullscreen, link, linkOff } from '@wordpress/icons';
+import { crop, fullscreen, link, linkOff } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { ALLOWED_MEDIA_TYPES } from '../../loop-sources/gallery-manager/prepare-images';
 import { DimensionsTool } from '../../utils/dimensions-tools';
 import {
 	useImageSizeOnInsert,
@@ -39,6 +46,7 @@ import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
+import { getGalleryImageId, useGalleryImage } from './gallery-image';
 
 const CLICK_ACTION_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
@@ -69,6 +77,7 @@ export default function ItemImageEdit({
 	setAttributes,
 	context,
 	clientId,
+	isSelected,
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -84,6 +93,8 @@ export default function ItemImageEdit({
 	} = attributes;
 
 	const {
+		'vp/queryType': queryType,
+		'vp/itemImgId': itemImgId,
 		'vp/itemImgUrl': itemImgUrl,
 		'vp/itemImgAlt': itemImgAlt,
 		'vp/itemImageSizes': itemImageSizes,
@@ -103,6 +114,52 @@ export default function ItemImageEdit({
 	// Sizes are resolved on the server; only the choice between them is made here.
 	const imageUrl = itemImageSizes?.[sizeSlug] || itemImgUrl;
 
+	// The editor hands the block editor its media handlers only for a user
+	// who may upload, and the crop tool on top of that is a site setting -
+	// the two conditions the core Image block puts its own tools behind.
+	const { canUpload, imageEditing } = useSelect((select) => {
+		const settings = select(blockEditorStore).getSettings();
+
+		return {
+			canUpload: !!settings.mediaUpload,
+			imageEditing: !!settings.imageEditing,
+		};
+	}, []);
+
+	const galleryImageId = getGalleryImageId(queryType, itemImgId);
+	const { replaceImage, cropImage, isPending } = useGalleryImage(
+		clientId,
+		galleryImageId
+	);
+	const hasImageTools =
+		!!galleryImageId && canUpload && blockEditingMode === 'default';
+
+	// The cropper wants the pixel size of the picture, and only the picture
+	// knows it: read off the `img` once it has loaded, and kept with the URL
+	// it was read for, so a change of item is a picture not yet measured.
+	const [naturalSize, setNaturalSize] = useState();
+	const isMeasured = naturalSize?.url === imageUrl;
+
+	// The crop under way: the attachment the cropper was opened for, so that
+	// it closes with the item it was opened on rather than moving over to the
+	// next one, and the width the picture had, which is the box the cropper
+	// is given. Left to measure the box itself, it measures it before it has
+	// one, and the cropper library carries a zero-sized first measurement
+	// into every position it computes from then on.
+	const imageRef = useRef();
+	const [cropping, setCropping] = useState();
+	const isCropping =
+		isSelected &&
+		hasImageTools &&
+		isMeasured &&
+		cropping?.id === galleryImageId;
+
+	useEffect(() => {
+		if (!isSelected) {
+			setCropping(undefined);
+		}
+	}, [isSelected]);
+
 	const overlay = getOverlayValues(attributes, OVERLAY_ATTRIBUTES);
 
 	// The rules of the core Featured Image block: a ratio owns the width, an
@@ -118,13 +175,38 @@ export default function ItemImageEdit({
 			: undefined,
 	};
 
-	const imageElement = (
+	// Core's own crop opens its media editor modal through a private setting
+	// a plugin cannot read, and the packages behind it are not scripts of
+	// their own. The inline cropper is the one crop the block editor offers
+	// a plugin: deprecated since 7.1, and kept exactly so that plugins have
+	// somewhere to stand until the cropper package is public - it says so
+	// once in the console when opened.
+	const imageElement = isCropping ? (
+		<ImageEditor
+			id={galleryImageId}
+			url={imageUrl}
+			width={cropping.width}
+			height={(cropping.width * naturalSize.height) / naturalSize.width}
+			naturalWidth={naturalSize.width}
+			naturalHeight={naturalSize.height}
+			onSaveImage={cropImage}
+			onFinishEditing={() => setCropping(undefined)}
+		/>
+	) : (
 		<>
 			{imageUrl ? (
 				<img
+					ref={imageRef}
 					src={imageUrl}
 					alt={itemImgAlt || ''}
 					style={imageStyles}
+					onLoad={(event) =>
+						setNaturalSize({
+							url: imageUrl,
+							width: event.target.naturalWidth,
+							height: event.target.naturalHeight,
+						})
+					}
 				/>
 			) : (
 				<div
@@ -159,21 +241,60 @@ export default function ItemImageEdit({
 		<>
 			{blockEditingMode === 'default' && (
 				<>
-					<BlockControls group="block">
-						<ToolbarDropdownMenu
-							icon={CLICK_ACTION_ICONS[clickAction]}
-							label={__('On click', 'visual-portfolio')}
-							controls={CLICK_ACTION_OPTIONS.map((option) => ({
-								title: option.label,
-								icon: CLICK_ACTION_ICONS[option.value],
-								isActive: option.value === clickAction,
-								onClick: () =>
-									setAttributes({
-										clickAction: option.value,
-									}),
-							}))}
-						/>
-					</BlockControls>
+					{/* The cropper brings a toolbar of its own, and nothing else belongs beside it. */}
+					{!isCropping && (
+						<BlockControls group="block">
+							<ToolbarDropdownMenu
+								icon={CLICK_ACTION_ICONS[clickAction]}
+								label={__('On click', 'visual-portfolio')}
+								controls={CLICK_ACTION_OPTIONS.map(
+									(option) => ({
+										title: option.label,
+										icon: CLICK_ACTION_ICONS[option.value],
+										isActive: option.value === clickAction,
+										onClick: () =>
+											setAttributes({
+												clickAction: option.value,
+											}),
+									})
+								)}
+							/>
+							{/* Both tools wait, disabled rather than hidden so the
+							    toolbar keeps its shape and its focus, while the item
+							    has not caught up with the last change. */}
+							{hasImageTools && imageEditing && (
+								<ToolbarButton
+									icon={crop}
+									label={__('Crop', 'visual-portfolio')}
+									onClick={() =>
+										setCropping({
+											id: galleryImageId,
+											width: imageRef.current
+												?.clientWidth,
+										})
+									}
+									disabled={!isMeasured || isPending}
+								/>
+							)}
+						</BlockControls>
+					)}
+					{hasImageTools && !isCropping && (
+						<BlockControls group="other">
+							<MediaReplaceFlow
+								mediaId={galleryImageId}
+								mediaURL={imageUrl}
+								allowedTypes={ALLOWED_MEDIA_TYPES}
+								onSelect={replaceImage}
+								name={__('Replace', 'visual-portfolio')}
+								renderToggle={(toggleProps) => (
+									<ToolbarButton
+										{...toggleProps}
+										disabled={isPending}
+									/>
+								)}
+							/>
+						</BlockControls>
+					)}
 					<InspectorControls group="color">
 						{colorGradientSettings.hasColorsOrGradients && (
 							<ColorGradientSettingsDropdown
@@ -319,7 +440,7 @@ export default function ItemImageEdit({
 				</>
 			)}
 			<figure {...blockProps}>
-				{'url' === clickAction && itemUrl ? (
+				{'url' === clickAction && itemUrl && !isCropping ? (
 					// The link is inert in the editor, the click belongs to the block.
 					<a
 						href={itemUrl}

@@ -8,6 +8,7 @@
 	"ancestor": ["visual-portfolio/item-template"],
 	"textdomain": "visual-portfolio",
 	"usesContext": [
+		"vp/queryType",
 		"vp/itemImgId",
 		"vp/itemImgUrl",
 		"vp/itemImgAlt",

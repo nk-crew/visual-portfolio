@@ -34,7 +34,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { memo, useEffect, useMemo, useState } from '@wordpress/element';
+import { memo, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
@@ -786,12 +786,22 @@ export default function BlockEdit({
 	const blockContexts = useMemo(() => items.map(getItemContext), [items]);
 
 	// The selected item can disappear when the query changes, and an id nothing
-	// matches would leave the template without an editable item.
-	const activeContextId = blockContexts.some(
+	// matches would leave the template without an editable item. The item that
+	// took its place inherits it: an image cropped or replaced from the toolbar
+	// is a new item to the endpoint, standing exactly where the old one stood,
+	// and the block being edited must not jump away from it.
+	const activeIndexRef = useRef(0);
+	const activeIndex = blockContexts.findIndex(
 		(blockContext) => blockContext['vp/itemId'] === activeBlockContextId
-	)
-		? activeBlockContextId
-		: blockContexts[0]?.['vp/itemId'];
+	);
+
+	if (-1 !== activeIndex) {
+		activeIndexRef.current = activeIndex;
+	}
+
+	const activeContextId = (blockContexts[activeIndex] ??
+		blockContexts[activeIndexRef.current] ??
+		blockContexts[0])?.['vp/itemId'];
 
 	const isEmpty = !isLoading && !blockContexts.length;
 

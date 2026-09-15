@@ -28,12 +28,7 @@ import { plus } from '@wordpress/icons';
 
 import GalleryImage from './gallery-image';
 import ImageSettingsModal from './image-settings-modal';
-import { mergeSelection } from './prepare-images';
-
-const { pro: isProPlugin } = window.VPGutenbergVariables;
-
-// Videos are only useful with the Pro formats behind them.
-const ALLOWED_MEDIA_TYPES = isProPlugin ? ['image', 'video'] : ['image'];
+import { ALLOWED_MEDIA_TYPES, mergeSelection } from './prepare-images';
 
 // The file chooser of an empty gallery takes MIME patterns rather than the
 // media types beside it, and offering fewer there than the gallery accepts is

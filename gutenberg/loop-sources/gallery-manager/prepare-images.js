@@ -1,9 +1,31 @@
+const { pro: isProPlugin } = window.VPGutenbergVariables;
+
+// Videos are only useful with the Pro formats behind them.
+export const ALLOWED_MEDIA_TYPES = isProPlugin ? ['image', 'video'] : ['image'];
+
+/**
+ * A text field of a media item, whichever shape the item came in.
+ *
+ * The media frame answers with plain strings; an upload answers with the REST
+ * record, where the description is a `{ raw, rendered }` pair.
+ *
+ * @param {string|Object} value - field value.
+ * @return {string} text.
+ */
+function getText(value) {
+	return 'string' === typeof value ? value : value?.raw || '';
+}
+
 /**
  * A media library item, as the gallery stores it.
  *
  * The stored shape is what PHP reads back (`imagesQuery.images` is handed to the
  * query as-is), so only `id` really matters for rendering - the URLs exist for
  * the editor previews and for the sitemap.
+ *
+ * The item arrives in one of two shapes: the media frame's, or the REST record
+ * an upload answers with - `mime_type` for `mime`, `media_details.sizes` for
+ * `sizes`, and a `{ raw, rendered }` pair for the description.
  *
  * @param {Object} media - media library item.
  * @return {Object} gallery image.
@@ -16,21 +38,25 @@ export function prepareImage(media) {
 	};
 
 	// GIFs only animate at full size, so they keep the original URL.
-	if ('image/gif' !== media.mime) {
-		const sizes = media.sizes || {};
+	if ('image/gif' !== (media.mime || media.mime_type)) {
+		const sizes = media.sizes || media.media_details?.sizes || {};
 		const preview = sizes.large || sizes.medium || sizes.thumbnail;
+		const previewUrl = preview?.url || preview?.source_url;
 
-		if (preview?.url) {
-			image.imgThumbnailUrl = preview.url;
+		if (previewUrl) {
+			image.imgThumbnailUrl = previewUrl;
 		}
 	}
 
-	if (media.title) {
-		image.title = media.title;
+	const title = getText(media.title);
+	const description = getText(media.description);
+
+	if (title) {
+		image.title = title;
 	}
 
-	if (media.description) {
-		image.description = media.description;
+	if (description) {
+		image.description = description;
 	}
 
 	return image;

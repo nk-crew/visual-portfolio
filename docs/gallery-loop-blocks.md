@@ -28,6 +28,17 @@ ordering, offsets and manual selections) or a gallery of images managed inside
 the block. Visual Portfolio Pro adds social networks and taxonomy sources to the
 same picker.
 
+**Item image.** On a gallery of images the toolbar of the item image carries
+the two media tools the core Image block has: *Crop* and *Replace*. Both act on
+the entry of the item in the loop's gallery — the same entry the gallery
+manager edits from the sidebar — so a title, a category, a link or a focal point
+typed into it stays. A crop is saved as a new attachment, the way the core block
+saves one, and the snackbar it ends with offers to undo it; the crop itself is
+the inline cropper the block editor still ships for plugins, with the zoom, the
+aspect ratio and the rotation in the toolbar. Replace offers the media library
+and an upload. A posts loop shows neither: its image is the featured image of
+the post, and belongs to it.
+
 **Layouts.** The item template offers grid, masonry, tiles, justified and
 carousel — a block variation each, the way the Group block offers Group, Row,
 Stack and Grid. The editor draws the switcher itself: a row of icons above the
