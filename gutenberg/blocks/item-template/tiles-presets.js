@@ -1,4 +1,10 @@
-import { Button, Dropdown, ToolbarButton } from '@wordpress/components';
+import {
+	BaseControl,
+	Button,
+	Dropdown,
+	ToolbarButton,
+} from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
@@ -136,6 +142,10 @@ function getPatternLabel(presets, value) {
 /**
  * The presets as a select, for the settings sidebar.
  *
+ * Labelled the way the editor labels its own selects: the toggle is named by
+ * the label and by what it shows, so it is read as "Pattern, 3 columns, 5
+ * tiles".
+ *
  * @param {Object}   props          - component props.
  * @param {Array}    props.presets  - tiles notations.
  * @param {string}   props.value    - the pattern in hand.
@@ -143,40 +153,51 @@ function getPatternLabel(presets, value) {
  * @return {Element} component.
  */
 export function TilesPresetsSelect({ presets, value, onChange }) {
+	const id = useInstanceId(TilesPresetsSelect, 'vp-tiles-presets-select');
+	const labelId = `${id}__label`;
+	const toggleId = `${id}__toggle`;
+
 	return (
-		<Dropdown
-			className="vp-tiles-presets-select"
-			contentClassName="vp-tiles-presets-popover"
-			popoverProps={{ placement: 'left-start', offset: 36 }}
-			renderToggle={({ isOpen, onToggle }) => (
-				<Button
-					className="vp-tiles-presets-select__toggle"
-					icon={chevronDown}
-					iconPosition="right"
-					aria-haspopup="true"
-					aria-expanded={isOpen}
-					onClick={onToggle}
-				>
-					<TilesSwatch
+		<div className="vp-tiles-presets-select">
+			<BaseControl.VisualLabel id={labelId}>
+				{__('Pattern', 'visual-portfolio')}
+			</BaseControl.VisualLabel>
+			<Dropdown
+				className="vp-tiles-presets-select__dropdown"
+				contentClassName="vp-tiles-presets-popover"
+				popoverProps={{ placement: 'left-start', offset: 36 }}
+				renderToggle={({ isOpen, onToggle }) => (
+					<Button
+						id={toggleId}
+						className="vp-tiles-presets-select__toggle"
+						icon={chevronDown}
+						iconPosition="right"
+						aria-labelledby={`${labelId} ${toggleId}`}
+						aria-haspopup="true"
+						aria-expanded={isOpen}
+						onClick={onToggle}
+					>
+						<TilesSwatch
+							value={value}
+							className="vp-tiles-presets-select__swatch"
+						/>
+						<span className="vp-tiles-presets-select__label">
+							{getPatternLabel(presets, value)}
+						</span>
+					</Button>
+				)}
+				renderContent={({ onClose }) => (
+					<TilesPresetsGrid
+						presets={presets}
 						value={value}
-						className="vp-tiles-presets-select__swatch"
+						onSelect={(preset) => {
+							onChange(preset);
+							onClose();
+						}}
 					/>
-					<span className="vp-tiles-presets-select__label">
-						{getPatternLabel(presets, value)}
-					</span>
-				</Button>
-			)}
-			renderContent={({ onClose }) => (
-				<TilesPresetsGrid
-					presets={presets}
-					value={value}
-					onSelect={(preset) => {
-						onChange(preset);
-						onClose();
-					}}
-				/>
-			)}
-		/>
+				)}
+			/>
+		</div>
 	);
 }
 

@@ -1034,9 +1034,6 @@ export default function BlockEdit({
 					onDeselect={() => setAttributes({ layoutTiles: '3|1,1|' })}
 				>
 					<VStack spacing={3}>
-						<BaseControl.VisualLabel as="legend">
-							{__('Pattern', 'visual-portfolio')}
-						</BaseControl.VisualLabel>
 						{/* A preset is a pattern to start from: picked here, it
 						    is what the editor below then shows and edits. */}
 						<TilesPresetsSelect

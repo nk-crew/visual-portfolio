@@ -563,55 +563,60 @@ export default function TilesEditor({ value, onChange }) {
 				onDragEnd={onDragEnd}
 				onDragCancel={() => setDragging(null)}
 			>
-				<SortableContext items={ids} strategy={stayPut}>
-					{/* biome-ignore lint/a11y/noStaticElementInteractions: a click beside the tiles only lets go of the one picked with its own button; Escape does the same from the keyboard, and nothing here is reachable by the keyboard alone. */}
-					<div
-						ref={canvasRef}
-						className="vp-tiles-editor__canvas"
-						style={canvasStyle}
-						onClick={onCanvasClick}
-						onKeyDown={onCanvasKeyDown}
-					>
-						{tiles.map((item, index) => (
-							<Tile
-								// The pattern is a list of positions, and a
-								// position is what identifies a tile in it.
-								key={index}
-								id={ids[index]}
-								index={index}
-								style={styles[index]}
-								isSelected={index === selected}
-								resizing={resizing}
-								onSelect={toggleTile}
-								onResize={(size) => updateTile(index, size)}
-								tools={{
-									onAdd: addTile,
-									canAdd: tiles.length < MAX_TILES,
-									onRemove: removeTile,
-									canRemove: tiles.length > 1,
-								}}
-							/>
-						))}
-						{/*
-						 * The pattern repeats over the items, and where the
-						 * next turn of it lands - into the holes the first
-						 * left - is part of what a pattern looks like. Drawn
-						 * once more, dimmed.
-						 */}
-						{tiles.map((item, index) => (
-							<div
-								key={`repeat-${index}`}
-								className="vp-tiles-editor__tile is-repeat"
-								style={styles[index]}
-								aria-hidden="true"
-							>
-								<span className="vp-tiles-editor__face">
-									{index + 1}
-								</span>
-							</div>
-						))}
-					</div>
-				</SortableContext>
+				<fieldset className="vp-tiles-editor__tiles">
+					<BaseControl.VisualLabel as="legend">
+						{__('Tiles', 'visual-portfolio')}
+					</BaseControl.VisualLabel>
+					<SortableContext items={ids} strategy={stayPut}>
+						{/* biome-ignore lint/a11y/noStaticElementInteractions: a click beside the tiles only lets go of the one picked with its own button; Escape does the same from the keyboard, and nothing here is reachable by the keyboard alone. */}
+						<div
+							ref={canvasRef}
+							className="vp-tiles-editor__canvas"
+							style={canvasStyle}
+							onClick={onCanvasClick}
+							onKeyDown={onCanvasKeyDown}
+						>
+							{tiles.map((item, index) => (
+								<Tile
+									// The pattern is a list of positions, and a
+									// position is what identifies a tile in it.
+									key={index}
+									id={ids[index]}
+									index={index}
+									style={styles[index]}
+									isSelected={index === selected}
+									resizing={resizing}
+									onSelect={toggleTile}
+									onResize={(size) => updateTile(index, size)}
+									tools={{
+										onAdd: addTile,
+										canAdd: tiles.length < MAX_TILES,
+										onRemove: removeTile,
+										canRemove: tiles.length > 1,
+									}}
+								/>
+							))}
+							{/*
+							 * The pattern repeats over the items, and where the
+							 * next turn of it lands - into the holes the first
+							 * left - is part of what a pattern looks like. Drawn
+							 * once more, dimmed.
+							 */}
+							{tiles.map((item, index) => (
+								<div
+									key={`repeat-${index}`}
+									className="vp-tiles-editor__tile is-repeat"
+									style={styles[index]}
+									aria-hidden="true"
+								>
+									<span className="vp-tiles-editor__face">
+										{index + 1}
+									</span>
+								</div>
+							))}
+						</div>
+					</SortableContext>
+				</fieldset>
 				{/*
 				 * The tile in hand follows the pointer as a copy of itself;
 				 * the drop animation is switched off because it would fly to
