@@ -42,10 +42,10 @@ Visual Portfolio provides powerful tools to showcase your works and photo galler
 Clone the repository, then run:
 
 ```bash
-./scripts/worktree-setup.sh
+npx --yes --package=@nk-crew/plugin-toolkit nk-worktree-setup
 ```
 
-That installs dependencies and starts a local WordPress environment. The same script
+That installs dependencies and starts a local WordPress environment. The same command
 prepares a fresh `git worktree`.
 
 ### Development Commands
