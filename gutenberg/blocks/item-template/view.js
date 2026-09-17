@@ -405,12 +405,13 @@ function isRepeating(list) {
  *
  * The loop is carried by moving the slides one end has run out of to the
  * other, and a carousel whose slides all fit in its frame runs out of none:
- * the library shuffled the few it had back and forth instead. Such a carousel
- * is run as a plain one. Counted rather than measured. The slide width is a
- * `calc()` that fits the column count into the frame, so the slides overflow
- * it when there are more of them than columns, and a measure would have to
- * undo the padding the loop is carried in, the library's included, to find
- * the same.
+ * the library shuffled the few it had back and forth instead, and a loop of
+ * as many slides as columns rests with a hole in it, whichever way the slides
+ * are aligned. Such a carousel is run as a plain one. Counted rather than
+ * measured. The slide width is a `calc()` that fits the column count into the
+ * frame, so the slides overflow it when there are more of them than columns,
+ * and a measure would have to undo the padding the loop is carried in, the
+ * library's included, to find the same.
  *
  * @param {HTMLElement} list    Item template list.
  * @param {number}      columns Slides the frame holds.
@@ -2914,10 +2915,15 @@ function initCarousel(list, restore) {
 
 	const stopAnswering = repeats ? answerForScrollWidth(list) : noop;
 
+	// A carousel torn down while the library is still on its way, by a Load
+	// More or by a column change that flips the loop, would have this import
+	// land on the one started in its place, with the wrong mode.
+	let torn = false;
+
 	if ((canDrag || repeats) && source) {
 		import(/* webpackIgnore: true */ source)
 			.then(({ Blossom }) => {
-				if (!list.isConnected || carousels.has(list)) {
+				if (torn || !list.isConnected || carousels.has(list)) {
 					return;
 				}
 
@@ -2960,6 +2966,7 @@ function initCarousel(list, restore) {
 	list.dispatchEvent(new window.CustomEvent(START_EVENT, { bubbles: true }));
 
 	return () => {
+		torn = true;
 		list.dispatchEvent(
 			new window.CustomEvent(STOP_EVENT, { bubbles: true })
 		);
