@@ -66,10 +66,6 @@ class Visual_Portfolio_Block_Loop_Carousel_Autoplay {
 	 * @return string
 	 */
 	public function block_render( $attributes ) {
-		if ( Visual_Portfolio_Block_Loop_Carousel_Nav::is_hidden( $attributes ) ) {
-			return '';
-		}
-
 		// Both names travel on the markup rather than reaching the module
 		// through a translation of its own, the way the label of a dot does.
 		//
@@ -82,7 +78,6 @@ class Visual_Portfolio_Block_Loop_Carousel_Autoplay {
 				self::button_classes( $attributes ),
 				'autoplay',
 				array(
-					'aria-pressed'         => 'false',
 					'aria-label'           => __( 'Stop the carousel', 'visual-portfolio' ),
 					'data-vp-play-label'   => __( 'Start the carousel', 'visual-portfolio' ),
 					'data-vp-pause-label'  => __( 'Stop the carousel', 'visual-portfolio' ),

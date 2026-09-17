@@ -62,6 +62,12 @@ export function getSizeSlugForColumns(columns) {
 	return 'vp_md';
 }
 
+// The blocks already given their size. A block is mounted more than once in
+// its life - the item template mounts the item being edited anew whenever the
+// item's image changes, a crop or a replacement included - and the insertion
+// that this answers happened once.
+const sized = new Set();
+
 /**
  * Give a freshly inserted image block the size its gallery wants.
  *
@@ -97,10 +103,11 @@ export function useImageSizeOnInsert(clientId, columns, setAttributes) {
 	);
 
 	useEffect(() => {
-		if (!justInserted) {
+		if (!justInserted || sized.has(clientId)) {
 			return;
 		}
 
+		sized.add(clientId);
 		setAttributes({ sizeSlug: getSizeSlugForColumns(columns) });
 		// Insertion is the moment this runs, and nothing about it repeats.
 		// eslint-disable-next-line react-hooks/exhaustive-deps

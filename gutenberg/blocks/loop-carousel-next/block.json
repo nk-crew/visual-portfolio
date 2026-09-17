@@ -6,15 +6,14 @@
 	"category": "media",
 	"description": "Moves a carousel gallery on one slide. Block is experimental and will change in future releases. Please use with caution.",
 	"keywords": ["carousel", "slider", "arrow", "next"],
-	"ancestor": ["visual-portfolio/loop"],
+	"parent": [
+		"visual-portfolio/loop",
+		"visual-portfolio/item-template",
+		"visual-portfolio/loop-carousel-nav"
+	],
 	"textdomain": "visual-portfolio",
 	"usesContext": ["vp/queryType"],
 	"attributes": {
-		"lock": {
-			"type": "object",
-			"default": { "move": false, "remove": true }
-		},
-		"isHidden": { "type": "boolean", "default": false },
 		"icon": {
 			"type": "string",
 			"default": "chevron",

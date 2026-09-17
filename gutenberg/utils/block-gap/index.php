@@ -16,8 +16,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * what lets these blocks put the value on a custom property of their own. This
  * is the conversion core's layout support performs, in one place: the unsafe
  * characters are the ones `wp_sanitize_block_gap_value()` refuses, and a preset
- * becomes the variable the theme declared it under. The axial form is the one
- * `__experimentalGetGapCSSValue()` produces on the editor side.
+ * becomes the variable the theme declared it under.
+ *
+ * One length, whatever shape the value is in. The blocks declare one axis of
+ * gap, and the editor's control writes that axis as `left` - beside a `top`
+ * it carries over from a value that was once a plain string. The layouts
+ * work their track widths out inside `calc()`, where a two-value shorthand is
+ * not a length, so the axis the control edits is the one that is read.
  *
  * @param mixed $gap - `style.spacing.blockGap` of a block.
  *
@@ -26,16 +31,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 function visual_portfolio_get_block_gap( $gap ) {
 	$gap = wp_sanitize_block_gap_value( $gap );
 
-	// Two axes, and the shorthand takes the row gap before the column gap.
 	if ( is_array( $gap ) ) {
-		$row    = visual_portfolio_get_block_gap( $gap['top'] ?? '' );
-		$column = visual_portfolio_get_block_gap( $gap['left'] ?? '' );
-
-		if ( '' === $row || '' === $column ) {
-			return '' === $row ? $column : $row;
-		}
-
-		return $row === $column ? $row : $row . ' ' . $column;
+		return visual_portfolio_get_block_gap( $gap['left'] ?? $gap['top'] ?? '' );
 	}
 
 	if ( ! is_string( $gap ) || '' === $gap ) {

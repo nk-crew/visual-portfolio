@@ -5,23 +5,17 @@
  * truth for what a page renders. Core's own `getGapCSSValue()` answers with the
  * two-value `row column` shorthand, and these layouts work their track widths
  * out inside `calc()`, where a shorthand is not a length. One axis is all the
- * blocks declare, so one length is all this has to produce.
+ * blocks declare, and the control writes it as `left` - beside a `top` it
+ * carries over from a value that was once a plain string - so that axis is
+ * the one that is read.
  *
  * @param {string|Object} gap - `style.spacing.blockGap` of a block.
  *
  * @return {string} CSS length, or an empty string when the theme decides.
  */
 export default function getBlockGapValue(gap) {
-	// Two axes, and either one of them is the gap when the other is unset.
 	if (gap && 'object' === typeof gap) {
-		const row = getBlockGapValue(gap.top);
-		const column = getBlockGapValue(gap.left);
-
-		if ('' === row || '' === column) {
-			return '' === row ? column : row;
-		}
-
-		return row === column ? row : `${row} ${column}`;
+		return getBlockGapValue(gap.left ?? gap.top);
 	}
 
 	if ('string' !== typeof gap || '' === gap) {

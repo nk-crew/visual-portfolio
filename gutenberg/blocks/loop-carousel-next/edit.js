@@ -8,10 +8,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	blockClassName,
-	VisibilityToolbar,
-} from '../../utils/block-visibility';
-import {
 	arrowClassNames,
 	ControlPanel,
 	ShowOnHoverControl,
@@ -26,7 +22,7 @@ export default function CarouselNextEdit({
 	context,
 	clientId,
 }) {
-	const { isHidden, showOnHover } = attributes;
+	const { showOnHover } = attributes;
 
 	useLoopOrphanWarning(metadata.name, context);
 
@@ -36,18 +32,12 @@ export default function CarouselNextEdit({
 	// preview has no answer for: on the page the arrow is switched off at the
 	// end it has run out of, and an editor has no scroll position to run out.
 	const blockProps = useBlockProps({
-		className: blockClassName(
+		className:
 			`vp-block-loop-carousel-next ${arrowClassNames(attributes)}`.trim(),
-			isHidden
-		),
 	});
 
 	return (
 		<>
-			<VisibilityToolbar
-				isHidden={isHidden}
-				setAttributes={setAttributes}
-			/>
 			{/* An arrow in a row leaves the fade to the row, and the glyph
 			    is a block variation - switched above the settings, where the
 			    editor switches every other kind of block. */}

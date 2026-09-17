@@ -72,21 +72,6 @@ class Visual_Portfolio_Block_Loop_Carousel_Nav {
 	}
 
 	/**
-	 * Whether a control was switched off.
-	 *
-	 * A carousel control cannot be deleted - `lock.remove` is the default of
-	 * every one of them - so this is how one is taken off a page, and the block
-	 * stays in the editor where it can be switched back on.
-	 *
-	 * @param array $attributes - block attributes.
-	 *
-	 * @return bool
-	 */
-	public static function is_hidden( $attributes ) {
-		return ! empty( $attributes['isHidden'] );
-	}
-
-	/**
 	 * The classes an arrow carries for its settings.
 	 *
 	 * A chevron is the default and carries no class. How the button is drawn
@@ -164,9 +149,9 @@ class Visual_Portfolio_Block_Loop_Carousel_Nav {
 	 * @return string
 	 */
 	public function block_render( $attributes, $content ) {
-		// A row whose every control was switched off still draws the gap the
+		// A row whose every control was deleted still draws the gap the
 		// layout puts between them, and a margin of its own.
-		if ( self::is_hidden( $attributes ) || '' === trim( $content ) ) {
+		if ( '' === trim( $content ) ) {
 			return '';
 		}
 

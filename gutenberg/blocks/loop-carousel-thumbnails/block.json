@@ -6,7 +6,11 @@
 	"category": "media",
 	"description": "A strip of small pictures a carousel gallery can be steered by. Block is experimental and will change in future releases. Please use with caution.",
 	"keywords": ["carousel", "slider", "thumbnails", "filmstrip"],
-	"ancestor": ["visual-portfolio/loop"],
+	"parent": [
+		"visual-portfolio/loop",
+		"visual-portfolio/item-template",
+		"visual-portfolio/loop-carousel-nav"
+	],
 	"textdomain": "visual-portfolio",
 	"usesContext": [
 		"vp/queryId",
@@ -18,11 +22,6 @@
 		"vp/blockId"
 	],
 	"attributes": {
-		"lock": {
-			"type": "object",
-			"default": { "move": false, "remove": true }
-		},
-		"isHidden": { "type": "boolean", "default": false },
 		"sizeSlug": { "type": "string", "default": "thumbnail" },
 		"thumbHeight": { "type": "number", "default": 72 },
 		"aspectRatio": { "type": "string", "default": "1" },

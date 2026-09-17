@@ -40,10 +40,6 @@ class Visual_Portfolio_Block_Loop_Carousel_Indicator {
 	 * @return string
 	 */
 	public function block_render( $attributes ) {
-		if ( Visual_Portfolio_Block_Loop_Carousel_Nav::is_hidden( $attributes ) ) {
-			return '';
-		}
-
 		$indicator = $attributes['indicator'] ?? 'dots';
 
 		// The slide on screen and how many there are, as a pair of numbers.

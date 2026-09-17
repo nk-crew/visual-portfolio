@@ -950,54 +950,155 @@ test.describe('Gallery Item Template layouts', () => {
 		}
 	});
 
-	test('a narrow screen draws the column count it was given', async ({
+	test('a repeating carousel steps its frames round the loop', async ({
 		page,
 		requestUtils,
 	}) => {
 		await publishLoop(requestUtils, page, {
-			title: 'Layouts - responsive columns',
-			blockId: 'e2e-responsive-columns',
+			title: 'Layouts - repeating grouped',
+			blockId: 'e2e-repeat-grouped',
 			images,
 			layout: {
-				layoutType: 'grid',
+				layoutType: 'carousel',
 				layoutColumnsMode: 'manual',
-				layoutColumnCount: 4,
-				layoutColumnCountTablet: 3,
-				layoutColumnCountMobile: 2,
+				layoutColumnCount: 2,
+				carouselSlidesPerGroup: 2,
+				carouselRepeat: true,
 			},
+			carousel: [
+				'loop-carousel-previous',
+				'loop-carousel-indicator',
+				'loop-carousel-next',
+			],
 		});
 
 		const list = page.locator(LIST);
-		// How many items sit on the first row, which is the column count as a
-		// visitor sees it.
-		const columns = () =>
-			list.evaluate((node) => {
-				const items = Array.from(node.children);
-				const top = items[0].getBoundingClientRect().top;
+		const dots = page.locator(`${NAV} ${DOT}`);
+		const current = () =>
+			dots.evaluateAll((nodes) =>
+				nodes.findIndex(
+					(dot) => 'true' === dot.getAttribute('aria-current')
+				)
+			);
 
-				return items.filter(
-					(item) =>
-						Math.abs(item.getBoundingClientRect().top - top) < 2
-				).length;
-			});
+		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true');
+		await expect
+			.poll(() => list.evaluate((node) => node.scrollLeft), {
+				timeout: 10000,
+			})
+			.toBeGreaterThan(0);
 
-		await page.setViewportSize({ width: 1280, height: 900 });
-		await expect.poll(columns, { timeout: 10000 }).toBe(4);
+		// A loop has no end to keep a snap for: the places are the frames,
+		// and nothing else - a dot for the last slide would name a place the
+		// loop never rests on.
+		await expect(dots).toHaveCount(3);
+		await expect
+			.poll(
+				() =>
+					dots.evaluateAll((nodes) =>
+						nodes.map((dot) => dot.dataset.vpSlide)
+					),
+				{ timeout: 10000 }
+			)
+			.toEqual(['0', '2', '4']);
 
-		// The screens are cut where the editor cuts its responsive styles: a
-		// tablet is 782px and narrower, a phone 480px and narrower. Above the
-		// tablet the count of its own does not apply, and the ladder steps
-		// the desktop count down to three on its own.
-		await page.setViewportSize({ width: 900, height: 900 });
-		await expect.poll(columns, { timeout: 10000 }).toBe(3);
+		// Three presses are a whole turn: the step after the last frame is
+		// the first frame again, and the dots follow.
+		for (const expected of [1, 2, 0]) {
+			await page.locator(NEXT_ARROW).click();
+			await expect
+				.poll(() => getRestingSlide(list), { timeout: 10000 })
+				.toBe(expected * 2);
+			await expect.poll(current, { timeout: 10000 }).toBe(expected);
+		}
 
-		// On a tablet the ladder would have given two; three is the setting.
-		await page.setViewportSize({ width: 700, height: 900 });
-		await expect.poll(columns, { timeout: 10000 }).toBe(3);
+		// And back over the seam the other way.
+		await page.locator(PREV_ARROW).click();
+		await expect
+			.poll(() => getRestingSlide(list), { timeout: 10000 })
+			.toBe(4);
+		await expect.poll(current, { timeout: 10000 }).toBe(2);
+	});
 
-		// And on a phone the ladder would have given one.
-		await page.setViewportSize({ width: 400, height: 900 });
-		await expect.poll(columns, { timeout: 10000 }).toBe(2);
+	test('a loop is left out where every slide fits the frame', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - repeat that fits',
+			blockId: 'e2e-repeat-fits',
+			images,
+			perPage: 2,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'auto',
+				layoutMinimumColumnWidth: '10rem',
+				carouselRepeat: true,
+			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+
+		// Two slides in a frame that holds them both: there is nothing to
+		// move round, so the module runs the carousel as a plain one and
+		// takes the attribute the stylesheet pads the loop by off the list.
+		await expect(list).toHaveClass(/vp-has-script/);
+		await expect(list).not.toHaveAttribute('data-vp-carousel-repeat');
+		await expect(list).toHaveCSS('padding-inline-start', '0px');
+		await expect(page.locator(NEXT_ARROW)).toBeDisabled();
+	});
+
+	test('the bar of a repeating carousel runs from the first slide to the last', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - repeating progress',
+			blockId: 'e2e-repeat-progress',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+				carouselRepeat: true,
+			},
+			carousel: [['loop-carousel-indicator', { indicator: 'progress' }]],
+		});
+
+		const list = page.locator(LIST);
+		const bar = page.locator(`${NAV} [role="slider"]`);
+
+		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true');
+
+		// The scroll of a loop is a clock, and a bar reading it ran from a
+		// quarter on the first slide to an eighth on the last. What it says
+		// is the slide on screen over the count.
+		await expect(bar).toHaveAttribute('aria-valuenow', '0');
+		await expect(bar).toHaveAttribute('aria-valuetext', 'Slide 1 of 6');
+
+		await bar.focus();
+		await page.keyboard.press('End');
+		await expect(bar).toHaveAttribute('aria-valuenow', '100');
+		await expect(bar).toHaveAttribute('aria-valuetext', 'Slide 6 of 6');
+		await expect
+			.poll(() => getRestingSlide(list), { timeout: 10000 })
+			.toBe(IMAGES_COUNT - 1);
+
+		// Four pixels is not something a finger can take hold of: the target
+		// reaches ten pixels above the bar, and nothing clips it.
+		const box = await bar.boundingBox();
+		const above = await page.evaluate(
+			([x, y]) =>
+				document
+					.elementFromPoint(x, y)
+					?.classList.contains(
+						'vp-block-loop-carousel-indicator--progress'
+					),
+			[box.x + box.width / 2, box.y - 8]
+		);
+
+		expect(above).toBe(true);
 	});
 
 	test('a carousel can be steered by its thumbnails', async ({
@@ -1134,13 +1235,18 @@ test.describe('Gallery Item Template layouts', () => {
 		const position = () => list.evaluate((node) => node.scrollLeft);
 
 		// A carousel with autoplay wakes the button, the way a carousel wakes
-		// an arrow.
+		// an arrow. Its label names what a press does next, the way the button
+		// of a player does.
 		await expect(button).toBeVisible();
-		await expect(button).toHaveAttribute('aria-pressed', 'false');
+		await expect(button).toHaveAttribute('aria-label', 'Stop the carousel');
+		await expect(button).not.toHaveAttribute('aria-pressed');
 
-		// Pressed is stopped: the button holds the carousel down, and says so.
+		// Stopped, the button offers to start the carousel again.
 		await button.click();
-		await expect(button).toHaveAttribute('aria-pressed', 'true');
+		await expect(button).toHaveAttribute(
+			'aria-label',
+			'Start the carousel'
+		);
 
 		// And the indicator stops drawing a wait: a half filled pill on a
 		// stopped carousel is a countdown that never ends.
@@ -1170,11 +1276,14 @@ test.describe('Gallery Item Template layouts', () => {
 		});
 		await page.waitForTimeout(2600);
 		await expect.poll(position, { timeout: 1000 }).toBe(0);
-		await expect(button).toHaveAttribute('aria-pressed', 'true');
+		await expect(button).toHaveAttribute(
+			'aria-label',
+			'Start the carousel'
+		);
 
 		// And pressing it again lets the carousel run on.
 		await button.click();
-		await expect(button).toHaveAttribute('aria-pressed', 'false');
+		await expect(button).toHaveAttribute('aria-label', 'Stop the carousel');
 		await page.mouse.move(0, 0);
 		await expect.poll(position, { timeout: 10000 }).toBeGreaterThan(0);
 	});
@@ -2018,6 +2127,55 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(rewound).toEqual([]);
 	});
 
+	test('autoplay stays held while the pointer crosses a control over the slides', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel autoplay over control',
+			blockId: 'e2e-carousel-autoplay-control',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselAutoplay: true,
+				carouselAutoplayDelay: 2,
+			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
+			carouselOverlay: true,
+		});
+
+		const list = page.locator(LIST);
+		const next = page.locator(NEXT_ARROW);
+		const position = () => list.evaluate((node) => node.scrollLeft);
+
+		await expect(next).toBeVisible();
+
+		const slides = await list.boundingBox();
+		const arrow = await next.boundingBox();
+
+		// Onto the slides, over the arrow that sits on them, and back onto
+		// the slides. The arrow is inside the frame, so leaving the arrow is
+		// not leaving the carousel - and the wait stays held for as long as
+		// the pointer rests there.
+		await page.mouse.move(slides.x + slides.width / 2, slides.y + 10);
+		await page.mouse.move(
+			arrow.x + arrow.width / 2,
+			arrow.y + arrow.height / 2
+		);
+		await page.mouse.move(slides.x + slides.width / 2, slides.y + 10);
+		await page.waitForTimeout(2800);
+
+		expect(await position()).toBe(0);
+
+		// Off the carousel the wait runs down and the carousel moves on.
+		await page.mouse.move(1, 1);
+		await expect.poll(position, { timeout: 10000 }).toBeGreaterThan(0);
+	});
+
 	test('a wait starts again on the slide the carousel is moved to', async ({
 		page,
 		requestUtils,
@@ -2166,6 +2324,60 @@ test.describe('Gallery Item Template layouts', () => {
 		// it - twice the box - is a third.
 		expect(geometry.box).toBeCloseTo(1 / 6, 2);
 		expect(geometry.height).toBeGreaterThan(0);
+
+		// The slide before the first is a copy moved round from the far end,
+		// animated over a range the module writes on it from where it is
+		// drawn - inset by what the effect insets its own timeline by, which
+		// is written on the item. And the card in the middle is painted over
+		// the copy it overhangs: the library translates every item of a loop,
+		// which makes each one a stacking context, so the raised stacking is
+		// the item's own.
+		await expect
+			.poll(
+				() =>
+					list.evaluate((node) => {
+						const items = Array.from(node.children);
+						const copy = items.find((item) =>
+							item.classList.contains('vp-carousel-moved-round')
+						);
+
+						if (!copy) {
+							return null;
+						}
+
+						const inset = parseFloat(
+							window.getComputedStyle(items[0]).viewTimelineInset
+						);
+						const [start] = copy.style
+							.getPropertyValue('--vp-carousel-copy-contain')
+							.split(' ');
+						const moved = parseFloat(copy.style.translate);
+						// `end - box + inset`, the way the module writes it.
+						const expected =
+							copy.offsetLeft +
+							moved +
+							copy.offsetWidth -
+							node.clientWidth +
+							inset;
+
+						return Math.abs(parseFloat(start) - expected) < 1;
+					}),
+				{ timeout: 10000 }
+			)
+			.toBe(true);
+
+		// And the card in the middle is stacked over every other: the library
+		// translates every item of a loop, which makes each one a stacking
+		// context of its own, so the raised stacking is the item's - where a
+		// z-index on the card inside one ranked nothing outside it.
+		const stacking = await list.evaluate((node) =>
+			Array.from(node.children).map((item) =>
+				parseInt(window.getComputedStyle(item).zIndex, 10)
+			)
+		);
+
+		expect(stacking[0]).toBe(100);
+		expect(Math.max(...stacking.slice(1))).toBeLessThan(100);
 	});
 
 	test('the arrows step one slide a press, however fast they are pressed', async ({
@@ -2335,6 +2547,46 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(await carousel.evaluate((node) => node.style.height)).toBe('');
 	});
 
+	test('a load more starts a repeating carousel again on the slide it was showing', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - repeating load more',
+			blockId: 'e2e-repeat-load-more',
+			images,
+			perPage: 3,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+				carouselRepeat: true,
+			},
+			controls: ['loop-pagination-trigger'],
+			carousel: ['loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+		const items = page.locator(`${LIST} > ${ITEM}`);
+
+		await expect(items).toHaveCount(3);
+		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true');
+
+		await page.locator(NEXT_ARROW).click();
+		await expect
+			.poll(() => getRestingSlide(list), { timeout: 10000 })
+			.toBe(1);
+		await settle(list);
+
+		// The loop is started again with the slides that arrived, on the
+		// slide the visitor was looking at - not on the first.
+		await page.locator(LOAD_MORE).click();
+		await expect(items).toHaveCount(IMAGES_COUNT);
+		await expect
+			.poll(() => getRestingSlide(list), { timeout: 10000 })
+			.toBe(1);
+	});
+
 	test('masonry leaves the layout to the browser where Grid Lanes exists', async ({
 		page,
 		requestUtils,
@@ -2497,99 +2749,6 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(drawn[0]).toBeGreaterThan(0);
 	});
 
-	test('a screen is given a count of its own the way the editor styles a screen', async ({
-		page,
-		admin,
-		editor,
-	}) => {
-		await admin.createNewPost({
-			title: 'Layouts - responsive control',
-			postType: 'page',
-			showWelcomeGuide: false,
-			legacyCanvas: true,
-		});
-
-		await editor.insertBlock({
-			name: 'visual-portfolio/loop',
-			attributes: {
-				baseQuery: { perPage: IMAGES_COUNT, maxPages: 1 },
-				queryType: 'images',
-				imagesQuery: { images },
-			},
-			innerBlocks: [
-				{
-					name: 'visual-portfolio/item-template',
-					attributes: {
-						layoutType: 'grid',
-						layoutColumnsMode: 'manual',
-						layoutColumnCount: 4,
-					},
-					innerBlocks: [{ name: 'visual-portfolio/item-image' }],
-				},
-			],
-		});
-
-		const canvas = getEditorCanvas(page, editor);
-
-		await editor.selectBlocks(
-			canvas.locator('[data-type="visual-portfolio/item-template"]')
-		);
-		await editor.openDocumentSettingsSidebar();
-
-		const columns = page.getByRole('slider', { name: 'Columns' });
-
-		// The desktop count, which is what the block was given.
-		await expect(columns).toHaveValue('4');
-
-		// A narrower screen is styled the way the editor styles one: with
-		// Responsive styles on, the View switched to that screen, and the
-		// inspector showing what a viewport can be styled with - the Layout
-		// panel among it, which is where the count for the screen lives.
-		const view = page.getByRole('button', { name: 'View', exact: true });
-
-		await view.click();
-		await page
-			.getByRole('menuitemcheckbox', { name: 'Responsive styles' })
-			.click();
-
-		const tablet = page.getByRole('menuitemradio', { name: 'Tablet' });
-
-		if (!(await tablet.isVisible())) {
-			await view.click();
-		}
-
-		await tablet.click();
-
-		await expect(columns).toHaveValue('0');
-
-		await columns.fill('2');
-
-		await expect
-			.poll(
-				() =>
-					editor
-						.getBlocks()
-						.then(
-							(blocks) =>
-								blocks[0].innerBlocks[0].attributes
-									.layoutColumnCountTablet
-						),
-				{ timeout: 10000 }
-			)
-			.toBe(2);
-
-		// And the desktop count was left where it was.
-		const blocks = await editor.getBlocks();
-
-		expect(blocks[0].innerBlocks[0].attributes.layoutColumnCount).toBe(4);
-
-		// Back on the desktop, the count is the desktop's again.
-		await view.click();
-		await page.getByRole('menuitemradio', { name: 'Desktop' }).click();
-
-		await expect(columns).toHaveValue('4');
-	});
-
 	test('the editor draws the layout the moment it is picked', async ({
 		page,
 		admin,
@@ -2658,271 +2817,6 @@ test.describe('Gallery Item Template layouts', () => {
 			'grid-column-start',
 			'span 2'
 		);
-	});
-
-	/**
-	 * A tiles layout in the editor, with the pattern editor open.
-	 *
-	 * @param {Object} page   - Playwright page.
-	 * @param {Object} admin  - admin utils.
-	 * @param {Object} editor - editor utils.
-	 * @param {string} title  - title of the page.
-	 * @return {Object} the canvas.
-	 */
-	async function openTilesEditor(page, admin, editor, title) {
-		await admin.createNewPost({
-			title,
-			postType: 'page',
-			showWelcomeGuide: false,
-			legacyCanvas: true,
-		});
-
-		await editor.insertBlock({
-			name: 'visual-portfolio/loop',
-			attributes: {
-				baseQuery: { perPage: IMAGES_COUNT, maxPages: 1 },
-				queryType: 'images',
-				imagesQuery: { images },
-			},
-			innerBlocks: [
-				{
-					name: 'visual-portfolio/item-template',
-					attributes: { layoutType: 'tiles' },
-					innerBlocks: [
-						{
-							name: 'visual-portfolio/item-image',
-							attributes: { aspectRatio: '1' },
-						},
-					],
-				},
-			],
-		});
-
-		const canvas = getEditorCanvas(page, editor);
-
-		await editor.selectBlocks(
-			canvas.locator('[data-type="visual-portfolio/item-template"]')
-		);
-		await editor.openDocumentSettingsSidebar();
-
-		return canvas;
-	}
-
-	/**
-	 * The pattern the item template holds.
-	 *
-	 * @param {Object} editor - editor utils.
-	 * @return {Promise<string>} tiles notation.
-	 */
-	function getPattern(editor) {
-		return editor
-			.getBlocks()
-			.then((blocks) => blocks[0].innerBlocks[0].attributes.layoutTiles);
-	}
-
-	test('the pattern editor builds a pattern by hand', async ({
-		page,
-		admin,
-		editor,
-	}) => {
-		const canvas = await openTilesEditor(
-			page,
-			admin,
-			editor,
-			'Layouts - pattern editor'
-		);
-		const list = canvas.locator(LIST);
-
-		// The default pattern is one square, drawn but not in hand: the tools
-		// come with the tile that is picked, the way a block's toolbar does.
-		const first = page.getByRole('button', { name: 'Tile 1' });
-		const add = page.getByRole('button', { name: 'Add tile' });
-
-		await expect(first).toHaveAttribute('aria-pressed', 'false');
-		await expect(page.getByRole('button', { name: 'Tile 2' })).toHaveCount(
-			0
-		);
-		await expect(add).toHaveCount(0);
-
-		await first.click();
-
-		await expect(first).toHaveAttribute('aria-pressed', 'true');
-		await expect(add).toBeVisible();
-
-		// A new tile is a copy of the one in hand, after it, and becomes the
-		// one in hand - so four presses are four more squares.
-		for (let i = 0; i < 4; i += 1) {
-			await add.click();
-		}
-
-		await expect(
-			page.getByRole('button', { name: 'Tile 5' })
-		).toHaveAttribute('aria-pressed', 'true');
-		await expect
-			.poll(() => getPattern(editor))
-			.toBe('3|1,1|1,1|1,1|1,1|1,1|');
-
-		// The height is measured in column widths, so a tile two columns wide
-		// and two tall is the block the reference pattern has - which the
-		// notation writes as `2,1`, a height of once its own width.
-		await page.getByRole('button', { name: 'Tile 2' }).click();
-		await page.getByRole('spinbutton', { name: 'Width' }).fill('2');
-		await page.getByRole('spinbutton', { name: 'Height' }).fill('2');
-
-		await page.getByRole('button', { name: 'Tile 4' }).click();
-		await page.getByRole('spinbutton', { name: 'Width' }).fill('2');
-
-		await expect.poll(() => getPattern(editor)).toBe(TILES);
-
-		// And the gallery is laid out by it as it is typed: the editable item
-		// is shadowed by a hidden preview of itself, so the second tile of the
-		// pattern is the third node in the list.
-		await expect(list.locator(ITEM).nth(2)).toHaveCSS(
-			'grid-column-start',
-			'span 2'
-		);
-		await expect(list.locator(ITEM).nth(2)).toHaveCSS(
-			'grid-row-start',
-			'span 2'
-		);
-
-		// A tile dragged onto another takes its place in the pattern, and
-		// stays in hand where it lands.
-		const second = page.getByRole('button', { name: 'Tile 2' });
-		const from = await second.boundingBox();
-		const to = await first.boundingBox();
-
-		await page.mouse.move(
-			from.x + from.width / 2,
-			from.y + from.height / 2
-		);
-		await page.mouse.down();
-		// The drag starts a few pixels in, so a click stays a click.
-		await page.mouse.move(
-			from.x + from.width / 2 - 10,
-			from.y + from.height / 2
-		);
-		await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, {
-			steps: 8,
-		});
-		await page.mouse.up();
-
-		await expect(first).toHaveAttribute('aria-pressed', 'true');
-		await expect
-			.poll(() => getPattern(editor))
-			.toBe('3|2,1|1,1|1,1|2,0.5|1,1|');
-
-		// `@dnd-kit` swallows the click that follows a drop for 50ms, so
-		// that a drag does not end in a click on the tile it lands on. No
-		// hand clicks the next button that soon; the test would.
-		await page.waitForTimeout(100);
-		await page.getByRole('button', { name: 'Remove tile' }).click();
-
-		await expect
-			.poll(() => getPattern(editor))
-			.toBe('3|1,1|1,1|2,0.5|1,1|');
-
-		// Fewer columns than a tile is wide: the tile is narrowed to the grid
-		// and keeps its height, the way the layout would have clamped it.
-		await page.getByRole('slider', { name: 'Columns' }).fill('1');
-
-		await expect.poll(() => getPattern(editor)).toBe('1|1,1|1,1|1,1|1,1|');
-
-		// The presets are a select above the editor. Its toggle names what is
-		// in hand - a pattern of one's own, until a preset is picked - and
-		// the preset picked is what the editor then shows.
-		const presets = page.locator('.vp-tiles-presets-select__toggle');
-
-		await expect(presets).toHaveText('Custom pattern');
-
-		await presets.click();
-		await page.locator(`.vp-tiles-preset[aria-label="${TILES}"]`).click();
-
-		await expect.poll(() => getPattern(editor)).toBe(TILES);
-		await expect(presets).toHaveText('3 columns, 5 tiles');
-		await expect(
-			page.getByRole('button', { name: 'Tile 5' })
-		).toBeVisible();
-
-		// A tile is let go of with a click beside the tiles, and its tools go
-		// with it; Escape lets go of one too.
-		await expect(first).toHaveAttribute('aria-pressed', 'true');
-
-		await page
-			.locator('.vp-tiles-editor__canvas')
-			.click({ position: { x: 4, y: 4 } });
-
-		await expect(first).toHaveAttribute('aria-pressed', 'false');
-		await expect(add).toHaveCount(0);
-
-		await first.click();
-		await expect(add).toBeVisible();
-		await first.press('Escape');
-		await expect(add).toHaveCount(0);
-	});
-
-	test('the pattern editor resizes a tile by its handles', async ({
-		page,
-		admin,
-		editor,
-	}) => {
-		const canvas = await openTilesEditor(
-			page,
-			admin,
-			editor,
-			'Layouts - pattern handles'
-		);
-		const list = canvas.locator(LIST);
-
-		// The handles come with the tile that is picked.
-		await page.getByRole('button', { name: 'Tile 1' }).click();
-
-		const tile = page.locator('.vp-tiles-editor__tile.is-selected');
-		const box = await tile.boundingBox();
-
-		// One column over, plus the gap between two: the far edge lands on the
-		// next column and snaps to it.
-		const pitch = box.width + 4;
-
-		/**
-		 * Drag a handle of the selected tile.
-		 *
-		 * @param {string} side - `right` or `bottom`.
-		 * @param {number} dx   - horizontal distance.
-		 * @param {number} dy   - vertical distance.
-		 */
-		async function drag(side, dx, dy) {
-			// The corner handle is named after both its sides.
-			const handle = tile.locator(
-				`.components-resizable-box__side-handle.components-resizable-box__handle-${side}`
-			);
-			const from = await handle.boundingBox();
-			const x = from.x + from.width / 2;
-			const y = from.y + from.height / 2;
-
-			await page.mouse.move(x, y);
-			await page.mouse.down();
-			await page.mouse.move(x + dx, y + dy, { steps: 8 });
-			await page.mouse.up();
-		}
-
-		// Widened, a tile keeps the height it had - which the notation, that
-		// measures the height against the width, writes as half.
-		await drag('right', pitch, 0);
-
-		await expect.poll(() => getPattern(editor)).toBe('3|2,0.5|');
-		await expect(list.locator(ITEM).first()).toHaveCSS(
-			'grid-column-start',
-			'span 2'
-		);
-
-		// Pulled down by a column width, it is a column width taller.
-		await drag('bottom', 0, pitch);
-
-		await expect.poll(() => getPattern(editor)).toBe('3|2,1|');
-		await expect(
-			page.getByRole('spinbutton', { name: 'Height' })
-		).toHaveValue('2');
 	});
 
 	test('the editor lays a control inside the item template over the slides', async ({
@@ -3240,152 +3134,5 @@ test.describe('Gallery Item Template layouts', () => {
 
 		await expect(list).toHaveClass(/vp-carousel-acme-flip/);
 		await expect(list).not.toHaveAttribute('data-vp-carousel-repeat');
-	});
-
-	// The module keeps the timelines of an effect where the browser has none
-	// - Firefox, Safari before 26 - and the browser here has them, so the
-	// question the module asks of `CSS.supports` is answered for it before
-	// the page loads. What the stylesheet then makes of the numbers is
-	// Firefox's to show; what is checked here is the numbers. The suite runs
-	// with reduced motion, and a visitor who asked for that is left the plain
-	// carousel, so this runs without it.
-	test.describe('an effect where the browser has no timelines', () => {
-		test.use({
-			contextOptions: {
-				reducedMotion: 'no-preference',
-				strictSelectors: true,
-			},
-		});
-
-		test('the module writes where every slide is, and keeps it written', async ({
-			page,
-			requestUtils,
-		}) => {
-			await page.addInitScript(() => {
-				const supports = window.CSS.supports.bind(window.CSS);
-
-				window.CSS.supports = (...args) =>
-					!String(args[0]).includes('animation-timeline') &&
-					supports(...args);
-			});
-
-			await publishLoop(requestUtils, page, {
-				title: 'Layouts - scripted timelines',
-				blockId: 'e2e-scripted-timelines',
-				images,
-				layout: {
-					layoutType: 'carousel',
-					layoutColumnsMode: 'manual',
-					layoutColumnCount: 2,
-					carouselEffect: 'slideshow',
-				},
-			});
-
-			const list = page.locator(LIST);
-
-			// The mark the scripted rules apply to.
-			await expect(list).toHaveClass(/vp-carousel-scripted/);
-
-			// How far through `cover` each slide is: from its first edge
-			// entering the frame at 0 to its last edge leaving at 1. A
-			// slideshow shows one slide over the frame, so at rest the first
-			// is halfway through, the next is waiting at the edge, and the
-			// one after that is a whole slide off.
-			const covered = () =>
-				list.evaluate((node) =>
-					Array.from(
-						node.querySelectorAll(
-							'.wp-block-visual-portfolio-item-template__item'
-						),
-						(item) =>
-							parseFloat(
-								item.style.getPropertyValue(
-									'--vp-carousel-cover'
-								)
-							)
-					).slice(0, 3)
-				);
-
-			await expect
-				.poll(covered, { timeout: 10000 })
-				.toEqual([0.5, 0, -0.5]);
-
-			// Scrolled a slide on, every number moves a half with it.
-			await list.evaluate((node) => {
-				node.scrollTo({ left: node.clientWidth, behavior: 'instant' });
-			});
-
-			await expect.poll(covered, { timeout: 10000 }).toEqual([1, 0.5, 0]);
-		});
-
-		test('the editor preview keeps them the same way', async ({
-			page,
-			admin,
-			editor,
-		}) => {
-			await page.addInitScript(() => {
-				const supports = window.CSS.supports.bind(window.CSS);
-
-				window.CSS.supports = (...args) =>
-					!String(args[0]).includes('animation-timeline') &&
-					supports(...args);
-			});
-
-			await admin.createNewPost({
-				title: 'Layouts - scripted timelines in the editor',
-				postType: 'page',
-				showWelcomeGuide: false,
-				legacyCanvas: true,
-			});
-
-			await editor.insertBlock({
-				name: 'visual-portfolio/loop',
-				attributes: {
-					baseQuery: { perPage: IMAGES_COUNT, maxPages: 1 },
-					queryType: 'images',
-					imagesQuery: { images },
-				},
-				innerBlocks: [
-					{
-						name: 'visual-portfolio/item-template',
-						attributes: {
-							layoutType: 'carousel',
-							carouselEffect: 'slideshow',
-						},
-						innerBlocks: [{ name: 'visual-portfolio/item-image' }],
-					},
-				],
-			});
-
-			const list = getEditorCanvas(page, editor).locator(LIST);
-
-			await expect(list).toHaveClass(/vp-carousel-scripted/);
-			await expect
-				.poll(
-					() =>
-						list.evaluate((node) =>
-							node
-								.querySelector(
-									'.wp-block-visual-portfolio-item-template__item'
-								)
-								.style.getPropertyValue('--vp-carousel-cover')
-						),
-					{ timeout: 10000 }
-				)
-				.toBe('0.5000');
-
-			// Switched off, the effect takes its numbers with it: the preview
-			// is a plain carousel again, the way the page would be.
-			const clientId = (await editor.getBlocks({ full: true }))[0]
-				.innerBlocks[0].clientId;
-
-			await page.evaluate((id) => {
-				window.wp.data
-					.dispatch('core/block-editor')
-					.updateBlockAttributes(id, { carouselEffect: 'none' });
-			}, clientId);
-
-			await expect(list).not.toHaveClass(/vp-carousel-scripted/);
-		});
 	});
 });

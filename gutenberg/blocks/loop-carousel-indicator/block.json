@@ -13,15 +13,14 @@
 		"pagination",
 		"progress"
 	],
-	"ancestor": ["visual-portfolio/loop"],
+	"parent": [
+		"visual-portfolio/loop",
+		"visual-portfolio/item-template",
+		"visual-portfolio/loop-carousel-nav"
+	],
 	"textdomain": "visual-portfolio",
 	"usesContext": ["vp/queryType"],
 	"attributes": {
-		"lock": {
-			"type": "object",
-			"default": { "move": false, "remove": true }
-		},
-		"isHidden": { "type": "boolean", "default": false },
 		"indicator": {
 			"type": "string",
 			"default": "dots",

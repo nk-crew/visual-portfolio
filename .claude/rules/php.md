@@ -22,5 +22,5 @@ paths:
 
 ## Before you finish
 
-Run `npm run lint:php`. WPCS runs against PHP 7.2+ compatibility, so avoid syntax newer
+Run `npm run lint:php`. WPCS runs against PHP 7.4+ compatibility, so avoid syntax newer
 than that in shipped code.

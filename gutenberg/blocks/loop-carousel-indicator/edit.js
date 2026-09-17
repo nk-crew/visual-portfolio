@@ -9,10 +9,6 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	blockClassName,
-	VisibilityToolbar,
-} from '../../utils/block-visibility';
-import {
 	ControlPanel,
 	indicatorClassNames,
 	ShowOnHoverControl,
@@ -40,8 +36,7 @@ export default function CarouselIndicatorEdit({
 	context,
 	clientId,
 }) {
-	const { indicator, isHidden, showOnHover, maxDots, isDraggable } =
-		attributes;
+	const { indicator, showOnHover, maxDots, isDraggable } = attributes;
 	const isProgress = 'progress' === indicator;
 	const isCounter = 'counter' === indicator;
 	const isDots = !isProgress && !isCounter;
@@ -51,10 +46,8 @@ export default function CarouselIndicatorEdit({
 	const { isOverlay, isInRow } = useControlPlacement(clientId);
 
 	const blockProps = useBlockProps({
-		className: blockClassName(
+		className:
 			`vp-block-loop-carousel-indicator vp-block-loop-carousel-indicator--${isDots ? 'dots' : indicator}${isProgress && isDraggable ? ' is-draggable' : ''} ${indicatorClassNames(attributes)}`.trim(),
-			isHidden
-		),
 	});
 
 	// The bar reads its fill from the box around it, the same way the page
@@ -68,10 +61,6 @@ export default function CarouselIndicatorEdit({
 
 	return (
 		<>
-			<VisibilityToolbar
-				isHidden={isHidden}
-				setAttributes={setAttributes}
-			/>
 			{isDots || isProgress || (isOverlay && !isInRow) ? (
 				<InspectorControls>
 					<ControlPanel title={__('Indicator', 'visual-portfolio')}>

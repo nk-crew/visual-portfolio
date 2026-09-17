@@ -389,60 +389,32 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A count of its own for a narrower screen is written only when it was
-	 * asked for, so a gallery that never opened the setting is drawn exactly
-	 * as it was.
+	 * A count for a narrower screen is Pro's to write; the free plugin prints
+	 * none, and ignores one that arrives in the attributes.
 	 *
 	 * @return void
 	 */
-	public function test_a_narrow_screen_can_be_given_a_column_count_of_its_own() {
-		$plain = $this->render_loop(
-			'<!-- wp:visual-portfolio/item-image /-->',
-			array(
-				'layoutType'        => 'grid',
-				'layoutColumnsMode' => 'manual',
-				'layoutColumnCount' => 4,
-			)
-		);
-
-		$this->assertStringNotContainsString( '--vp-layout-columns-tablet', $plain );
-		$this->assertStringNotContainsString( 'vp-has-tablet-columns', $plain );
-
-		$responsive = $this->render_loop(
+	public function test_the_free_plugin_writes_no_screen_count() {
+		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
 			array(
 				'layoutType'              => 'grid',
 				'layoutColumnsMode'       => 'manual',
 				'layoutColumnCount'       => 4,
 				'layoutColumnCountTablet' => 2,
-				'layoutColumnCountMobile' => 1,
 			)
 		);
 
-		$this->assertStringContainsString( '--vp-layout-columns-tablet:2', $responsive );
-		$this->assertStringContainsString( '--vp-layout-columns-mobile:1', $responsive );
-		$this->assertStringContainsString( 'vp-has-tablet-columns', $responsive );
-		$this->assertStringContainsString( 'vp-has-mobile-columns', $responsive );
-
-		// Auto mode has no use for it: the width of a column is what decides
-		// the count there, and a second answer would fight it.
-		$auto = $this->render_loop(
-			'<!-- wp:visual-portfolio/item-image /-->',
-			array(
-				'layoutType'              => 'grid',
-				'layoutColumnsMode'       => 'auto',
-				'layoutColumnCountTablet' => 2,
-			)
-		);
-
-		$this->assertStringNotContainsString( '--vp-layout-columns-tablet', $auto );
+		$this->assertStringContainsString( '--vp-layout-columns:4', $output );
+		$this->assertStringNotContainsString( '--vp-layout-columns-tablet', $output );
+		$this->assertStringNotContainsString( 'vp-has-tablet-columns', $output );
 	}
 
 	/**
-	 * A count set for a screen applies where the editor previews that screen:
-	 * at the breakpoints the theme declares for its responsive styles, or the
-	 * ones the editor falls back to - and as the same ranges, so the tablet
-	 * count is the tablet's alone.
+	 * The rules a count set for a screen applies by are the free plugin's,
+	 * for Pro to write the classes of: at the breakpoints the theme declares
+	 * for its responsive styles, or the ones the editor falls back to - and
+	 * as the same ranges, so the tablet count is the tablet's alone.
 	 *
 	 * @return void
 	 */
@@ -601,7 +573,6 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'data-wp-on--click="actions.carouselAutoplayToggle"', $output );
 		$this->assertStringContainsString( 'data-vp-play-label', $output );
 		$this->assertStringContainsString( 'data-vp-pause-label', $output );
-		$this->assertStringContainsString( 'aria-pressed="false"', $output );
 
 		// Switched off until a carousel is running under it, like every other
 		// control - and a carousel with no autoplay never wakes this one.
@@ -833,13 +804,13 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 			array(
 				'layoutType'        => 'carousel',
 				'layoutColumnsMode' => 'manual',
-				'layoutColumnCount' => 6,
+				'layoutColumnCount' => 4,
 				'carouselRepeat'    => true,
 			)
 		);
 
-		// Six across, so four - and never more than there are images.
-		$this->assertSame( 4, substr_count( $wide, 'data-skip-lazy' ) );
+		// Four across, so three.
+		$this->assertSame( 3, substr_count( $wide, 'data-skip-lazy' ) );
 
 		// A carousel that does not repeat has no seam at all.
 		$plain = $this->render_loop(
@@ -851,16 +822,101 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A control that was switched off renders nothing at all. It cannot be
-	 * deleted, so hiding is the only way one is taken off a page.
+	 * A loop with nothing to run round is left out: five slides at six
+	 * across all fit the frame, and slides of their own width have no step
+	 * the loop could be counted in.
 	 *
 	 * @return void
 	 */
-	public function test_a_hidden_carousel_control_renders_nothing() {
+	public function test_the_loop_is_left_out_where_nothing_can_move_round() {
+		$fits = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'        => 'carousel',
+				'layoutColumnsMode' => 'manual',
+				'layoutColumnCount' => 6,
+				'carouselRepeat'    => true,
+			)
+		);
+
+		$this->assertStringNotContainsString( 'data-vp-carousel-repeat', $fits );
+		$this->assertStringNotContainsString( 'data-skip-lazy', $fits );
+
+		$own_width = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'        => 'carousel',
+				'layoutColumnsMode' => 'manual',
+				'layoutColumnCount' => 2,
+				'carouselRepeat'    => true,
+				'carouselAutoWidth' => true,
+			)
+		);
+
+		$this->assertStringNotContainsString( 'data-vp-carousel-repeat', $own_width );
+		$this->assertStringContainsString( 'vp-carousel-auto-width', $own_width );
+
+		$loops = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'        => 'carousel',
+				'layoutColumnsMode' => 'manual',
+				'layoutColumnCount' => 2,
+				'carouselRepeat'    => true,
+			)
+		);
+
+		$this->assertStringContainsString( 'data-vp-carousel-repeat="true"', $loops );
+	}
+
+	/**
+	 * The gap is one length however the editor stored it: the axis its
+	 * control edits, a zero with a unit, a preset as the theme's variable.
+	 *
+	 * @return void
+	 */
+	public function test_the_gap_is_printed_as_one_length() {
+		$axial = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutColumnsMode' => 'manual',
+				'layoutColumnCount' => 3,
+				'style'             => array( 'spacing' => array( 'blockGap' => array( 'top' => '2.5rem', 'left' => '3rem' ) ) ),
+			)
+		);
+
+		$this->assertStringContainsString( '--vp-layout-gap:3rem"', $axial );
+
+		$none = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'style' => array( 'spacing' => array( 'blockGap' => '0' ) ),
+			)
+		);
+
+		$this->assertStringContainsString( '--vp-layout-gap:0px;', $none );
+
+		$preset = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'style' => array( 'spacing' => array( 'blockGap' => array( 'left' => 'var:preset|spacing|40' ) ) ),
+			)
+		);
+
+		$this->assertStringContainsString( '--vp-layout-gap:var(--wp--preset--spacing--40);', $preset );
+	}
+
+	/**
+	 * A control is taken off a page the way any block is: hidden through the
+	 * editor's own block visibility, which the control blocks leave enabled.
+	 *
+	 * @return void
+	 */
+	public function test_a_carousel_control_hidden_by_the_editor_renders_nothing() {
 		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
 			array( 'layoutType' => 'carousel' ),
-			'<!-- wp:visual-portfolio/loop-carousel-previous {"isHidden":true} /--><!-- wp:visual-portfolio/loop-carousel-next /-->'
+			'<!-- wp:visual-portfolio/loop-carousel-previous {"metadata":{"blockVisibility":false}} /--><!-- wp:visual-portfolio/loop-carousel-next /-->'
 		);
 
 		$this->assertStringNotContainsString( 'vp-block-loop-carousel-previous', $output );
@@ -868,8 +924,8 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A row whose every control was switched off is not a row at all: the gap
-	 * its layout draws and the margin around it would be left behind.
+	 * A row whose every control was hidden is not a row at all: the gap its
+	 * layout draws and the margin around it would be left behind.
 	 *
 	 * @return void
 	 */
@@ -877,9 +933,17 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
 			array( 'layoutType' => 'carousel' ),
-			'<!-- wp:visual-portfolio/loop-carousel-nav --><!-- wp:visual-portfolio/loop-carousel-previous {"isHidden":true} /--><!-- /wp:visual-portfolio/loop-carousel-nav -->'
+			'<!-- wp:visual-portfolio/loop-carousel-nav --><!-- wp:visual-portfolio/loop-carousel-previous {"metadata":{"blockVisibility":false}} /--><!-- /wp:visual-portfolio/loop-carousel-nav -->'
 		);
 
 		$this->assertStringNotContainsString( 'vp-block-loop-carousel-nav', $output );
+
+		$with_control = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'carousel' ),
+			'<!-- wp:visual-portfolio/loop-carousel-nav --><!-- wp:visual-portfolio/loop-carousel-previous /--><!-- /wp:visual-portfolio/loop-carousel-nav -->'
+		);
+
+		$this->assertStringContainsString( 'vp-block-loop-carousel-nav', $with_control );
 	}
 }
