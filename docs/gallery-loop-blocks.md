@@ -437,7 +437,11 @@ a deck — has nothing to move: with `repeat: false` on both sides the *Repeat*
 setting is left out of the page and the control is greyed with the reason. Two
 carousels are left out of the loop whatever the effect: one whose slides are
 their own width, since the loop is counted a step per slide, and one whose
-slides all fit the frame, which has nothing to run round.
+slides all fit the frame, which has nothing to run round. The first is settled
+on the server. The second is the frame's to say. Three slides fit three columns
+on a desktop and overflow the one column of a phone, so the module counts the
+slides against the columns, and counts again whenever the columns change,
+starting the carousel over as a loop or as a plain one.
 
 The list is given the classes `vp-carousel-effect` and `vp-carousel-acme-flip`,
 and the stylesheet is the install's own to enqueue —

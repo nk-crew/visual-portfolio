@@ -1049,6 +1049,63 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(page.locator(NEXT_ARROW)).toBeDisabled();
 	});
 
+	test('the loop is taken up where a narrower screen no longer fits the slides', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - repeat on a phone',
+			blockId: 'e2e-repeat-phone',
+			images,
+			perPage: 3,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselRepeat: true,
+			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+
+		// Three slides at three across fit the frame of a desktop, so the
+		// loop is left out there.
+		await expect(list).toHaveClass(/vp-has-script/);
+		await expect(list).not.toHaveAttribute('data-vp-carousel-repeat');
+		await expect(page.locator(NEXT_ARROW)).toBeDisabled();
+
+		// On a phone the ladder gives them a column each and two of them
+		// overflow, so the carousel is started again as a loop, and a press
+		// on the arrow moves it.
+		await page.setViewportSize({ width: 390, height: 900 });
+
+		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true');
+		await expect(page.locator(NEXT_ARROW)).toBeEnabled();
+
+		await page.locator(NEXT_ARROW).click();
+		await expect
+			.poll(() => getRestingSlide(list), { timeout: 10000 })
+			.toBe(1);
+
+		// Back on a desktop the three fit again, and the loop is left out
+		// again.
+		await page.setViewportSize({ width: 1280, height: 900 });
+
+		await expect(list).not.toHaveAttribute('data-vp-carousel-repeat');
+		await expect(page.locator(NEXT_ARROW)).toBeDisabled();
+
+		// Every slide sits where the layout put it: the library moved two of
+		// them round, and a plain carousel does not put them back.
+		const translates = await list.evaluate((node) =>
+			[...node.children].map(
+				(item) => window.getComputedStyle(item).translate
+			)
+		);
+
+		expect(translates).toEqual(['none', 'none', 'none']);
+	});
+
 	test('the bar of a repeating carousel runs from the first slide to the last', async ({
 		page,
 		requestUtils,
@@ -1476,6 +1533,42 @@ test.describe('Gallery Item Template layouts', () => {
 				timeout: 10000,
 			})
 			.toBe(0);
+	});
+
+	test('the dots follow the places of a narrower screen', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel dots narrow',
+			blockId: 'e2e-carousel-dots-narrow',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				// A step of a screenful, which is where the places move with
+				// the columns.
+				carouselSlidesPerGroup: 0,
+			},
+			carousel: ['loop-carousel-indicator'],
+		});
+
+		const dots = page.locator(`${NAV} ${DOT}`);
+		const places = () =>
+			dots.evaluateAll((nodes) =>
+				nodes.map((dot) => dot.dataset.vpSlide)
+			);
+
+		// Six slides three at a time are two frames.
+		await expect.poll(places, { timeout: 10000 }).toEqual(['0', '3']);
+
+		// Two at a time on a narrower screen are three, and the dots are the
+		// new places rather than the ones of the frame before.
+		await page.setViewportSize({ width: 700, height: 900 });
+
+		await expect.poll(places, { timeout: 10000 }).toEqual(['0', '2', '4']);
+		await expect(dots.first()).toHaveAttribute('aria-current', 'true');
 	});
 
 	test('a counter names the slide on screen and how many there are', async ({
@@ -2170,6 +2263,50 @@ test.describe('Gallery Item Template layouts', () => {
 		await page.waitForTimeout(2800);
 
 		expect(await position()).toBe(0);
+
+		// Off the carousel the wait runs down and the carousel moves on.
+		await page.mouse.move(1, 1);
+		await expect.poll(position, { timeout: 10000 }).toBeGreaterThan(0);
+	});
+
+	test('a mouse press on the slides holds the carousel no longer than the pointer', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel autoplay press',
+			blockId: 'e2e-carousel-autoplay-press',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselAutoplay: true,
+				carouselAutoplayDelay: 2,
+			},
+			carousel: ['loop-carousel-indicator'],
+		});
+
+		const list = page.locator(LIST);
+		const position = () => list.evaluate((node) => node.scrollLeft);
+
+		await expect(page.locator(CAROUSEL)).toHaveClass(
+			/vp-carousel-is-playing/
+		);
+
+		// A press in the gap between two slides, which the module answers by
+		// focusing the list: the browser calls that focus visible, and a
+		// visible focus holds the wait. This one is the pointer's.
+		const box = await list.boundingBox();
+		const [first, second] = await getItemBoxes(page);
+
+		await page.mouse.click(
+			box.x + (first.x + first.width + second.x) / 2,
+			box.y + first.y + first.height / 2
+		);
+		await expect(list).toBeFocused();
 
 		// Off the carousel the wait runs down and the carousel moves on.
 		await page.mouse.move(1, 1);

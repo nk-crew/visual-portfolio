@@ -1007,13 +1007,10 @@ class Visual_Portfolio_Block_Item_Template {
 		// The widest the layout ever gets, which is the row a desktop sees first.
 		$first_row = $this->get_layout_columns( $attributes, $layout_type );
 
-		// A loop of slides that all fit the frame has nothing to run round.
-		// A count is the honest answer only where one was set; the module
-		// measures the rest.
-		if ( ! $this->is_auto_columns( $attributes, $layout_type ) && count( $items ) <= $first_row ) {
-			$attributes['carouselRepeat'] = false;
-		}
-
+		// A loop of slides that all fit the frame has nothing to run round,
+		// but whether they fit is the frame's to say. Three slides fit three
+		// columns on a desktop and overflow the one column of a phone, so the
+		// module counts them, and the request is printed whatever the count.
 		$repeats = 'carousel' === $layout_type && ! empty( $attributes['carouselRepeat'] );
 		$last    = count( $items ) - 1;
 		$warm    = $repeats ? $this->get_seam_size( $attributes, $first_row, count( $items ) ) : 0;

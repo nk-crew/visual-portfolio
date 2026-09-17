@@ -406,25 +406,19 @@ function isRepeating(list) {
  * The loop is carried by moving the slides one end has run out of to the
  * other, and a carousel whose slides all fit in its frame runs out of none:
  * the library shuffled the few it had back and forth instead. Such a carousel
- * is run as a plain one, and the stylesheet is told so through the attribute
- * it pads the loop by.
+ * is run as a plain one. Counted rather than measured. The slide width is a
+ * `calc()` that fits the column count into the frame, so the slides overflow
+ * it when there are more of them than columns, and a measure would have to
+ * undo the padding the loop is carried in, the library's included, to find
+ * the same.
  *
- * @param {HTMLElement} list Item template list.
+ * @param {HTMLElement} list    Item template list.
+ * @param {number}      columns Slides the frame holds.
  *
  * @return {boolean} True when the slides overflow the frame.
  */
-function hasLoop(list) {
-	// Measured as the plain carousel it would otherwise be: the attribute
-	// turns the loop's own padding on, which scrolls whatever the slides do.
-	delete list.dataset.vpCarouselRepeat;
-
-	const loops = list.scrollWidth > list.clientWidth + 1;
-
-	if (loops) {
-		list.dataset.vpCarouselRepeat = 'true';
-	}
-
-	return loops;
+function hasLoop(list, columns) {
+	return list.querySelectorAll(ITEM_SELECTOR).length > Math.max(1, columns);
 }
 
 /**
@@ -2291,6 +2285,9 @@ function initScrub(list) {
 		snap = list.style.getPropertyValue(SNAP_TYPE_PROPERTY);
 		list.style.setProperty(SNAP_TYPE_PROPERTY, 'none');
 		list.classList.add(SCRUBBING_CLASS);
+		// The slide a press asked for a moment ago is not the current one any
+		// more: the finger is, and the bar follows it.
+		pending.delete(list);
 	};
 
 	const freeSnap = () => {
@@ -2640,9 +2637,14 @@ function initAutoplay(list) {
 	const onPointerLeave = (event) => pointerOn.delete(event.currentTarget);
 	// A focus the keyboard put there: a press on the play button focuses
 	// it too, and a carousel started with a mouse would be held by the very
-	// button that started it.
+	// button that started it. The focus the module gives the list on a
+	// mouse press is the pointer's as well, whatever the browser says of it,
+	// and the list is marked so while it lasts.
 	const onFocusIn = (event) => {
-		if (event.target.matches?.(':focus-visible')) {
+		if (
+			event.target.matches?.(':focus-visible') &&
+			!event.target.classList.contains(POINTER_FOCUS_CLASS)
+		) {
 			focusIn.add(event.currentTarget);
 		}
 	};
@@ -2783,23 +2785,53 @@ function initCarousel(list, restore) {
 		askedToRepeat.add(list);
 	}
 
-	const repeats = askedToRepeat.has(list) && hasLoop(list);
+	// Whether the slides overflow the frame is known once the columns are:
+	// the slide width is a `calc()` over the column count, which auto mode
+	// has to work out from the container, below. Unset until then, which is
+	// what the first count tells the callback.
+	let repeats;
+	let columns = 0;
 
-	// The slide width is a `calc()` over the column count, which auto mode has
-	// to work out from the container.
-	const stopColumns = syncColumns(list, () => {
+	const stopColumns = syncColumns(list, (count) => {
+		columns = count;
+
+		// Whether the slides overflow the frame changes with the columns.
+		// Three slides fit three columns and overflow one, so a loop that
+		// could not run before may run now, or the other way round. The
+		// carousel is started again then, on the slide it is showing, the
+		// way a Load More starts it again.
+		if (
+			undefined !== repeats &&
+			askedToRepeat.has(list) &&
+			hasLoop(list, count) !== repeats
+		) {
+			list.dispatchEvent(new window.Event(RELAYOUT_EVENT));
+
+			return;
+		}
+
 		// A group measured as a screenful changes with the width of the frame,
 		// so where a swipe rests is worked out again with the columns - and
-		// so is the number of dots, one per place. Blossom measured the loop
-		// at the old width, so it is asked again.
-		syncDots(list);
+		// so is the number of dots, one per place, which is why the places
+		// come first. Blossom measured the loop at the old width, so it is
+		// asked again.
 		syncSnapGroups(list);
+		syncDots(list);
 		syncNav(list);
 
 		if (carousels.has(list)) {
 			remeasureLoop(list);
 		}
 	});
+
+	// The stylesheet is told through the attribute it pads the loop by.
+	repeats = askedToRepeat.has(list) && hasLoop(list, columns);
+
+	if (repeats) {
+		list.dataset.vpCarouselRepeat = 'true';
+	} else {
+		delete list.dataset.vpCarouselRepeat;
+	}
 
 	// Whether a play and pause button has anything to stop, which is the same
 	// question `initAutoplay` answers by doing nothing at all.
@@ -2808,16 +2840,16 @@ function initCarousel(list, restore) {
 		!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 	const sleepControls = wakeControls(list, hasAutoplay);
 
-	syncDots(list);
 	syncSnapGroups(list);
+	syncDots(list);
 	syncNav(list);
 
 	list.addEventListener('scroll', onScroll, { passive: true });
 	list.addEventListener(GO_TO_EVENT, onGoTo);
 
 	const stopObserving = observeItems(list, () => {
-		syncDots(list);
 		syncSnapGroups(list);
+		syncDots(list);
 		syncNav(list);
 	});
 
@@ -2954,6 +2986,13 @@ function initCarousel(list, restore) {
 		if (carousel) {
 			carousels.delete(list);
 			carousel.destroy();
+
+			// The library leaves the slides where it moved them round, and
+			// a carousel started again as a plain one has nowhere to put
+			// them back.
+			list.querySelectorAll(ITEM_SELECTOR).forEach((item) => {
+				item.style.removeProperty('translate');
+			});
 		}
 	};
 }

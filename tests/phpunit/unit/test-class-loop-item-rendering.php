@@ -827,9 +827,10 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A loop with nothing to run round is left out: five slides at six
-	 * across all fit the frame, and slides of their own width have no step
-	 * the loop could be counted in.
+	 * Slides of their own width have no step the loop could be counted in,
+	 * so the loop is left out for them. Whether the slides fit the frame is
+	 * the frame's to say, so five slides at six across still carry the
+	 * request: three columns on a desktop are one on a phone.
 	 *
 	 * @return void
 	 */
@@ -844,8 +845,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertStringNotContainsString( 'data-vp-carousel-repeat', $fits );
-		$this->assertStringNotContainsString( 'data-skip-lazy', $fits );
+		$this->assertStringContainsString( 'data-vp-carousel-repeat="true"', $fits );
 
 		$own_width = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
@@ -909,6 +909,16 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 		);
 
 		$this->assertStringContainsString( '--vp-layout-gap:var(--wp--preset--spacing--40);', $preset );
+
+		// The field cleared: the `top` a string once left behind is not a gap.
+		$cleared = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'style' => array( 'spacing' => array( 'blockGap' => array( 'top' => '2.5rem' ) ) ),
+			)
+		);
+
+		$this->assertStringNotContainsString( '--vp-layout-gap:', $cleared );
 	}
 
 	/**

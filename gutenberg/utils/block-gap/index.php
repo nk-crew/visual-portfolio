@@ -19,10 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * becomes the variable the theme declared it under.
  *
  * One length, whatever shape the value is in. The blocks declare one axis of
- * gap, and the editor's control writes that axis as `left` - beside a `top`
- * it carries over from a value that was once a plain string. The layouts
- * work their track widths out inside `calc()`, where a two-value shorthand is
- * not a length, so the axis the control edits is the one that is read.
+ * gap, and the editor's control writes that axis as `left`. The layouts work
+ * their track widths out inside `calc()`, where a two-value shorthand is not
+ * a length, so the axis the control edits is the one that is read. A `top`
+ * beside it is carried over from a value that was once a plain string, and
+ * stays there once the field is cleared, so it is not read even where `left`
+ * is gone.
  *
  * @param mixed $gap - `style.spacing.blockGap` of a block.
  *
@@ -32,7 +34,7 @@ function visual_portfolio_get_block_gap( $gap ) {
 	$gap = wp_sanitize_block_gap_value( $gap );
 
 	if ( is_array( $gap ) ) {
-		return visual_portfolio_get_block_gap( $gap['left'] ?? $gap['top'] ?? '' );
+		return visual_portfolio_get_block_gap( $gap['left'] ?? '' );
 	}
 
 	if ( ! is_string( $gap ) || '' === $gap ) {

@@ -5,9 +5,10 @@
  * truth for what a page renders. Core's own `getGapCSSValue()` answers with the
  * two-value `row column` shorthand, and these layouts work their track widths
  * out inside `calc()`, where a shorthand is not a length. One axis is all the
- * blocks declare, and the control writes it as `left` - beside a `top` it
- * carries over from a value that was once a plain string - so that axis is
- * the one that is read.
+ * blocks declare, and the control writes it as `left`, so that axis is the
+ * one that is read. A `top` beside it is carried over from a value that was
+ * once a plain string, and stays there once the field is cleared, so it is
+ * not read even where `left` is gone.
  *
  * @param {string|Object} gap - `style.spacing.blockGap` of a block.
  *
@@ -15,7 +16,7 @@
  */
 export default function getBlockGapValue(gap) {
 	if (gap && 'object' === typeof gap) {
-		return getBlockGapValue(gap.left ?? gap.top);
+		return getBlockGapValue(gap.left);
 	}
 
 	if ('string' !== typeof gap || '' === gap) {
