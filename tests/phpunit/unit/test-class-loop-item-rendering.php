@@ -395,6 +395,11 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_the_free_plugin_writes_no_screen_count() {
+		// Under Pro the same suite runs with Pro's module writing them.
+		if ( class_exists( 'Visual_Portfolio_Pro_Responsive_Layout' ) ) {
+			$this->markTestSkipped( 'Pro writes the screen counts on this install.' );
+		}
+
 		$output = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
 			array(
