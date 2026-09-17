@@ -43,16 +43,14 @@ the post, and belongs to it.
 carousel — a block variation each, the way the Group block offers Group, Row,
 Stack and Grid. The editor draws the switcher itself: a row of icons above the
 settings, and an entry in the block switcher of the toolbar. Tiles adds a
-*Pattern* editor to the settings once it is the layout: the tiles of the
-repeating pattern are drawn on a canvas at the shape the page gives them. A
-tile is resized by its handles or by its *Width* and *Height*, dragged onto
-another tile to take its place in the pattern, and doubled or removed from the
-small toolbar that hangs over the selected tile. Width is counted in columns
-and height in column widths — `1` is as tall as a column is wide, whatever the
-width of the tile — which the block writes into the tiles notation of
-`layoutTiles`. The presets pick a whole pattern to start from: a select above
-the canvas, whose toggle shows the pattern in hand, and the same catalogue
-behind a button of the block toolbar.
+*Pattern* setting once it is the layout: a select of presets, whose toggle shows
+the pattern in hand as a swatch, and the same catalogue behind a button of the
+block toolbar. A preset is the tiles notation of `layoutTiles` — columns, then
+the width and height of every tile of the repeating pattern, width counted in
+columns and height in column widths. Pro adds an editor of that notation under
+the select: the tiles are drawn on a canvas at the shape the page gives them,
+resized by their handles or by *Width* and *Height*, dragged onto one another to
+change places, doubled or removed from a small toolbar over the selected tile.
 
 Columns come in the two shapes the core grid layout offers, and are edited with
 the same controls under the same names. **Auto** asks for a *Min. column width*
@@ -69,24 +67,23 @@ keeps its proportions, so a pattern narrows into a stack instead of spilling out
 of the grid. Auto mode is untouched: fitting the container is already what it
 does. The gap is **Block spacing** in the Dimensions panel, like any other block.
 
-A manual count can answer for one screen at a time, and the screen is the one
-the editor is already previewing: switch the View to *Tablet* or *Mobile* with
-*Responsive styles* on, and the Layout panel carries the count for that screen.
-A tablet is 782px and narrower, a phone 480px and narrower, unless the theme
-moves the breakpoints in `settings.viewport` of `theme.json` — the count applies
-where the editor previewed it. Both extra counts start at zero, which is the
-ladder above, so a gallery that never touches them is drawn exactly as it was.
-Auto mode does not offer them: the width of a column is what decides the count
-there. Tiles narrow down the ladder alone; Pro gives a tablet and a phone a
-pattern of their own, edited in the same place.
+Pro lets a manual count answer for one screen at a time, and the screen is the
+one the editor is already previewing: switch the View to *Tablet* or *Mobile*
+with *Responsive styles* on, and the Layout panel carries the count for that
+screen. A tablet is 782px and narrower, a phone 480px and narrower, unless the
+theme moves the breakpoints in `settings.viewport` of `theme.json` — the count
+applies where the editor previewed it. A screen with no count of its own walks
+the ladder above. Auto mode does not offer them: the width of a column is what
+decides the count there. Tiles get a pattern per screen the same way. Without
+Pro the Layout panel of a tablet or phone preview says so, and nothing else.
 
 What a theme overrides in CSS, without touching the markup:
 
 | Property | Meaning |
 |---|---|
 | `--vp-layout-columns` | Column count, or the maximum in auto mode |
-| `--vp-layout-columns-tablet` | Count on a tablet, when one was set |
-| `--vp-layout-columns-mobile` | Count on a phone, when one was set |
+| `--vp-layout-columns-tablet` | Count on a tablet, when Pro set one |
+| `--vp-layout-columns-mobile` | Count on a phone, when Pro set one |
 | `--vp-layout-current-columns` | Columns the layout is drawn with, after narrowing |
 | `--vp-layout-min-column-width` | Minimum column width, auto mode only |
 | `--vp-layout-track` | The `minmax()` track a grid repeats, auto mode only |
@@ -202,11 +199,10 @@ mouse drags it because the strip is handed to the same library the carousel
 uses, which is already on the page. A gallery that appends items with **Load More** does not extend
 the strip — the module has no picture to add — so the two are not combined yet.
 
-None of them can be deleted: every one is inserted with `lock.remove`, and the
-switch that takes one off a page is *Hide on the page* on its toolbar. A hidden
-control renders nothing at all and stays on the canvas, dimmed, which is where
-it is found and switched back on. The lock is the ordinary block lock, so a
-second arrow added on purpose is unlocked through the block's own Lock dialog.
+A control that is not wanted is deleted, or hidden the way any block is hidden
+— through the editor's own block visibility, which the control blocks leave
+enabled. A control goes only where it can drive something: directly inside the
+loop, the item template or a navigation row, which its `parent` says.
 
 A control is rendered switched off and stays that way until a carousel is
 running under it, so one that ended up beside a grid — or on a page whose module
@@ -438,7 +434,14 @@ it, and it keeps the control.
 unless the effect says otherwise. The loop is carried by moving the slides one
 end has run out of to the other, so an effect that pins its slides in place —
 a deck — has nothing to move: with `repeat: false` on both sides the *Repeat*
-setting is left out of the page and the control is greyed with the reason.
+setting is left out of the page and the control is greyed with the reason. Two
+carousels are left out of the loop whatever the effect: one whose slides are
+their own width, since the loop is counted a step per slide, and one whose
+slides all fit the frame, which has nothing to run round. The first is settled
+on the server. The second is the frame's to say. Three slides fit three columns
+on a desktop and overflow the one column of a phone, so the module counts the
+slides against the columns, and counts again whenever the columns change,
+starting the carousel over as a loop or as a plain one.
 
 The list is given the classes `vp-carousel-effect` and `vp-carousel-acme-flip`,
 and the stylesheet is the install's own to enqueue —
@@ -446,6 +449,9 @@ and the stylesheet is the install's own to enqueue —
 geometric belongs inside
 `@supports (animation-timeline: view())`: without it the two boxes are still
 rendered and the carousel is the plain carousel it would have been anyway.
+Firefox and Safari before 26 have no such timelines; Pro keeps them by hand
+there, for its own effects and the free ones alike, on the `vp-carousel-start`
+and `vp-carousel-stop` events below.
 
 The frame around the list is an inline-size query container, so a width is
 stated in `cqw` rather than in a percentage of the list — a carousel that
@@ -506,14 +512,17 @@ and `{ attributes, setAttributes, clientId }` and returns `ToolsPanelItem`
 children — ordinary children of the block's Settings panel, registering with it
 the way the built-in ones do.
 
-The pattern the item template previews goes through the `vpf.itemTemplateTiles`
-JavaScript filter, given the desktop pattern and `{ attributes, deviceType }`;
-Pro returns the pattern of the screen the editor is previewing. What edits a
-pattern — `TilesEditor`, `TilesPresetsSelect` and the parser `parseTiles` —
-sits in the `visual-portfolio/components` store beside the other shared
-components, with `getViewportBreakpoints()` for the breakpoints the editor
-previews a tablet and a phone at, so a pattern kept in an attribute of another
-plugin's is edited the way the desktop's is.
+The item template previews a screen through three JavaScript filters, each
+given `{ attributes, deviceType }`: `vpf.itemTemplateTiles` with the desktop
+pattern, `vpf.itemTemplateColumns` with the column settings, and
+`vpf.itemTemplateEffectDriver` with what runs a carousel effect where the
+browser has no timelines. `vpf.itemTemplatePatternEditor` is given `null` and
+`{ value, onChange }` and returns what edits the tiles notation under the
+presets. Pro answers all four. The notation itself — `parseTiles`,
+`serializeTiles`, `getTileStyles`, `formatTilesNumber` and `tilesLimits` — sits
+in the `visual-portfolio/components` store beside `TilesPresetsSelect`, with
+`getViewportBreakpoints()` for the breakpoints the editor previews a tablet and
+a phone at.
 
 ## Block Bindings
 
@@ -595,6 +604,14 @@ template:
 |---|---|
 | `vp-carousel-go-to` | `detail.index` — scroll to that slide |
 | `vp-carousel-autoplay` | `detail.playing` — `false` holds autoplay, `true` releases it |
+
+And announces itself on the same element, bubbling, so that a script outside
+the module can run beside a carousel for as long as it runs:
+
+| Event | When |
+|---|---|
+| `vp-carousel-start` | the module has started the carousel, once per start — a Load More starts it again |
+| `vp-carousel-stop` | the module is about to let go of it |
 
 Holding autoplay is not the same as stopping it: the pause a pointer or a focus
 already applies keeps working underneath, and releasing the hold does not

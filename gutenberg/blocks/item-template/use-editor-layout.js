@@ -2,13 +2,15 @@
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import { syncColumns } from './auto-columns';
 import { layoutJustified, layoutMasonry, startLayout } from './layouts';
-import { driveTimelines } from './timelines';
+
+const noop = () => {};
 
 /**
  * Keep the editor preview laid out.
@@ -57,13 +59,15 @@ export default function useEditorLayout({
 		// The carousel is drawn by the stylesheet, but its slide width is a
 		// `calc()` over the column count, and both the container and the
 		// breakpoints can move it. An effect is drawn from timelines the
-		// browser may not have, in which case the preview keeps them the way
-		// the page does.
+		// browser may not have; Pro keeps them by hand there, on the page and
+		// in this preview alike, and answers the filter with what runs them.
 		const stopColumns = syncColumns(list);
-		const stopTimelines = driveTimelines(list);
+		const stopEffects =
+			applyFilters('vpf.itemTemplateEffectDriver', () => noop)(list) ||
+			noop;
 
 		return () => {
-			stopTimelines();
+			stopEffects();
 			stopColumns();
 		};
 	}, [layoutType, itemsCount, signature]);

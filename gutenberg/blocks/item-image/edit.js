@@ -180,62 +180,66 @@ export default function ItemImageEdit({
 	// their own. The inline cropper is the one crop the block editor offers
 	// a plugin: deprecated since 7.1, and kept exactly so that plugins have
 	// somewhere to stand until the cropper package is public - it says so
-	// once in the console when opened.
-	const imageElement = isCropping ? (
-		<ImageEditor
-			id={galleryImageId}
-			url={imageUrl}
-			width={cropping.width}
-			height={(cropping.width * naturalSize.height) / naturalSize.width}
-			naturalWidth={naturalSize.width}
-			naturalHeight={naturalSize.height}
-			onSaveImage={cropImage}
-			onFinishEditing={() => setCropping(undefined)}
-		/>
-	) : (
-		<>
-			{imageUrl ? (
-				<img
-					ref={imageRef}
-					src={imageUrl}
-					alt={itemImgAlt || ''}
-					style={imageStyles}
-					onLoad={(event) =>
-						setNaturalSize({
-							url: imageUrl,
-							width: event.target.naturalWidth,
-							height: event.target.naturalHeight,
-						})
-					}
-				/>
-			) : (
-				<div
-					className="wp-block-visual-portfolio-item-image__placeholder"
-					style={imageStyles}
-				>
-					<svg
-						className="wp-block-visual-portfolio-item-image__placeholder-illustration"
-						viewBox="0 0 60 60"
-						preserveAspectRatio="none"
-						xmlns="http://www.w3.org/2000/svg"
-						aria-hidden="true"
-						focusable="false"
+	// once in the console when opened. The day it goes, the Crop button goes
+	// with it rather than the block.
+	const imageElement =
+		isCropping && ImageEditor ? (
+			<ImageEditor
+				id={galleryImageId}
+				url={imageUrl}
+				width={cropping.width}
+				height={
+					(cropping.width * naturalSize.height) / naturalSize.width
+				}
+				naturalWidth={naturalSize.width}
+				naturalHeight={naturalSize.height}
+				onSaveImage={cropImage}
+				onFinishEditing={() => setCropping(undefined)}
+			/>
+		) : (
+			<>
+				{imageUrl ? (
+					<img
+						ref={imageRef}
+						src={imageUrl}
+						alt={itemImgAlt || ''}
+						style={imageStyles}
+						onLoad={(event) =>
+							setNaturalSize({
+								url: imageUrl,
+								width: event.target.naturalWidth,
+								height: event.target.naturalHeight,
+							})
+						}
+					/>
+				) : (
+					<div
+						className="wp-block-visual-portfolio-item-image__placeholder"
+						style={imageStyles}
 					>
-						<path
-							vectorEffect="non-scaling-stroke"
-							d="M60 60 0 0"
-						/>
-					</svg>
-				</div>
-			)}
-			{hasOverlay(overlay) && (
-				<ItemOverlay
-					className="wp-block-visual-portfolio-item-image__overlay"
-					overlay={overlay}
-				/>
-			)}
-		</>
-	);
+						<svg
+							className="wp-block-visual-portfolio-item-image__placeholder-illustration"
+							viewBox="0 0 60 60"
+							preserveAspectRatio="none"
+							xmlns="http://www.w3.org/2000/svg"
+							aria-hidden="true"
+							focusable="false"
+						>
+							<path
+								vectorEffect="non-scaling-stroke"
+								d="M60 60 0 0"
+							/>
+						</svg>
+					</div>
+				)}
+				{hasOverlay(overlay) && (
+					<ItemOverlay
+						className="wp-block-visual-portfolio-item-image__overlay"
+						overlay={overlay}
+					/>
+				)}
+			</>
+		);
 
 	return (
 		<>
@@ -262,7 +266,7 @@ export default function ItemImageEdit({
 							{/* Both tools wait, disabled rather than hidden so the
 							    toolbar keeps its shape and its focus, while the item
 							    has not caught up with the last change. */}
-							{hasImageTools && imageEditing && (
+							{hasImageTools && imageEditing && ImageEditor && (
 								<ToolbarButton
 									icon={crop}
 									label={__('Crop', 'visual-portfolio')}

@@ -6,7 +6,7 @@
 	"category": "media",
 	"description": "Holds the controls of a carousel gallery in one row. Block is experimental and will change in future releases. Please use with caution.",
 	"keywords": ["carousel", "slider", "arrows", "dots", "navigation"],
-	"ancestor": ["visual-portfolio/loop"],
+	"parent": ["visual-portfolio/loop", "visual-portfolio/item-template"],
 	"allowedBlocks": [
 		"visual-portfolio/loop-carousel-previous",
 		"visual-portfolio/loop-carousel-next",
@@ -17,11 +17,6 @@
 	"textdomain": "visual-portfolio",
 	"usesContext": ["vp/queryType"],
 	"attributes": {
-		"lock": {
-			"type": "object",
-			"default": { "move": false, "remove": true }
-		},
-		"isHidden": { "type": "boolean", "default": false },
 		"showOnHover": { "type": "boolean", "default": false }
 	},
 	"supports": {

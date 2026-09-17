@@ -94,6 +94,12 @@ class Visual_Portfolio_Block_Item_Template {
 	 * Printed after the stylesheet, at the same weight as the ladder the
 	 * stylesheet walks, so a count set outright wins over a stepped one.
 	 *
+	 * Nothing in the free plugin writes the classes these rules answer to.
+	 * They are the half of the contract Pro's responsive layout relies on:
+	 * it prints `vp-has-{screen}-columns` and `--vp-layout-columns-{screen}`
+	 * on a list, and the count applies at the breakpoints the editor
+	 * previews the screen at.
+	 *
 	 * @return void
 	 */
 	public function add_screen_columns_style() {
@@ -654,27 +660,6 @@ class Visual_Portfolio_Block_Item_Template {
 
 		$styles = sprintf( '--vp-layout-columns:%d;', $maximum );
 
-		// A count of its own for a narrower screen. Left at zero the count
-		// steps down the ladder the stylesheet walks, which is what a gallery
-		// has always done; a number set here is the answer for that screen
-		// instead - applied by the rules of `add_screen_columns_style()`, at
-		// the breakpoints the editor previews the screen at. Only in manual
-		// mode - the width of a column is what decides the count in auto
-		// mode, and a second answer would fight it.
-		if ( ! $is_auto ) {
-			foreach ( array(
-				'tablet' => 'layoutColumnCountTablet',
-				'mobile' => 'layoutColumnCountMobile',
-			) as $screen => $attribute ) {
-				$count = max( 0, min( Visual_Portfolio_Tiles_Parser::MAX_COLUMNS, (int) ( $attributes[ $attribute ] ?? 0 ) ) );
-
-				if ( $count ) {
-					$classes[] = 'vp-has-' . $screen . '-columns';
-					$styles   .= sprintf( '--vp-layout-columns-%1$s:%2$d;', $screen, $count );
-				}
-			}
-		}
-
 		if ( '' !== $gap ) {
 			$styles .= sprintf( '--vp-layout-gap:%s;', $gap );
 		}
@@ -1013,15 +998,22 @@ class Visual_Portfolio_Block_Item_Template {
 		// loop moves the slides one end has run out of to the other, and a
 		// pinned slide stays where it is - so the loop was drawn as an empty
 		// list. The setting is kept and comes back with an effect that moves.
-		if ( $effect && ! $this->effect_repeats( $effect ) ) {
+		// Slides of their own width cannot either: the loop is counted a step
+		// per slide, and slides of different widths have no step.
+		if ( ( $effect && ! $this->effect_repeats( $effect ) ) || ! empty( $attributes['carouselAutoWidth'] ) ) {
 			$attributes['carouselRepeat'] = false;
 		}
 
 		// The widest the layout ever gets, which is the row a desktop sees first.
 		$first_row = $this->get_layout_columns( $attributes, $layout_type );
-		$repeats   = 'carousel' === $layout_type && ! empty( $attributes['carouselRepeat'] );
-		$last      = count( $items ) - 1;
-		$warm      = $repeats ? $this->get_seam_size( $attributes, $first_row, count( $items ) ) : 0;
+
+		// A loop of slides that all fit the frame has nothing to run round,
+		// but whether they fit is the frame's to say. Three slides fit three
+		// columns on a desktop and overflow the one column of a phone, so the
+		// module counts them, and the request is printed whatever the count.
+		$repeats = 'carousel' === $layout_type && ! empty( $attributes['carouselRepeat'] );
+		$last    = count( $items ) - 1;
+		$warm    = $repeats ? $this->get_seam_size( $attributes, $first_row, count( $items ) ) : 0;
 
 		$with_popup = self::opens_a_popup( $block->parsed_block['innerBlocks'] ?? array() );
 

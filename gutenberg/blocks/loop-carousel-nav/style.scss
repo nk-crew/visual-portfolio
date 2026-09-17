@@ -549,7 +549,6 @@
 	position: relative;
 	width: min(180px, 60%);
 	height: 4px;
-	overflow: hidden;
 	background-color: var(--vp-carousel-track, color-mix(in oklab, currentcolor 10%, transparent 90%));
 	border-radius: 2px;
 
@@ -557,6 +556,9 @@
 	// may not is left as it was: something to read, not to press.
 	&.is-draggable {
 		cursor: grab;
+		// The drag is the bar's, frame by frame: a browser that took the
+		// gesture for a scroll of the page would cancel it halfway.
+		touch-action: none;
 
 		&:active {
 			cursor: grabbing;
@@ -564,7 +566,8 @@
 
 		// Four pixels is not something a finger can take hold of. The bar
 		// keeps its own height and is given a target twenty four pixels tall
-		// around it, which is what a pointer has to be able to reach.
+		// around it, which is what a pointer has to be able to reach - and
+		// which the bar must not clip, so the fill clips itself instead.
 		&::before {
 			position: absolute;
 			inset-block: -10px;
@@ -586,7 +589,7 @@
 
 .vp-block-loop-carousel-progress-value {
 	display: block;
-	width: var(--vp-carousel-progress, 0%);
+	width: min(100%, var(--vp-carousel-progress, 0%));
 	height: 100%;
 	background-color: currentcolor;
 	border-radius: inherit;

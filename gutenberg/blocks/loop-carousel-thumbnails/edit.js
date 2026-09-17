@@ -9,10 +9,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	blockClassName,
-	VisibilityToolbar,
-} from '../../utils/block-visibility';
-import {
 	ControlPanel,
 	ShowOnHoverControl,
 	useControlPlacement,
@@ -30,17 +26,15 @@ export default function CarouselThumbnailsEdit({
 	context,
 	clientId,
 }) {
-	const { isHidden, showOnHover, thumbHeight, aspectRatio } = attributes;
+	const { showOnHover, thumbHeight, aspectRatio } = attributes;
 
 	useLoopOrphanWarning(metadata.name, context);
 
 	const { isOverlay, isInRow } = useControlPlacement(clientId);
 
 	const blockProps = useBlockProps({
-		className: blockClassName(
+		className:
 			`vp-block-loop-carousel-thumbnails ${showOnHover ? 'is-shown-on-hover' : ''}`.trim(),
-			isHidden
-		),
 	});
 
 	const style = {
@@ -51,10 +45,6 @@ export default function CarouselThumbnailsEdit({
 
 	return (
 		<>
-			<VisibilityToolbar
-				isHidden={isHidden}
-				setAttributes={setAttributes}
-			/>
 			<InspectorControls>
 				<ControlPanel title={__('Thumbnails', 'visual-portfolio')}>
 					<RangeControl

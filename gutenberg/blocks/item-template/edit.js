@@ -45,6 +45,7 @@ import {
 	stretchFullWidth,
 	stretchWide,
 } from '@wordpress/icons';
+import ProNote from '../../components/pro-note';
 /**
  * Internal dependencies
  */
@@ -57,11 +58,14 @@ import {
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
 import { getColumnsProps, getViewportBreakpoints } from './columns';
+import { effectRepeats, effectTakesColumns, getEffectOptions } from './effects';
 import { getTileStyles, getTilesColumns } from './tiles';
-import TilesEditor from './tiles-editor';
 import { TilesPresetsSelect, TilesPresetsToolbarButton } from './tiles-presets';
 import useEditorLayout from './use-editor-layout';
 import variations from './variations';
+
+const { plugin_version: pluginVersion, pro: isProPlugin } =
+	window.VPGutenbergVariables;
 
 const ITEM_CLASS_NAME = 'wp-block-visual-portfolio-item-template__item';
 
@@ -176,7 +180,7 @@ function getSizeInfo(size) {
  * @return {string|undefined} The reason, or nothing when there is a container.
  */
 function getCarouselContainerReason(attributes) {
-	if (attributes.carouselRepeat && effectRepeats(attributes.carouselEffect)) {
+	if (attributes.carouselRepeat && canRepeat(attributes)) {
 		return __(
 			'A carousel that repeats has no edge for its slides to start from.',
 			'visual-portfolio'
@@ -237,59 +241,51 @@ function getCarouselInset(attributes) {
 	return size ? `max(0px, (100cqw - ${size}) / 2)` : undefined;
 }
 
-// `columns: false` says the effect spreads one slide over the width of the
-// gallery and owns that width, so the columns control is not offered beside it.
-const EFFECT_OPTIONS = [
-	{ label: __('None', 'visual-portfolio'), value: 'none' },
-	{ label: __('Coverflow', 'visual-portfolio'), value: 'coverflow' },
-	{
-		label: __('Slideshow', 'visual-portfolio'),
-		value: 'slideshow',
-		columns: false,
-	},
-];
-
 /**
- * The effects this install offers.
+ * Whether the repeat control does something for these settings.
  *
- * An effect is a stylesheet over two boxes the item template already renders,
- * so Pro and a theme add one through this filter and `vpf_carousel_effects` on
- * the server, and write no markup at all.
+ * Two things the loop cannot carry: an effect that pins its slides, and
+ * slides of their own width - the loop is counted a step per slide, and
+ * slides of different widths have no step. The server leaves the loop out
+ * for both, and the control says so rather than promising one.
  *
- * @return {Array} select options.
+ * @param {Object} attributes - block attributes.
+ *
+ * @return {boolean} True when Repeat can be switched on.
  */
-function getEffectOptions() {
-	return applyFilters('vpf.carouselEffects', EFFECT_OPTIONS);
+function canRepeat(attributes) {
+	return (
+		effectRepeats(attributes.carouselEffect) &&
+		!attributes.carouselAutoWidth
+	);
 }
 
 /**
- * Whether an effect leaves the column count to the gallery.
+ * Why a carousel cannot repeat, when it cannot.
  *
- * @param {string} effect - selected effect.
+ * @param {Object} attributes - block attributes.
  *
- * @return {boolean} True when the columns control is worth offering.
+ * @return {string} The reason, or the help of a control that works.
  */
-function effectTakesColumns(effect) {
-	const option = getEffectOptions().find((item) => item.value === effect);
+function getRepeatHelp(attributes) {
+	if (attributes.carouselAutoWidth) {
+		return __(
+			'Slides of their own width have no step to count the loop in, so the carousel cannot run round.',
+			'visual-portfolio'
+		);
+	}
 
-	return !option || false !== option.columns;
-}
+	if (!effectRepeats(attributes.carouselEffect)) {
+		return __(
+			'This effect pins its slides in place, so the carousel cannot run round.',
+			'visual-portfolio'
+		);
+	}
 
-/**
- * Whether an effect can be run round in a loop.
- *
- * The loop moves the slides one end has run out of to the other, and an
- * effect that pins its slides in place - a deck - has nothing to move, so the
- * server leaves the loop out of it. `repeat: false` on the option says so.
- *
- * @param {string} effect - selected effect.
- *
- * @return {boolean} True when the repeat control does something.
- */
-function effectRepeats(effect) {
-	const option = getEffectOptions().find((item) => item.value === effect);
-
-	return !option || false !== option.repeat;
+	return __(
+		'The carousel runs on without an end, in both directions.',
+		'visual-portfolio'
+	);
 }
 
 // The same question the view module asks: where the browser packs masonry
@@ -424,43 +420,38 @@ function MaximumColumnsControl({ value, onChange }) {
 	);
 }
 
-// A count of its own for a narrower screen is set the way the editor styles
-// a block for one: switch the View to Tablet or Mobile with Responsive styles
-// on, and the inspector shows the panels a viewport can be styled in, the
-// Layout panel among them - which is where the count for that screen lives.
-// Keyed by the names the editor calls its devices, and by the screen each
-// one is written for.
-const SCREEN_ATTRIBUTES = {
-	Tablet: { screen: 'tablet', attribute: 'layoutColumnCountTablet' },
-	Mobile: { screen: 'mobile', attribute: 'layoutColumnCountMobile' },
+// The screens the editor previews, by the names it calls its devices. A
+// count of columns and a tiles pattern for one of them are Pro's: set the way
+// the editor styles a block for a screen, with Responsive styles on and the
+// View switched to that screen, in the Layout panel. Without Pro the panel
+// says so, once.
+const SCREENS = {
+	Tablet: 'tablet',
+	Mobile: 'mobile',
 };
 
 /**
- * What a count for a screen answers for, breakpoint included - the editor
- * says what a size comes to wherever it offers one.
+ * A note where a Pro setting would be, for an install without Pro.
  *
- * @param {string} screen     - `tablet` or `mobile`.
- * @param {string} breakpoint - the width the screen is previewed at.
- * @return {string} help text.
+ * @param {Object} props          - component props.
+ * @param {string} props.children - what Pro adds here.
+ * @param {string} props.campaign - the UTM campaign of the link.
+ *
+ * @return {Element} component.
  */
-function getScreenHelp(screen, breakpoint) {
-	return 'tablet' === screen
-		? sprintf(
-				/* translators: %s: breakpoint, e.g. 782px. */
-				__(
-					'The count on a tablet, %s and narrower, down to a phone. Zero steps the desktop count down on its own, the way it always has.',
-					'visual-portfolio'
-				),
-				breakpoint
-			)
-		: sprintf(
-				/* translators: %s: breakpoint, e.g. 480px. */
-				__(
-					'The count on a phone, %s and narrower. Zero steps the desktop count down on its own, the way it always has.',
-					'visual-portfolio'
-				),
-				breakpoint
-			);
+function ProUpsell({ children, campaign }) {
+	return (
+		<ProNote title={__('Premium Only', 'visual-portfolio')}>
+			<p>{children}</p>
+			<ProNote.Button
+				target="_blank"
+				rel="noopener noreferrer"
+				href={`https://www.visualportfolio.com/pricing/?utm_source=plugin&utm_medium=block_settings&utm_campaign=${campaign}&utm_content=${pluginVersion}`}
+			>
+				{__('Go Pro', 'visual-portfolio')}
+			</ProNote.Button>
+		</ProNote>
+	);
 }
 
 // A slide height is typed in the same units, and in `vh` besides: a share of
@@ -641,8 +632,6 @@ export default function BlockEdit({
 		layoutType,
 		layoutColumnsMode,
 		layoutColumnCount,
-		layoutColumnCountTablet,
-		layoutColumnCountMobile,
 		layoutMinimumColumnWidth,
 		layoutAutoFit,
 		layoutTiles,
@@ -682,9 +671,8 @@ export default function BlockEdit({
 		() => getViewportBreakpoints(viewport),
 		[viewport]
 	);
-	const screen = SCREEN_ATTRIBUTES[deviceType];
-	const screenAttribute =
-		screen && breakpoints[screen.screen] ? screen.attribute : undefined;
+	// The screen being previewed, when the theme has a breakpoint for it.
+	const screen = breakpoints[SCREENS[deviceType]] ? SCREENS[deviceType] : '';
 	const {
 		'vp/queryType': queryType,
 		'vp/baseQuery': baseQuery,
@@ -824,6 +812,39 @@ export default function BlockEdit({
 		[layoutTiles, attributes, deviceType]
 	);
 
+	// An effect that spreads one slide over the width of the gallery owns that
+	// width, so the preview draws it the way the page will and the control that
+	// would fight it is not offered.
+	const singleSlide =
+		'carousel' === layoutType && !effectTakesColumns(carouselEffect);
+
+	// The columns the preview is drawn with. A screen may have a count of its
+	// own - Pro gives a tablet and a phone one - which rides along under
+	// `layoutColumnCountTablet` and `layoutColumnCountMobile`, the two keys
+	// `getColumnsProps` draws a screen's count from.
+	const previewColumns = useMemo(
+		() =>
+			applyFilters(
+				'vpf.itemTemplateColumns',
+				{
+					layoutColumnsMode,
+					layoutColumnCount,
+					layoutMinimumColumnWidth,
+					layoutAutoFit,
+				},
+				{ attributes, deviceType, singleSlide }
+			),
+		[
+			layoutColumnsMode,
+			layoutColumnCount,
+			layoutMinimumColumnWidth,
+			layoutAutoFit,
+			attributes,
+			deviceType,
+			singleSlide,
+		]
+	);
+
 	// Tiles carry their columns in the notation, so that is where the layout
 	// reads them.
 	const tileStyles = useMemo(
@@ -834,14 +855,10 @@ export default function BlockEdit({
 		() => ('tiles' === layoutType ? getTilesColumns(previewTiles) : 0),
 		[layoutType, previewTiles]
 	);
-	// An effect that spreads one slide over the width of the gallery owns that
-	// width, so the preview draws it the way the page will and the control that
-	// would fight it is not offered.
-	const singleSlide =
-		'carousel' === layoutType && !effectTakesColumns(carouselEffect);
-	// And an effect that pins its slides cannot run round, so the repeat
-	// control is left in place but greyed, the way the container control is.
-	const repeatable = effectRepeats(carouselEffect);
+	// A carousel that cannot run round - an effect that pins its slides,
+	// slides of their own width - keeps the repeat control in place but
+	// greyed, the way the container control is.
+	const repeatable = canRepeat(attributes);
 
 	// Tiles carry their columns in the notation, so that is where the layout
 	// reads them, whatever the columns controls say. The counts for the
@@ -851,32 +868,26 @@ export default function BlockEdit({
 		() =>
 			getColumnsProps(
 				{
+					...previewColumns,
 					layoutType,
 					layoutColumnsMode: singleSlide
 						? 'manual'
-						: layoutColumnsMode,
+						: previewColumns.layoutColumnsMode,
 					layoutColumnCount: singleSlide
 						? 1
-						: tilesColumns || layoutColumnCount,
+						: tilesColumns || previewColumns.layoutColumnCount,
 					layoutColumnCountTablet: singleSlide
 						? 0
-						: layoutColumnCountTablet,
+						: previewColumns.layoutColumnCountTablet,
 					layoutColumnCountMobile: singleSlide
 						? 0
-						: layoutColumnCountMobile,
-					layoutMinimumColumnWidth,
-					layoutAutoFit,
+						: previewColumns.layoutColumnCountMobile,
 				},
 				getBlockGapValue(attributes.style?.spacing?.blockGap)
 			),
 		[
 			layoutType,
-			layoutColumnsMode,
-			layoutColumnCount,
-			layoutColumnCountTablet,
-			layoutColumnCountMobile,
-			layoutMinimumColumnWidth,
-			layoutAutoFit,
+			previewColumns,
 			tilesColumns,
 			singleSlide,
 			attributes.style?.spacing?.blockGap,
@@ -996,42 +1007,41 @@ export default function BlockEdit({
 			? __('Slides per view', 'visual-portfolio')
 			: __('Columns', 'visual-portfolio');
 
-	// The count for the screen being previewed, in the Layout panel: the one
-	// panel the editor keeps for the layout of a viewport, and one of the few
-	// it shows at all while Responsive styles has the inspector styling that
-	// viewport alone. Nothing here on a desktop - the desktop count is the
-	// count, and lives with the rest of the settings.
-	const screenControls = hasColumns && !isAuto && screenAttribute && (
-		<InspectorControls
-			group="layout"
-			resetAllFilter={() => ({
-				layoutColumnCountTablet: 0,
-				layoutColumnCountMobile: 0,
-			})}
-		>
-			<ToolsPanelItem
-				isShownByDefault
-				panelId={clientId}
-				hasValue={() => !!attributes[screenAttribute]}
-				label={countLabel}
-				onDeselect={() => setAttributes({ [screenAttribute]: 0 })}
-			>
-				<RangeControl
-					label={countLabel}
-					help={getScreenHelp(
-						screen.screen,
-						breakpoints[screen.screen]
-					)}
-					value={attributes[screenAttribute] || 0}
-					onChange={(value) =>
-						setAttributes({ [screenAttribute]: value ?? 0 })
+	// A count of its own for the screen being previewed is Pro's, and sits in
+	// the Layout panel: the one panel the editor keeps for the layout of a
+	// viewport, and one of the few it shows at all while Responsive styles
+	// has the inspector styling that viewport alone. Without Pro the panel
+	// says so - for a manual count and a tiles pattern alike, since Pro gives
+	// a screen both. Nothing on a desktop: the desktop settings are the
+	// settings.
+	const screenNote = !isProPlugin &&
+		screen &&
+		((hasColumns && !isAuto) || 'tiles' === layoutType) && (
+			<InspectorControls group="layout">
+				<ToolsPanelItem
+					isShownByDefault
+					panelId={clientId}
+					hasValue={() => false}
+					label={
+						'tiles' === layoutType
+							? __('Pattern', 'visual-portfolio')
+							: countLabel
 					}
-					min={0}
-					max={MAX_COLUMN_COUNT}
-				/>
-			</ToolsPanelItem>
-		</InspectorControls>
-	);
+				>
+					<ProUpsell campaign="loop_responsive_layout">
+						{'tiles' === layoutType
+							? __(
+									'Give a tablet and a phone a tiles pattern of their own, set for the screen you are previewing.',
+									'visual-portfolio'
+								)
+							: __(
+									'Give a tablet and a phone a column count of their own, set for the screen you are previewing.',
+									'visual-portfolio'
+								)}
+					</ProUpsell>
+				</ToolsPanelItem>
+			</InspectorControls>
+		);
 
 	const layoutControls = (
 		<ToolsPanel
@@ -1057,8 +1067,9 @@ export default function BlockEdit({
 					onDeselect={() => setAttributes({ layoutTiles: '3|1,1|' })}
 				>
 					<VStack spacing={3}>
-						{/* A preset is a pattern to start from: picked here, it
-						    is what the editor below then shows and edits. */}
+						{/* A preset is a whole pattern. Editing one - a tile
+						    resized, moved or doubled on a canvas - is Pro's,
+						    which answers the filter with its editor. */}
 						<TilesPresetsSelect
 							presets={tilesPresets}
 							value={layoutTiles}
@@ -1066,12 +1077,19 @@ export default function BlockEdit({
 								setAttributes({ layoutTiles: value })
 							}
 						/>
-						<TilesEditor
-							value={layoutTiles}
-							onChange={(value) =>
-								setAttributes({ layoutTiles: value })
-							}
-						/>
+						{applyFilters('vpf.itemTemplatePatternEditor', null, {
+							value: layoutTiles,
+							onChange: (value) =>
+								setAttributes({ layoutTiles: value }),
+						}) ??
+							(!isProPlugin && (
+								<ProUpsell campaign="loop_tiles_editor">
+									{__(
+										'Draw a pattern of your own: resize, move and double the tiles on a canvas.',
+										'visual-portfolio'
+									)}
+								</ProUpsell>
+							))}
 					</VStack>
 				</ToolsPanelItem>
 			)}
@@ -1419,17 +1437,7 @@ export default function BlockEdit({
 				    effect. */}
 				<ToggleControl
 					label={__('Repeat', 'visual-portfolio')}
-					help={
-						repeatable
-							? __(
-									'The carousel runs on without an end, in both directions.',
-									'visual-portfolio'
-								)
-							: __(
-									'This effect pins its slides in place, so the carousel cannot run round.',
-									'visual-portfolio'
-								)
-					}
+					help={getRepeatHelp(attributes)}
 					checked={carouselRepeat && repeatable}
 					disabled={!repeatable}
 					onChange={(value) =>
@@ -1579,7 +1587,7 @@ export default function BlockEdit({
 				{justifiedControls}
 				{carouselControls}
 			</InspectorControls>
-			{screenControls}
+			{screenNote}
 		</>
 	);
 

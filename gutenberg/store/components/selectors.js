@@ -1,6 +1,17 @@
 import { getViewportBreakpoints } from '../../blocks/item-template/columns';
-import { parseTiles } from '../../blocks/item-template/tiles';
-import TilesEditor from '../../blocks/item-template/tiles-editor';
+import {
+	effectRepeats,
+	effectTakesColumns,
+} from '../../blocks/item-template/effects';
+import {
+	formatTilesNumber,
+	getTileStyles,
+	MAX_COLUMNS,
+	MAX_ROW_SPAN,
+	MAX_TILES,
+	parseTiles,
+	serializeTiles,
+} from '../../blocks/item-template/tiles';
 import { TilesPresetsSelect } from '../../blocks/item-template/tiles-presets';
 import ClassesTree from '../../components/classes-tree';
 import ColorPicker from '../../components/color-picker';
@@ -33,13 +44,26 @@ export function get() {
 		ToggleGroupCategoryControl,
 		ToggleGroupButtonsControl,
 
-		// The tiles pattern of the item template, and what edits it. Pro
-		// gives a tablet and a phone a pattern of their own, edited the way
-		// the desktop's is, and reads the breakpoints the editor previews
-		// those screens at the way the block does.
-		TilesEditor,
+		// The tiles notation of the item template, and the presets it is
+		// picked from. Pro's editor of a pattern is built on these - a tile
+		// resized, moved or doubled on a canvas is written back as the same
+		// notation - and Pro reads the breakpoints the editor previews a
+		// screen at the way the block does.
 		TilesPresetsSelect,
 		parseTiles,
+		serializeTiles,
+		getTileStyles,
+		formatTilesNumber,
+		tilesLimits: {
+			MAX_COLUMNS,
+			MAX_ROW_SPAN,
+			MAX_TILES,
+		},
 		getViewportBreakpoints,
+
+		// What an effect of the carousel leaves to the gallery, the free
+		// effects and the ones an install added alike.
+		effectTakesColumns,
+		effectRepeats,
 	};
 }

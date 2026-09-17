@@ -47,10 +47,6 @@ class Visual_Portfolio_Block_Loop_Carousel_Thumbnails {
 	 * @return string
 	 */
 	public function block_render( $attributes, $content, $block ) {
-		if ( Visual_Portfolio_Block_Loop_Carousel_Nav::is_hidden( $attributes ) ) {
-			return '';
-		}
-
 		$atts = Visual_Portfolio_Gutenberg::transform_context_to_attributes( $block->context );
 
 		if ( empty( $atts ) ) {

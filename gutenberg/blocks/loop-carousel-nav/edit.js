@@ -14,10 +14,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	blockClassName,
-	VisibilityToolbar,
-} from '../../utils/block-visibility';
-import {
 	ARROW_BLOCKS,
 	ArrowControls,
 	ControlPanel,
@@ -69,7 +65,7 @@ export default function CarouselNavEdit({
 	context,
 	clientId,
 }) {
-	const { isHidden, showOnHover } = attributes;
+	const { showOnHover } = attributes;
 
 	useLoopOrphanWarning(metadata.name, context);
 
@@ -78,12 +74,9 @@ export default function CarouselNavEdit({
 	const { updateBlockAttributes } = useDispatch(blockEditorStore);
 
 	const blockProps = useBlockProps({
-		className: blockClassName(
-			showOnHover
-				? `vp-block-loop-carousel-nav ${SHOW_ON_HOVER_CLASS}`
-				: 'vp-block-loop-carousel-nav',
-			isHidden
-		),
+		className: showOnHover
+			? `vp-block-loop-carousel-nav ${SHOW_ON_HOVER_CLASS}`
+			: 'vp-block-loop-carousel-nav',
 	});
 
 	// The allowed blocks are declared in `block.json`.
@@ -94,10 +87,6 @@ export default function CarouselNavEdit({
 
 	return (
 		<>
-			<VisibilityToolbar
-				isHidden={isHidden}
-				setAttributes={setAttributes}
-			/>
 			<InspectorControls>
 				{isOverlay ? (
 					<ControlPanel

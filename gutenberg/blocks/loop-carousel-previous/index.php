@@ -40,10 +40,6 @@ class Visual_Portfolio_Block_Loop_Carousel_Previous {
 	 * @return string
 	 */
 	public function block_render( $attributes ) {
-		if ( Visual_Portfolio_Block_Loop_Carousel_Nav::is_hidden( $attributes ) ) {
-			return '';
-		}
-
 		return sprintf(
 			'<button type="button" %1$s><span aria-hidden="true"></span></button>',
 			Visual_Portfolio_Block_Loop_Carousel_Nav::control_attributes(

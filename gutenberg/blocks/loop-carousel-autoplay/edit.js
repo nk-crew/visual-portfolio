@@ -9,10 +9,6 @@ import { __ } from '@wordpress/i18n';
  */
 import { ToggleGroupButtonsControl } from '../../components/toggle-group-control';
 import {
-	blockClassName,
-	VisibilityToolbar,
-} from '../../utils/block-visibility';
-import {
 	AUTOPLAY_ICONS,
 	autoplayClassNames,
 	ControlPanel,
@@ -28,7 +24,7 @@ export default function CarouselAutoplayEdit({
 	context,
 	clientId,
 }) {
-	const { isHidden, icon, showOnHover } = attributes;
+	const { icon, showOnHover } = attributes;
 
 	useLoopOrphanWarning(metadata.name, context);
 
@@ -37,18 +33,12 @@ export default function CarouselAutoplayEdit({
 	// Drawn as though the carousel were running, which is what the page
 	// renders too: an editor has no autoplay to be running.
 	const blockProps = useBlockProps({
-		className: blockClassName(
+		className:
 			`vp-block-loop-carousel-autoplay ${autoplayClassNames(attributes)}`.trim(),
-			isHidden
-		),
 	});
 
 	return (
 		<>
-			<VisibilityToolbar
-				isHidden={isHidden}
-				setAttributes={setAttributes}
-			/>
 			<InspectorControls>
 				<ControlPanel title={__('Play and pause', 'visual-portfolio')}>
 					<ToggleGroupButtonsControl
