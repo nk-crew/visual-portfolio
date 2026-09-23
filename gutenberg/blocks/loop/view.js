@@ -435,31 +435,32 @@ function advanceTrigger(trigger, nextLoop, loop) {
 		return;
 	}
 
-	// The fetched page has no trigger of its own: that was the last one. The
-	// end of the list, when the gallery has one, was printed hidden with this
-	// page and takes the trigger's place.
+	// The fetched page has no trigger of its own: that was the last one. Every
+	// end of the list the gallery has was printed hidden with this page, in
+	// whichever pagination block it sits, and is revealed now.
+	const ends = Array.from(loop.querySelectorAll(END_SELECTOR)).filter(
+		(end) => end.hidden && end.closest(LOOP_SELECTOR) === loop
+	);
 	const pagination = trigger.closest(PAGINATION_SELECTOR);
-	const end = pagination ? pagination.querySelector(END_SELECTOR) : null;
 
-	if (end) {
-		const parent = trigger.parentNode;
-		const sibling = trigger.nextSibling;
-
-		trigger.remove();
-		end.hidden = false;
-		registerUndo(loop, () => {
-			end.hidden = true;
-			parent.insertBefore(trigger, sibling);
-		});
-		return;
-	}
-
-	const node = pagination || trigger;
+	// The trigger's pagination goes with it, unless it holds an end of the list.
+	const node =
+		pagination && !pagination.querySelector(END_SELECTOR)
+			? pagination
+			: trigger;
 	const parent = node.parentNode;
 	const sibling = node.nextSibling;
 
 	node.remove();
-	registerUndo(loop, () => parent.insertBefore(node, sibling));
+	ends.forEach((end) => {
+		end.hidden = false;
+	});
+	registerUndo(loop, () => {
+		ends.forEach((end) => {
+			end.hidden = true;
+		});
+		parent.insertBefore(node, sibling);
+	});
 }
 
 /**

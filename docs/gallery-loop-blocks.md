@@ -276,10 +276,10 @@ and block transforms convert between it and the three paged children.
 `loop-pagination-end` holds the blocks shown at the end of the list. The server
 shows it on the last page of a gallery that has more than one, prints it hidden
 on the pages before it, and leaves it out on a page past the last one, where No
-Results speaks. Load More and infinite scroll never reload the page, so they
-reveal the hidden copy in place of the trigger once the page they fetched has
-no trigger of its own. Blocks inside it keep their behaviour, since it was
-printed with the page.
+Results speaks. Load More and infinite scroll never reload the page, so once
+the page they fetched has no trigger of its own they remove the trigger and
+reveal every End of List of the gallery, in whichever pagination block it sits.
+Blocks inside it keep their behaviour, since it was printed with the page.
 
 Items are resolved once, by `Visual_Portfolio_Get::get_loop_items()`, which is
 the same query pipeline the legacy gallery uses. Every item block reads its data
