@@ -94,6 +94,18 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	initial-value: 0%;
 }
 
+// What an effect would set as `view-timeline-inset` on a slide, for
+// `timelines.js`, which keeps the timelines where the browser has none.
+// Registered as a length so that the script reads it back in pixels, whatever
+// unit the effect wrote it in.
+@property --vp-carousel-timeline-inset {
+	syntax: "<length>";
+	inherits: false;
+	// A registered length has to be a length, and a bare zero is not one.
+	// stylelint-disable-next-line length-zero-no-unit
+	initial-value: 0px;
+}
+
 // The place of an item in the list, printed by the server. A stacking effect
 // deals the items into a pile, and the pile has to know which card is which.
 @property --vp-slide-index {
@@ -513,10 +525,10 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	}
 
 	// Scroll driven effects, and nothing else - where the timeline is missing
-	// the rules never apply and the carousel is exactly the carousel it was
-	// without them. Pro keeps the timelines by hand where the browser has
-	// none, and includes the same mixin for the list its module marks - see
-	// `_carousel-effects.scss` - so an effect is described once.
+	// the rules below never apply and the carousel is exactly the carousel it
+	// was without them. `timelines.js` keeps the timelines by hand there, and
+	// the same mixin draws the list it marks - see `_carousel-effects.scss` -
+	// so an effect is described once.
 	@supports (animation-timeline: view()) {
 		// The scroll of the list, named for the slides a repeating carousel
 		// has moved round. Their own view timelines are measured from where
@@ -530,6 +542,10 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		}
 
 		@include effects.carousel-effects(true);
+	}
+
+	@supports not (animation-timeline: view()) {
+		@include effects.carousel-effects(false);
 	}
 }
 
@@ -583,6 +599,49 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 
 	100% {
 		transform: rotateY(55deg) scale(0.8);
+	}
+}
+
+// Arriving above leaving: the first half of the passage is spent on top, the
+// slide at rest included. Pro's transitions stack their items with it too.
+@keyframes vp-carousel-arriving-above {
+	0%,
+	50% {
+		z-index: 2;
+	}
+
+	51%,
+	100% {
+		z-index: 1;
+	}
+}
+
+// Carried back by what the slide is carried forward - a whole slide each way
+// over the passage - and faded in on the way to the middle. Not out again: a
+// card on its way out is under the one coming in, and is covered by it. Until
+// the passage has begun the card is hidden outright rather than merely clear:
+// it lies over the frame, above the card on show, and a clear card still
+// takes the clicks meant for the one under it.
+@keyframes vp-carousel-fade-card {
+	0% {
+		translate: calc(-1 * var(--vp-carousel-pin));
+		opacity: 0;
+		visibility: hidden;
+	}
+
+	2% {
+		visibility: hidden;
+	}
+
+	50% {
+		translate: 0;
+		opacity: 1;
+		visibility: visible;
+	}
+
+	100% {
+		translate: var(--vp-carousel-pin);
+		opacity: 1;
 	}
 }
 

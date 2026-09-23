@@ -292,6 +292,51 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Fade is one of the free effects, and like the slideshow it spreads one
+	 * slide over the width of the gallery.
+	 *
+	 * @return void
+	 */
+	public function test_fade_is_a_free_effect_that_owns_the_width() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'        => 'carousel',
+				'layoutColumnsMode' => 'manual',
+				'layoutColumnCount' => 3,
+				'carouselEffect'    => 'fade',
+			)
+		);
+
+		$this->assertStringContainsString( 'vp-carousel-fade', $output );
+		$this->assertStringContainsString( '--vp-layout-columns:1', $output );
+	}
+
+	/**
+	 * A carousel with an effect brings the script that keeps its timelines
+	 * where the browser has none, and a plain one does not.
+	 *
+	 * @return void
+	 */
+	public function test_an_effect_brings_the_timelines_script() {
+		wp_dequeue_script( Visual_Portfolio_Block_Item_Template::TIMELINES );
+
+		$this->render_loop( '<!-- wp:visual-portfolio/item-image /-->', array( 'layoutType' => 'carousel' ) );
+
+		$this->assertFalse( wp_script_is( Visual_Portfolio_Block_Item_Template::TIMELINES, 'enqueued' ) );
+
+		$this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'     => 'carousel',
+				'carouselEffect' => 'slideshow',
+			)
+		);
+
+		$this->assertTrue( wp_script_is( Visual_Portfolio_Block_Item_Template::TIMELINES, 'enqueued' ) );
+	}
+
+	/**
 	 * An effect that pins its slides in place cannot be run round.
 	 *
 	 * The loop moves the slides one end has run out of to the other, and a

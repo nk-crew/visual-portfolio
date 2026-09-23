@@ -38,6 +38,12 @@ class Visual_Portfolio_Block_Item_Template {
 	const CAROUSEL_STYLE = 'visual-portfolio-blossom-carousel';
 
 	/**
+	 * Handle of the script that keeps the timelines of an effect where the
+	 * browser has none - Firefox, Safari before 26.
+	 */
+	const TIMELINES = 'visual-portfolio-carousel-timelines';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -222,6 +228,11 @@ class Visual_Portfolio_Block_Item_Template {
 			array(),
 			'1.1.8'
 		);
+
+		// A classic script rather than a part of the view module, so it runs
+		// for every effect an install adds, on the events the module
+		// announces, and does nothing where the browser has the timelines.
+		Visual_Portfolio_Assets::register_script( self::TIMELINES, 'build/gutenberg/blocks/item-template/timelines' );
 
 		$view_module = 'build/gutenberg/blocks/item-template/view';
 		$asset       = Visual_Portfolio_Assets::get_asset_file( $view_module, 'script' );
@@ -890,6 +901,7 @@ class Visual_Portfolio_Block_Item_Template {
 			array(
 				'coverflow' => array( 'columns' => true ),
 				'slideshow' => array( 'columns' => false ),
+				'fade'      => array( 'columns' => false ),
 			)
 		);
 
@@ -1001,6 +1013,10 @@ class Visual_Portfolio_Block_Item_Template {
 		// item, which stays the box the browser snaps to and the module
 		// measures. Nothing else in the family renders them.
 		$effect = $this->get_carousel_effect( $attributes, $layout_type );
+
+		if ( $effect ) {
+			wp_enqueue_script( self::TIMELINES );
+		}
 
 		// An effect that spreads one slide over the width of the gallery owns
 		// that width. Left to a count, it drew the slideshow and the decks as

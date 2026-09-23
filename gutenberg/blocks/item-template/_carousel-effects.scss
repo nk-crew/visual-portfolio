@@ -1,11 +1,11 @@
-// The two carousel effects of the free plugin, and the way any effect is driven.
+// The carousel effects of the free plugin, and the way any effect is driven.
 //
-// A partial rather than rules of its own, because it is included twice: by
-// `style.scss` for the browsers that drive the animations from their own
-// timelines, and by Pro's carousel effects stylesheet for the browsers that
-// have none - Firefox, Safari before 26 - where Pro's module keeps the
-// timelines by hand and the same rules are held still at the time it names.
-// One description of an effect, so the two cannot drift.
+// A partial rather than rules of its own, because it is included twice by
+// `style.scss`: once for the browsers that drive the animations from their own
+// timelines, and once for the browsers that have none - Firefox, Safari before
+// 26 - where `timelines.js` keeps the timelines by hand and the same rules are
+// held still at the time it names. One description of an effect, so the two
+// cannot drift. Pro describes its own effects the same way.
 
 $item: ".wp-block-visual-portfolio-item-template__item";
 $slide: ".wp-block-visual-portfolio-item-template__slide";
@@ -60,19 +60,19 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 	}
 }
 
-// The two carousel effects, for one of the two ways of driving them. Both
-// draw each card from where its own slide is in the frame - the timeline of
-// the slide, natively, or the numbers Pro's module writes on it - so both run
+// The carousel effects, for one of the two ways of driving them. Each draws
+// every card from where its own slide is in the frame - the timeline of the
+// slide, natively, or the numbers `timelines.js` writes on it - so each runs
 // round a repeating carousel: a slide the loop has moved round is animated
 // from the scroll of the list instead, over the range the module writes on
-// it, and Pro's module reads such a slide where it is drawn.
+// it, and `timelines.js` reads such a slide where it is drawn.
 //
 // Included inside the block selector, so `&` is the list.
 //
 // @param {boolean} $native Whether the browser drives the animations.
 @mixin carousel-effects($native) {
-	// Any carousel where the browser has the timelines, and one the module
-	// has marked where it has not.
+	// Any carousel where the browser has the timelines, and one
+	// `timelines.js` has marked where it has not.
 	$scripted: if($native, "", ".vp-carousel-scripted");
 
 	// Cards one whole slide wide over boxes half that, so every card
@@ -189,6 +189,61 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 			> #{$item}.vp-carousel-moved-round #{$card} {
 				animation-range: var(--vp-carousel-copy-cover);
 				animation-timeline: --vp-carousel-scroll;
+			}
+		}
+	}
+
+	// One slide giving way to the next in place. A card is carried back by
+	// what its slide is carried forward, so it stays over the frame while the
+	// slide scrolls under it, and which of two cards over the frame is on top
+	// is the item's to say, on a timeline of its own. The card is see-through
+	// on its way in and solid from the middle on, and stacked above its
+	// neighbours until it reaches the middle - so scrolled on, the next card
+	// fades in over the current one, and scrolled back, the current card
+	// fades out over the previous one.
+	&.vp-layout-carousel#{$scripted}.vp-carousel-fade {
+		// A slide is carried two of its widths over its passage, one of them
+		// to the middle, so a card held over the frame is carried back by its
+		// own width.
+		--vp-carousel-pin: 100%;
+
+		gap: 0;
+
+		> #{$item} {
+			animation-name: vp-carousel-arriving-above;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+
+			@if $native {
+				view-timeline-name: --vp-carousel-item;
+				view-timeline-axis: inline;
+			}
+
+			@include scrubbed($native, --vp-carousel-item);
+		}
+
+		@if $native {
+			#{$slide} {
+				view-timeline-name: --vp-carousel-slide;
+				view-timeline-axis: inline;
+			}
+		}
+
+		#{$card} {
+			animation-name: vp-carousel-fade-card;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+
+			@include scrubbed($native, --vp-carousel-slide);
+		}
+
+		@if $native {
+			> #{$item}.vp-carousel-moved-round {
+				&,
+				#{$card} {
+					animation-range: var(--vp-carousel-copy-cover);
+					animation-timeline: --vp-carousel-scroll;
+				}
 			}
 		}
 	}

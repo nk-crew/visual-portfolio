@@ -459,8 +459,8 @@ Three of them need a word for sources that are neither posts nor images:
 
 ### Carousel effects
 
-An effect is a pair of scroll driven animations over two boxes the item template
-already renders. A carousel that plays one wraps every item in them, so an
+The free plugin draws three: cover flow, slideshow and fade. An effect is a pair
+of scroll driven animations over two boxes the item template already renders. A carousel that plays one wraps every item in them, so an
 effect needs a stylesheet, a name on each side, and no markup of its own:
 
 ```html
@@ -521,9 +521,14 @@ and the stylesheet is the install's own to enqueue —
 geometric belongs inside
 `@supports (animation-timeline: view())`: without it the two boxes are still
 rendered and the carousel is the plain carousel it would have been anyway.
-Firefox and Safari before 26 have no such timelines; Pro keeps them by hand
-there, for its own effects and the free ones alike, on the `vp-carousel-start`
-and `vp-carousel-stop` events below.
+Firefox and Safari before 26 have no such timelines. The plugin keeps them by
+hand there, for every effect the install has, with a classic script that runs
+on the `vp-carousel-start` and `vp-carousel-stop` events below. It writes on
+each slide how far through `cover` and through `contain` a view timeline would
+have it, as `--vp-carousel-cover` and `--vp-carousel-contain`, and marks the
+list `vp-carousel-scripted`. An effect then states the same animations under
+`@supports not (animation-timeline: view())` for that marked list, paused and
+held at those times, the way `_carousel-effects.scss` does for the free ones.
 
 The frame around the list is an inline-size query container, so a width is
 stated in `cqw` rather than in a percentage of the list — a carousel that
@@ -588,9 +593,10 @@ The item template previews a screen through three JavaScript filters, each
 given `{ attributes, deviceType }`: `vpf.itemTemplateTiles` with the desktop
 pattern, `vpf.itemTemplateColumns` with the column settings, and
 `vpf.itemTemplateEffectDriver` with what runs a carousel effect where the
-browser has no timelines. `vpf.itemTemplatePatternEditor` is given `null` and
-`{ value, onChange }` and returns what edits the tiles notation under the
-presets. Pro answers all four. The notation itself — `parseTiles`,
+browser has no timelines, the plugin's own driver by default.
+`vpf.itemTemplatePatternEditor` is given `null` and `{ value, onChange }` and
+returns what edits the tiles notation under the presets. Pro answers the tiles,
+columns and pattern editor filters. The notation itself — `parseTiles`,
 `serializeTiles`, `getTileStyles`, `formatTilesNumber` and `tilesLimits` — sits
 in the `visual-portfolio/components` store beside `TilesPresetsSelect`, with
 `getViewportBreakpoints()` for the breakpoints the editor previews a tablet and
