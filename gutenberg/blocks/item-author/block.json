@@ -7,11 +7,24 @@
 	"description": "Displays the author of a gallery item. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/item-template"],
 	"textdomain": "visual-portfolio",
-	"usesContext": ["vp/itemAuthor", "vp/itemAuthorUrl"],
+	"usesContext": [
+		"vp/itemPostId",
+		"vp/itemAuthor",
+		"vp/itemAuthorUrl",
+		"vp/itemAuthorAvatar"
+	],
 	"attributes": {
 		"prefix": {
 			"type": "string",
 			"role": "content"
+		},
+		"showAvatar": {
+			"type": "boolean",
+			"default": false
+		},
+		"avatarSize": {
+			"type": "number",
+			"default": 24
 		},
 		"isLink": {
 			"type": "boolean",

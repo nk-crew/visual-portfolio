@@ -16,3 +16,11 @@
 		text-decoration: inherit;
 	}
 }
+
+// Inline with the name, so the block's own text alignment moves both.
+.wp-block-visual-portfolio-item-author__avatar {
+	display: inline-block;
+	margin-inline-end: 0.5em;
+	vertical-align: middle;
+	border-radius: 50%;
+}

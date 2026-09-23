@@ -7,6 +7,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
+	__experimentalNumberControl as NumberControl,
 	TextControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -23,7 +24,7 @@ import { useIsPreview } from '../../utils/use-is-preview';
 const DEFAULT_SEPARATOR = ', ';
 
 export default function ItemCategoriesEdit({
-	attributes: { separator },
+	attributes: { separator, limit },
 	setAttributes,
 	context: { 'vp/itemCategories': itemCategories },
 }) {
@@ -32,9 +33,9 @@ export default function ItemCategoriesEdit({
 	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 
-	const categories = (itemCategories || []).filter(
-		(category) => category?.label
-	);
+	const categories = (itemCategories || [])
+		.filter((category) => category?.label)
+		.slice(0, limit > 0 ? limit : undefined);
 
 	// The placeholder stands in on the item being edited and nowhere else.
 	const isPreview = useIsPreview();
@@ -53,6 +54,7 @@ export default function ItemCategoriesEdit({
 							setAttributes(
 								getResetAllValues(filters, {
 									separator: DEFAULT_SEPARATOR,
+									limit: 0,
 								})
 							)
 						}
@@ -77,6 +79,32 @@ export default function ItemCategoriesEdit({
 								onChange={(newSeparator) =>
 									setAttributes({
 										separator: newSeparator,
+									})
+								}
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							label={__('Maximum categories', 'visual-portfolio')}
+							hasValue={() => limit > 0}
+							onDeselect={() => setAttributes({ limit: 0 })}
+						>
+							<NumberControl
+								label={__(
+									'Maximum categories',
+									'visual-portfolio'
+								)}
+								help={__(
+									'How many categories an item shows. Zero shows them all.',
+									'visual-portfolio'
+								)}
+								min={0}
+								value={limit}
+								onChange={(value) =>
+									setAttributes({
+										limit: Math.max(
+											0,
+											parseInt(value, 10) || 0
+										),
 									})
 								}
 							/>

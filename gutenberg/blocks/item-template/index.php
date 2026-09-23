@@ -405,6 +405,13 @@ class Visual_Portfolio_Block_Item_Template {
 		 */
 		$context = apply_filters( 'vpf_loop_item_context', $context, $item, $options );
 
+		// Settings > Discussion > Show Avatars decides for the whole site, the way
+		// `get_avatar()` does for core's blocks, and that holds for an avatar a
+		// filter added too.
+		if ( ! get_option( 'show_avatars' ) ) {
+			$context['vp/itemAuthorAvatar'] = '';
+		}
+
 		if ( 'vp/' === $prefix ) {
 			return $context;
 		}
@@ -1194,7 +1201,7 @@ class Visual_Portfolio_Block_Item_Template {
 				}
 
 				if ( ! empty( $attributes['carouselAutoplay'] ) ) {
-					$extra['data-vp-carousel-autoplay'] = max( 2, min( 10, (float) ( $attributes['carouselAutoplayDelay'] ?? 5 ) ) );
+					$extra['data-vp-carousel-autoplay'] = max( 2, min( 60, (float) ( $attributes['carouselAutoplayDelay'] ?? 5 ) ) );
 				}
 
 				// A scroll container has to be reachable by keyboard, and a
