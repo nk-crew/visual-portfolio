@@ -43,8 +43,7 @@ class Visual_Portfolio_Block_Loop_Pagination_Trigger {
 	 */
 	public function block_render( $attributes, $content, $block ) {
 		$max_pages    = Visual_Portfolio_Block_Loop_Pagination::get_max_pages( $block->context );
-		$query_id     = Visual_Portfolio_Block_Loop::get_query_id( $block->context );
-		$current_page = Visual_Portfolio_Get::get_current_page_number( $query_id );
+		$current_page = Visual_Portfolio_Block_Loop::get_current_page( $block->context );
 
 		// Nothing left to load.
 		if ( $max_pages <= 1 || $current_page >= $max_pages ) {

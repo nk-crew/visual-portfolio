@@ -55,21 +55,20 @@ class Visual_Portfolio_Block_Loop_Pagination_Numbers {
 			)
 		);
 
-		// Get current page.
-		$query_id     = Visual_Portfolio_Block_Loop::get_query_id( $block->context );
-		$current_page = Visual_Portfolio_Get::get_current_page_number( $query_id );
-
 		$pagination_links = Visual_Portfolio_Get::get_pagination_links(
 			array(
-				'start_page' => $current_page,
+				'start_page' => Visual_Portfolio_Block_Loop::get_current_page( $block->context ),
 				'max_pages'  => $max_pages,
 				'mid_size'   => $attributes['midSize'],
+				// Built the way every link of the loop is, the random seed and
+				// the addresses of the portfolio archive included.
+				'page_link'  => Visual_Portfolio_Block_Loop::get_link( array( 'vp_page' => 999999999 ), $block->context ),
 			),
 			array(
 				'pagination_paged__show_arrows'  => false,
 				'pagination_paged__show_numbers' => true,
 			),
-			$query_id
+			Visual_Portfolio_Block_Loop::get_query_id( $block->context )
 		);
 
 		// Generate pagination numbers.
@@ -80,7 +79,7 @@ class Visual_Portfolio_Block_Loop_Pagination_Numbers {
 			if ( $link['is_dots'] ) {
 				$output .= '<span class="vp-block-loop-pagination-dots">...</span>';
 			} else {
-				$url = $link['url'] ? esc_url( Visual_Portfolio_Block_Loop::add_random_seed( $link['url'], $block->context ) ) : '#';
+				$url = $link['url'] ? esc_url( $link['url'] ) : '#';
 
 				if ( $link['active'] ) {
 					$output .= sprintf(

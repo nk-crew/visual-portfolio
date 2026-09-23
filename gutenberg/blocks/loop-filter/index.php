@@ -191,7 +191,7 @@ class Visual_Portfolio_Block_Loop_Filter {
 					)
 				),
 				Visual_Portfolio_Block_Loop::get_select_form(
-					Visual_Portfolio_Get::get_query_var_name( 'filter', Visual_Portfolio_Block_Loop::get_query_id( $block->context ) ),
+					'filter',
 					$content,
 					array(
 						'label'  => __( 'Category filter', 'visual-portfolio' ),

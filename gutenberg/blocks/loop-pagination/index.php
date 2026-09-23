@@ -81,7 +81,7 @@ class Visual_Portfolio_Block_Loop_Pagination {
 
 		// The filter narrows the query, so it is part of the identity here - and
 		// which filter that is depends on the loop.
-		$identity = wp_json_encode( array( $options, $query_id, Visual_Portfolio_Get::get_filter_active_item( array(), $query_id ) ) );
+		$identity = wp_json_encode( array( $options, $query_id, Visual_Portfolio_Block_Loop::get_active_filter( $context ) ) );
 
 		// Without a reliable identity two different loops would share one entry,
 		// which is worse than calculating twice.

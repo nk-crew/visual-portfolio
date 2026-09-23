@@ -29,6 +29,15 @@ class Visual_Portfolio_Block_Loop {
 	private static $random_order_cache = array();
 
 	/**
+	 * Legacy options of a loop, keyed by its query context.
+	 *
+	 * The controls ask about their loop once per link.
+	 *
+	 * @var array
+	 */
+	private static $options_cache = array();
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -158,12 +167,86 @@ class Visual_Portfolio_Block_Loop {
 			return '#';
 		}
 
-		$url = Visual_Portfolio_Get::get_pagenum_link(
-			array( 'vp_page' => $page ),
-			self::get_query_id( $context )
-		);
+		$url = self::get_link( array( 'vp_page' => $page ), $context );
 
-		return $url ? esc_url( self::add_random_seed( $url, $context ) ) : '#';
+		return $url ? esc_url( $url ) : '#';
+	}
+
+	/**
+	 * Link to a state of a loop, with the random seed.
+	 *
+	 * @param array $query_arg - what the link sets, under the legacy names `vp_filter`, `vp_page` and `vp_sort`, values encoded.
+	 * @param array $context   - block context of the control.
+	 *
+	 * @return string Unescaped URL.
+	 */
+	public static function get_link( $query_arg, $context ) {
+		$query_id = self::get_query_id( $context );
+
+		// The portfolio archive gives its states addresses of their own.
+		$url = Visual_Portfolio_Archive_Mapping::is_archive_loop( self::get_options( $context ) )
+			? Visual_Portfolio_Archive_Mapping::get_loop_link( $query_arg, $query_id )
+			: Visual_Portfolio_Get::get_pagenum_link( $query_arg, $query_id );
+
+		return self::add_random_seed( $url, $context );
+	}
+
+	/**
+	 * The page a loop shows.
+	 *
+	 * @param array $context - block context of a control.
+	 *
+	 * @return int
+	 */
+	public static function get_current_page( $context ) {
+		// The portfolio archive keeps its page in the address, and its items
+		// show that page. WordPress reads /portfolio/page/2/ into `paged`, the
+		// archive's own rules into `vp_page_query`.
+		$archive_page = Visual_Portfolio_Archive_Mapping::is_archive_loop( self::get_options( $context ) ) ? (int) ( get_query_var( 'vp_page_query' ) ? get_query_var( 'vp_page_query' ) : get_query_var( 'paged' ) ) : 0;
+
+		return $archive_page > 0 ? $archive_page : Visual_Portfolio_Get::get_current_page_number( self::get_query_id( $context ) );
+	}
+
+	/**
+	 * The filter a loop is narrowed by.
+	 *
+	 * A gallery of the current query also reads it from the main query, the way
+	 * its items do. The portfolio archive puts the category of its address
+	 * there.
+	 *
+	 * @param array $context - block context of a control.
+	 *
+	 * @return string|false Filter value, or false for none.
+	 */
+	public static function get_active_filter( $context ) {
+		global $wp_query;
+
+		$query_opts = 'current_query' === ( self::get_options( $context )['posts_source'] ?? '' ) && $wp_query instanceof WP_Query ? $wp_query->query_vars : array();
+
+		return Visual_Portfolio_Get::get_filter_active_item( $query_opts, self::get_query_id( $context ) );
+	}
+
+	/**
+	 * Legacy options of the loop a control belongs to.
+	 *
+	 * @param array $context - block context of the control.
+	 *
+	 * @return array
+	 */
+	private static function get_options( $context ) {
+		$identity = wp_json_encode( $context );
+
+		if ( false === $identity ) {
+			return Visual_Portfolio_Gutenberg::transform_context_to_attributes( $context );
+		}
+
+		$cache_key = md5( $identity );
+
+		if ( ! isset( self::$options_cache[ $cache_key ] ) ) {
+			self::$options_cache[ $cache_key ] = Visual_Portfolio_Gutenberg::transform_context_to_attributes( $context );
+		}
+
+		return self::$options_cache[ $cache_key ];
 	}
 
 	/**
@@ -215,21 +298,6 @@ class Visual_Portfolio_Block_Loop {
 	}
 
 	/**
-	 * The URL a control form submits to.
-	 *
-	 * A GET form throws away the query string of its action and replaces it with
-	 * its own fields, so the action is the path alone and everything the form has
-	 * to keep travels as a hidden input - see `get_preserved_inputs()`.
-	 *
-	 * @return string Unescaped URL.
-	 */
-	public static function get_form_action() {
-		$parts = explode( '?', Visual_Portfolio_Get::get_current_url(), 2 );
-
-		return $parts[0];
-	}
-
-	/**
 	 * Hidden inputs that carry the rest of the URL through a form submit.
 	 *
 	 * A GET form sends its own fields and nothing else. Without these, sorting
@@ -268,12 +336,18 @@ class Visual_Portfolio_Block_Loop {
 	 * filter or order starts at page one - and everything else is carried along,
 	 * including the state of the other loops on the page.
 	 *
+	 * A GET form throws away the query string of its action and replaces it
+	 * with its own fields, so the action is an address alone and everything the
+	 * form has to keep travels as a hidden input. The address is the one the
+	 * loop starts over from, which on the portfolio archive leaves the category
+	 * out for a filter.
+	 *
 	 * With the store running, changing the select swaps the loop and the button
 	 * has nothing left to do. It is rendered shown and hidden from there rather
 	 * than the other way round, since a module that never arrives has to leave
 	 * a working form behind, not a dead one.
 	 *
-	 * @param string $name    - parameter the select writes.
+	 * @param string $role    - `filter` or `sort`, what the select sets.
 	 * @param string $options - option tags, escaped.
 	 * @param array  $texts   - `label`, the accessible name of the select;
 	 *                          `prompt`, the option shown while none is selected;
@@ -283,7 +357,19 @@ class Visual_Portfolio_Block_Loop {
 	 *
 	 * @return string
 	 */
-	public static function get_select_form( $name, $options, $texts, $block, $context ) {
+	public static function get_select_form( $role, $options, $texts, $block, $context ) {
+		$name   = Visual_Portfolio_Get::get_query_var_name( $role, self::get_query_id( $context ) );
+		$action = explode(
+			'?',
+			self::get_link(
+				array(
+					'vp_' . $role => '',
+					'vp_page'     => 1,
+				),
+				$context
+			),
+			2
+		);
 		$seed   = self::get_control_random_seed( $context );
 		$hidden = self::get_preserved_inputs(
 			array( $name, Visual_Portfolio_Get::get_query_var_name( 'page', self::get_query_id( $context ) ) ),
@@ -299,7 +385,7 @@ class Visual_Portfolio_Block_Loop {
 
 		return sprintf(
 			'<form method="get" action="%1$s" data-wp-interactive="%2$s">%3$s<select name="%4$s" aria-label="%5$s" data-wp-on--change="actions.navigate">%6$s</select><button type="submit" class="%7$s__submit" data-wp-bind--hidden="state.isEnhanced">%8$s</button></form>',
-			esc_url( self::get_form_action() ),
+			esc_url( $action[0] ),
 			esc_attr( self::STORE ),
 			$hidden,
 			esc_attr( $name ),

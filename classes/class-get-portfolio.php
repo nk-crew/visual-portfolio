@@ -3445,7 +3445,7 @@ class Visual_Portfolio_Get {
 	/**
 	 * Get pagination links.
 	 *
-	 * @param array           $args - Block Arguments.
+	 * @param array           $args - Block Arguments. `page_link`, the link to page 999999999, stands in for the one built here.
 	 * @param array           $vp_options - Block Options.
 	 * @param int|string|null $query_id - id of the loop the pagination belongs to, or null for the legacy parameters.
 	 *
@@ -3460,7 +3460,7 @@ class Visual_Portfolio_Get {
 						'%#%',
 						remove_query_arg(
 							'add-to-cart',
-							self::get_pagenum_link(
+							$args['page_link'] ?? self::get_pagenum_link(
 								array(
 									'vp_page' => 999999999,
 								),
