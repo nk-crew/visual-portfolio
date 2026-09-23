@@ -204,6 +204,66 @@ class ClassLoopArchive extends WP_UnitTestCase {
 	}
 
 	/**
+	 * "All" leads to the front page only while the front page shows the
+	 * archive, not after the site went back to its latest posts.
+	 *
+	 * @return void
+	 */
+	public function test_all_leads_to_the_front_page_only_while_it_shows_the_archive() {
+		$this->request( '/portfolio-category/nature/', array( 'vp_page_archive' => '1' ) );
+
+		$all = array(
+			'vp_filter' => '',
+			'vp_page'   => 1,
+		);
+
+		update_option( 'page_on_front', $this->archive );
+		update_option( 'show_on_front', 'page' );
+
+		$this->assertSame( home_url( '/' ), Visual_Portfolio_Block_Loop::get_link( $all, $this->context ) );
+
+		update_option( 'show_on_front', 'posts' );
+
+		$this->assertSame( home_url( '/portfolio/' ), Visual_Portfolio_Block_Loop::get_link( $all, $this->context ) );
+	}
+
+	/**
+	 * Page numbers leave out a page parameter the current URL carries, and keep
+	 * what another filter of the links adds.
+	 *
+	 * @return void
+	 */
+	public function test_page_numbers_drop_a_stale_page_and_keep_what_filters_add() {
+		$this->request( '/portfolio/?vp-7-page=2', array( 'vp_page_archive' => '1' ) );
+
+		$extend = static function ( $link ) {
+			return add_query_arg( 'lang', 'de', $link );
+		};
+
+		add_filter( 'paginate_links', $extend );
+
+		$links = Visual_Portfolio_Get::get_pagination_links(
+			array(
+				'start_page' => 2,
+				'max_pages'  => 3,
+				'page_link'  => Visual_Portfolio_Block_Loop::get_link( array( 'vp_page' => 999999999 ), $this->context ),
+			),
+			array(
+				'pagination_paged__show_arrows'  => false,
+				'pagination_paged__show_numbers' => true,
+			),
+			7
+		);
+
+		remove_filter( 'paginate_links', $extend );
+
+		$this->assertSame(
+			array( home_url( '/portfolio/page/1/?lang=de' ), home_url( '/portfolio/page/3/?lang=de' ) ),
+			array_values( array_filter( wp_list_pluck( $links, 'url' ) ) )
+		);
+	}
+
+	/**
 	 * A sort shown as links starts the archive over at its first page, with
 	 * or without the slash the permalinks end in.
 	 *

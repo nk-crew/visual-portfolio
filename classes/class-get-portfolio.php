@@ -3472,7 +3472,8 @@ class Visual_Portfolio_Get {
 				return remove_query_arg( array_keys( array_diff_key( $link_args, $base_args ) ), $link );
 			};
 
-			add_filter( 'paginate_links', $own_args );
+			// First, so a link another filter extends keeps what it adds.
+			add_filter( 'paginate_links', $own_args, PHP_INT_MIN );
 		}
 
 		$pagination_links = paginate_links(
@@ -3504,7 +3505,7 @@ class Visual_Portfolio_Get {
 		);
 
 		if ( $own_args ) {
-			remove_filter( 'paginate_links', $own_args );
+			remove_filter( 'paginate_links', $own_args, PHP_INT_MIN );
 		}
 
 		// parse html string and make arrays.

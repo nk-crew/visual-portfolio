@@ -1555,12 +1555,13 @@ class Visual_Portfolio_Archive_Mapping {
 	 *
 	 * The rules and the classic block use the slug of the page, not its
 	 * permalink, which a parent page moves away from it. An archive on the
-	 * front page answers at the front page.
+	 * front page answers at the front page while the front page shows a page.
+	 * Switching back to the latest posts leaves `page_on_front` set.
 	 *
 	 * @return string
 	 */
 	private static function get_archive_address() {
-		if ( (int) get_option( 'page_on_front' ) === (int) Settings::get_option( 'portfolio_archive_page', 'vp_general' ) ) {
+		if ( 'page' === get_option( 'show_on_front' ) && (int) get_option( 'page_on_front' ) === (int) Settings::get_option( 'portfolio_archive_page', 'vp_general' ) ) {
 			return home_url( '/' );
 		}
 
@@ -1568,10 +1569,12 @@ class Visual_Portfolio_Archive_Mapping {
 	}
 
 	/**
-	 * Address of a path the archive's rules answer.
+	 * Address of a path under the archive's rules.
 	 *
-	 * The rules match the path without the permalink front, and after the
-	 * `index.php/` that PATHINFO permalinks carry.
+	 * The rules match the path without the permalink front. With PATHINFO
+	 * permalinks the address carries `index.php/`, as the classic block's
+	 * links do. The rules of the post type answer the archive and its pages
+	 * there, and a category address opens the taxonomy archive of the theme.
 	 *
 	 * @param string $path - path under the site.
 	 *

@@ -181,14 +181,24 @@ class Visual_Portfolio_Block_Loop {
 	 * @return string Unescaped URL.
 	 */
 	public static function get_link( $query_arg, $context ) {
+		return self::add_random_seed( self::get_state_url( $query_arg, $context ), $context );
+	}
+
+	/**
+	 * URL of a state of a loop, without the random seed.
+	 *
+	 * @param array $query_arg - what the link sets, under the legacy names `vp_filter`, `vp_page` and `vp_sort`, values encoded.
+	 * @param array $context   - block context of the control.
+	 *
+	 * @return string Unescaped URL.
+	 */
+	public static function get_state_url( $query_arg, $context ) {
 		$query_id = self::get_query_id( $context );
 
 		// The portfolio archive gives its states addresses of their own.
-		$url = Visual_Portfolio_Archive_Mapping::is_archive_loop( self::get_options( $context ) )
+		return Visual_Portfolio_Archive_Mapping::is_archive_loop( self::get_options( $context ) )
 			? Visual_Portfolio_Archive_Mapping::get_loop_link( $query_arg, $query_id )
 			: Visual_Portfolio_Get::get_pagenum_link( $query_arg, $query_id );
-
-		return self::add_random_seed( $url, $context );
 	}
 
 	/**

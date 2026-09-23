@@ -98,20 +98,24 @@ class Visual_Portfolio_Block_Loop_Sort {
 		$active_item = Visual_Portfolio_Get::get_current_sort( $query_id );
 
 		foreach ( $shown as $slug => $label ) {
-			// The link every control of the loop is built with, which follows
+			// The URL every control of the loop is built with, which follows
 			// the addresses of the portfolio archive, then the filter
-			// `Visual_Portfolio_Get::get_sort_item_url()` applies.
-			$url = apply_filters(
-				'vpf_extend_sort_item_url',
-				Visual_Portfolio_Block_Loop::get_link(
-					array(
-						'vp_sort' => rawurlencode( $slug ),
-						'vp_page' => 1,
+			// `Visual_Portfolio_Get::get_sort_item_url()` applies, then the
+			// random seed, in the order a sort link has always had them.
+			$url = Visual_Portfolio_Block_Loop::add_random_seed(
+				apply_filters(
+					'vpf_extend_sort_item_url',
+					Visual_Portfolio_Block_Loop::get_state_url(
+						array(
+							'vp_sort' => rawurlencode( $slug ),
+							'vp_page' => 1,
+						),
+						$block->context
 					),
-					$block->context
+					$slug,
+					$loop_options
 				),
-				$slug,
-				$loop_options
+				$block->context
 			);
 
 			$is_active = ! $active_item && ! $slug ? true : $active_item === $slug;
