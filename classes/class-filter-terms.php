@@ -158,6 +158,12 @@ class Visual_Portfolio_Filter_Terms {
 		// A feed caps the posts at the feed's length.
 		unset( $args['paged'], $args['offset'], $args['order'], $args['feed'] );
 
+		// Asked for ids, `WP_Query` skips the status check it makes on a query
+		// for one post, so such a query is given the statuses the viewer reads.
+		if ( empty( $args['post_status'] ) && array_filter( array_intersect_key( $args, array_flip( Visual_Portfolio_Custom_Query_Guard::SINGLE_POST_VARS ) ) ) ) {
+			$args = Visual_Portfolio_Custom_Query_Guard::restrict_args( $args );
+		}
+
 		$taxonomies = array_values( array_filter( get_taxonomies(), array( 'Visual_Portfolio_Get', 'allow_taxonomies_for_filter' ) ) );
 
 		if ( empty( $taxonomies ) ) {
