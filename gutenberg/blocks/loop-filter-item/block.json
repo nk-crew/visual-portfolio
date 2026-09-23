@@ -14,7 +14,8 @@
 		"vp/postsQuery",
 		"vp/imagesQuery",
 		"vp/sourceQuery",
-		"vp/showCount"
+		"vp/showCount",
+		"vp/displayAsDropdown"
 	],
 	"supports": {
 		"lock": true,

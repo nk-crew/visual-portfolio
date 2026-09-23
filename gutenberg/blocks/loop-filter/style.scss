@@ -2,6 +2,30 @@
 .vp-block-loop-filter {
 	font-size: var(--wp--preset--font-size--medium, 1rem);
 	font-weight: 500;
+
+	// Shown as a dropdown.
+	form {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5em;
+		align-items: center;
+	}
+
+	select {
+		font-size: inherit;
+	}
+
+	// Only ever seen where the script module is not. With it the select
+	// navigates on its own and the button is bound away.
+	&__submit {
+		font-size: inherit;
+	}
+
+	// The items of a dropdown, which the editor lists under it while they are
+	// edited, laid out like the filter itself.
+	&__options {
+		width: 100%;
+	}
 }
 
 // Count.

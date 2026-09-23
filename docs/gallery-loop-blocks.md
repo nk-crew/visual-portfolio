@@ -246,13 +246,29 @@ arrow does), *Slide height* and *Blocks fill the slide*,
 With JavaScript they swap the gallery in place; without it they work as ordinary
 page loads. Both paths land on the same URL.
 
+*Display as dropdown* shows the filter or the sort as a select instead of links.
+It is off for the filter and on for the sort, which is how both looked before the
+setting existed. A filter shown as a dropdown keeps its items. The editor lists
+them under the select while the filter is selected, so labels, order and the Hide
+option still apply. Item styles do not, since an option holds text only. An item hidden on some screen sizes is hidden with CSS, which the native
+picker of a phone may not apply to an option. While no option stands for the
+current state, which happens without "All" or without the default order, the
+select leads with a prompt. Without JavaScript a Filter or Sort button submits
+the select. With it, changing the select swaps the gallery and the focus stays
+on the select.
+
+When the last Load More takes the trigger away from a visitor who pressed it,
+the focus moves to the first link of the first item that arrived, or to that
+item itself when it holds none. A last page the infinite scroll loads by itself
+leaves the focus where it is.
+
 ## Anatomy
 
 ```
 visual-portfolio/loop                      query, block id, layout wrapper
-├── visual-portfolio/loop-filter           links, one per term
+├── visual-portfolio/loop-filter           links, one per term, or a GET form around a <select>
 │   └── visual-portfolio/loop-filter-item
-├── visual-portfolio/loop-sort             a GET form around a <select>
+├── visual-portfolio/loop-sort             a GET form around a <select>, or links
 ├── visual-portfolio/item-template         runs the query, renders <ul><li>
 │   ├── visual-portfolio/item-image
 │   ├── visual-portfolio/item-cover        image with blocks on top of it
@@ -617,7 +633,7 @@ Nothing in these modules is required for the gallery to work. Every control is a
 real link or a real form resolved by the server; the modules replace the page
 load with a region swap, and hand the navigation back to the browser whenever
 they cannot. `state.isEnhanced` is how a server-rendered fallback control — the
-submit button of the sort form — knows to take itself away.
+submit button of a filter or sort form — knows to take itself away.
 
 They are directives and actions and nothing else — between 0.4 and 4.4 KB each,
 with `@wordpress/interactivity` from the WordPress bundle as the only static
@@ -692,7 +708,9 @@ so two galleries on one page never move each other:
 
 Defaults are never written: page one, an empty filter and the default sort are
 removed from the URL rather than spelled out. The canonical view of a page is
-therefore the URL with no parameters at all.
+therefore the URL with no parameters at all. A filter or sort form submitted
+without JavaScript is the exception. It names its parameter even for "All" or the
+default order, and an empty value reads the same as none.
 
 ### What a page cache sees
 

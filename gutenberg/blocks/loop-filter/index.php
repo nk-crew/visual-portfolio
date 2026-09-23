@@ -146,9 +146,16 @@ class Visual_Portfolio_Block_Loop_Filter {
 			return '';
 		}
 
-		$items   = self::get_items( $block->parsed_block['innerBlocks'] ?? array(), $terms, ! empty( $attributes['showAllItem'] ) );
-		$context = array_merge( $block->context, array( 'vp/showCount' => ! empty( $attributes['showCount'] ) ) );
-		$content = '';
+		$as_dropdown = ! empty( $attributes['displayAsDropdown'] );
+		$items       = self::get_items( $block->parsed_block['innerBlocks'] ?? array(), $terms, ! empty( $attributes['showAllItem'] ) );
+		$content     = '';
+		$context     = array_merge(
+			$block->context,
+			array(
+				'vp/showCount'         => ! empty( $attributes['showCount'] ),
+				'vp/displayAsDropdown' => $as_dropdown,
+			)
+		);
 
 		// The way `WP_Block::render()` renders inner blocks, so the filters
 		// that give a child its parent's layout still see this block.
@@ -172,6 +179,29 @@ class Visual_Portfolio_Block_Loop_Filter {
 
 		if ( '' === trim( $content ) ) {
 			return '';
+		}
+
+		// Each item rendered itself as an option.
+		if ( $as_dropdown ) {
+			return sprintf(
+				'<div %1$s>%2$s</div>',
+				get_block_wrapper_attributes(
+					array(
+						'class' => 'vp-block-loop-filter',
+					)
+				),
+				Visual_Portfolio_Block_Loop::get_select_form(
+					Visual_Portfolio_Get::get_query_var_name( 'filter', Visual_Portfolio_Block_Loop::get_query_id( $block->context ) ),
+					$content,
+					array(
+						'label'  => __( 'Category filter', 'visual-portfolio' ),
+						'prompt' => __( 'Select category', 'visual-portfolio' ),
+						'submit' => __( 'Filter', 'visual-portfolio' ),
+					),
+					'vp-block-loop-filter',
+					$block->context
+				)
+			);
 		}
 
 		$wrapper_attributes = get_block_wrapper_attributes(

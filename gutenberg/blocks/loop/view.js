@@ -292,7 +292,8 @@ function refreshLayout(list, added) {
  * @return {string} URL, or an empty string when the control leads nowhere.
  */
 function getControlUrl(element) {
-	// The sort control is a `<select>`, every other control is a link.
+	// A sort or a filter shown as a dropdown is a `<select>`, every other
+	// control is a link.
 	if (element instanceof window.HTMLSelectElement) {
 		const selected = element.selectedOptions[0];
 
@@ -319,6 +320,27 @@ function isPlainActivation(event) {
 		event.altKey ||
 		('number' === typeof event.button && 0 !== event.button)
 	);
+}
+
+/**
+ * Hand the focus to the first link or button inside an element, or to the
+ * element itself when it holds none.
+ *
+ * @param {HTMLElement} element The list after a swap, or the first item a Load
+ *                             More appended.
+ */
+function focusIn(element) {
+	const target = element.querySelector('a[href], button');
+
+	if (target) {
+		target.focus();
+		return;
+	}
+
+	// Items that hold no link at all still have to catch the focus rather than
+	// drop it on the body.
+	element.setAttribute('tabindex', '-1');
+	element.focus();
 }
 
 /**
@@ -535,9 +557,24 @@ async function loadNextPage(trigger, context, byClick) {
 				item.remove();
 			});
 		});
+
+		// Read before the trigger can go, since a removed node drops the focus
+		// it held on the body. Moved only for a visitor who asked for this page.
+		// One the observer loaded arrives while they scroll, and the trigger
+		// may still hold the focus of an earlier click, so moving it would pull
+		// the view to the new items.
+		const hadFocus =
+			byClick && trigger.contains(window.document.activeElement);
+
 		advanceTrigger(trigger, nextLoop, loop);
 		refreshLayout(list, added);
 		announceUpdate(context);
+
+		// The last page took the trigger away. The first of the items that
+		// arrived is where the visitor was going.
+		if (hadFocus && !trigger.isConnected && added.length) {
+			focusIn(added[0]);
+		}
 
 		return APPENDED;
 	} catch (error) {
@@ -565,9 +602,10 @@ async function loadNextPage(trigger, context, byClick) {
 store('visual-portfolio/loop', {
 	state: {
 		// True wherever this module is running, which is the only thing a
-		// fallback control needs to know: the sort form binds its submit button
-		// to it and disappears the moment the select starts navigating on its
-		// own. A module that never arrives leaves the button where it is.
+		// fallback control needs to know. A filter or sort form binds its
+		// submit button to it, which disappears the moment the select starts
+		// navigating on its own. A module that never arrives leaves the button
+		// where it is.
 		isEnhanced: true,
 
 		// Read through the context so that two loops on one page keep their own
@@ -670,20 +708,11 @@ store('visual-portfolio/loop', {
 			// The node that was activated is either gone - the last page has
 			// no Next - or still standing there meaning something else, and
 			// either way the visitor is left somewhere they did not choose.
-			// The items that just arrived are where they meant to be. A sort
-			// control is the exception: it comes back from the swap unchanged,
-			// and moving off it would lose them their place in the form.
+			// The items that just arrived are where they meant to be. A select
+			// is the exception. It comes back from the swap unchanged, and
+			// moving off it would lose them their place in the form.
 			if (list && !(ref instanceof window.HTMLSelectElement)) {
-				const target = list.querySelector('a[href], button');
-
-				if (target) {
-					target.focus();
-				} else {
-					// A gallery whose items hold no link at all still has to
-					// catch the focus rather than drop it on the body.
-					list.setAttribute('tabindex', '-1');
-					list.focus();
-				}
+				focusIn(list);
 			}
 		}),
 

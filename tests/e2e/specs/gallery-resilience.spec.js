@@ -19,6 +19,10 @@ const ITEM = '.wp-block-visual-portfolio-item-template__item';
 const TITLE = '.wp-block-visual-portfolio-item-title';
 const SORT = '.vp-block-loop-sort';
 const SORT_SUBMIT = '.vp-block-loop-sort__submit';
+const FILTER = '.vp-block-loop-filter';
+const FILTER_SUBMIT = '.vp-block-loop-filter__submit';
+const DROPDOWN_FILTER =
+	'<!-- wp:visual-portfolio/loop-filter {"displayAsDropdown":true} /-->';
 const NEXT = '.vp-block-loop-pagination-next';
 const LOAD_MORE = '.vp-block-loop-pagination-trigger';
 
@@ -165,6 +169,18 @@ test.describe('Gallery Loop resilience', () => {
 				? route.abort('failed')
 				: route.continue();
 		});
+	}
+
+	/**
+	 * The images of the source, every other one in the same category.
+	 *
+	 * @return {Array} images with a category each.
+	 */
+	function getCategorizedImages() {
+		return images.map((image, index) => ({
+			...image,
+			categories: [index % 2 ? 'Odd' : 'Even'],
+		}));
 	}
 
 	/**
@@ -315,6 +331,127 @@ test.describe('Gallery Loop resilience', () => {
 		]);
 
 		// A region swap, not a page load.
+		expect(await page.evaluate(() => window.__vpSameDocument)).toBe(true);
+	});
+
+	test('a filter shown as a dropdown with no JavaScript submits its form', async ({
+		browser,
+		requestUtils,
+	}) => {
+		const context = await browser.newContext({ javaScriptEnabled: false });
+		const page = await context.newPage();
+
+		await publish(
+			requestUtils,
+			page,
+			'Resilience - dropdown filter without JavaScript',
+			getLoopMarkup({
+				queryId: 1,
+				images: getCategorizedImages(),
+				perPage: IMAGES_COUNT,
+				controls: [DROPDOWN_FILTER],
+			})
+		);
+
+		await expect(page.locator(FILTER_SUBMIT)).toBeVisible();
+
+		await page.locator(`${FILTER} select`).selectOption('odd');
+		await page.locator(FILTER_SUBMIT).click();
+		await page.waitForLoadState('domcontentloaded');
+
+		expect(getLoopParam(page.url(), 'filter')).toBe('odd');
+		expect(await getTitles(page.locator(LOOP))).toEqual([
+			'Resilience B',
+			'Resilience D',
+			'Resilience F',
+		]);
+
+		// "All" submits an empty filter, which shows every item again.
+		await page.locator(`${FILTER} select`).selectOption('');
+		await page.locator(FILTER_SUBMIT).click();
+		await page.waitForLoadState('domcontentloaded');
+
+		expect(await getTitles(page.locator(LOOP))).toHaveLength(IMAGES_COUNT);
+
+		await context.close();
+	});
+
+	test('a filter shown as a dropdown swaps the loop and keeps the focus', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publish(
+			requestUtils,
+			page,
+			'Resilience - dropdown filter with JavaScript',
+			getLoopMarkup({
+				queryId: 1,
+				images: getCategorizedImages(),
+				perPage: IMAGES_COUNT,
+				controls: [DROPDOWN_FILTER],
+			})
+		);
+
+		await expect(page.locator(FILTER_SUBMIT)).toBeHidden();
+
+		await markDocument(page);
+
+		const select = page.locator(`${FILTER} select`);
+
+		await select.focus();
+		await select.selectOption('even');
+
+		await expect
+			.poll(() => getLoopParam(page.url(), 'filter'))
+			.toBe('even');
+
+		expect(await getTitles(page.locator(LOOP))).toEqual([
+			'Resilience A',
+			'Resilience C',
+			'Resilience E',
+		]);
+		await expect(select).toBeFocused();
+		expect(await page.evaluate(() => window.__vpSameDocument)).toBe(true);
+	});
+
+	test('a sort shown as links swaps the loop', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publish(
+			requestUtils,
+			page,
+			'Resilience - sort as links',
+			getLoopMarkup({
+				queryId: 1,
+				images,
+				perPage: IMAGES_COUNT,
+				controls: [
+					'<!-- wp:visual-portfolio/loop-sort {"displayAsDropdown":false} /-->',
+				],
+			})
+		);
+
+		await markDocument(page);
+		await page
+			.locator(`${SORT} a`, { hasText: 'Sort by title (Z-A)' })
+			.click();
+
+		await expect
+			.poll(() => getLoopParam(page.url(), 'sort'))
+			.toBe('title_desc');
+
+		expect(await getTitles(page.locator(LOOP))).toEqual([
+			'Resilience F',
+			'Resilience E',
+			'Resilience D',
+			'Resilience C',
+			'Resilience B',
+			'Resilience A',
+		]);
+		await expect(page.locator(`${SORT} [aria-current]`)).toHaveText(
+			'Sort by title (Z-A)'
+		);
 		expect(await page.evaluate(() => window.__vpSameDocument)).toBe(true);
 	});
 
