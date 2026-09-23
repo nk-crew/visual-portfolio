@@ -66,8 +66,9 @@ layout ends up a single column on a narrow screen. A tile is capped with it and
 keeps its proportions, so a pattern narrows into a stack instead of spilling out
 of the grid. Auto mode is untouched: fitting the container is already what it
 does. The gap is **Block spacing** in the Dimensions panel, like any other block.
-Unlinked, it sets the gap between columns and the gap between rows apart; a
-side left empty takes the value of the other.
+Horizontal is the gap between columns, and between rows as well unless Vertical
+sets one of its own. With only Vertical set, the columns keep the default gap.
+A carousel has one row, so it reads Horizontal alone.
 
 A grid row is as tall as its tallest item, and the other items of the row
 stretch to its height. The block toolbar of a grid aligns them to the top, the
@@ -273,10 +274,12 @@ carries a `triggerType` of `load-more` or `infinite`, offered as two variations,
 and block transforms convert between it and the three paged children.
 
 `loop-pagination-end` holds the blocks shown at the end of the list. The server
-prints it on the last page of a gallery that has more than one, so paged
-navigation shows it there. Load More and infinite scroll never reload the page:
-when the page they fetched has no trigger, they put its copy of this block where
-the trigger was.
+shows it on the last page of a gallery that has more than one, prints it hidden
+on the pages before it, and leaves it out on a page past the last one, where No
+Results speaks. Load More and infinite scroll never reload the page, so they
+reveal the hidden copy in place of the trigger once the page they fetched has
+no trigger of its own. Blocks inside it keep their behaviour, since it was
+printed with the page.
 
 Items are resolved once, by `Visual_Portfolio_Get::get_loop_items()`, which is
 the same query pipeline the legacy gallery uses. Every item block reads its data

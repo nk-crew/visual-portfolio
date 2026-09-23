@@ -118,7 +118,8 @@ class ClassLoopNoResultsAndEnd extends WP_UnitTestCase {
 	}
 
 	/**
-	 * End of List is on the last page and nowhere before it.
+	 * End of List is shown on the last page, and waits hidden on the pages
+	 * before it for Load More to reach the end.
 	 *
 	 * @return void
 	 */
@@ -127,7 +128,7 @@ class ClassLoopNoResultsAndEnd extends WP_UnitTestCase {
 
 		$first = $this->render_loop( self::$images, $pagination );
 
-		$this->assertStringNotContainsString( 'That is all.', $first );
+		$this->assertMatchesRegularExpression( '/<div class="[^"]*vp-block-loop-pagination-end[^"]*" hidden>/', $first );
 		$this->assertStringContainsString( 'vp-block-loop-pagination-trigger', $first );
 
 		$this->reset_loop_state();
@@ -136,9 +137,24 @@ class ClassLoopNoResultsAndEnd extends WP_UnitTestCase {
 
 		$last = $this->render_loop( self::$images, $pagination );
 
-		$this->assertStringContainsString( 'That is all.', $last );
-		$this->assertStringContainsString( 'vp-block-loop-pagination-end', $last );
+		$this->assertMatchesRegularExpression( '/<div class="[^"]*vp-block-loop-pagination-end[^"]*"><p[^>]*>That is all.<\/p>/', $last );
 		$this->assertStringNotContainsString( 'vp-block-loop-pagination-trigger', $last );
+	}
+
+	/**
+	 * A page past the last one, which a link saved before the gallery shrank
+	 * still leads to, is left to No Results.
+	 *
+	 * @return void
+	 */
+	public function test_a_page_past_the_last_has_no_end_of_the_list() {
+		$pagination = '<!-- wp:visual-portfolio/loop-pagination --><!-- wp:visual-portfolio/loop-pagination-end --><!-- wp:paragraph --><p>That is all.</p><!-- /wp:paragraph --><!-- /wp:visual-portfolio/loop-pagination-end --><!-- /wp:visual-portfolio/loop-pagination -->';
+
+		$_GET['vp-1-page'] = '9';
+
+		$output = $this->render_loop( self::$images, $pagination );
+
+		$this->assertStringNotContainsString( 'That is all.', $output );
 	}
 
 	/**

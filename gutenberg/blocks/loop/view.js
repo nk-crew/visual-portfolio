@@ -435,20 +435,26 @@ function advanceTrigger(trigger, nextLoop, loop) {
 		return;
 	}
 
-	// The fetched page has no trigger of its own: that was the last one. Its
-	// end of the list, when the gallery has one, takes the trigger's place. It
-	// has no behaviour of its own, so a copy inserted by hand is complete.
-	const end = nextLoop.querySelector(END_SELECTOR);
+	// The fetched page has no trigger of its own: that was the last one. The
+	// end of the list, when the gallery has one, was printed hidden with this
+	// page and takes the trigger's place.
+	const pagination = trigger.closest(PAGINATION_SELECTOR);
+	const end = pagination ? pagination.querySelector(END_SELECTOR) : null;
 
 	if (end) {
-		const copy = window.document.importNode(end, true);
+		const parent = trigger.parentNode;
+		const sibling = trigger.nextSibling;
 
-		trigger.replaceWith(copy);
-		registerUndo(loop, () => copy.replaceWith(trigger));
+		trigger.remove();
+		end.hidden = false;
+		registerUndo(loop, () => {
+			end.hidden = true;
+			parent.insertBefore(trigger, sibling);
+		});
 		return;
 	}
 
-	const node = trigger.closest(PAGINATION_SELECTOR) || trigger;
+	const node = pagination || trigger;
 	const parent = node.parentNode;
 	const sibling = node.nextSibling;
 

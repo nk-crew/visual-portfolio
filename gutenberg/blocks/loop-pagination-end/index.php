@@ -35,9 +35,11 @@ class Visual_Portfolio_Block_Loop_Pagination_End {
 	/**
 	 * Block output
 	 *
-	 * Printed on the last page of a gallery that has more than one. Load More
-	 * and infinite scroll never reload the page to reach it: they take this
-	 * block from the last page they fetch and put it where the trigger was.
+	 * Shown on the last page of a gallery that has more than one, and printed
+	 * hidden on the pages before it. Load More and infinite scroll never reload
+	 * the page, so they reveal it once the page they fetched is the last. A copy
+	 * taken from that page would lose the behaviour of any block inside it,
+	 * which only runs on what the page was printed with.
 	 *
 	 * @param array    $attributes - block attributes.
 	 * @param string   $content - block content.
@@ -54,14 +56,16 @@ class Visual_Portfolio_Block_Loop_Pagination_End {
 		$query_id     = Visual_Portfolio_Block_Loop::get_query_id( $block->context );
 		$current_page = Visual_Portfolio_Get::get_current_page_number( $query_id );
 
-		// A gallery of one page has no list to reach the end of.
-		if ( $max_pages <= 1 || $current_page < $max_pages ) {
+		// A gallery of one page has no list to reach the end of, and a page
+		// past the last one is left to No Results.
+		if ( $max_pages <= 1 || (int) $current_page > (int) $max_pages ) {
 			return '';
 		}
 
 		return sprintf(
-			'<div %1$s>%2$s</div>',
+			'<div %1$s%2$s>%3$s</div>',
 			get_block_wrapper_attributes( array( 'class' => 'vp-block-loop-pagination-end' ) ),
+			(int) $current_page < (int) $max_pages ? ' hidden' : '',
 			$content
 		);
 	}
