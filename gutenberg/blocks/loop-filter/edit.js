@@ -153,21 +153,21 @@ export default function BlockEdit({
 	const queryKey = JSON.stringify({
 		queryType,
 		termsQuery,
-		images: imagesQuery?.images,
+		// Of an image, only its categories are terms.
+		imageCategories: (imagesQuery?.images || []).map(
+			(image) => image.categories || []
+		),
 		sourceQuery,
 		showAllItem,
 	});
 
-	// A new source or new taxonomies are a new set of terms: the items are
-	// rebuilt from them. Anything else only narrows or widens the set, and the
-	// items the user labelled stay as they are.
+	// Another kind of source, or other post types, is a new set of terms: the
+	// items are rebuilt from it. Anything else narrows or widens the set, and
+	// the items the user labelled stay as they are.
 	const sourceKey = JSON.stringify({
 		queryType,
 		source: postsQuery?.source,
-		taxonomies: postsQuery?.taxonomies,
-		images: imagesQuery?.images,
-		sourceQuery,
-		showAllItem,
+		postTypesSet: postsQuery?.postTypesSet,
 	});
 
 	useEffect(() => {
@@ -269,8 +269,9 @@ export default function BlockEdit({
 						return;
 					}
 
+					// The page adds a plain "All", and styles the terms only.
 					const block = createBlock(ITEM_BLOCK, {
-						...newItemStyle,
+						...('*' === item.filter ? {} : newItemStyle),
 						...getItemAttributes(item),
 					});
 

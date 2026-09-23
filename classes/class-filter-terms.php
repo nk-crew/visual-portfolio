@@ -29,6 +29,15 @@ class Visual_Portfolio_Filter_Terms {
 	const IDS_PER_QUERY = 100000;
 
 	/**
+	 * Query vars that do not change which posts a query returns. A gallery of
+	 * the current query carries whatever the address had, and a key that
+	 * differed by them would be a new answer for the same posts.
+	 *
+	 * @var array
+	 */
+	const KEYLESS_VARS = array( 'page', 'cpage', 'comments_per_page', 'embed', 'feed', 'preview', 'tb', 'sentence', 'exact', 'more', 'withcomments', 'withoutcomments', 'posts_per_archive_page' );
+
+	/**
 	 * Terms already resolved in this request, by cache key.
 	 *
 	 * @var array
@@ -84,6 +93,12 @@ class Visual_Portfolio_Filter_Terms {
 			// A gallery of the current query on a search page is keyed by what
 			// the visitor typed, which is too many keys to keep.
 			$terms = self::get_posts_terms( $query_opts, ! ( is_search() && 'current_query' === ( $options['posts_source'] ?? '' ) ) );
+
+			// The post being viewed is taken off the shared answer here, rather
+			// than out of the query, which would give every post a key of its own.
+			if ( ! empty( $options['posts_exclude_current'] ) && is_singular() ) {
+				$terms = self::without_post( $terms, get_queried_object_id(), $query_opts );
+			}
 		}
 
 		$result = array();
@@ -124,9 +139,8 @@ class Visual_Portfolio_Filter_Terms {
 	/**
 	 * Terms of the posts a query returns, with how many of them each holds.
 	 *
-	 * A viewer who reads nothing but public posts gets the public answer, which
-	 * is cached and shared. Only a viewer who can read other users' private
-	 * posts is counted on every render.
+	 * Visitors share one answer, kept until a change they would see. Logged-in
+	 * users are counted on every render.
 	 *
 	 * @param array $query_opts - `WP_Query` arguments of the gallery, unpaged.
 	 * @param bool  $shareable  - whether the answer may be cached at all.
@@ -140,7 +154,9 @@ class Visual_Portfolio_Filter_Terms {
 			$query_opts,
 			array(
 				'fields'                 => 'ids',
+				// Both, since the vars of a main query carry `nopaging` already.
 				'posts_per_page'         => -1,
+				'nopaging'               => true,
 				'orderby'                => 'none',
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => false,
@@ -156,21 +172,14 @@ class Visual_Portfolio_Filter_Terms {
 			return array();
 		}
 
-		$cacheable = $shareable && ! self::reads_private_posts( $args );
-
-		// Without statuses of its own the query shows a logged-in user their own
-		// private posts as well, which the shared answer must not carry.
-		if ( $cacheable && empty( $args['post_status'] ) ) {
-			$args['post_status'] = array_values( get_post_stati( array( 'public' => true ) ) );
-
-			if ( in_array( 'attachment', (array) ( $args['post_type'] ?? array() ), true ) ) {
-				$args['post_status'][] = 'inherit';
-			}
-		}
+		// What a logged-in user reads depends on who they are, and on plugins
+		// that decide it, so only visitors share an answer. A window of dates
+		// moves with the clock, which no version tracks.
+		$cacheable = $shareable && ! is_user_logged_in() && empty( $args['date_query'] );
 
 		// The locale keeps apart the languages a translation plugin filters the
 		// same query into.
-		$key = 'vpf_filter_terms_' . md5( (string) wp_json_encode( array( $args, $taxonomies, get_locale() ) ) . self::get_version() );
+		$key = 'vpf_filter_terms_' . md5( (string) wp_json_encode( array( array_diff_key( $args, array_flip( self::KEYLESS_VARS ) ), $taxonomies, get_locale() ) ) . self::get_version() );
 
 		if ( $cacheable ) {
 			if ( isset( self::$resolved[ $key ] ) ) {
@@ -224,33 +233,64 @@ class Visual_Portfolio_Filter_Terms {
 	}
 
 	/**
-	 * Whether the current user would see other users' private posts in a query
-	 * that names no statuses of its own.
+	 * Terms without the counts of one post, when the gallery holds it.
 	 *
-	 * @param array $args - `WP_Query` arguments.
+	 * @param array $terms      - terms with their counts.
+	 * @param int   $post_id    - post to take off.
+	 * @param array $query_opts - `WP_Query` arguments of the gallery, unpaged.
 	 *
-	 * @return bool
+	 * @return array
 	 */
-	private static function reads_private_posts( $args ) {
-		if ( ! is_user_logged_in() || ! empty( $args['post_status'] ) ) {
-			return false;
+	private static function without_post( $terms, $post_id, $query_opts ) {
+		if ( ! $post_id || empty( $terms ) ) {
+			return $terms;
 		}
 
-		$types = (array) ( $args['post_type'] ?? 'post' );
+		$selected = isset( $query_opts['post__in'] ) ? array_map( 'intval', (array) $query_opts['post__in'] ) : null;
 
-		if ( in_array( 'any', $types, true ) ) {
-			$types = get_post_types( array( 'exclude_from_search' => false ) );
+		if ( null !== $selected && ! in_array( (int) $post_id, $selected, true ) ) {
+			return $terms;
 		}
 
-		foreach ( $types as $type ) {
-			$object = get_post_type_object( $type );
+		$args = array_merge(
+			$query_opts,
+			array(
+				'post__in'               => array( (int) $post_id ),
+				'fields'                 => 'ids',
+				'posts_per_page'         => 1,
+				'nopaging'               => false,
+				'orderby'                => 'none',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
 
-			if ( $object && current_user_can( $object->cap->read_private_posts ) ) {
-				return true;
+		unset( $args['paged'], $args['offset'], $args['order'] );
+
+		if ( empty( ( new WP_Query( $args ) )->posts ) ) {
+			return $terms;
+		}
+
+		$own = wp_get_object_terms( $post_id, wp_list_pluck( $terms, 'taxonomy' ), array( 'fields' => 'ids' ) );
+
+		if ( is_wp_error( $own ) || empty( $own ) ) {
+			return $terms;
+		}
+
+		$result = array();
+
+		foreach ( $terms as $term ) {
+			if ( in_array( (int) $term['id'], array_map( 'intval', $own ), true ) ) {
+				--$term['count'];
+			}
+
+			if ( $term['count'] > 0 ) {
+				$result[] = $term;
 			}
 		}
 
-		return false;
+		return $result;
 	}
 
 	/**
@@ -330,23 +370,35 @@ class Visual_Portfolio_Filter_Terms {
 		}
 
 		$type   = get_post_type_object( $post->post_type );
-		$status = get_post_status_object( $status ? $status : $post->post_status );
+		$status = $status ? $status : $post->post_status;
 
-		return $type && ( $type->public || $type->publicly_queryable ) && $status && $status->public;
+		if ( ! $type || ! ( $type->public || $type->publicly_queryable ) ) {
+			return false;
+		}
+
+		// An attachment is shown in the status it inherits.
+		if ( 'attachment' === $post->post_type && 'inherit' === $status ) {
+			return true;
+		}
+
+		$status = get_post_status_object( $status );
+
+		return $status && $status->public;
 	}
 
 	/**
-	 * Forget the cached terms when a post comes into or leaves the public view.
+	 * Forget the cached terms when a post a visitor sees, or saw, is saved.
 	 *
-	 * Saving a draft, or editing a published post, changes nothing a visitor
-	 * sees in a filter; a changed term of a published post is caught below.
+	 * Editing a published post can move it into a gallery or out of one that a
+	 * keyword or a custom query narrows. Saving a draft, or its autosave,
+	 * changes nothing a visitor sees.
 	 *
 	 * @param string  $new_status - new status.
 	 * @param string  $old_status - old status.
 	 * @param WP_Post $post       - post.
 	 */
 	public static function maybe_forget_for_status( $new_status, $old_status, $post ) {
-		if ( self::is_public( $post, $new_status ) !== self::is_public( $post, $old_status ) ) {
+		if ( self::is_public( $post, $new_status ) || self::is_public( $post, $old_status ) ) {
 			self::forget();
 		}
 	}

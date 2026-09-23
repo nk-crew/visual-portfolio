@@ -271,22 +271,23 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			array_intersect_key( $params, array_flip( $source_configs[ $content_source ] ) )
 		);
 
-		// `perm` below holds back only private posts: drafts and the other
-		// statuses a query may ask for are left to whoever asked, and anyone who
-		// edits a post of their own reaches this endpoint.
-		if ( isset( $options['posts_custom_query'] ) ) {
-			$options['posts_custom_query'] = Visual_Portfolio_Custom_Query_Guard::restrict( $options['posts_custom_query'] );
-		}
+		// `perm` holds back only private posts: drafts and the other statuses a
+		// query may ask for are left to whoever asked, and anyone who edits a
+		// post of their own reaches this endpoint. The statuses are checked on
+		// the arguments the query ends up with, whatever spelling led there.
+		$restrict_statuses = array( 'Visual_Portfolio_Custom_Query_Guard', 'restrict_args' );
 
 		$restrict_to_readable = static function ( $query ) {
 			$query->set( 'perm', 'readable' );
 		};
 
+		add_filter( 'vpf_extend_query_args', $restrict_statuses, PHP_INT_MAX );
 		add_action( 'pre_get_posts', $restrict_to_readable );
 
 		$terms = Visual_Portfolio_Filter_Terms::get( $options );
 
 		remove_action( 'pre_get_posts', $restrict_to_readable );
+		remove_filter( 'vpf_extend_query_args', $restrict_statuses, PHP_INT_MAX );
 
 		$url      = get_permalink( $post_id );
 		$url      = $url ? $url : home_url();

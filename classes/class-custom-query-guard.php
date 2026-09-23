@@ -14,67 +14,46 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_Custom_Query_Guard {
 	/**
-	 * A custom query string without the statuses the current user may not read.
+	 * Query arguments without the statuses the current user may not read.
 	 *
-	 * A user who can read other users' private posts of every post type the
-	 * query names keeps the query as written. Anyone else keeps the public
-	 * statuses, and `inherit` when the query names attachments alone. Only the
-	 * `post_status` pairs change; a pair left with nothing is dropped, so the
-	 * query falls back to published posts.
+	 * Read from the arguments `WP_Query` gets rather than from the text of the
+	 * custom query: `parse_str()` and the sanitizing before it turn many
+	 * spellings into `post_status`. A user who can read other users' private
+	 * posts of every post type the query names keeps it as written. Anyone
+	 * else keeps the public statuses, and `inherit` when the query names
+	 * attachments alone; a query left with none falls back to published posts.
 	 *
-	 * @param string $query_string - custom query, as the Custom Query field holds it.
+	 * @param array $args - `WP_Query` arguments.
 	 *
-	 * @return string
+	 * @return array
 	 */
-	public static function restrict( $query_string ) {
-		if ( ! is_string( $query_string ) || false === stripos( $query_string, 'post_status' ) ) {
-			return $query_string;
+	public static function restrict_args( $args ) {
+		if ( empty( $args['post_status'] ) ) {
+			return $args;
 		}
 
-		// Decoded the way `Visual_Portfolio_Get::get_query_params()` reads it.
-		$decoded = html_entity_decode( $query_string );
-		$vars    = array();
-
-		parse_str( $decoded, $vars );
-
-		$types = isset( $vars['post_type'] ) ? (array) $vars['post_type'] : array( 'any' );
-		$types = array_filter( array_map( 'trim', explode( ',', implode( ',', $types ) ) ) );
+		$types = array_filter( array_map( 'trim', is_array( $args['post_type'] ?? null ) ? $args['post_type'] : explode( ',', (string) ( $args['post_type'] ?? 'post' ) ) ) );
 
 		if ( self::can_read_private( $types ) ) {
-			return $query_string;
+			return $args;
 		}
 
-		$allowed = get_post_stati( array( 'public' => true ) );
+		$allowed = array_values( get_post_stati( array( 'public' => true ) ) );
 
 		if ( array( 'attachment' ) === array_values( array_unique( $types ) ) ) {
 			$allowed[] = 'inherit';
 		}
 
-		$pairs   = array();
-		$changed = false;
+		$asked = array_map( 'trim', is_array( $args['post_status'] ) ? $args['post_status'] : explode( ',', (string) $args['post_status'] ) );
+		$kept  = array_values( array_intersect( $asked, $allowed ) );
 
-		foreach ( explode( '&', $decoded ) as $pair ) {
-			$parts = explode( '=', $pair, 2 );
-			$name  = urldecode( $parts[0] );
-
-			if ( 'post_status' !== $name && 0 !== strpos( $name, 'post_status[' ) ) {
-				$pairs[] = $pair;
-				continue;
-			}
-
-			$asked = array_map( 'trim', explode( ',', urldecode( $parts[1] ?? '' ) ) );
-			$kept  = array_intersect( $asked, $allowed );
-
-			if ( $kept !== $asked ) {
-				$changed = true;
-			}
-
-			if ( ! empty( $kept ) ) {
-				$pairs[] = $parts[0] . '=' . implode( ',', $kept );
-			}
+		if ( empty( $kept ) ) {
+			unset( $args['post_status'] );
+		} else {
+			$args['post_status'] = $kept;
 		}
 
-		return $changed ? implode( '&', $pairs ) : $query_string;
+		return $args;
 	}
 
 	/**

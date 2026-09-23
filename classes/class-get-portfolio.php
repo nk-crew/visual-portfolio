@@ -2179,7 +2179,7 @@ class Visual_Portfolio_Get {
 				// on its own page. Unlike "avoid duplicates", which is about
 				// several galleries sharing a page, this is about one post
 				// listing itself.
-				if ( ! empty( $options['posts_exclude_current'] ) && is_singular() ) {
+				if ( ! $for_filter && ! empty( $options['posts_exclude_current'] ) && is_singular() ) {
 					$current                    = get_queried_object_id();
 					$not_current                = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
 					$query_opts['post__not_in'] = array_merge( $not_current, array( $current ) );

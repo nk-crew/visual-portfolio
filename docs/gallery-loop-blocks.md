@@ -290,13 +290,15 @@ at all prints no filter. To keep a term off the filter, hide its item with the
 block's Hide option; a deleted item comes back with its term.
 
 For posts the terms come from the ids of the unpaged, unordered query and one
-grouped count over their term relationships. Everyone who reads public posts
-only, visitors and logged-in users alike, shares one answer kept in a transient;
-a user who can read other users' private posts is counted on every render, and
-so is a gallery of the current query on a search page, which the search text
-would otherwise multiply. The transient is dropped when a post enters or leaves
-the public view, when the terms of a public post change, or when a term is
-edited or deleted. The editor lists the same terms, adds the new ones in the
+grouped count over their term relationships. Visitors who are not logged in
+share one answer kept in a transient. Logged-in users are counted on every
+render, since what they read depends on who they are, and so are a gallery of
+the current query on a search page, which the search text would otherwise
+multiply, and a query with a window of dates, which moves with the clock. On a
+single post a loop that leaves out that post takes its terms off the shared
+answer. The transient is dropped when a public post is saved, published,
+unpublished or deleted, when the terms of a public post change, or when a term
+is edited or deleted. The editor lists the same terms, adds the new ones in the
 same style without marking the post edited, and keeps labels and items when the
 query only narrows or widens; a new source or new taxonomies rebuild the items.
 

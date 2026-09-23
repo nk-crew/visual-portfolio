@@ -458,13 +458,12 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Only a viewer who reads other users' private posts is counted apart. A
-	 * logged-in author shares the visitors' answer, which never carries a
-	 * private post, theirs included.
+	 * A logged-in user is counted for themselves, their own private posts
+	 * included, and what they saw is not kept for visitors.
 	 *
 	 * @return void
 	 */
-	public function test_only_a_reader_of_private_posts_is_counted_apart() {
+	public function test_logged_in_users_are_counted_for_themselves() {
 		$author = self::factory()->user->create( array( 'role' => 'author' ) );
 
 		self::factory()->post->create(
@@ -483,14 +482,86 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 
 		wp_set_current_user( $author );
 
-		$items = $this->render_filter( array( 'source' => 'post' ) );
-
-		$this->assertNotContains( 'Empty (1)', $items );
-		$this->assertNotContains( 'Delta (1)', $items );
+		$this->assertContains( 'Empty (1)', $this->render_filter( array( 'source' => 'post' ) ) );
 
 		wp_set_current_user( 0 );
 
-		$this->assertNotContains( 'Delta (1)', $this->render_filter( array( 'source' => 'post' ) ) );
+		$items = $this->render_filter( array( 'source' => 'post' ) );
+
+		$this->assertNotContains( 'Delta (1)', $items );
+		$this->assertNotContains( 'Empty (1)', $items );
+	}
+
+	/**
+	 * A gallery of the current query lists the terms of the archive it is on.
+	 *
+	 * @return void
+	 */
+	public function test_a_current_query_archive_lists_its_terms() {
+		$this->go_to( get_category_link( self::$categories['alpha'] ) );
+
+		$this->assertSame( array( 'All', 'Alpha (2)', 'Beta (1)' ), $this->render_filter( array( 'source' => 'current_query' ) ) );
+	}
+
+	/**
+	 * Editing a published post refreshes the terms, since it can move the post
+	 * into a gallery a keyword narrows.
+	 *
+	 * @return void
+	 */
+	public function test_editing_a_published_post_refreshes_the_terms() {
+		$query = array(
+			'source'  => 'post',
+			'keyword' => 'Special',
+		);
+
+		$this->assertSame( array(), $this->render_filter( $query ) );
+
+		wp_update_post(
+			array(
+				'ID'         => self::$posts[3],
+				'post_title' => 'Special post',
+			)
+		);
+
+		$this->new_request();
+
+		$this->assertSame( array( 'All', 'Gamma (1)' ), $this->render_filter( $query ) );
+	}
+
+	/**
+	 * A window of dates moves with the clock, so it is counted on every render.
+	 *
+	 * @return void
+	 */
+	public function test_a_date_window_is_counted_on_every_render() {
+		global $wpdb;
+
+		$last_years = static function ( $args ) {
+			$args['date_query'] = array( array( 'after' => '-100 years' ) );
+
+			return $args;
+		};
+
+		add_filter( 'vpf_extend_query_args', $last_years );
+
+		$this->assertContains( 'Gamma (1)', $this->render_filter( array( 'source' => 'post' ) ) );
+
+		$wpdb->insert(
+			$wpdb->term_relationships,
+			array(
+				'object_id'        => self::$posts[2],
+				'term_taxonomy_id' => get_term( self::$categories['gamma'] )->term_taxonomy_id,
+			)
+		);
+
+		$this->new_request();
+
+		$items = $this->render_filter( array( 'source' => 'post' ) );
+
+		remove_filter( 'vpf_extend_query_args', $last_years );
+
+		$this->assertContains( 'Gamma (2)', $items );
 	}
 
 	/**
@@ -534,6 +605,17 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'contributor' ) ) );
 
 		$this->assertSame( array( 'All' ), $this->request_labels( $query ) );
+
+		// `parse_str()` reads a dot as an underscore.
+		$this->assertSame(
+			array( 'All' ),
+			$this->request_labels(
+				array(
+					'source'      => 'custom_query',
+					'customQuery' => 'post_type=post&post.status=draft,publish&category_name=delta',
+				)
+			)
+		);
 
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
 
