@@ -20,5 +20,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<!-- wp:visual-portfolio/item-image {"aspectRatio":"1","clickAction":"popup"} /-->
 		<!-- wp:visual-portfolio/item-title {"style":{"typography":{"textAlign":"center"}}} /-->
 	<!-- /wp:visual-portfolio/item-template -->
+	<!-- wp:visual-portfolio/loop-no-results -->
+		<!-- wp:paragraph -->
+		<p><?php esc_html_e( 'No items were found matching your selection.', 'visual-portfolio' ); ?></p>
+		<!-- /wp:paragraph -->
+	<!-- /wp:visual-portfolio/loop-no-results -->
 </div>
 <!-- /wp:visual-portfolio/loop -->

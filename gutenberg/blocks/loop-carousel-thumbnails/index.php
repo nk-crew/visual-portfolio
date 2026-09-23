@@ -101,6 +101,12 @@ class Visual_Portfolio_Block_Loop_Carousel_Thumbnails {
 			++$index;
 		}
 
+		// The pictures are lazy loaded like those of the items, and a carousel
+		// whose items carry no picture of their own has requested nothing yet.
+		if ( Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' ) ) {
+			Visual_Portfolio_Assets::enqueue_lazyload_assets();
+		}
+
 		$classes = array( 'vp-block-loop-carousel-thumbnails' );
 
 		if ( ! empty( $attributes['showOnHover'] ) ) {

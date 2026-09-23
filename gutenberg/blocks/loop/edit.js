@@ -74,6 +74,21 @@ const TEMPLATE = [
 		],
 	],
 	[
+		'visual-portfolio/loop-no-results',
+		{},
+		[
+			[
+				'core/paragraph',
+				{
+					content: __(
+						'No items were found matching your selection.',
+						'visual-portfolio'
+					),
+				},
+			],
+		],
+	],
+	[
 		'visual-portfolio/loop-pagination',
 		{},
 		// The `paged` variation, expressed by its inner blocks.

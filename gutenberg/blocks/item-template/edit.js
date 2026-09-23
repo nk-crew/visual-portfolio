@@ -5,6 +5,7 @@ import apiFetch from '@wordpress/api-fetch';
 import {
 	BlockContextProvider,
 	BlockControls,
+	BlockVerticalAlignmentToolbar,
 	store as blockEditorStore,
 	InspectorControls,
 	__experimentalUseBlockPreview as useBlockPreview,
@@ -635,6 +636,7 @@ export default function BlockEdit({
 		layoutMinimumColumnWidth,
 		layoutAutoFit,
 		layoutTiles,
+		verticalAlignment,
 		justifiedRowHeight,
 		justifiedRowHeightTolerance,
 		justifiedMaxRowsCount,
@@ -883,7 +885,8 @@ export default function BlockEdit({
 						? 0
 						: previewColumns.layoutColumnCountMobile,
 				},
-				getBlockGapValue(attributes.style?.spacing?.blockGap)
+				getBlockGapValue(attributes.style?.spacing?.blockGap),
+				getBlockGapValue(attributes.style?.spacing?.blockGap, 'top')
 			),
 		[
 			layoutType,
@@ -913,6 +916,10 @@ export default function BlockEdit({
 				? 'vp-layout-masonry-native'
 				: `vp-layout-${layoutType}`,
 		];
+
+		if ('grid' === layoutType && verticalAlignment) {
+			classes.push(`are-vertically-aligned-${verticalAlignment}`);
+		}
 
 		if ('carousel' === layoutType) {
 			if (carouselAutoWidth) {
@@ -945,6 +952,7 @@ export default function BlockEdit({
 	}, [
 		isEmpty,
 		layoutType,
+		verticalAlignment,
 		carouselAutoWidth,
 		carouselFreeScroll,
 		carouselEdgeFade,
@@ -1596,6 +1604,14 @@ export default function BlockEdit({
 	// switchers. The layout itself is a block variation and needs nothing here.
 	const blockControls = (
 		<BlockControls group="block">
+			{'grid' === layoutType && (
+				<BlockVerticalAlignmentToolbar
+					value={verticalAlignment}
+					onChange={(value) =>
+						setAttributes({ verticalAlignment: value })
+					}
+				/>
+			)}
 			{'tiles' === layoutType && (
 				<TilesPresetsToolbarButton
 					icon={TILES_ICON}

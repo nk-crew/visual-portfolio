@@ -20,6 +20,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<!-- wp:visual-portfolio/item-image {"aspectRatio":"4/3","clickAction":"popup"} /-->
 		<!-- wp:visual-portfolio/item-title /-->
 	<!-- /wp:visual-portfolio/item-template -->
+	<!-- wp:visual-portfolio/loop-no-results -->
+		<!-- wp:paragraph -->
+		<p><?php esc_html_e( 'No items were found matching your selection.', 'visual-portfolio' ); ?></p>
+		<!-- /wp:paragraph -->
+	<!-- /wp:visual-portfolio/loop-no-results -->
 	<!-- wp:visual-portfolio/loop-carousel-nav {"layout":{"type":"flex","justifyContent":"center"}} -->
 		<!-- wp:visual-portfolio/loop-carousel-previous /-->
 		<!-- wp:visual-portfolio/loop-carousel-indicator {"indicator":"progress"} /-->

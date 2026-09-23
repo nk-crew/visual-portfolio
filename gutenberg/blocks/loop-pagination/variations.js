@@ -35,7 +35,10 @@ export default [
 			'visual-portfolio'
 		),
 		attributes: { layout: { type: 'flex', justifyContent: 'center' } },
-		innerBlocks: [['visual-portfolio/loop-pagination-trigger']],
+		innerBlocks: [
+			['visual-portfolio/loop-pagination-trigger'],
+			['visual-portfolio/loop-pagination-end'],
+		],
 		icon: {
 			foreground: '#2540CC',
 			src: <LoadMoreIcon width="20" height="20" />,
@@ -55,6 +58,7 @@ export default [
 				'visual-portfolio/loop-pagination-trigger',
 				{ triggerType: 'infinite' },
 			],
+			['visual-portfolio/loop-pagination-end'],
 		],
 		icon: {
 			foreground: '#2540CC',

@@ -19,5 +19,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<!-- wp:visual-portfolio/item-template {"layoutType":"masonry","layoutColumnsMode":"manual","layoutColumnCount":4} -->
 		<!-- wp:visual-portfolio/item-image {"clickAction":"popup"} /-->
 	<!-- /wp:visual-portfolio/item-template -->
+	<!-- wp:visual-portfolio/loop-no-results -->
+		<!-- wp:paragraph -->
+		<p><?php esc_html_e( 'No items were found matching your selection.', 'visual-portfolio' ); ?></p>
+		<!-- /wp:paragraph -->
+	<!-- /wp:visual-portfolio/loop-no-results -->
 </div>
 <!-- /wp:visual-portfolio/loop -->

@@ -24,6 +24,7 @@ const LIST_SELECTOR = '.wp-block-visual-portfolio-item-template';
 const ITEM_SELECTOR = '.wp-block-visual-portfolio-item-template__item';
 const PAGINATION_SELECTOR = '.vp-block-loop-pagination';
 const TRIGGER_SELECTOR = '.vp-block-loop-pagination-trigger';
+const END_SELECTOR = '.vp-block-loop-pagination-end';
 const MASONRY_CLASS = 'vp-layout-masonry';
 
 // Written on the list once Masonry is positioning the items, and read by the
@@ -434,13 +435,32 @@ function advanceTrigger(trigger, nextLoop, loop) {
 		return;
 	}
 
-	// The fetched page has no trigger of its own: that was the last one.
-	const node = trigger.closest(PAGINATION_SELECTOR) || trigger;
+	// The fetched page has no trigger of its own: that was the last one. Every
+	// end of the list the gallery has was printed hidden with this page, in
+	// whichever pagination block it sits, and is revealed now.
+	const ends = Array.from(loop.querySelectorAll(END_SELECTOR)).filter(
+		(end) => end.hidden && end.closest(LOOP_SELECTOR) === loop
+	);
+	const pagination = trigger.closest(PAGINATION_SELECTOR);
+
+	// The trigger's pagination goes with it, unless it holds an end of the list.
+	const node =
+		pagination && !pagination.querySelector(END_SELECTOR)
+			? pagination
+			: trigger;
 	const parent = node.parentNode;
 	const sibling = node.nextSibling;
 
 	node.remove();
-	registerUndo(loop, () => parent.insertBefore(node, sibling));
+	ends.forEach((end) => {
+		end.hidden = false;
+	});
+	registerUndo(loop, () => {
+		ends.forEach((end) => {
+			end.hidden = true;
+		});
+		parent.insertBefore(node, sibling);
+	});
 }
 
 /**

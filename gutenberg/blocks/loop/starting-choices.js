@@ -36,12 +36,16 @@ const PAGINATION_INNER = {
 		['visual-portfolio/loop-pagination-numbers'],
 		['visual-portfolio/loop-pagination-next'],
 	],
-	'load-more': [['visual-portfolio/loop-pagination-trigger']],
+	'load-more': [
+		['visual-portfolio/loop-pagination-trigger'],
+		['visual-portfolio/loop-pagination-end'],
+	],
 	infinite: [
 		[
 			'visual-portfolio/loop-pagination-trigger',
 			{ triggerType: 'infinite' },
 		],
+		['visual-portfolio/loop-pagination-end'],
 	],
 };
 
