@@ -327,7 +327,7 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			require_once $this->plugin_path . 'classes/class-images.php';
 			require_once $this->plugin_path . 'classes/class-rest.php';
 			require_once $this->plugin_path . 'classes/class-get-portfolio.php';
-			require_once $this->plugin_path . 'classes/class-filter-terms.php';
+			require_once $this->plugin_path . 'classes/class-custom-query-guard.php';
 			require_once $this->plugin_path . 'classes/class-tiles-parser.php';
 
 			require_once $this->plugin_path . 'classes/class-gutenberg.php';
@@ -336,6 +336,7 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 
 			// Gallery Loop block family, see `supports_loop_blocks()`.
 			if ( $this->supports_loop_blocks() ) {
+				require_once $this->plugin_path . 'classes/class-filter-terms.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-filter-item/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-filter/index.php';

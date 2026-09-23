@@ -146,6 +146,55 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Forget what this process remembered of the last request, the way a new
+	 * request starts: the random seed and the terms resolved so far.
+	 *
+	 * @return void
+	 */
+	private function new_request() {
+		foreach ( array( array( 'Visual_Portfolio_Get', 'rand_seed_session', false ), array( 'Visual_Portfolio_Filter_Terms', 'resolved', array() ) ) as list( $class, $name, $value ) ) {
+			$property = new ReflectionProperty( $class, $name );
+
+			if ( method_exists( $property, 'setAccessible' ) ) {
+				$property->setAccessible( true );
+			}
+
+			$property->setValue( null, $value );
+		}
+	}
+
+	/**
+	 * Labels of the filter items the editor endpoint answers with.
+	 *
+	 * @param array $posts_query - `postsQuery` of the loop.
+	 *
+	 * @return array
+	 */
+	private function request_labels( $posts_query ) {
+		global $wp_rest_server;
+
+		$wp_rest_server = new WP_REST_Server();
+
+		do_action( 'rest_api_init', $wp_rest_server );
+
+		$request = new WP_REST_Request( 'POST', '/visual-portfolio/v1/get_filter_items' );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'queryType'  => 'posts',
+					'postsQuery' => $posts_query,
+				)
+			)
+		);
+
+		$response       = rest_do_request( $request );
+		$wp_rest_server = null;
+
+		return wp_list_pluck( $response->get_data()['response'], 'label' );
+	}
+
+	/**
 	 * A saved filter item block for a category.
 	 *
 	 * @param string $slug       - category slug.
@@ -208,6 +257,21 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An item hidden with the block's Hide option keeps its term off the
+	 * filter instead of coming back as a new term.
+	 *
+	 * @return void
+	 */
+	public function test_a_hidden_item_keeps_its_term_off_the_filter() {
+		$items = $this->render_filter(
+			array( 'source' => 'post' ),
+			$this->saved_item( 'beta', array( 'metadata' => array( 'blockVisibility' => false ) ) )
+		);
+
+		$this->assertSame( array( 'All', 'Alpha (2)', 'Gamma (1)' ), $items );
+	}
+
+	/**
 	 * A manual selection lists the terms of the posts it selected.
 	 *
 	 * @return void
@@ -237,6 +301,47 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 		);
 
 		$this->assertSame( array( 'All', 'Alpha (1)', 'Beta (2)' ), $items );
+	}
+
+	/**
+	 * The filter reads the options the items read, so a plugin that changes
+	 * them changes both.
+	 *
+	 * @return void
+	 */
+	public function test_the_filter_reads_the_options_the_items_read() {
+		$select_first = static function ( $options ) {
+			$options['posts_source'] = 'ids';
+			$options['posts_ids']    = array( self::$posts[0] );
+
+			return $options;
+		};
+
+		add_filter( 'vpf_get_options', $select_first );
+
+		$items = $this->render_filter( array( 'source' => 'post' ) );
+
+		remove_filter( 'vpf_get_options', $select_first );
+
+		$this->assertSame( array( 'All', 'Alpha (1)' ), $items );
+	}
+
+	/**
+	 * A loop that leaves out the post being viewed leaves its terms out too.
+	 *
+	 * @return void
+	 */
+	public function test_the_current_post_is_left_out_when_the_loop_leaves_it_out() {
+		$this->go_to( get_permalink( self::$posts[3] ) );
+
+		$items = $this->render_filter(
+			array(
+				'source'         => 'post',
+				'excludeCurrent' => true,
+			)
+		);
+
+		$this->assertSame( array( 'All', 'Alpha (2)', 'Beta (2)' ), $items );
 	}
 
 	/**
@@ -286,17 +391,102 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A logged-in user sees what they may read, and what they saw is not kept
-	 * for visitors.
+	 * A random order does not change which terms there are, so two requests
+	 * with different seeds share one cached answer.
 	 *
 	 * @return void
 	 */
-	public function test_a_logged_in_user_neither_reads_nor_fills_the_cache() {
+	public function test_a_random_order_shares_the_cache() {
+		global $wpdb;
+
+		$query = array(
+			'source'  => 'post',
+			'orderBy' => 'rand',
+		);
+
+		$this->assertContains( 'Gamma (1)', $this->render_filter( $query ) );
+
+		// Behind WordPress' back, so only a new count would see it.
+		$wpdb->insert(
+			$wpdb->term_relationships,
+			array(
+				'object_id'        => self::$posts[2],
+				'term_taxonomy_id' => get_term( self::$categories['gamma'] )->term_taxonomy_id,
+			)
+		);
+
+		$this->new_request();
+
+		$this->assertContains( 'Gamma (1)', $this->render_filter( $query ) );
+	}
+
+	/**
+	 * Saving a post no visitor sees keeps the cached terms, and a post leaving
+	 * the public view takes its terms with it.
+	 *
+	 * @return void
+	 */
+	public function test_only_changes_a_visitor_sees_refresh_the_terms() {
+		$draft = self::factory()->post->create(
+			array(
+				'post_status'   => 'draft',
+				'post_category' => array( self::$categories['delta'] ),
+			)
+		);
+
+		$this->assertContains( 'Gamma (1)', $this->render_filter( array( 'source' => 'post' ) ) );
+
+		$version = get_transient( Visual_Portfolio_Filter_Terms::VERSION_KEY );
+
+		wp_update_post(
+			array(
+				'ID'         => $draft,
+				'post_title' => 'Still a draft',
+			)
+		);
+
+		$this->assertSame( $version, get_transient( Visual_Portfolio_Filter_Terms::VERSION_KEY ) );
+
+		wp_update_post(
+			array(
+				'ID'          => self::$posts[3],
+				'post_status' => 'draft',
+			)
+		);
+
+		$this->assertNotContains( 'Gamma (1)', $this->render_filter( array( 'source' => 'post' ) ) );
+	}
+
+	/**
+	 * Only a viewer who reads other users' private posts is counted apart. A
+	 * logged-in author shares the visitors' answer, which never carries a
+	 * private post, theirs included.
+	 *
+	 * @return void
+	 */
+	public function test_only_a_reader_of_private_posts_is_counted_apart() {
+		$author = self::factory()->user->create( array( 'role' => 'author' ) );
+
+		self::factory()->post->create(
+			array(
+				'post_status'   => 'private',
+				'post_author'   => $author,
+				'post_category' => array( self::$categories['empty'] ),
+			)
+		);
+
 		$this->assertNotContains( 'Delta (1)', $this->render_filter( array( 'source' => 'post' ) ) );
 
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
 		$this->assertContains( 'Delta (1)', $this->render_filter( array( 'source' => 'post' ) ) );
+
+		wp_set_current_user( $author );
+
+		$items = $this->render_filter( array( 'source' => 'post' ) );
+
+		$this->assertNotContains( 'Empty (1)', $items );
+		$this->assertNotContains( 'Delta (1)', $items );
 
 		wp_set_current_user( 0 );
 
@@ -310,32 +500,43 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_the_editor_lists_the_terms_of_a_manual_selection() {
-		global $wp_rest_server;
-
-		$wp_rest_server = new WP_REST_Server();
-
-		do_action( 'rest_api_init', $wp_rest_server );
-
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
 
-		$request = new WP_REST_Request( 'POST', '/visual-portfolio/v1/get_filter_items' );
-		$request->set_header( 'Content-Type', 'application/json' );
-		$request->set_body(
-			wp_json_encode(
-				array(
-					'queryType'  => 'posts',
-					'postsQuery' => array(
-						'source' => 'ids',
-						'ids'    => array( self::$posts[0], self::$posts[3] ),
-					),
-				)
+		$labels = $this->request_labels(
+			array(
+				'source' => 'ids',
+				'ids'    => array( self::$posts[0], self::$posts[3] ),
 			)
 		);
 
-		$response       = rest_do_request( $request );
-		$wp_rest_server = null;
-		$labels         = wp_list_pluck( $response->get_data()['response'], 'label' );
-
 		$this->assertSame( array( 'All', 'Alpha', 'Gamma' ), $labels );
+	}
+
+	/**
+	 * A custom query in the editor of someone who cannot read other users'
+	 * drafts counts none of them.
+	 *
+	 * @return void
+	 */
+	public function test_the_editor_hides_drafts_a_contributor_cannot_read() {
+		self::factory()->post->create(
+			array(
+				'post_status'   => 'draft',
+				'post_category' => array( self::$categories['delta'] ),
+			)
+		);
+
+		$query = array(
+			'source'      => 'custom_query',
+			'customQuery' => 'post_type=post&post_status=draft,publish&category_name=delta',
+		);
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'contributor' ) ) );
+
+		$this->assertSame( array( 'All' ), $this->request_labels( $query ) );
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+
+		$this->assertSame( array( 'All', 'Delta' ), $this->request_labels( $query ) );
 	}
 }

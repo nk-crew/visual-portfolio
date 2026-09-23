@@ -73,19 +73,19 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			)
 		);
 
-		// Get filter items.
-		register_rest_route(
-			$namespace,
-			'/get_filter_items/',
-			array(
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => array( $this, 'get_filter_items' ),
-				'permission_callback' => array( $this, 'get_filter_items_permission' ),
-			)
-		);
-
-		// Get gallery items for the editor preview of a Gallery Loop block.
+		// Get the filter items and the gallery items for the editor preview of
+		// a Gallery Loop block.
 		if ( visual_portfolio()->supports_loop_blocks() ) {
+			register_rest_route(
+				$namespace,
+				'/get_filter_items/',
+				array(
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'get_filter_items' ),
+					'permission_callback' => array( $this, 'get_filter_items_permission' ),
+				)
+			);
+
 			register_rest_route(
 				$namespace,
 				'/get_loop_items/',
@@ -183,6 +183,45 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	}
 
 	/**
+	 * Options each source may pass to the editor previews of a Gallery Loop.
+	 *
+	 * @param array $params - request parameters in the legacy format.
+	 *
+	 * @return array Allowed option names, by content source.
+	 */
+	private function get_loop_source_configs( $params ) {
+		return apply_filters(
+			'vpf_rest_loop_items_source_configs',
+			array(
+				'post-based' => array(
+					'posts_source',
+					'post_types_set',
+					'posts_ids',
+					'posts_excluded_ids',
+					'posts_offset',
+					'posts_taxonomies',
+					'posts_taxonomies_relation',
+					'posts_order_by',
+					'posts_order_direction',
+					'posts_avoid_duplicate_posts',
+					'posts_exclude_current',
+					'posts_keyword',
+					'posts_custom_query',
+				),
+				'images' => array(
+					'images',
+					'image_categories',
+					'images_titles_source',
+					'images_descriptions_source',
+					'images_order_by',
+					'images_order_direction',
+				),
+			),
+			$params
+		);
+	}
+
+	/**
 	 * Get filter items.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
@@ -204,17 +243,41 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 
 		// Converted the way the block context is when the page renders, so the
 		// editor lists the terms the page will.
-		$options = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $params, true );
+		$params         = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $params, true );
+		$content_source = $params['content_source'] ?? false;
 
-		if ( empty( $options['content_source'] ) ) {
+		if ( ! $content_source ) {
 			return $this->error(
 				'missing_params',
 				esc_html__( 'Required parameters are missing.', 'visual-portfolio' )
 			);
 		}
 
-		// As for the loop items, a custom query must not count posts the user
-		// cannot read.
+		// The options the preview of the items takes, so the terms are those of
+		// the posts it shows.
+		$source_configs = apply_filters( 'vpf_rest_filter_items_source_configs', $this->get_loop_source_configs( $params ), $params );
+
+		// Sources that are not filterable have no terms to offer, but they are
+		// not an error - the block simply shows the "All" item.
+		if ( ! isset( $source_configs[ $content_source ] ) ) {
+			return $this->success( array( $this->get_all_filter_item( $post_id ) ) );
+		}
+
+		$options = array_merge(
+			array(
+				'content_source' => $content_source,
+				'block_id'       => 'rest-filter-preview',
+			),
+			array_intersect_key( $params, array_flip( $source_configs[ $content_source ] ) )
+		);
+
+		// `perm` below holds back only private posts: drafts and the other
+		// statuses a query may ask for are left to whoever asked, and anyone who
+		// edits a post of their own reaches this endpoint.
+		if ( isset( $options['posts_custom_query'] ) ) {
+			$options['posts_custom_query'] = Visual_Portfolio_Custom_Query_Guard::restrict( $options['posts_custom_query'] );
+		}
+
 		$restrict_to_readable = static function ( $query ) {
 			$query->set( 'perm', 'readable' );
 		};
@@ -380,36 +443,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			);
 		}
 
-		// Define allowed parameters for each content source.
-		$source_configs = apply_filters(
-			'vpf_rest_loop_items_source_configs',
-			array(
-				'post-based' => array(
-					'posts_source',
-					'post_types_set',
-					'posts_ids',
-					'posts_excluded_ids',
-					'posts_offset',
-					'posts_taxonomies',
-					'posts_taxonomies_relation',
-					'posts_order_by',
-					'posts_order_direction',
-					'posts_avoid_duplicate_posts',
-					'posts_exclude_current',
-					'posts_keyword',
-					'posts_custom_query',
-				),
-				'images' => array(
-					'images',
-					'image_categories',
-					'images_titles_source',
-					'images_descriptions_source',
-					'images_order_by',
-					'images_order_direction',
-				),
-			),
-			$params
-		);
+		$source_configs = $this->get_loop_source_configs( $params );
 
 		// A source no options are registered for has nothing that can be
 		// previewed safely, but it is not an error - the block shows its

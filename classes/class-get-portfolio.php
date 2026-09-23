@@ -2131,12 +2131,7 @@ class Visual_Portfolio_Get {
 
 					// Taxonomies.
 					if ( ! empty( $options['posts_taxonomies'] ) && ! isset( $query_opts['tax_query'] ) ) {
-						$terms_list = get_terms(
-							get_object_taxonomies( is_array( $query_opts['post_type'] ) ? $query_opts['post_type'] : array( $query_opts['post_type'] ) ),
-							array(
-								'hide_empty' => false,
-							)
-						);
+						$type_taxonomies = get_object_taxonomies( is_array( $query_opts['post_type'] ) ? $query_opts['post_type'] : array( $query_opts['post_type'] ) );
 
                         // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 						$query_opts['tax_query'] = array(
@@ -2153,14 +2148,11 @@ class Visual_Portfolio_Get {
 						}
 
 						foreach ( $options['posts_taxonomies'] as $taxonomy ) {
-							$taxonomy_name = null;
-
-							foreach ( $terms_list as $term ) {
-								if ( $term->term_id === (int) $taxonomy ) {
-									$taxonomy_name = $term->taxonomy;
-									continue;
-								}
-							}
+							// The selected term alone, not every term of the post
+							// type's taxonomies, which a site with thousands of
+							// tags pays for on every render.
+							$term          = get_term( (int) $taxonomy );
+							$taxonomy_name = $term instanceof WP_Term && ( empty( $type_taxonomies ) || in_array( $term->taxonomy, $type_taxonomies, true ) ) ? $term->taxonomy : null;
 
 							if ( $taxonomy_name ) {
 								$query_opts['tax_query'][] = array(
@@ -2187,7 +2179,7 @@ class Visual_Portfolio_Get {
 				// on its own page. Unlike "avoid duplicates", which is about
 				// several galleries sharing a page, this is about one post
 				// listing itself.
-				if ( ! $for_filter && ! empty( $options['posts_exclude_current'] ) && is_singular() ) {
+				if ( ! empty( $options['posts_exclude_current'] ) && is_singular() ) {
 					$current                    = get_queried_object_id();
 					$not_current                = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
 					$query_opts['post__not_in'] = array_merge( $not_current, array( $current ) );

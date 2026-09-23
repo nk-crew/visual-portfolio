@@ -286,11 +286,19 @@ over the whole gallery rather than the page on screen. The items saved in the
 block keep their order, label and style. An item whose term has nothing in the
 gallery is left out and stays in the content, a term without an item follows the
 saved ones in the style of the first saved term item, and a gallery with no term
-at all prints no filter. For posts the terms come from the ids of the unpaged
-query and one grouped count over their term relationships, kept in a transient
-for visitors who are not logged in until a post of a viewable type is saved or
-deleted, its terms change, or a term is added, edited or deleted. The editor
-lists the same terms and adds the new ones without marking the post edited.
+at all prints no filter. To keep a term off the filter, hide its item with the
+block's Hide option; a deleted item comes back with its term.
+
+For posts the terms come from the ids of the unpaged, unordered query and one
+grouped count over their term relationships. Everyone who reads public posts
+only, visitors and logged-in users alike, shares one answer kept in a transient;
+a user who can read other users' private posts is counted on every render, and
+so is a gallery of the current query on a search page, which the search text
+would otherwise multiply. The transient is dropped when a post enters or leaves
+the public view, when the terms of a public post change, or when a term is
+edited or deleted. The editor lists the same terms, adds the new ones in the
+same style without marking the post edited, and keeps labels and items when the
+query only narrows or widens; a new source or new taxonomies rebuild the items.
 
 Items are resolved once, by `Visual_Portfolio_Get::get_loop_items()`, which is
 the same query pipeline the legacy gallery uses. Every item block reads its data
