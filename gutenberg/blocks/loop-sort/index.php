@@ -90,14 +90,9 @@ class Visual_Portfolio_Block_Loop_Sort {
 			return '';
 		}
 
-		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				'class' => 'vp-block-loop-sort',
-			)
-		);
-
-		$options  = '';
-		$query_id = Visual_Portfolio_Block_Loop::get_query_id( $block->context );
+		$items       = '';
+		$query_id    = Visual_Portfolio_Block_Loop::get_query_id( $block->context );
+		$as_dropdown = ! empty( $attributes['displayAsDropdown'] );
 
 		// Get active item.
 		$active_item = Visual_Portfolio_Get::get_current_sort( $query_id );
@@ -110,40 +105,59 @@ class Visual_Portfolio_Block_Loop_Sort {
 
 			$is_active = ! $active_item && ! $slug ? true : $active_item === $slug;
 
-			$options .= '<option data-vp-url="' . esc_url( $url ) . '" value="' . esc_attr( $slug ) . '" ' . selected( $is_active, true, false ) . '>';
-			$options .= esc_html( $label );
-			$options .= '</option>';
+			if ( $as_dropdown ) {
+				$items .= '<option data-vp-url="' . esc_url( $url ) . '" value="' . esc_attr( $slug ) . '" ' . selected( $is_active, true, false ) . '>';
+				$items .= esc_html( $label );
+				$items .= '</option>';
+				continue;
+			}
+
+			// The active option is not a link, as on the filter.
+			if ( $is_active ) {
+				$items .= sprintf(
+					'<span aria-current="page" class="vp-block-loop-sort__item is-active">%s</span>',
+					esc_html( $label )
+				);
+				continue;
+			}
+
+			$items .= sprintf(
+				'<a href="%1$s" class="vp-block-loop-sort__item" data-wp-interactive="%2$s" data-wp-on--click="actions.navigate">%3$s</a>',
+				esc_url( $url ),
+				esc_attr( Visual_Portfolio_Block_Loop::STORE ),
+				esc_html( $label )
+			);
 		}
 
-		$sort_name = Visual_Portfolio_Get::get_query_var_name( 'sort', $query_id );
-		$page_name = Visual_Portfolio_Get::get_query_var_name( 'page', $query_id );
-		$seed      = Visual_Portfolio_Block_Loop::get_control_random_seed( $block->context );
+		if ( ! $as_dropdown ) {
+			return sprintf(
+				'<nav %1$s>%2$s</nav>',
+				get_block_wrapper_attributes(
+					array(
+						'class'      => 'vp-block-loop-sort',
+						// `get_block_wrapper_attributes()` escapes the values itself.
+						'aria-label' => __( 'Sort items', 'visual-portfolio' ),
+					)
+				),
+				$items
+			);
+		}
 
-		// A form is what makes the only control of the family that is not a link
-		// work without JavaScript: submitting it lands on the very URL the
-		// selected option carries. The two parameters this loop writes itself are
-		// left out - a new order starts at page one - and everything else in the
-		// query string is carried along, including the state of the other loops
-		// on the page.
-		$hidden = Visual_Portfolio_Block_Loop::get_preserved_inputs(
-			array( $sort_name, $page_name ),
-			$seed ? array( 'vpf_random_seed' => $seed ) : array()
-		);
-
-		// With the store running, changing the select swaps the loop and the
-		// button has nothing left to do. It is rendered shown and hidden from
-		// there rather than the other way round: a module that never arrives has
-		// to leave a working form behind, not a dead one.
 		return sprintf(
-			'<div %1$s><form method="get" action="%2$s" data-wp-interactive="%3$s">%4$s<select name="%5$s" aria-label="%6$s" data-wp-on--change="actions.navigate">%7$s</select><button type="submit" class="vp-block-loop-sort__submit" data-wp-bind--hidden="state.isEnhanced">%8$s</button></form></div>',
-			$wrapper_attributes,
-			esc_url( Visual_Portfolio_Block_Loop::get_form_action() ),
-			esc_attr( Visual_Portfolio_Block_Loop::STORE ),
-			$hidden,
-			esc_attr( $sort_name ),
-			esc_attr__( 'Sort items', 'visual-portfolio' ),
-			$options,
-			esc_html__( 'Sort', 'visual-portfolio' )
+			'<div %1$s>%2$s</div>',
+			get_block_wrapper_attributes(
+				array(
+					'class' => 'vp-block-loop-sort',
+				)
+			),
+			Visual_Portfolio_Block_Loop::get_select_form(
+				Visual_Portfolio_Get::get_query_var_name( 'sort', $query_id ),
+				__( 'Sort items', 'visual-portfolio' ),
+				$items,
+				__( 'Sort', 'visual-portfolio' ),
+				'vp-block-loop-sort',
+				$block->context
+			)
 		);
 	}
 }

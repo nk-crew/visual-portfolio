@@ -260,6 +260,49 @@ class Visual_Portfolio_Block_Loop {
 	}
 
 	/**
+	 * A control that sets one parameter of the loop from a select.
+	 *
+	 * A form is what makes a select work without JavaScript: submitting it lands
+	 * on the very URL the selected option carries. The parameter the select
+	 * writes and the page are left out of the carried query string - a new
+	 * filter or order starts at page one - and everything else is carried along,
+	 * including the state of the other loops on the page.
+	 *
+	 * With the store running, changing the select swaps the loop and the button
+	 * has nothing left to do. It is rendered shown and hidden from there rather
+	 * than the other way round: a module that never arrives has to leave a
+	 * working form behind, not a dead one.
+	 *
+	 * @param string $name    - parameter the select writes.
+	 * @param string $label   - accessible name of the select.
+	 * @param string $options - option tags, escaped.
+	 * @param string $submit  - text of the button.
+	 * @param string $block   - class name of the block, the button's is built on it.
+	 * @param array  $context - block context of the control.
+	 *
+	 * @return string
+	 */
+	public static function get_select_form( $name, $label, $options, $submit, $block, $context ) {
+		$seed   = self::get_control_random_seed( $context );
+		$hidden = self::get_preserved_inputs(
+			array( $name, Visual_Portfolio_Get::get_query_var_name( 'page', self::get_query_id( $context ) ) ),
+			$seed ? array( 'vpf_random_seed' => $seed ) : array()
+		);
+
+		return sprintf(
+			'<form method="get" action="%1$s" data-wp-interactive="%2$s">%3$s<select name="%4$s" aria-label="%5$s" data-wp-on--change="actions.navigate">%6$s</select><button type="submit" class="%7$s__submit" data-wp-bind--hidden="state.isEnhanced">%8$s</button></form>',
+			esc_url( self::get_form_action() ),
+			esc_attr( self::STORE ),
+			$hidden,
+			esc_attr( $name ),
+			esc_attr( $label ),
+			$options,
+			esc_attr( $block ),
+			esc_html( $submit )
+		);
+	}
+
+	/**
 	 * Flatten parameters into hidden inputs, arrays included.
 	 *
 	 * @param array  $params - parameters.

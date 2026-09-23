@@ -7,6 +7,7 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import {
+	Disabled,
 	Spinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -14,7 +15,9 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { create } from '@wordpress/rich-text';
+import classnames from 'classnames/dedupe';
 
 /**
  * Internal dependencies
@@ -98,15 +101,39 @@ function getNewItemStyle(blocks) {
 	);
 }
 
+/**
+ * Text of the option an item is in a dropdown, as the page prints it.
+ *
+ * @param {Object}  attributes - filter item attributes.
+ * @param {boolean} showCount  - whether the counts are shown.
+ * @return {string} option text.
+ */
+function getOptionText({ text, filter, count }, showCount) {
+	const label = create({ html: text || '' }).text;
+
+	if (!showCount || '*' === filter || !count) {
+		return label;
+	}
+
+	return sprintf(
+		// translators: 1: category name, 2: number of items in it.
+		__('%1$s (%2$s)', 'visual-portfolio'),
+		label,
+		count
+	);
+}
+
 export default function BlockEdit({
 	attributes,
 	setAttributes,
 	context,
 	clientId,
+	isSelected,
+	__unstableLayoutClassNames: layoutClassNames,
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { showCount, showAllItem } = attributes;
+	const { showCount, showAllItem, displayAsDropdown } = attributes;
 
 	useLoopOrphanWarning('visual-portfolio/loop-filter', context);
 
@@ -335,15 +362,79 @@ export default function BlockEdit({
 		__unstableMarkNextChangeAsNotPersistent,
 	]);
 
+	// What a dropdown lists, and whether its items are being edited.
+	const { itemBlocks, isEditingItems } = useSelect(
+		(select) => {
+			const store = select(blockEditorStore);
+
+			return {
+				itemBlocks: store.getBlocks(clientId),
+				isEditingItems: store.hasSelectedInnerBlock(clientId, true),
+			};
+		},
+		[clientId]
+	);
+
+	// The editor gives the layout classes to the element that holds the inner
+	// blocks, and the wrapper of a dropdown holds the select.
 	const blockProps = useBlockProps({
-		className: 'vp-block-loop-filter',
+		className: classnames(
+			'vp-block-loop-filter',
+			displayAsDropdown && layoutClassNames
+		),
 	});
 
-	const innerBlocksProps = useInnerBlocksProps(blockProps, {
-		orientation: 'horizontal',
-		renderAppender: false,
-		templateLock: false,
-	});
+	// A dropdown shows its items under the select while the filter or one of
+	// them is selected, so their labels and order can still be edited.
+	const innerBlocksProps = useInnerBlocksProps(
+		displayAsDropdown
+			? { className: 'vp-block-loop-filter__options' }
+			: blockProps,
+		{
+			orientation: 'horizontal',
+			renderAppender: false,
+			templateLock: false,
+		}
+	);
+
+	// The page leaves hidden items out, and marks "All" active: the editor has
+	// no filter in its URL. Without "All" it asks for a category instead.
+	const options = itemBlocks.filter(
+		(item) => false !== item.attributes.metadata?.blockVisibility
+	);
+	const allOption = options.find((item) => '*' === item.attributes.filter);
+
+	let content = <div {...innerBlocksProps} />;
+
+	if (isLoading) {
+		content = (
+			<div {...blockProps}>
+				<Spinner />
+			</div>
+		);
+	} else if (displayAsDropdown) {
+		content = (
+			<div {...blockProps}>
+				<Disabled>
+					<select value={allOption?.clientId ?? ''} readOnly>
+						{!allOption && (
+							<option value="" disabled>
+								{__('Select category', 'visual-portfolio')}
+							</option>
+						)}
+						{options.map((item) => (
+							<option key={item.clientId} value={item.clientId}>
+								{getOptionText(item.attributes, showCount)}
+							</option>
+						))}
+					</select>
+				</Disabled>
+				{(isSelected || isEditingItems) && (
+					<div {...innerBlocksProps} />
+				)}
+			</div>
+		);
+	}
 
 	return (
 		<>
@@ -353,6 +444,7 @@ export default function BlockEdit({
 					resetAll={(filters) =>
 						setAttributes(
 							getResetAllValues(filters, {
+								displayAsDropdown: false,
 								showCount: false,
 								showAllItem: true,
 							})
@@ -360,6 +452,27 @@ export default function BlockEdit({
 					}
 					dropdownMenuProps={dropdownMenuProps}
 				>
+					<ToolsPanelItem
+						label={__('Display as dropdown', 'visual-portfolio')}
+						isShownByDefault
+						hasValue={() => displayAsDropdown}
+						onDeselect={() =>
+							setAttributes({ displayAsDropdown: false })
+						}
+					>
+						<ToggleControl
+							label={__(
+								'Display as dropdown',
+								'visual-portfolio'
+							)}
+							checked={displayAsDropdown}
+							onChange={() =>
+								setAttributes({
+									displayAsDropdown: !displayAsDropdown,
+								})
+							}
+						/>
+					</ToolsPanelItem>
 					<ToolsPanelItem
 						label={__('Display Count', 'visual-portfolio')}
 						isShownByDefault
@@ -398,13 +511,7 @@ export default function BlockEdit({
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			{isLoading ? (
-				<div {...blockProps}>
-					<Spinner />
-				</div>
-			) : (
-				<div {...innerBlocksProps} />
-			)}
+			{content}
 		</>
 	);
 }

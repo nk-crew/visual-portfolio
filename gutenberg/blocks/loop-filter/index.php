@@ -128,6 +128,29 @@ class Visual_Portfolio_Block_Loop_Filter {
 	}
 
 	/**
+	 * Options of a dropdown, led by a prompt while none of them is selected.
+	 *
+	 * Without "All" no option is selected until a category is, and a select
+	 * shows its first option instead. That category could not be chosen then:
+	 * picking the option already shown changes nothing.
+	 *
+	 * @param string $options - option tags.
+	 *
+	 * @return string
+	 */
+	private static function add_prompt( $options ) {
+		$processor = new WP_HTML_Tag_Processor( $options );
+
+		while ( $processor->next_tag( 'option' ) ) {
+			if ( null !== $processor->get_attribute( 'selected' ) ) {
+				return $options;
+			}
+		}
+
+		return '<option value="" disabled selected>' . esc_html__( 'Select category', 'visual-portfolio' ) . '</option>' . $options;
+	}
+
+	/**
 	 * Block output
 	 *
 	 * @param array    $attributes - block attributes.
@@ -146,9 +169,16 @@ class Visual_Portfolio_Block_Loop_Filter {
 			return '';
 		}
 
-		$items   = self::get_items( $block->parsed_block['innerBlocks'] ?? array(), $terms, ! empty( $attributes['showAllItem'] ) );
-		$context = array_merge( $block->context, array( 'vp/showCount' => ! empty( $attributes['showCount'] ) ) );
-		$content = '';
+		$as_dropdown = ! empty( $attributes['displayAsDropdown'] );
+		$items       = self::get_items( $block->parsed_block['innerBlocks'] ?? array(), $terms, ! empty( $attributes['showAllItem'] ) );
+		$content     = '';
+		$context     = array_merge(
+			$block->context,
+			array(
+				'vp/showCount'         => ! empty( $attributes['showCount'] ),
+				'vp/displayAsDropdown' => $as_dropdown,
+			)
+		);
 
 		// The way `WP_Block::render()` renders inner blocks, so the filters
 		// that give a child its parent's layout still see this block.
@@ -172,6 +202,26 @@ class Visual_Portfolio_Block_Loop_Filter {
 
 		if ( '' === trim( $content ) ) {
 			return '';
+		}
+
+		// Each item rendered itself as an option.
+		if ( $as_dropdown ) {
+			return sprintf(
+				'<div %1$s>%2$s</div>',
+				get_block_wrapper_attributes(
+					array(
+						'class' => 'vp-block-loop-filter',
+					)
+				),
+				Visual_Portfolio_Block_Loop::get_select_form(
+					Visual_Portfolio_Get::get_query_var_name( 'filter', Visual_Portfolio_Block_Loop::get_query_id( $block->context ) ),
+					__( 'Category filter', 'visual-portfolio' ),
+					self::add_prompt( $content ),
+					__( 'Filter', 'visual-portfolio' ),
+					'vp-block-loop-filter',
+					$block->context
+				)
+			);
 		}
 
 		$wrapper_attributes = get_block_wrapper_attributes(

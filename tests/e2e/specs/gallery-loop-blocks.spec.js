@@ -263,7 +263,14 @@ test.describe('Gallery Loop blocks', () => {
 		await expect(items).toHaveCount(PER_PAGE);
 
 		for (let i = 1; i <= expectedPages - 1; i++) {
-			await loadMore.click();
+			// The last page is asked for from the keyboard: the trigger goes
+			// with it, and the focus it held must land somewhere useful.
+			if (i === expectedPages - 1) {
+				await loadMore.focus();
+				await frontend.keyboard.press('Enter');
+			} else {
+				await loadMore.click();
+			}
 
 			await expect(items).toHaveCount(
 				Math.min(totalPosts, PER_PAGE * (i + 1))
@@ -272,6 +279,10 @@ test.describe('Gallery Loop blocks', () => {
 
 		// Everything is loaded, so there is nothing left to click.
 		await expect(loadMore).toHaveCount(0);
+
+		// The items hold no link, so the first of those that arrived last takes
+		// the focus itself.
+		await expect(items.nth(PER_PAGE * (expectedPages - 1))).toBeFocused();
 	});
 
 	test('page count follows the content without re-saving the page', async ({

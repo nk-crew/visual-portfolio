@@ -55,11 +55,15 @@
 		"vp/imagesQuery",
 		"vp/sourceQuery"
 	],
-	"providesContext": { "vp/showCount": "showCount" },
+	"providesContext": {
+		"vp/showCount": "showCount",
+		"vp/displayAsDropdown": "displayAsDropdown"
+	},
 	"styles": [{ "name": "fill", "label": "Fill" }],
 	"attributes": {
 		"showCount": { "type": "boolean", "default": false },
-		"showAllItem": { "type": "boolean", "default": true }
+		"showAllItem": { "type": "boolean", "default": true },
+		"displayAsDropdown": { "type": "boolean", "default": false }
 	},
 	"style": "visual-portfolio-block-loop-filter"
 }

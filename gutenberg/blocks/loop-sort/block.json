@@ -27,6 +27,10 @@
 		"labels": {
 			"type": "object",
 			"default": {}
+		},
+		"displayAsDropdown": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
@@ -56,8 +60,14 @@
 			}
 		},
 		"spacing": {
+			"blockGap": ["horizontal", "vertical"],
 			"padding": true,
 			"margin": ["top", "bottom"]
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": { "type": "flex" }
 		}
 	},
 	"selectors": { "root": ".vp-block-loop-sort" },

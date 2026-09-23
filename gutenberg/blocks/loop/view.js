@@ -322,6 +322,29 @@ function isPlainActivation(event) {
 }
 
 /**
+ * Hand the focus to items that just arrived.
+ *
+ * @param {HTMLElement[]} items    Items to look through, in order.
+ * @param {HTMLElement}   fallback Element that takes the focus when none of the
+ *                                 items holds a link or a button.
+ */
+function focusItems(items, fallback) {
+	const target = items
+		.map((item) => item.querySelector('a[href], button'))
+		.find(Boolean);
+
+	if (target) {
+		target.focus();
+		return;
+	}
+
+	// A gallery whose items hold no link at all still has to catch the focus
+	// rather than drop it on the body.
+	fallback.setAttribute('tabindex', '-1');
+	fallback.focus();
+}
+
+/**
  * Announce the update to assistive technology.
  *
  * @param {Object} context Loop context.
@@ -535,9 +558,20 @@ async function loadNextPage(trigger, context, byClick) {
 				item.remove();
 			});
 		});
+
+		// Read before the trigger can go: a removed node drops the focus it
+		// held on the body.
+		const hadFocus = trigger.contains(window.document.activeElement);
+
 		advanceTrigger(trigger, nextLoop, loop);
 		refreshLayout(list, added);
 		announceUpdate(context);
+
+		// The last page took the trigger away. The items that arrived are where
+		// the visitor was going.
+		if (hadFocus && !trigger.isConnected) {
+			focusItems(added, added[0] || list);
+		}
 
 		return APPENDED;
 	} catch (error) {
@@ -674,16 +708,7 @@ store('visual-portfolio/loop', {
 			// control is the exception: it comes back from the swap unchanged,
 			// and moving off it would lose them their place in the form.
 			if (list && !(ref instanceof window.HTMLSelectElement)) {
-				const target = list.querySelector('a[href], button');
-
-				if (target) {
-					target.focus();
-				} else {
-					// A gallery whose items hold no link at all still has to
-					// catch the focus rather than drop it on the body.
-					list.setAttribute('tabindex', '-1');
-					list.focus();
-				}
+				focusItems([list], list);
 			}
 		}),
 

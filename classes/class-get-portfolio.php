@@ -2650,7 +2650,9 @@ class Visual_Portfolio_Get {
 			$active_item = sanitize_text_field( wp_unslash( $_GET[ $name ] ?? $query_opts['vp_filter'] ) );
 		}
 
-		return $active_item;
+		// An empty value is what a filter dropdown submits for "All" without
+		// JavaScript, and an image gallery would look for items in no category.
+		return '' === $active_item ? false : $active_item;
 	}
 
 	/**

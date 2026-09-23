@@ -6,11 +6,13 @@ import {
 	CheckboxControl,
 	Disabled,
 	TextControl,
+	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import classnames from 'classnames/dedupe';
 
 /**
  * Internal dependencies
@@ -44,10 +46,15 @@ function getShownOptions(selected, labels) {
 	}));
 }
 
-export default function LoopSortEdit({ attributes, setAttributes, context }) {
+export default function LoopSortEdit({
+	attributes,
+	setAttributes,
+	context,
+	__unstableLayoutClassNames: layoutClassNames,
+}) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { options = [], labels = {} } = attributes;
+	const { options = [], labels = {}, displayAsDropdown } = attributes;
 
 	useLoopOrphanWarning('visual-portfolio/loop-sort', context);
 
@@ -99,6 +106,7 @@ export default function LoopSortEdit({ attributes, setAttributes, context }) {
 					resetAll={(filters) =>
 						setAttributes(
 							getResetAllValues(filters, {
+								displayAsDropdown: true,
 								options: [],
 								labels: {},
 							})
@@ -106,6 +114,27 @@ export default function LoopSortEdit({ attributes, setAttributes, context }) {
 					}
 					dropdownMenuProps={dropdownMenuProps}
 				>
+					<ToolsPanelItem
+						label={__('Display as dropdown', 'visual-portfolio')}
+						isShownByDefault
+						hasValue={() => !displayAsDropdown}
+						onDeselect={() =>
+							setAttributes({ displayAsDropdown: true })
+						}
+					>
+						<ToggleControl
+							label={__(
+								'Display as dropdown',
+								'visual-portfolio'
+							)}
+							checked={displayAsDropdown}
+							onChange={() =>
+								setAttributes({
+									displayAsDropdown: !displayAsDropdown,
+								})
+							}
+						/>
+					</ToolsPanelItem>
 					<ToolsPanelItem
 						label={__('Sort Options', 'visual-portfolio')}
 						isShownByDefault
@@ -160,16 +189,50 @@ export default function LoopSortEdit({ attributes, setAttributes, context }) {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			<div {...useBlockProps({ className: 'vp-block-loop-sort' })}>
-				<Disabled>
-					<select>
-						{shown.map(({ value, label }) => (
-							<option key={value || 'default'} value={value}>
+			<div
+				{...useBlockProps({
+					// Only a block that holds inner blocks is given its layout
+					// classes by the editor.
+					className: classnames(
+						'vp-block-loop-sort',
+						layoutClassNames
+					),
+				})}
+			>
+				{displayAsDropdown ? (
+					<Disabled>
+						<select>
+							{shown.map(({ value, label }) => (
+								<option key={value || 'default'} value={value}>
+									{label}
+								</option>
+							))}
+						</select>
+					</Disabled>
+				) : (
+					// The editor has no sort in its URL, which is the state the
+					// render callback marks the default order active in.
+					shown.map(({ value, label }) =>
+						value ? (
+							<a
+								key={value}
+								href="#sort-pseudo-link"
+								className="vp-block-loop-sort__item"
+								onClick={(event) => event.preventDefault()}
+							>
 								{label}
-							</option>
-						))}
-					</select>
-				</Disabled>
+							</a>
+						) : (
+							<span
+								key="default"
+								aria-current="page"
+								className="vp-block-loop-sort__item is-active"
+							>
+								{label}
+							</span>
+						)
+					)
+				)}
 			</div>
 		</>
 	);
