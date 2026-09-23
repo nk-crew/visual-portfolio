@@ -263,7 +263,7 @@ test.describe('Gallery Loop blocks', () => {
 		await expect(items).toHaveCount(PER_PAGE);
 
 		for (let i = 1; i <= expectedPages - 1; i++) {
-			// The last page is asked for from the keyboard: the trigger goes
+			// The last page is asked for from the keyboard. The trigger goes
 			// with it, and the focus it held must land somewhere useful.
 			if (i === expectedPages - 1) {
 				await loadMore.focus();

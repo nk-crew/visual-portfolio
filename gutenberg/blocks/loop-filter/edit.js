@@ -397,8 +397,9 @@ export default function BlockEdit({
 		}
 	);
 
-	// The page leaves hidden items out, and marks "All" active: the editor has
-	// no filter in its URL. Without "All" it asks for a category instead.
+	// The page leaves hidden items out and marks "All" active, since the
+	// editor has no filter in its URL. Without "All" it asks for a category
+	// instead.
 	const options = itemBlocks.filter(
 		(item) => false !== item.attributes.metadata?.blockVisibility
 	);

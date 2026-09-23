@@ -558,11 +558,11 @@ async function loadNextPage(trigger, context, byClick) {
 			});
 		});
 
-		// Read before the trigger can go: a removed node drops the focus it
-		// held on the body. Moved only for a visitor who asked for this page:
-		// one the observer loaded arrives while they scroll, and the trigger may
-		// still hold the focus of an earlier click, so moving it would pull the
-		// view to the new items.
+		// Read before the trigger can go, since a removed node drops the focus
+		// it held on the body. Moved only for a visitor who asked for this page.
+		// One the observer loaded arrives while they scroll, and the trigger
+		// may still hold the focus of an earlier click, so moving it would pull
+		// the view to the new items.
 		const hadFocus =
 			byClick && trigger.contains(window.document.activeElement);
 
@@ -602,7 +602,7 @@ async function loadNextPage(trigger, context, byClick) {
 store('visual-portfolio/loop', {
 	state: {
 		// True wherever this module is running, which is the only thing a
-		// fallback control needs to know: a filter or sort form binds its
+		// fallback control needs to know. A filter or sort form binds its
 		// submit button to it, which disappears the moment the select starts
 		// navigating on its own. A module that never arrives leaves the button
 		// where it is.
@@ -709,7 +709,7 @@ store('visual-portfolio/loop', {
 			// no Next - or still standing there meaning something else, and
 			// either way the visitor is left somewhere they did not choose.
 			// The items that just arrived are where they meant to be. A select
-			// is the exception: it comes back from the swap unchanged, and
+			// is the exception. It comes back from the swap unchanged, and
 			// moving off it would lose them their place in the form.
 			if (list && !(ref instanceof window.HTMLSelectElement)) {
 				focusIn(list);

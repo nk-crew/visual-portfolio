@@ -262,7 +262,7 @@ class Visual_Portfolio_Block_Loop {
 	/**
 	 * A control that sets one parameter of the loop from a select.
 	 *
-	 * A form is what makes a select work without JavaScript: submitting it lands
+	 * A form is what makes a select work without JavaScript. Submitting it lands
 	 * on the very URL the selected option carries. The parameter the select
 	 * writes and the page are left out of the carried query string - a new
 	 * filter or order starts at page one - and everything else is carried along,
@@ -270,8 +270,8 @@ class Visual_Portfolio_Block_Loop {
 	 *
 	 * With the store running, changing the select swaps the loop and the button
 	 * has nothing left to do. It is rendered shown and hidden from there rather
-	 * than the other way round: a module that never arrives has to leave a
-	 * working form behind, not a dead one.
+	 * than the other way round, since a module that never arrives has to leave
+	 * a working form behind, not a dead one.
 	 *
 	 * @param string $name    - parameter the select writes.
 	 * @param string $options - option tags, escaped.
@@ -291,8 +291,8 @@ class Visual_Portfolio_Block_Loop {
 		);
 
 		// Without an option for the current state a select shows its first
-		// option as chosen, and that option could not be chosen then: picking
-		// the one already shown changes nothing.
+		// option as chosen, and that option could not be chosen then, since
+		// picking the one already shown changes nothing.
 		if ( ! self::has_selected_option( $options ) ) {
 			$options = '<option value="" disabled selected>' . esc_html( $texts['prompt'] ) . '</option>' . $options;
 		}

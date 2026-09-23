@@ -248,10 +248,9 @@ page loads. Both paths land on the same URL.
 
 *Display as dropdown* shows the filter or the sort as a select instead of links.
 It is off for the filter and on for the sort, which is how both looked before the
-setting existed. A filter shown as a dropdown keeps its items: the editor lists
+setting existed. A filter shown as a dropdown keeps its items. The editor lists
 them under the select while the filter is selected, so labels, order and the Hide
-option still apply, while the item styles do not, since an option holds text
-only. An item hidden on some screen sizes is hidden with CSS, which the native
+option still apply. Item styles do not, since an option holds text only. An item hidden on some screen sizes is hidden with CSS, which the native
 picker of a phone may not apply to an option. While no option stands for the
 current state, which happens without "All" or without the default order, the
 select leads with a prompt. Without JavaScript a Filter or Sort button submits
@@ -710,7 +709,7 @@ so two galleries on one page never move each other:
 Defaults are never written: page one, an empty filter and the default sort are
 removed from the URL rather than spelled out. The canonical view of a page is
 therefore the URL with no parameters at all. A filter or sort form submitted
-without JavaScript is the exception: it names its parameter even for "All" or the
+without JavaScript is the exception. It names its parameter even for "All" or the
 default order, and an empty value reads the same as none.
 
 ### What a page cache sees
