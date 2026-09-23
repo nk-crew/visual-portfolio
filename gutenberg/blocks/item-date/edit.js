@@ -12,7 +12,11 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
+import {
+	dateI18n,
+	getSettings as getDateSettings,
+	humanTimeDiff,
+} from '@wordpress/date';
 import { __ } from '@wordpress/i18n';
 import {
 	getResetAllValues,
@@ -38,7 +42,9 @@ export default function ItemDateEdit({
 
 	const dateElement = (
 		<time dateTime={dateI18n('c', date)}>
-			{dateI18n(format || siteFormat, date)}
+			{'human-diff' === format
+				? humanTimeDiff(date)
+				: dateI18n(format || siteFormat, date)}
 		</time>
 	);
 

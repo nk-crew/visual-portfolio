@@ -59,6 +59,24 @@ class Visual_Portfolio_Block_Item_Date {
 		$formatted = mysql2date( $format, $published_time );
 		$machine   = mysql2date( 'c', $published_time );
 
+		// `human-diff` is a format core's picker offers and PHP cannot read. Core's
+		// own date blocks answer it with a relative time, and so does this one.
+		if ( 'human-diff' === $format ) {
+			$published = date_create( $published_time, wp_timezone() );
+			$formatted = '';
+
+			// A date that cannot be read shows nothing, as it does in any format.
+			if ( $published ) {
+				$timestamp = $published->getTimestamp();
+
+				$formatted = $timestamp > time()
+					// translators: %s: human-readable time difference.
+					? sprintf( __( '%s from now', 'visual-portfolio' ), human_time_diff( $timestamp ) )
+					// translators: %s: human-readable time difference.
+					: sprintf( __( '%s ago', 'visual-portfolio' ), human_time_diff( $timestamp ) );
+			}
+		}
+
 		if ( ! $formatted ) {
 			return '';
 		}
