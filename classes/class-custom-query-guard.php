@@ -20,18 +20,16 @@ class Visual_Portfolio_Custom_Query_Guard {
 	 * custom query: `parse_str()` and the sanitizing before it turn many
 	 * spellings into `post_status`. A user who can read other users' private
 	 * posts of every post type the query names keeps it as written. Anyone
-	 * else keeps the public statuses, and `inherit` when the query names
-	 * attachments alone; a query left with none falls back to published posts.
+	 * else gets the public statuses they asked for, and `inherit` when the
+	 * query names attachments alone; a query that asked for none of them, or
+	 * for no status at all, is given them all. A query for one post by id or
+	 * slug checks no status unless it is given one.
 	 *
 	 * @param array $args - `WP_Query` arguments.
 	 *
 	 * @return array
 	 */
 	public static function restrict_args( $args ) {
-		if ( empty( $args['post_status'] ) ) {
-			return $args;
-		}
-
 		$types = array_filter( array_map( 'trim', is_array( $args['post_type'] ?? null ) ? $args['post_type'] : explode( ',', (string) ( $args['post_type'] ?? 'post' ) ) ) );
 
 		if ( self::can_read_private( $types ) ) {
@@ -44,14 +42,10 @@ class Visual_Portfolio_Custom_Query_Guard {
 			$allowed[] = 'inherit';
 		}
 
-		$asked = array_map( 'trim', is_array( $args['post_status'] ) ? $args['post_status'] : explode( ',', (string) $args['post_status'] ) );
+		$asked = array_map( 'trim', is_array( $args['post_status'] ?? '' ) ? $args['post_status'] : explode( ',', (string) ( $args['post_status'] ?? '' ) ) );
 		$kept  = array_values( array_intersect( $asked, $allowed ) );
 
-		if ( empty( $kept ) ) {
-			unset( $args['post_status'] );
-		} else {
-			$args['post_status'] = $kept;
-		}
+		$args['post_status'] = empty( $kept ) ? $allowed : $kept;
 
 		return $args;
 	}

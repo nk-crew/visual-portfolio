@@ -300,7 +300,8 @@ answer. The transient is dropped when a public post is saved, published,
 unpublished or deleted, when the terms of a public post change, or when a term
 is edited or deleted. The editor lists the same terms, adds the new ones in the
 same style without marking the post edited, and keeps labels and items when the
-query only narrows or widens; a new source or new taxonomies rebuild the items.
+query only narrows or widens; another kind of source or other post types rebuild
+the items.
 
 Items are resolved once, by `Visual_Portfolio_Get::get_loop_items()`, which is
 the same query pipeline the legacy gallery uses. Every item block reads its data

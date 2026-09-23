@@ -530,6 +530,90 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Address vars a query does not read share the cached answer.
+	 *
+	 * @return void
+	 */
+	public function test_address_vars_that_change_nothing_share_the_cache() {
+		global $wpdb;
+
+		$this->go_to( get_category_link( self::$categories['alpha'] ) );
+
+		$this->assertContains( 'Alpha (2)', $this->render_filter( array( 'source' => 'current_query' ) ) );
+
+		$wpdb->insert(
+			$wpdb->term_relationships,
+			array(
+				'object_id'        => self::$posts[3],
+				'term_taxonomy_id' => get_term( self::$categories['alpha'] )->term_taxonomy_id,
+			)
+		);
+
+		$this->go_to( add_query_arg( 'pb', '2', get_category_link( self::$categories['alpha'] ) ) );
+		$this->new_request();
+
+		$this->assertContains( 'Alpha (2)', $this->render_filter( array( 'source' => 'current_query' ) ) );
+	}
+
+	/**
+	 * Search flags change which posts a query returns, so they keep two
+	 * galleries apart.
+	 *
+	 * @return void
+	 */
+	public function test_search_flags_keep_galleries_apart() {
+		$exact = $this->render_filter(
+			array(
+				'source'      => 'custom_query',
+				'customQuery' => 'post_type=post&s=Post&exact=1',
+			)
+		);
+
+		$loose = $this->render_filter(
+			array(
+				'source'      => 'custom_query',
+				'customQuery' => 'post_type=post&s=Post',
+			)
+		);
+
+		$this->assertSame( array(), $exact );
+		$this->assertSame( array( 'All', 'Alpha (2)', 'Beta (2)', 'Gamma (1)' ), $loose );
+	}
+
+	/**
+	 * A query for unpublished statuses, and a render in the admin, are counted
+	 * on every render and never fill the visitors' answer.
+	 *
+	 * @return void
+	 */
+	public function test_unpublished_statuses_stay_out_of_the_cache() {
+		self::factory()->post->create(
+			array(
+				'post_status'   => 'draft',
+				'post_category' => array( self::$categories['delta'] ),
+			)
+		);
+
+		$this->assertContains(
+			'Delta (1)',
+			$this->render_filter(
+				array(
+					'source'      => 'custom_query',
+					'customQuery' => 'post_type=post&post_status=draft,publish',
+				)
+			)
+		);
+
+		set_current_screen( 'edit-post' );
+
+		$this->assertContains( 'Delta (1)', $this->render_filter( array( 'source' => 'post' ) ) );
+
+		set_current_screen( 'front' );
+
+		$this->assertNotContains( 'Delta (1)', $this->render_filter( array( 'source' => 'post' ) ) );
+	}
+
+	/**
 	 * A window of dates moves with the clock, so it is counted on every render.
 	 *
 	 * @return void
@@ -590,7 +674,7 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_the_editor_hides_drafts_a_contributor_cannot_read() {
-		self::factory()->post->create(
+		$draft = self::factory()->post->create(
 			array(
 				'post_status'   => 'draft',
 				'post_category' => array( self::$categories['delta'] ),
@@ -613,6 +697,17 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 				array(
 					'source'      => 'custom_query',
 					'customQuery' => 'post_type=post&post.status=draft,publish&category_name=delta',
+				)
+			)
+		);
+
+		// A query for one post checks no status unless it is given one.
+		$this->assertSame(
+			array( 'All' ),
+			$this->request_labels(
+				array(
+					'source'      => 'custom_query',
+					'customQuery' => 'p=' . $draft,
 				)
 			)
 		);

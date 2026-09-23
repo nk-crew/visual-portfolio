@@ -29,15 +29,6 @@ class Visual_Portfolio_Filter_Terms {
 	const IDS_PER_QUERY = 100000;
 
 	/**
-	 * Query vars that do not change which posts a query returns. A gallery of
-	 * the current query carries whatever the address had, and a key that
-	 * differed by them would be a new answer for the same posts.
-	 *
-	 * @var array
-	 */
-	const KEYLESS_VARS = array( 'page', 'cpage', 'comments_per_page', 'embed', 'feed', 'preview', 'tb', 'sentence', 'exact', 'more', 'withcomments', 'withoutcomments', 'posts_per_archive_page' );
-
-	/**
 	 * Terms already resolved in this request, by cache key.
 	 *
 	 * @var array
@@ -164,7 +155,8 @@ class Visual_Portfolio_Filter_Terms {
 			)
 		);
 
-		unset( $args['paged'], $args['offset'], $args['order'] );
+		// A feed caps the posts at the feed's length.
+		unset( $args['paged'], $args['offset'], $args['order'], $args['feed'] );
 
 		$taxonomies = array_values( array_filter( get_taxonomies(), array( 'Visual_Portfolio_Get', 'allow_taxonomies_for_filter' ) ) );
 
@@ -173,15 +165,21 @@ class Visual_Portfolio_Filter_Terms {
 		}
 
 		// What a logged-in user reads depends on who they are, and on plugins
-		// that decide it, so only visitors share an answer. A window of dates
-		// moves with the clock, which no version tracks.
-		$cacheable = $shareable && ! is_user_logged_in() && empty( $args['date_query'] );
-
-		// The locale keeps apart the languages a translation plugin filters the
-		// same query into.
-		$key = 'vpf_filter_terms_' . md5( (string) wp_json_encode( array( array_diff_key( $args, array_flip( self::KEYLESS_VARS ) ), $taxonomies, get_locale() ) ) . self::get_version() );
+		// that decide it, so only visitors share an answer, and only on the
+		// front, where the admin adds no statuses of its own. A window of dates
+		// moves with the clock, and saving an unpublished post changes nothing
+		// a version tracks.
+		$statuses  = is_array( $args['post_status'] ?? '' ) ? $args['post_status'] : array_filter( explode( ',', (string) ( $args['post_status'] ?? '' ) ) );
+		$cacheable = $shareable && ! is_user_logged_in() && ! is_admin() && empty( $args['date_query'] ) && ! array_diff( array_map( 'trim', $statuses ), get_post_stati( array( 'public' => true ) ), array( 'inherit' ) );
+		$key       = '';
 
 		if ( $cacheable ) {
+			// Keyed by the SQL the query becomes rather than by its arguments: a
+			// current query carries whatever the address had, most of which
+			// changes nothing. The locale keeps apart the languages a translation
+			// plugin gives the same SQL.
+			$key = 'vpf_filter_terms_' . md5( self::get_request( $args ) . wp_json_encode( array( $taxonomies, get_locale() ) ) . self::get_version() );
+
 			if ( isset( self::$resolved[ $key ] ) ) {
 				return self::$resolved[ $key ];
 			}
@@ -230,6 +228,31 @@ class Visual_Portfolio_Filter_Terms {
 		}
 
 		return $terms;
+	}
+
+	/**
+	 * The SQL a query runs, without running it.
+	 *
+	 * @param array $args - `WP_Query` arguments.
+	 *
+	 * @return string
+	 */
+	private static function get_request( $args ) {
+		$query = new WP_Query();
+
+		$skip = static function ( $posts, $asked ) use ( $query ) {
+			return $asked === $query ? array() : $posts;
+		};
+
+		add_filter( 'posts_pre_query', $skip, PHP_INT_MAX, 2 );
+
+		// Uncached, or the empty answer given here would be the one WordPress
+		// hands the real query of the same arguments.
+		$query->query( array_merge( $args, array( 'cache_results' => false ) ) );
+
+		remove_filter( 'posts_pre_query', $skip, PHP_INT_MAX );
+
+		return (string) $query->request;
 	}
 
 	/**
