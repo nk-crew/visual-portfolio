@@ -48,20 +48,23 @@ const PAGINATION_INNER = {
 /**
  * Set the click action of every item picture in a tree.
  *
- * @param {Array}  blocks - blocks to walk.
- * @param {string} action - click action to set.
+ * @param {Array}    blocks    - blocks to walk.
+ * @param {Function} getAction - takes the current click action, returns the new one.
  * @return {Array} blocks.
  */
-function setClickAction(blocks, action) {
+function setClickAction(blocks, getAction) {
 	return blocks.map((block) => {
 		const attributes = CLICKABLE_NAMES.includes(block.name)
-			? { ...block.attributes, clickAction: action }
+			? {
+					...block.attributes,
+					clickAction: getAction(block.attributes.clickAction),
+				}
 			: block.attributes;
 
 		return {
 			...block,
 			attributes,
-			innerBlocks: setClickAction(block.innerBlocks || [], action),
+			innerBlocks: setClickAction(block.innerBlocks || [], getAction),
 		};
 	});
 }
@@ -69,11 +72,12 @@ function setClickAction(blocks, action) {
 /**
  * Apply the starting choices to the blocks of a pattern.
  *
- * @param {Array}  blocks     - inner blocks of the pattern's loop.
- * @param {Object} choices    - what the wizard asked.
+ * @param {Array}  blocks    - inner blocks of the pattern's loop.
+ * @param {Object} choices   - what the wizard asked.
+ * @param {string} queryType - content source of the loop.
  * @return {Array} blocks to insert.
  */
-export function applyChoices(blocks, choices) {
+export function applyChoices(blocks, choices, queryType) {
 	let result = blocks.filter(
 		(block) =>
 			(FILTER_NAME !== block.name || choices.filter) &&
@@ -110,5 +114,19 @@ export function applyChoices(blocks, choices) {
 		}
 	}
 
-	return setClickAction(result, choices.lightbox ? 'popup' : 'none');
+	// Without the lightbox a picture links to its item. The item of a gallery
+	// of images is the image file itself, so there the picture is left
+	// unclickable rather than swapping the page for a bare file. The chooser
+	// offers the patterns of posts too, so this holds whatever the pattern.
+	return setClickAction(result, (current) => {
+		if (choices.lightbox) {
+			return 'popup';
+		}
+
+		if ('images' === queryType) {
+			return 'none';
+		}
+
+		return 'popup' === current ? 'url' : current;
+	});
 }

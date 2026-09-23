@@ -74,6 +74,35 @@ class Visual_Portfolio_Block_Item_Author {
 
 		$classes = array();
 
+		// The avatar the item carries, the one the editor shows too. A post has a
+		// user behind it and is drawn at the size asked for; a social item brings
+		// the avatar of its channel as it is.
+		$avatar_url = ! empty( $attributes['showAvatar'] ) ? (string) ( $block->context['vp/itemAuthorAvatar'] ?? '' ) : '';
+		$post_id    = (int) ( $block->context['vp/itemPostId'] ?? 0 );
+		$size       = (int) ( $attributes['avatarSize'] ?? 24 );
+		$avatar     = '';
+
+		if ( $avatar_url && $post_id ) {
+			$avatar = get_avatar(
+				(int) get_post_field( 'post_author', $post_id ),
+				$size,
+				'',
+				'',
+				array( 'class' => 'wp-block-visual-portfolio-item-author__avatar' )
+			);
+		} elseif ( $avatar_url ) {
+			$avatar = sprintf(
+				'<img src="%1$s" width="%2$d" height="%2$d" alt="" loading="lazy" decoding="async" class="avatar wp-block-visual-portfolio-item-author__avatar">',
+				esc_url( $avatar_url ),
+				$size
+			);
+		}
+
+		if ( $avatar ) {
+			$classes[] = 'has-avatar';
+			$output    = $avatar . '<span class="wp-block-visual-portfolio-item-author__name">' . $output . '</span>';
+		}
+
 		if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 			$classes[] = 'has-link-color';
 		}

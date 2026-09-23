@@ -74,6 +74,13 @@ class Visual_Portfolio_Block_Item_Categories {
 			return '';
 		}
 
+		// Zero shows them all.
+		$limit = (int) ( $attributes['limit'] ?? 0 );
+
+		if ( $limit > 0 ) {
+			$links = array_slice( $links, 0, $limit );
+		}
+
 		$classes = array();
 
 		if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {

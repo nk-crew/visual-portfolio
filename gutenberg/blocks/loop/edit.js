@@ -583,7 +583,7 @@ function LoopPlaceholder({ attributes, setAttributes, clientId }) {
 					<ToggleControl
 						label={__('Open in a lightbox', 'visual-portfolio')}
 						help={__(
-							'A click opens the picture over the page instead of following a link.',
+							'A click on a picture opens it over the page.',
 							'visual-portfolio'
 						)}
 						checked={choices.lightbox}
@@ -629,7 +629,9 @@ function LoopPlaceholder({ attributes, setAttributes, clientId }) {
 						// Named after the pattern and derived from by core, the
 						// same as a block core inserted from a pattern itself.
 						setAttributes({ metadata });
-						insert(applyChoices(blocks, choices));
+						insert(
+							applyChoices(blocks, choices, attributes.queryType)
+						);
 					}}
 					onCancel={() => setStep('pattern')}
 				/>

@@ -1418,7 +1418,7 @@ export default function BlockEdit({
 								setAttributes({ carouselAutoplayDelay: value })
 							}
 							min={2}
-							max={10}
+							max={60}
 							step={0.5}
 						/>
 					)}

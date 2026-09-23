@@ -268,6 +268,17 @@ export default function ImageSettingsModal({
 						onChange={(title) => onChange({ title })}
 					/>
 
+					<TextControl
+						className="vpf-gallery-manager-modal__field-full"
+						label={__('Alt text', 'visual-portfolio')}
+						help={__(
+							'Describes the picture to someone who cannot see it. Left empty, the alt text from the media library is used.',
+							'visual-portfolio'
+						)}
+						value={image.alt || ''}
+						onChange={(alt) => onChange({ alt })}
+					/>
+
 					<TextareaControl
 						className="vpf-gallery-manager-modal__field-full"
 						label={__('Description', 'visual-portfolio')}
@@ -326,13 +337,18 @@ export default function ImageSettingsModal({
 						onChange={(author) => onChange({ author })}
 					/>
 
-					<TextControl
-						type="url"
-						label={__('Author URL', 'visual-portfolio')}
-						placeholder="https://"
-						value={image.author_url || ''}
-						onChange={(value) => onChange({ author_url: value })}
-					/>
+					{/* Without a name there is nothing to link, so the gallery ignores the URL. */}
+					{image.author ? (
+						<TextControl
+							type="url"
+							label={__('Author URL', 'visual-portfolio')}
+							placeholder="https://"
+							value={image.author_url || ''}
+							onChange={(value) =>
+								onChange({ author_url: value })
+							}
+						/>
+					) : null}
 
 					<LoopImageSettingsSlot {...fillProps} />
 				</div>

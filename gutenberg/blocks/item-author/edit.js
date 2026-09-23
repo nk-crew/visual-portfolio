@@ -8,6 +8,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	ExternalLink,
+	SelectControl,
 	TextControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -15,7 +16,7 @@ import {
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
@@ -24,17 +25,33 @@ import { useIsPreview } from '../../utils/use-is-preview';
 
 const DEFAULT_PREFIX = __('by ', 'visual-portfolio');
 
+// The sizes WordPress serves avatars at, as core's Author block offers them.
+const AVATAR_SIZES = [24, 48, 96].map((size) => ({
+	value: size,
+	// translators: %d: avatar size in pixels.
+	label: sprintf(__('%dpx', 'visual-portfolio'), size),
+}));
+
 export default function ItemAuthorEdit({
-	attributes: { prefix, isLink, rel, linkTarget },
+	attributes: { prefix, showAvatar, avatarSize, isLink, rel, linkTarget },
 	setAttributes,
-	context: { 'vp/itemAuthor': itemAuthor, 'vp/itemAuthorUrl': itemAuthorUrl },
+	context: {
+		'vp/itemAuthor': itemAuthor,
+		'vp/itemAuthorUrl': itemAuthorUrl,
+		'vp/itemAuthorAvatar': itemAuthorAvatar,
+	},
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// An untouched block carries no prefix of its own and shows the default.
 	const prefixValue = prefix ?? DEFAULT_PREFIX;
 
-	const blockProps = useBlockProps();
+	// The avatar the item carries, the same one the page draws.
+	const hasAvatar = showAvatar && !!itemAuthorAvatar;
+
+	const blockProps = useBlockProps({
+		className: hasAvatar ? 'has-avatar' : undefined,
+	});
 	const blockEditingMode = useBlockEditingMode();
 
 	// The placeholder stands in on the item being edited and nowhere else:
@@ -51,6 +68,25 @@ export default function ItemAuthorEdit({
 		return null;
 	}
 
+	const name = (
+		<>
+			{prefixValue}
+			{isLink ? (
+				// Inert in the editor - it only carries the link styling.
+				<a
+					href={itemAuthorUrl || '#'}
+					target={linkTarget}
+					rel={rel}
+					onClick={(event) => event.preventDefault()}
+				>
+					{author}
+				</a>
+			) : (
+				author
+			)}
+		</>
+	);
+
 	return (
 		<>
 			{blockEditingMode === 'default' && (
@@ -62,6 +98,8 @@ export default function ItemAuthorEdit({
 							setAttributes(
 								getResetAllValues(filters, {
 									prefix: DEFAULT_PREFIX,
+									showAvatar: false,
+									avatarSize: 24,
 									isLink: false,
 									rel: '',
 									linkTarget: '_self',
@@ -69,6 +107,50 @@ export default function ItemAuthorEdit({
 							)
 						}
 					>
+						<ToolsPanelItem
+							label={__('Show avatar', 'visual-portfolio')}
+							isShownByDefault
+							hasValue={() => showAvatar}
+							onDeselect={() =>
+								setAttributes({ showAvatar: false })
+							}
+						>
+							<ToggleControl
+								label={__('Show avatar', 'visual-portfolio')}
+								help={__(
+									'Shown where the item has one: the author of a post, or the channel of a social feed.',
+									'visual-portfolio'
+								)}
+								checked={showAvatar}
+								onChange={(value) =>
+									setAttributes({ showAvatar: value })
+								}
+							/>
+						</ToolsPanelItem>
+						{showAvatar && (
+							<ToolsPanelItem
+								label={__('Avatar size', 'visual-portfolio')}
+								isShownByDefault
+								hasValue={() => 24 !== avatarSize}
+								onDeselect={() =>
+									setAttributes({ avatarSize: 24 })
+								}
+							>
+								<SelectControl
+									label={__(
+										'Avatar size',
+										'visual-portfolio'
+									)}
+									value={avatarSize}
+									options={AVATAR_SIZES}
+									onChange={(value) =>
+										setAttributes({
+											avatarSize: parseInt(value, 10),
+										})
+									}
+								/>
+							</ToolsPanelItem>
+						)}
 						<ToolsPanelItem
 							label={__('Prefix text', 'visual-portfolio')}
 							isShownByDefault
@@ -168,19 +250,21 @@ export default function ItemAuthorEdit({
 				</InspectorControls>
 			)}
 			<div {...blockProps}>
-				{prefixValue}
-				{isLink ? (
-					// Inert in the editor - it only carries the link styling.
-					<a
-						href={itemAuthorUrl || '#'}
-						target={linkTarget}
-						rel={rel}
-						onClick={(event) => event.preventDefault()}
-					>
-						{author}
-					</a>
+				{hasAvatar ? (
+					<>
+						<img
+							className="wp-block-visual-portfolio-item-author__avatar"
+							src={itemAuthorAvatar}
+							width={avatarSize}
+							height={avatarSize}
+							alt=""
+						/>
+						<span className="wp-block-visual-portfolio-item-author__name">
+							{name}
+						</span>
+					</>
 				) : (
-					author
+					name
 				)}
 			</div>
 		</>
