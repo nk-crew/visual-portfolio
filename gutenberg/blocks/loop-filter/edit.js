@@ -27,12 +27,24 @@ import {
 
 const ITEM_BLOCK = 'visual-portfolio/loop-filter-item';
 
+// What names the term of an item. Every other attribute is its style, which an
+// item added for a new term takes from the first term item, as the page does.
+const IDENTITY_ATTRIBUTES = [
+	'text',
+	'filter',
+	'taxonomyId',
+	'count',
+	'anchor',
+	'metadata',
+	'lock',
+];
+
 /**
  * Identify a filter item.
  *
- * Term IDs are used where available and the filter slug otherwise, since image
- * categories are not terms and all report ID 0. Matching on the slug alone
- * would collide between two taxonomies sharing a slug.
+ * A mirror of `Visual_Portfolio_Filter_Terms::get_key()`: the term id, which
+ * survives a new slug, and the slug for image categories, which are not terms
+ * and all report id 0.
  *
  * @param {Object} item - filter item from the REST response or block attributes.
  * @return {string} unique key.
@@ -40,42 +52,50 @@ const ITEM_BLOCK = 'visual-portfolio/loop-filter-item';
 function getItemKey(item) {
 	const id = item.id ?? item.taxonomyId ?? 0;
 
-	return `${id}:${item.filter}`;
+	return id ? `term:${id}` : `slug:${item.filter}`;
 }
 
 /**
  * Attributes this block owns and keeps in sync with the query.
  *
- * @param {Object}  item                  - filter item from the REST response.
- * @param {Object}  [options]             - sync options.
- * @param {boolean} [options.structureOnly] - first sync of already saved items.
- * @param {Object}  [options.current]     - attributes the item already has.
+ * @param {Object}  item                - filter item from the REST response.
+ * @param {Object}  [options]           - sync options.
+ * @param {boolean} [options.keepLabel] - leave the label as it is.
  * @return {Object} block attributes.
  */
-function getItemAttributes(
-	item,
-	{ structureOnly = false, current = null } = {}
-) {
+function getItemAttributes(item, { keepLabel = false } = {}) {
 	const isAll = '*' === item.filter;
 
 	const attributes = {
 		filter: item.filter,
 		taxonomyId: item.id,
+		count: item.count || 0,
 	};
 
-	// The label can be edited by hand, so the first sync leaves it as saved.
-	if (!structureOnly) {
+	if (!keepLabel) {
 		attributes.text = isAll ? __('All', 'visual-portfolio') : item.label;
 	}
 
-	// Counts are server data, but rewriting a count that merely drifted would
-	// mark the post as modified just from opening it. A missing count is filled
-	// in regardless, otherwise "Display Count" has nothing to show.
-	if (!structureOnly || !current?.count) {
-		attributes.count = item.count || 0;
-	}
-
 	return attributes;
+}
+
+/**
+ * The style an item added for a new term takes.
+ *
+ * @param {Array} blocks - items of the filter.
+ * @return {Object} attributes of the first term item, else of the "All" item,
+ *                  without those that name the term.
+ */
+function getNewItemStyle(blocks) {
+	const template =
+		blocks.find((block) => '*' !== block.attributes.filter) ||
+		blocks.find((block) => '*' === block.attributes.filter);
+
+	return Object.fromEntries(
+		Object.entries(template?.attributes || {}).filter(
+			([name]) => !IDENTITY_ATTRIBUTES.includes(name)
+		)
+	);
 }
 
 export default function BlockEdit({
@@ -92,10 +112,11 @@ export default function BlockEdit({
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	// Key of the state the current items were synced for. Items live in the
+	// Keys of the state the current items were synced for. Items live in the
 	// post content, so there is nothing to sync until the query - or the choice
 	// of whether to keep the "All" item - changes.
 	const syncedQueryRef = useRef(null);
+	const syncedSourceRef = useRef(null);
 
 	const {
 		'vp/queryType': queryType,
@@ -108,7 +129,8 @@ export default function BlockEdit({
 	// Selectors are read inside the effect: the items are driven by the query,
 	// and depending on the block list would re-run the effect on its own writes.
 	const { getBlocks } = useSelect(blockEditorStore);
-	const { replaceInnerBlocks } = useDispatch(blockEditorStore);
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch(blockEditorStore);
 
 	// This block does not use the `url` the endpoint returns - it is rebuilt at
 	// render time - but the endpoint is public and needs the post to build it.
@@ -117,13 +139,35 @@ export default function BlockEdit({
 		[]
 	);
 
+	// What decides which terms there are: a manual selection, a custom query
+	// or an exclusion as much as the source. The order and the paging do not,
+	// and a sync after them would put the term names back over edited labels.
+	const {
+		order,
+		orderBy,
+		offset,
+		avoidDuplicates,
+		excludeCurrent,
+		...termsQuery
+	} = postsQuery || {};
 	const queryKey = JSON.stringify({
 		queryType,
-		source: postsQuery?.source,
-		taxonomies: postsQuery?.taxonomies,
-		images: imagesQuery?.images,
+		termsQuery,
+		// Of an image, only its categories are terms.
+		imageCategories: (imagesQuery?.images || []).map(
+			(image) => image.categories || []
+		),
 		sourceQuery,
 		showAllItem,
+	});
+
+	// Another kind of source, or other post types, is a new set of terms: the
+	// items are rebuilt from it. Anything else narrows or widens the set, and
+	// the items the user labelled stay as they are.
+	const sourceKey = JSON.stringify({
+		queryType,
+		source: postsQuery?.source,
+		postTypesSet: postsQuery?.postTypesSet,
 	});
 
 	useEffect(() => {
@@ -133,7 +177,8 @@ export default function BlockEdit({
 
 		// Saved content already carries its items, so the first sync only fills
 		// in what is missing instead of rewriting what is there.
-		const structureOnly = null === syncedQueryRef.current;
+		const isOpening = null === syncedQueryRef.current;
+		const isRebuild = !isOpening && syncedSourceRef.current !== sourceKey;
 		const currentBlocks = getBlocks(clientId);
 
 		// The "All" item is one of the synced items, so hiding it means
@@ -182,10 +227,10 @@ export default function BlockEdit({
 					);
 
 					if (!item) {
-						// Opening a post must not delete what it already
-						// carries: an item the query no longer returns may be
-						// hand-made, and its `lock` forbids removing it by hand.
-						if (structureOnly) {
+						// Only a new set of terms drops an item: one the query
+						// no longer returns may be hand-made, its `lock` forbids
+						// removing it by hand, and the page skips it anyway.
+						if (!isRebuild) {
 							updatedBlocks.push(block);
 						}
 
@@ -195,8 +240,7 @@ export default function BlockEdit({
 					matched.add(key);
 
 					const newAttributes = getItemAttributes(item, {
-						structureOnly,
-						current: block.attributes,
+						keepLabel: !isRebuild,
 					});
 					const hasChanges = Object.keys(newAttributes).some(
 						(name) => block.attributes[name] !== newAttributes[name]
@@ -218,15 +262,18 @@ export default function BlockEdit({
 				// Append the items that are not in the block list yet. The
 				// "All" item is the one that resets the filter, so it leads
 				// the list rather than trailing the categories it resets.
+				const newItemStyle = getNewItemStyle(keptBlocks);
+
 				items.forEach((item) => {
 					if (matched.has(getItemKey(item))) {
 						return;
 					}
 
-					const block = createBlock(
-						ITEM_BLOCK,
-						getItemAttributes(item)
-					);
+					// The page adds a plain "All", and styles the terms only.
+					const block = createBlock(ITEM_BLOCK, {
+						...('*' === item.filter ? {} : newItemStyle),
+						...getItemAttributes(item),
+					});
 
 					if ('*' === item.filter) {
 						updatedBlocks.unshift(block);
@@ -244,6 +291,12 @@ export default function BlockEdit({
 					);
 
 				if (!isUnchanged) {
+					// The page lists the terms by itself, so what opening the
+					// post brings in is shown without marking the post edited.
+					if (isOpening) {
+						__unstableMarkNextChangeAsNotPersistent();
+					}
+
 					replaceInnerBlocks(clientId, updatedBlocks, false);
 				}
 			})
@@ -259,6 +312,7 @@ export default function BlockEdit({
 				// Marked even when the request failed, so a single failure does
 				// not pin every later sync to the first-sync behaviour.
 				syncedQueryRef.current = queryKey;
+				syncedSourceRef.current = sourceKey;
 
 				setIsLoading(false);
 			});
@@ -268,6 +322,7 @@ export default function BlockEdit({
 		};
 	}, [
 		queryKey,
+		sourceKey,
 		queryType,
 		baseQuery,
 		postsQuery,
@@ -277,6 +332,7 @@ export default function BlockEdit({
 		clientId,
 		getBlocks,
 		replaceInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
 	]);
 
 	const blockProps = useBlockProps({

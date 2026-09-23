@@ -118,6 +118,8 @@ function useMaxPages({ attributes, setAttributes }) {
 	// and a request per preview is what kept the pattern chooser from ever
 	// reaching an idle frame - which is when it draws them.
 	const isPreview = useIsPreview();
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch(blockEditorStore);
 
 	// Read when a request resolves, so the pending value is never stale.
 	const baseQueryRef = useRef(baseQuery);
@@ -167,6 +169,9 @@ function useMaxPages({ attributes, setAttributes }) {
 						return;
 					}
 
+					// The page counts its pages itself, so bringing the preview
+					// up to date does not mark the post edited.
+					__unstableMarkNextChangeAsNotPersistent();
 					setAttributes({
 						baseQuery: {
 							...baseQueryRef.current,
@@ -184,7 +189,12 @@ function useMaxPages({ attributes, setAttributes }) {
 			cancelled = true;
 			clearTimeout(timeout);
 		};
-	}, [isPreview, query, setAttributes]);
+	}, [
+		isPreview,
+		query,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	]);
 }
 
 /**
