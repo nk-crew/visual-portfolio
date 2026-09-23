@@ -224,13 +224,28 @@ export function driveTimelines(list) {
 	};
 
 	// Slides that come and go - a Load More, the editor redrawing the preview.
-	const changes = new view.MutationObserver(() => {
-		watch();
-		schedule();
+	// And the mark: the editor writes the class of the list whole whenever a
+	// block inside it is selected, which takes the mark off with it.
+	const changes = new view.MutationObserver((records) => {
+		if (records.some((record) => 'childList' === record.type)) {
+			watch();
+			schedule();
+		}
+
+		if (
+			list.classList.contains(EFFECT_CLASS) &&
+			!list.classList.contains(SCRIPTED_CLASS)
+		) {
+			list.classList.add(SCRIPTED_CLASS);
+		}
 	});
 
 	list.addEventListener('scroll', schedule, { passive: true });
-	changes.observe(list, { childList: true });
+	changes.observe(list, {
+		childList: true,
+		attributes: true,
+		attributeFilter: ['class'],
+	});
 	watch();
 	draw(list);
 

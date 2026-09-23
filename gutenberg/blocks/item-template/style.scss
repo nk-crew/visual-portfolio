@@ -669,6 +669,18 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		.wp-block-visual-portfolio-item-template__card {
 			animation: none;
 		}
+
+		// Stopped, fade is the plain carousel it is drawn over. Its rules name
+		// the list by one more class than the rule above, and the scripted
+		// ones by two, so these do too.
+		&.vp-carousel-fade,
+		&.vp-carousel-fade.vp-carousel-scripted {
+			> .wp-block-visual-portfolio-item-template__item,
+			.wp-block-visual-portfolio-item-template__slide,
+			.wp-block-visual-portfolio-item-template__card {
+				animation: none;
+			}
+		}
 	}
 }
 

@@ -135,6 +135,15 @@ test.describe('Carousel effects', () => {
 		]);
 
 		expect(Math.round(widths[1])).toBe(Math.round(widths[0]));
+
+		// The suite runs with reduced motion, and a visitor who asked for it
+		// gets the plain carousel under the fade.
+		expect(
+			await list
+				.locator('.wp-block-visual-portfolio-item-template__card')
+				.first()
+				.evaluate((card) => window.getComputedStyle(card).animationName)
+		).toBe('none');
 	});
 
 	// The module keeps the timelines of an effect where the browser has none
@@ -269,16 +278,25 @@ test.describe('Carousel effects', () => {
 				)
 				.toBe('0.5000');
 
+			// Selecting a block inside rewrites the class of the list, and the
+			// mark is put back.
+			const [template] = (await editor.getBlocks({ full: true }))[0]
+				.innerBlocks;
+
+			await page.evaluate((id) => {
+				window.wp.data.dispatch('core/block-editor').selectBlock(id);
+			}, template.innerBlocks[0].clientId);
+
+			await expect(list).toHaveClass(/has-child-selected/);
+			await expect(list).toHaveClass(/vp-carousel-scripted/);
+
 			// Switched off, the effect takes its numbers with it: the preview
 			// is a plain carousel again, the way the page would be.
-			const clientId = (await editor.getBlocks({ full: true }))[0]
-				.innerBlocks[0].clientId;
-
 			await page.evaluate((id) => {
 				window.wp.data
 					.dispatch('core/block-editor')
 					.updateBlockAttributes(id, { carouselEffect: 'none' });
-			}, clientId);
+			}, template.clientId);
 
 			await expect(list).not.toHaveClass(/vp-carousel-scripted/);
 		});
