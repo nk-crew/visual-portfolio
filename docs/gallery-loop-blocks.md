@@ -281,6 +281,17 @@ the page they fetched has no trigger of its own they remove the trigger and
 reveal every End of List of the gallery, in whichever pagination block it sits.
 Blocks inside it keep their behaviour, since it was printed with the page.
 
+`loop-filter` lists the terms the gallery holds when the page renders, counted
+over the whole gallery rather than the page on screen. The items saved in the
+block keep their order, label and style. An item whose term has nothing in the
+gallery is left out and stays in the content, a term without an item follows the
+saved ones in the style of the first saved term item, and a gallery with no term
+at all prints no filter. For posts the terms come from the ids of the unpaged
+query and one grouped count over their term relationships, kept in a transient
+for visitors who are not logged in until a post of a viewable type is saved or
+deleted, its terms change, or a term is added, edited or deleted. The editor
+lists the same terms and adds the new ones without marking the post edited.
+
 Items are resolved once, by `Visual_Portfolio_Get::get_loop_items()`, which is
 the same query pipeline the legacy gallery uses. Every item block reads its data
 from block context; none of them queries anything.
@@ -358,8 +369,11 @@ The loop resolves its query through the same functions the legacy gallery does,
 so every one of these keeps working unchanged: `vpf_get_options`,
 `vpf_extend_options_before_query_args`, `vpf_extend_query_args`,
 `vpf_custom_query_result`, `vpf_custom_items`, `vpf_image_item_args`,
-`vpf_post_item_args`, `vpf_custom_filter_terms`, `vpf_extend_filter_items`,
-`vpf_wp_get_attachment_image`, `vpf_get_pagenum_link`.
+`vpf_post_item_args`, `vpf_custom_filter_terms`, `vpf_wp_get_attachment_image`,
+`vpf_get_pagenum_link`. The filter block takes its terms from
+`vpf_custom_filter_terms`, else from the taxonomies `vpf_allow_taxonomy_for_filter`
+allows; `vpf_extend_filter_items` belongs to the legacy filter markup and is not
+applied.
 
 Three of them need a word for sources that are neither posts nor images:
 

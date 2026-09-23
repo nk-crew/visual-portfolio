@@ -30,9 +30,9 @@ const ITEM_BLOCK = 'visual-portfolio/loop-filter-item';
 /**
  * Identify a filter item.
  *
- * Term IDs are used where available and the filter slug otherwise, since image
- * categories are not terms and all report ID 0. Matching on the slug alone
- * would collide between two taxonomies sharing a slug.
+ * A mirror of `Visual_Portfolio_Filter_Terms::get_key()`: the term id, which
+ * survives a new slug, and the slug for image categories, which are not terms
+ * and all report id 0.
  *
  * @param {Object} item - filter item from the REST response or block attributes.
  * @return {string} unique key.
@@ -40,39 +40,29 @@ const ITEM_BLOCK = 'visual-portfolio/loop-filter-item';
 function getItemKey(item) {
 	const id = item.id ?? item.taxonomyId ?? 0;
 
-	return `${id}:${item.filter}`;
+	return id ? `term:${id}` : `slug:${item.filter}`;
 }
 
 /**
  * Attributes this block owns and keeps in sync with the query.
  *
- * @param {Object}  item                  - filter item from the REST response.
- * @param {Object}  [options]             - sync options.
+ * @param {Object}  item                    - filter item from the REST response.
+ * @param {Object}  [options]               - sync options.
  * @param {boolean} [options.structureOnly] - first sync of already saved items.
- * @param {Object}  [options.current]     - attributes the item already has.
  * @return {Object} block attributes.
  */
-function getItemAttributes(
-	item,
-	{ structureOnly = false, current = null } = {}
-) {
+function getItemAttributes(item, { structureOnly = false } = {}) {
 	const isAll = '*' === item.filter;
 
 	const attributes = {
 		filter: item.filter,
 		taxonomyId: item.id,
+		count: item.count || 0,
 	};
 
 	// The label can be edited by hand, so the first sync leaves it as saved.
 	if (!structureOnly) {
 		attributes.text = isAll ? __('All', 'visual-portfolio') : item.label;
-	}
-
-	// Counts are server data, but rewriting a count that merely drifted would
-	// mark the post as modified just from opening it. A missing count is filled
-	// in regardless, otherwise "Display Count" has nothing to show.
-	if (!structureOnly || !current?.count) {
-		attributes.count = item.count || 0;
 	}
 
 	return attributes;
@@ -108,7 +98,8 @@ export default function BlockEdit({
 	// Selectors are read inside the effect: the items are driven by the query,
 	// and depending on the block list would re-run the effect on its own writes.
 	const { getBlocks } = useSelect(blockEditorStore);
-	const { replaceInnerBlocks } = useDispatch(blockEditorStore);
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch(blockEditorStore);
 
 	// This block does not use the `url` the endpoint returns - it is rebuilt at
 	// render time - but the endpoint is public and needs the post to build it.
@@ -117,10 +108,20 @@ export default function BlockEdit({
 		[]
 	);
 
+	// What decides which terms there are: a manual selection, a custom query
+	// or an exclusion as much as the source. The order and the paging do not,
+	// and a sync after them would put the term names back over edited labels.
+	const {
+		order,
+		orderBy,
+		offset,
+		avoidDuplicates,
+		excludeCurrent,
+		...termsQuery
+	} = postsQuery || {};
 	const queryKey = JSON.stringify({
 		queryType,
-		source: postsQuery?.source,
-		taxonomies: postsQuery?.taxonomies,
+		termsQuery,
 		images: imagesQuery?.images,
 		sourceQuery,
 		showAllItem,
@@ -196,7 +197,6 @@ export default function BlockEdit({
 
 					const newAttributes = getItemAttributes(item, {
 						structureOnly,
-						current: block.attributes,
 					});
 					const hasChanges = Object.keys(newAttributes).some(
 						(name) => block.attributes[name] !== newAttributes[name]
@@ -244,6 +244,12 @@ export default function BlockEdit({
 					);
 
 				if (!isUnchanged) {
+					// The page lists the terms by itself, so what opening the
+					// post brings in is shown without marking the post edited.
+					if (structureOnly) {
+						__unstableMarkNextChangeAsNotPersistent();
+					}
+
 					replaceInnerBlocks(clientId, updatedBlocks, false);
 				}
 			})
@@ -277,6 +283,7 @@ export default function BlockEdit({
 		clientId,
 		getBlocks,
 		replaceInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
 	]);
 
 	const blockProps = useBlockProps({
