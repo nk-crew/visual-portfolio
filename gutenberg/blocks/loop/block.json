@@ -67,10 +67,6 @@
 			"type": "object",
 			"default": {}
 		},
-		"customCss": {
-			"type": "string",
-			"default": ""
-		},
 		"preview_image_example": {
 			"type": "string",
 			"default": ""
