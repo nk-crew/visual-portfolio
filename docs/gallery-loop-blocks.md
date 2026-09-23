@@ -712,6 +712,15 @@ therefore the URL with no parameters at all. A filter or sort form submitted
 without JavaScript is the exception. It names its parameter even for "All" or the
 default order, and an empty value reads the same as none.
 
+**The portfolio archive.** A loop with the Current Query source on the page mapped
+to the portfolio archive keeps its category and its page in the path, the way the
+classic block does. Its filter links to /portfolio-category/{slug}/ and "All" to
+the archive page, its pages are /page/N/ under the current address, and its
+filter lists the categories of the whole archive with the one of the address
+active. With plain permalinks the archive has no paths of its own, and the loop's
+parameters address it the way they address any page. The page the plugin creates
+for the archive still holds the classic block while the family is experimental.
+
 ### What a page cache sees
 
 Navigation is plain GET, which is exactly what a page cache understands. Each

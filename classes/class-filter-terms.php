@@ -72,6 +72,10 @@ class Visual_Portfolio_Filter_Terms {
 		$source     = $options['content_source'];
 		$query_opts = Visual_Portfolio_Get::get_query_params( $options, true, false, $query_id );
 
+		if ( Visual_Portfolio_Archive_Mapping::is_archive( $options ) ) {
+			$query_opts = Visual_Portfolio_Archive_Mapping::without_address_terms( $query_opts );
+		}
+
 		/** This filter is documented in classes/class-get-portfolio.php */
 		$custom = apply_filters( 'vpf_custom_filter_terms', false, $query_opts, false, $options );
 

@@ -1466,8 +1466,147 @@ class Visual_Portfolio_Archive_Mapping {
 					get_post_meta( $post_id, '_vp_post_type_mapped', true )
 				)
 			) &&
-			'post-based' === $options['content_source'] &&
-			'current_query' === $options['posts_source'];
+			'post-based' === ( $options['content_source'] ?? '' ) &&
+			'current_query' === ( $options['posts_source'] ?? '' );
+	}
+
+	/**
+	 * Whether a Gallery Loop shows the portfolio archive of this request under
+	 * the archive's own addresses.
+	 *
+	 * With plain permalinks the archive has no paths of its own, and the
+	 * loop's parameters address it the way they address any page.
+	 *
+	 * @param array $options - legacy options of the loop.
+	 *
+	 * @return bool
+	 */
+	public static function is_archive_loop( $options ) {
+		return get_option( 'permalink_structure' ) && self::is_archive( $options );
+	}
+
+	/**
+	 * Address of a state of a Gallery Loop that shows the portfolio archive.
+	 *
+	 * The archive keeps its category and its page in the path, as in
+	 * /portfolio-category/nature/page/2/, the way the classic block links them.
+	 * A link that sets the filter leads to the address of that category, or of
+	 * the archive for "All", and one that keeps the filter stays under the
+	 * current address. The rest of the query string travels along.
+	 *
+	 * @param array           $query_arg - what the link sets, under the legacy names `vp_filter`, `vp_page` and `vp_sort`, values encoded.
+	 * @param int|string|null $query_id  - id of the loop.
+	 *
+	 * @return string Unescaped URL.
+	 */
+	public static function get_loop_link( $query_arg, $query_id ) {
+		$names = array(
+			'vp_filter' => Visual_Portfolio_Get::get_query_var_name( 'filter', $query_id ),
+			'vp_page'   => Visual_Portfolio_Get::get_query_var_name( 'page', $query_id ),
+			'vp_sort'   => Visual_Portfolio_Get::get_query_var_name( 'sort', $query_id ),
+		);
+
+		$current = explode( '?', Visual_Portfolio_Get::get_current_url(), 2 );
+		$query   = array();
+
+		wp_parse_str( $current[1] ?? '', $query );
+
+		// The page goes into the path.
+		unset( $query[ $names['vp_page'] ] );
+
+		if ( array_key_exists( 'vp_filter', $query_arg ) ) {
+			$filter = explode( ':', rawurldecode( (string) $query_arg['vp_filter'] ), 2 );
+			$base   = self::get_archive_address();
+
+			unset( $query[ $names['vp_filter'] ] );
+
+			if ( 'portfolio_category' === $filter[0] && ! empty( $filter[1] ) ) {
+				$base = self::get_address( self::get_permalink_structure()['category_base'] . '/' . $filter[1] );
+			} elseif ( '' !== $filter[0] ) {
+				$query[ $names['vp_filter'] ] = implode( ':', $filter );
+			}
+		} else {
+			// The current address, without the page it is on.
+			$base = preg_replace( '#/page/\d+/?$#', '', untrailingslashit( $current[0] ) );
+		}
+
+		if ( array_key_exists( 'vp_sort', $query_arg ) ) {
+			unset( $query[ $names['vp_sort'] ] );
+
+			if ( '' !== (string) $query_arg['vp_sort'] ) {
+				$query[ $names['vp_sort'] ] = rawurldecode( (string) $query_arg['vp_sort'] );
+			}
+		}
+
+		$page    = (int) ( $query_arg['vp_page'] ?? 1 );
+		$url     = user_trailingslashit( untrailingslashit( $base ) . ( $page > 1 ? '/page/' . $page : '' ) );
+		$renamed = array();
+
+		foreach ( $query_arg as $key => $value ) {
+			$renamed[ $names[ $key ] ?? $key ] = $value;
+		}
+
+		/** This filter is documented in classes/class-get-portfolio.php */
+		return apply_filters( 'vpf_get_pagenum_link', add_query_arg( urlencode_deep( $query ), $url ), $renamed, $query_id );
+	}
+
+	/**
+	 * Address of the archive, the way its rules answer it.
+	 *
+	 * The rules and the classic block use the slug of the page, not its
+	 * permalink, which a parent page moves away from it. An archive on the
+	 * front page answers at the front page while the front page shows a page.
+	 * Switching back to the latest posts leaves `page_on_front` set.
+	 *
+	 * @return string
+	 */
+	private static function get_archive_address() {
+		if ( 'page' === get_option( 'show_on_front' ) && (int) get_option( 'page_on_front' ) === (int) Settings::get_option( 'portfolio_archive_page', 'vp_general' ) ) {
+			return home_url( '/' );
+		}
+
+		return self::get_address( self::get_portfolio_slug() );
+	}
+
+	/**
+	 * Address of a path under the archive's rules.
+	 *
+	 * The rules match the path without the permalink front. With PATHINFO
+	 * permalinks the address carries `index.php/`, as the classic block's
+	 * links do. The rules of the post type answer the archive and its pages
+	 * there, and a category address opens the taxonomy archive of the theme.
+	 *
+	 * @param string $path - path under the site.
+	 *
+	 * @return string
+	 */
+	private static function get_address( $path ) {
+		global $wp_rewrite;
+
+		return home_url( ( $wp_rewrite->using_index_permalinks() ? $wp_rewrite->index . '/' : '' ) . $path );
+	}
+
+	/**
+	 * Query arguments of an archive loop, without the category or tag of the
+	 * address.
+	 *
+	 * On the archive the category in the address is what the visitor filtered
+	 * by, not a part of the gallery. The filter lists the terms of the whole
+	 * archive, the way the classic block counts them.
+	 *
+	 * @param array $query_opts - `WP_Query` arguments of the loop.
+	 *
+	 * @return array
+	 */
+	public static function without_address_terms( $query_opts ) {
+		$taxonomies = array( 'portfolio_category', 'portfolio_tag' );
+
+		// WordPress writes the term of a taxonomy address into these as well.
+		if ( in_array( $query_opts['taxonomy'] ?? '', $taxonomies, true ) ) {
+			unset( $query_opts['taxonomy'], $query_opts['term'] );
+		}
+
+		return array_diff_key( $query_opts, array_flip( array_merge( $taxonomies, array( 'vp_category', 'vp_filter' ) ) ) );
 	}
 
 	/**

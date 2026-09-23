@@ -26,6 +26,22 @@ import { getPluginSlug } from '../utils/plugin-slug';
 
 const logsEnabled = process.env.LOGS || false;
 
+// A Gallery Loop of the current query, the way an archive page is built with
+// the new blocks.
+const LOOP_ARCHIVE_CONTENT = [
+	'<!-- wp:visual-portfolio/loop {"block_id":"e2e-archive-loop","queryId":1,"queryType":"posts","baseQuery":{"perPage":2},"postsQuery":{"source":"current_query"}} -->',
+	'<div class="wp-block-visual-portfolio-loop vp-block-loop">',
+	'<!-- wp:visual-portfolio/loop-filter /-->',
+	'<!-- wp:visual-portfolio/item-template -->',
+	'<!-- wp:visual-portfolio/item-title /-->',
+	'<!-- /wp:visual-portfolio/item-template -->',
+	'<!-- wp:visual-portfolio/loop-pagination -->',
+	'<!-- wp:visual-portfolio/loop-pagination-numbers /-->',
+	'<!-- /wp:visual-portfolio/loop-pagination -->',
+	'</div>',
+	'<!-- /wp:visual-portfolio/loop -->',
+].join('');
+
 test.describe('archive pages', () => {
 	// The permalink structure is a site-wide option that outlives a test, so
 	// tracking what it is already set to turns most `setPermalinkSettings` calls
@@ -1146,6 +1162,66 @@ test.describe('archive pages', () => {
 		const receivedCategories = await getReceivedCategories(page);
 
 		expect(receivedCategories).toEqual(expectedArchiveCategoryPostName);
+	});
+
+	test('a Gallery Loop on the archive page follows the archive addresses (post name permalinks)', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await setPermalinkSettings(admin, page, 'Post name');
+		await maybeCreatePortfolioPosts(page, admin, editor, requestUtils);
+
+		const archive = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Portfolio',
+				status: 'publish',
+				content: LOOP_ARCHIVE_CONTENT,
+			},
+		});
+
+		await setArchiveSettings(admin, page);
+
+		const loop = page.locator('.vp-block-loop');
+		const filter = loop.locator('.vp-block-loop-filter');
+		const numbers = loop.locator('.vp-block-loop-pagination-numbers');
+		const items = loop.locator(
+			'.wp-block-visual-portfolio-item-template__item'
+		);
+
+		await page.goto(archive.link);
+
+		await expect(filter.locator('[aria-current]')).toHaveText('All');
+		await expect(
+			filter.getByRole('link', { name: 'Filter by car' })
+		).toHaveAttribute('href', /\/portfolio-category\/car\/$/);
+
+		// A category leads to its own address, and is the active one there.
+		await filter.getByRole('link', { name: 'Filter by car' }).click();
+		await page.waitForURL(/\/portfolio-category\/car\/$/);
+
+		await expect(filter.locator('[aria-current]')).toHaveText('car');
+		await expect(items).toHaveCount(2);
+
+		// Its pages live under it, and the address says which one is current.
+		await numbers.getByRole('link', { name: 'Page 2' }).click();
+		await page.waitForURL(/\/portfolio-category\/car\/page\/2\/$/);
+
+		await expect(numbers.locator('[aria-current]')).toHaveText('2');
+		await expect(items).toHaveCount(1);
+
+		// The filter still lists the categories of the whole archive.
+		await expect(
+			filter.getByRole('link', { name: 'Filter by ocean' })
+		).toHaveCount(1);
+
+		await filter.getByRole('link', { name: 'Display all items' }).click();
+		await page.waitForURL(archive.link);
+
+		await expect(filter.locator('[aria-current]')).toHaveText('All');
 	});
 
 	test('check archive page with load more pagination and category filter (plain permalinks)', async ({

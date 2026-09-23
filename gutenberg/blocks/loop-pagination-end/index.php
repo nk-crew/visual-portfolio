@@ -53,8 +53,7 @@ class Visual_Portfolio_Block_Loop_Pagination_End {
 		}
 
 		$max_pages    = Visual_Portfolio_Block_Loop_Pagination::get_max_pages( $block->context );
-		$query_id     = Visual_Portfolio_Block_Loop::get_query_id( $block->context );
-		$current_page = Visual_Portfolio_Get::get_current_page_number( $query_id );
+		$current_page = Visual_Portfolio_Block_Loop::get_current_page( $block->context );
 
 		// A gallery of one page has no list to reach the end of, and a page
 		// past the last one is left to No Results.

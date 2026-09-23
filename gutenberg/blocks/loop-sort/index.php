@@ -98,8 +98,23 @@ class Visual_Portfolio_Block_Loop_Sort {
 		$active_item = Visual_Portfolio_Get::get_current_sort( $query_id );
 
 		foreach ( $shown as $slug => $label ) {
+			// The URL every control of the loop is built with, which follows
+			// the addresses of the portfolio archive, then the filter
+			// `Visual_Portfolio_Get::get_sort_item_url()` applies, then the
+			// random seed, in the order a sort link has always had them.
 			$url = Visual_Portfolio_Block_Loop::add_random_seed(
-				Visual_Portfolio_Get::get_sort_item_url( $slug, $loop_options, $query_id ),
+				apply_filters(
+					'vpf_extend_sort_item_url',
+					Visual_Portfolio_Block_Loop::get_state_url(
+						array(
+							'vp_sort' => rawurlencode( $slug ),
+							'vp_page' => 1,
+						),
+						$block->context
+					),
+					$slug,
+					$loop_options
+				),
 				$block->context
 			);
 
@@ -151,7 +166,7 @@ class Visual_Portfolio_Block_Loop_Sort {
 				)
 			),
 			Visual_Portfolio_Block_Loop::get_select_form(
-				Visual_Portfolio_Get::get_query_var_name( 'sort', $query_id ),
+				'sort',
 				$items,
 				array(
 					'label'  => __( 'Sort items', 'visual-portfolio' ),
