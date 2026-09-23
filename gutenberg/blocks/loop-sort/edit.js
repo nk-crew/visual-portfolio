@@ -201,7 +201,14 @@ export default function LoopSortEdit({
 			>
 				{displayAsDropdown ? (
 					<Disabled>
-						<select>
+						{/* The default order is selected, as on the page, and
+						 without it the page asks for an order. */}
+						<select value="" readOnly>
+							{!shown.some(({ value }) => !value) && (
+								<option value="" disabled>
+									{__('Select sorting', 'visual-portfolio')}
+								</option>
+							)}
 							{shown.map(({ value, label }) => (
 								<option key={value || 'default'} value={value}>
 									{label}

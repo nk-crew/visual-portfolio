@@ -223,6 +223,35 @@ class ClassLoopControlsDisplay extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A sort select without the default order asks for an order while none is
+	 * chosen, so its first order can still be picked.
+	 *
+	 * @return void
+	 */
+	public function test_a_sort_without_the_default_order_asks_for_one() {
+		$sort = '<!-- wp:visual-portfolio/loop-sort {"options":["title","title_desc"]} /-->';
+
+		$this->assertSame(
+			array(
+				array( '', 'Select sorting', true ),
+				array( 'title', 'Sort by title (A-Z)', false ),
+				array( 'title_desc', 'Sort by title (Z-A)', false ),
+			),
+			$this->get_options( $this->render_loop( $sort ), 'vp-1-sort' )
+		);
+
+		$_GET['vp-1-sort'] = 'title';
+
+		$this->assertSame(
+			array(
+				array( 'title', 'Sort by title (A-Z)', true ),
+				array( 'title_desc', 'Sort by title (Z-A)', false ),
+			),
+			$this->get_options( $this->render_loop( $sort ), 'vp-1-sort' )
+		);
+	}
+
+	/**
 	 * Blocks saved before the setting existed keep their look: the filter as
 	 * links, the sort as a select.
 	 *

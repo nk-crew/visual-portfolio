@@ -251,11 +251,16 @@ It is off for the filter and on for the sort, which is how both looked before th
 setting existed. A filter shown as a dropdown keeps its items: the editor lists
 them under the select while the filter is selected, so labels, order and the Hide
 option still apply, while the item styles do not, since an option holds text
-only. Without JavaScript a Filter or Sort button submits the select. With it,
-changing the select swaps the gallery and the focus stays on the select.
+only. An item hidden on some screen sizes is hidden with CSS, which the native
+picker of a phone may not apply to an option. While no option stands for the
+current state, which happens without "All" or without the default order, the
+select leads with a prompt. Without JavaScript a Filter or Sort button submits
+the select. With it, changing the select swaps the gallery and the focus stays
+on the select.
 
-When the last Load More takes the trigger away, the focus moves to the first of
-the items that arrived, or to that item itself when it holds no link.
+When the last Load More takes the trigger away from a visitor who pressed it or
+reached it from the keyboard, the focus moves to the first link of the first
+item that arrived, or to that item itself when it holds none.
 
 ## Anatomy
 

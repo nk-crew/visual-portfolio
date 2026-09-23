@@ -274,20 +274,28 @@ class Visual_Portfolio_Block_Loop {
 	 * working form behind, not a dead one.
 	 *
 	 * @param string $name    - parameter the select writes.
-	 * @param string $label   - accessible name of the select.
 	 * @param string $options - option tags, escaped.
-	 * @param string $submit  - text of the button.
+	 * @param array  $texts   - `label`, the accessible name of the select;
+	 *                          `prompt`, the option shown while none is selected;
+	 *                          `submit`, the text of the button.
 	 * @param string $block   - class name of the block, the button's is built on it.
 	 * @param array  $context - block context of the control.
 	 *
 	 * @return string
 	 */
-	public static function get_select_form( $name, $label, $options, $submit, $block, $context ) {
+	public static function get_select_form( $name, $options, $texts, $block, $context ) {
 		$seed   = self::get_control_random_seed( $context );
 		$hidden = self::get_preserved_inputs(
 			array( $name, Visual_Portfolio_Get::get_query_var_name( 'page', self::get_query_id( $context ) ) ),
 			$seed ? array( 'vpf_random_seed' => $seed ) : array()
 		);
+
+		// Without an option for the current state a select shows its first
+		// option as chosen, and that option could not be chosen then: picking
+		// the one already shown changes nothing.
+		if ( ! self::has_selected_option( $options ) ) {
+			$options = '<option value="" disabled selected>' . esc_html( $texts['prompt'] ) . '</option>' . $options;
+		}
 
 		return sprintf(
 			'<form method="get" action="%1$s" data-wp-interactive="%2$s">%3$s<select name="%4$s" aria-label="%5$s" data-wp-on--change="actions.navigate">%6$s</select><button type="submit" class="%7$s__submit" data-wp-bind--hidden="state.isEnhanced">%8$s</button></form>',
@@ -295,11 +303,30 @@ class Visual_Portfolio_Block_Loop {
 			esc_attr( self::STORE ),
 			$hidden,
 			esc_attr( $name ),
-			esc_attr( $label ),
+			esc_attr( $texts['label'] ),
 			$options,
 			esc_attr( $block ),
-			esc_html( $submit )
+			esc_html( $texts['submit'] )
 		);
+	}
+
+	/**
+	 * Whether one of the given options is selected.
+	 *
+	 * @param string $options - option tags.
+	 *
+	 * @return bool
+	 */
+	private static function has_selected_option( $options ) {
+		$processor = new WP_HTML_Tag_Processor( $options );
+
+		while ( $processor->next_tag( 'option' ) ) {
+			if ( null !== $processor->get_attribute( 'selected' ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

@@ -128,29 +128,6 @@ class Visual_Portfolio_Block_Loop_Filter {
 	}
 
 	/**
-	 * Options of a dropdown, led by a prompt while none of them is selected.
-	 *
-	 * Without "All" no option is selected until a category is, and a select
-	 * shows its first option instead. That category could not be chosen then:
-	 * picking the option already shown changes nothing.
-	 *
-	 * @param string $options - option tags.
-	 *
-	 * @return string
-	 */
-	private static function add_prompt( $options ) {
-		$processor = new WP_HTML_Tag_Processor( $options );
-
-		while ( $processor->next_tag( 'option' ) ) {
-			if ( null !== $processor->get_attribute( 'selected' ) ) {
-				return $options;
-			}
-		}
-
-		return '<option value="" disabled selected>' . esc_html__( 'Select category', 'visual-portfolio' ) . '</option>' . $options;
-	}
-
-	/**
 	 * Block output
 	 *
 	 * @param array    $attributes - block attributes.
@@ -215,9 +192,12 @@ class Visual_Portfolio_Block_Loop_Filter {
 				),
 				Visual_Portfolio_Block_Loop::get_select_form(
 					Visual_Portfolio_Get::get_query_var_name( 'filter', Visual_Portfolio_Block_Loop::get_query_id( $block->context ) ),
-					__( 'Category filter', 'visual-portfolio' ),
-					self::add_prompt( $content ),
-					__( 'Filter', 'visual-portfolio' ),
+					$content,
+					array(
+						'label'  => __( 'Category filter', 'visual-portfolio' ),
+						'prompt' => __( 'Select category', 'visual-portfolio' ),
+						'submit' => __( 'Filter', 'visual-portfolio' ),
+					),
 					'vp-block-loop-filter',
 					$block->context
 				)

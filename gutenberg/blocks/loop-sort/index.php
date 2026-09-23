@@ -152,9 +152,12 @@ class Visual_Portfolio_Block_Loop_Sort {
 			),
 			Visual_Portfolio_Block_Loop::get_select_form(
 				Visual_Portfolio_Get::get_query_var_name( 'sort', $query_id ),
-				__( 'Sort items', 'visual-portfolio' ),
 				$items,
-				__( 'Sort', 'visual-portfolio' ),
+				array(
+					'label'  => __( 'Sort items', 'visual-portfolio' ),
+					'prompt' => __( 'Select sorting', 'visual-portfolio' ),
+					'submit' => __( 'Sort', 'visual-portfolio' ),
+				),
 				'vp-block-loop-sort',
 				$block->context
 			)

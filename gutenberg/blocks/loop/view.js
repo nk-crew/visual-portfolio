@@ -292,7 +292,8 @@ function refreshLayout(list, added) {
  * @return {string} URL, or an empty string when the control leads nowhere.
  */
 function getControlUrl(element) {
-	// The sort control is a `<select>`, every other control is a link.
+	// A sort or a filter shown as a dropdown is a `<select>`, every other
+	// control is a link.
 	if (element instanceof window.HTMLSelectElement) {
 		const selected = element.selectedOptions[0];
 
@@ -322,26 +323,24 @@ function isPlainActivation(event) {
 }
 
 /**
- * Hand the focus to items that just arrived.
+ * Hand the focus to the first link or button inside an element, or to the
+ * element itself when it holds none.
  *
- * @param {HTMLElement[]} items    Items to look through, in order.
- * @param {HTMLElement}   fallback Element that takes the focus when none of the
- *                                 items holds a link or a button.
+ * @param {HTMLElement} element The list after a swap, or the first item a Load
+ *                             More appended.
  */
-function focusItems(items, fallback) {
-	const target = items
-		.map((item) => item.querySelector('a[href], button'))
-		.find(Boolean);
+function focusIn(element) {
+	const target = element.querySelector('a[href], button');
 
 	if (target) {
 		target.focus();
 		return;
 	}
 
-	// A gallery whose items hold no link at all still has to catch the focus
-	// rather than drop it on the body.
-	fallback.setAttribute('tabindex', '-1');
-	fallback.focus();
+	// Items that hold no link at all still have to catch the focus rather than
+	// drop it on the body.
+	element.setAttribute('tabindex', '-1');
+	element.focus();
 }
 
 /**
@@ -560,17 +559,22 @@ async function loadNextPage(trigger, context, byClick) {
 		});
 
 		// Read before the trigger can go: a removed node drops the focus it
-		// held on the body.
-		const hadFocus = trigger.contains(window.document.activeElement);
+		// held on the body. Moved only for a visitor who asked for the page or
+		// reached the trigger from the keyboard: a trigger clicked earlier keeps
+		// the focus of that click, and the scroll that loads the last page must
+		// not pull the view to the new items.
+		const hadFocus =
+			trigger.contains(window.document.activeElement) &&
+			(byClick || trigger.matches(':focus-visible'));
 
 		advanceTrigger(trigger, nextLoop, loop);
 		refreshLayout(list, added);
 		announceUpdate(context);
 
-		// The last page took the trigger away. The items that arrived are where
-		// the visitor was going.
+		// The last page took the trigger away. The first of the items that
+		// arrived is where the visitor was going.
 		if (hadFocus && !trigger.isConnected) {
-			focusItems(added, added[0] || list);
+			focusIn(added[0] || list);
 		}
 
 		return APPENDED;
@@ -599,9 +603,10 @@ async function loadNextPage(trigger, context, byClick) {
 store('visual-portfolio/loop', {
 	state: {
 		// True wherever this module is running, which is the only thing a
-		// fallback control needs to know: the sort form binds its submit button
-		// to it and disappears the moment the select starts navigating on its
-		// own. A module that never arrives leaves the button where it is.
+		// fallback control needs to know: a filter or sort form binds its
+		// submit button to it, which disappears the moment the select starts
+		// navigating on its own. A module that never arrives leaves the button
+		// where it is.
 		isEnhanced: true,
 
 		// Read through the context so that two loops on one page keep their own
@@ -704,11 +709,11 @@ store('visual-portfolio/loop', {
 			// The node that was activated is either gone - the last page has
 			// no Next - or still standing there meaning something else, and
 			// either way the visitor is left somewhere they did not choose.
-			// The items that just arrived are where they meant to be. A sort
-			// control is the exception: it comes back from the swap unchanged,
-			// and moving off it would lose them their place in the form.
+			// The items that just arrived are where they meant to be. A select
+			// is the exception: it comes back from the swap unchanged, and
+			// moving off it would lose them their place in the form.
 			if (list && !(ref instanceof window.HTMLSelectElement)) {
-				focusItems([list], list);
+				focusIn(list);
 			}
 		}),
 
