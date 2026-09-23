@@ -3452,6 +3452,29 @@ class Visual_Portfolio_Get {
 	 * @return array
 	 */
 	public static function get_pagination_links( $args, $vp_options, $query_id = null ) {
+		// `paginate_links()` adds the query string of the current URL to every
+		// link. A link the caller built already carries what it means to, and
+		// the rest would bring a stale page along: the portfolio archive keeps
+		// its page in the path, and a page parameter left in the URL would
+		// follow every link.
+		$own_args = null;
+
+		if ( isset( $args['page_link'] ) ) {
+			$base_args = array();
+
+			wp_parse_str( (string) wp_parse_url( $args['page_link'], PHP_URL_QUERY ), $base_args );
+
+			$own_args = static function ( $link ) use ( $base_args ) {
+				$link_args = array();
+
+				wp_parse_str( (string) wp_parse_url( $link, PHP_URL_QUERY ), $link_args );
+
+				return remove_query_arg( array_keys( array_diff_key( $link_args, $base_args ) ), $link );
+			};
+
+			add_filter( 'paginate_links', $own_args );
+		}
+
 		$pagination_links = paginate_links(
 			array(
 				'base'      => esc_url_raw(
@@ -3479,6 +3502,10 @@ class Visual_Portfolio_Get {
 				'mid_size'  => $args['mid_size'] ?? 2,
 			)
 		);
+
+		if ( $own_args ) {
+			remove_filter( 'paginate_links', $own_args );
+		}
 
 		// parse html string and make arrays.
 		$filtered_links = array();

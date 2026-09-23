@@ -1516,12 +1516,12 @@ class Visual_Portfolio_Archive_Mapping {
 
 		if ( array_key_exists( 'vp_filter', $query_arg ) ) {
 			$filter = explode( ':', rawurldecode( (string) $query_arg['vp_filter'] ), 2 );
-			$base   = get_permalink( Visual_Portfolio_3rd_WPML::get_object_id( (int) Settings::get_option( 'portfolio_archive_page', 'vp_general' ) ) );
+			$base   = self::get_archive_address();
 
 			unset( $query[ $names['vp_filter'] ] );
 
 			if ( 'portfolio_category' === $filter[0] && ! empty( $filter[1] ) ) {
-				$base = home_url( self::get_permalink_structure()['category_base'] . '/' . $filter[1] );
+				$base = self::get_address( self::get_permalink_structure()['category_base'] . '/' . $filter[1] );
 			} elseif ( '' !== $filter[0] ) {
 				$query[ $names['vp_filter'] ] = implode( ':', $filter );
 			}
@@ -1548,6 +1548,39 @@ class Visual_Portfolio_Archive_Mapping {
 
 		/** This filter is documented in classes/class-get-portfolio.php */
 		return apply_filters( 'vpf_get_pagenum_link', add_query_arg( urlencode_deep( $query ), $url ), $renamed, $query_id );
+	}
+
+	/**
+	 * Address of the archive, the way its rules answer it.
+	 *
+	 * The rules and the classic block use the slug of the page, not its
+	 * permalink, which a parent page moves away from it. An archive on the
+	 * front page answers at the front page.
+	 *
+	 * @return string
+	 */
+	private static function get_archive_address() {
+		if ( (int) get_option( 'page_on_front' ) === (int) Settings::get_option( 'portfolio_archive_page', 'vp_general' ) ) {
+			return home_url( '/' );
+		}
+
+		return self::get_address( self::get_portfolio_slug() );
+	}
+
+	/**
+	 * Address of a path the archive's rules answer.
+	 *
+	 * The rules match the path without the permalink front, and after the
+	 * `index.php/` that PATHINFO permalinks carry.
+	 *
+	 * @param string $path - path under the site.
+	 *
+	 * @return string
+	 */
+	private static function get_address( $path ) {
+		global $wp_rewrite;
+
+		return home_url( ( $wp_rewrite->using_index_permalinks() ? $wp_rewrite->index . '/' : '' ) . $path );
 	}
 
 	/**

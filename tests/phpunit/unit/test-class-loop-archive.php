@@ -31,6 +31,13 @@ class ClassLoopArchive extends WP_UnitTestCase {
 	private $request = array();
 
 	/**
+	 * The archive page.
+	 *
+	 * @var int
+	 */
+	private $archive = 0;
+
+	/**
 	 * An archive page on pretty permalinks.
 	 *
 	 * @return void
@@ -46,7 +53,7 @@ class ClassLoopArchive extends WP_UnitTestCase {
 
 		$this->set_permalink_structure( '/%postname%/' );
 
-		$archive = self::factory()->post->create(
+		$this->archive = self::factory()->post->create(
 			array(
 				'post_type'   => 'page',
 				'post_name'   => 'portfolio',
@@ -54,8 +61,8 @@ class ClassLoopArchive extends WP_UnitTestCase {
 			)
 		);
 
-		update_post_meta( $archive, '_vp_post_type_mapped', 'portfolio' );
-		update_option( 'vp_general', array( 'portfolio_archive_page' => $archive ) );
+		update_post_meta( $this->archive, '_vp_post_type_mapped', 'portfolio' );
+		update_option( 'vp_general', array( 'portfolio_archive_page' => $this->archive ) );
 	}
 
 	/**
@@ -148,6 +155,86 @@ class ClassLoopArchive extends WP_UnitTestCase {
 				),
 			)
 		);
+	}
+
+	/**
+	 * "All" leads to the archive's address, which a parent page does not move,
+	 * and a category keeps the `index.php` of PATHINFO permalinks.
+	 *
+	 * @return void
+	 */
+	public function test_archive_links_take_the_addresses_the_rules_answer() {
+		wp_update_post(
+			array(
+				'ID'          => $this->archive,
+				'post_parent' => self::factory()->post->create(
+					array(
+						'post_type' => 'page',
+						'post_name' => 'work',
+					)
+				),
+			)
+		);
+
+		$this->request( '/portfolio-category/nature/', array( 'vp_page_archive' => '1' ) );
+
+		$this->assertSame(
+			home_url( '/portfolio/' ),
+			Visual_Portfolio_Block_Loop::get_link(
+				array(
+					'vp_filter' => '',
+					'vp_page'   => 1,
+				),
+				$this->context
+			)
+		);
+
+		$this->set_permalink_structure( '/index.php/%postname%/' );
+
+		$this->assertSame(
+			home_url( '/index.php/portfolio-category/people/' ),
+			Visual_Portfolio_Block_Loop::get_link(
+				array(
+					'vp_filter' => rawurlencode( 'portfolio_category:' ) . 'people',
+					'vp_page'   => 1,
+				),
+				$this->context
+			)
+		);
+	}
+
+	/**
+	 * A sort shown as links starts the archive over at its first page, with
+	 * or without the slash the permalinks end in.
+	 *
+	 * @return void
+	 */
+	public function test_archive_sort_links_start_over_at_the_first_page() {
+		$this->set_permalink_structure( '/%postname%' );
+		$this->request(
+			'/portfolio-category/nature/page/2',
+			array(
+				'vp_page_archive' => '1',
+				'vp_page_query'   => '2',
+				'vp_filter'       => 'portfolio_category:nature',
+			)
+		);
+
+		$sort = new WP_Block(
+			array(
+				'blockName'    => 'visual-portfolio/loop-sort',
+				'attrs'        => array(
+					'displayAsDropdown' => false,
+					'options'           => array( '', 'title' ),
+				),
+				'innerBlocks'  => array(),
+				'innerHTML'    => '',
+				'innerContent' => array(),
+			),
+			$this->context
+		);
+
+		$this->assertStringContainsString( 'href="' . esc_url( home_url( '/portfolio-category/nature?vp-7-sort=title' ) ) . '"', $sort->render() );
 	}
 
 	/**
