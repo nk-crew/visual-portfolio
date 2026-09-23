@@ -128,21 +128,53 @@ class ClassCustomQueryGuard extends WP_UnitTestCase {
 
 		$queries = $this->stored_queries( $this->save_as( $content, 'author' ) );
 
-		// Decoded: kses stores the ampersands of an author's content as entities.
-		$this->assertSame( 'post_type=post&post_status=draft,publish&post_status=publish', html_entity_decode( $queries[0] ) );
+		$this->assertSame( 'post_type=post&post_status=publish', $queries[0] );
 		$this->assertSame( 'publish', $this->asked_statuses( $queries[0] ) );
 		$this->assertSame( 'publish', $this->asked_statuses( $queries[1] ) );
 	}
 
 	/**
-	 * A query for one post checks no status on its own, so it is given one.
+	 * A query for one post checks no status on its own, so it is given one;
+	 * one for an attachment also gets the status an attachment has.
 	 *
 	 * @return void
 	 */
 	public function test_a_query_for_one_post_is_given_published_statuses() {
-		$queries = $this->stored_queries( $this->save_as( $this->loop_block( 'p=123' ), 'author' ) );
+		$queries = $this->stored_queries( $this->save_as( $this->loop_block( 'p=123' ) . $this->loop_block( 'attachment_id=123' ), 'author' ) );
 
 		$this->assertSame( 'publish', $this->asked_statuses( $queries[0] ) );
+		$this->assertSame( 'publish,inherit', $this->asked_statuses( $queries[1] ) );
+	}
+
+	/**
+	 * A status hidden past the vars `parse_str()` reads is not read back.
+	 *
+	 * @return void
+	 */
+	public function test_a_long_query_cannot_outrun_the_guard() {
+		$query   = 'post_type=post&post_status=draft,private' . str_repeat( '&x=1', 1200 );
+		$queries = $this->stored_queries( $this->save_as( $this->loop_block( $query ), 'author' ) );
+		$vars    = array();
+
+		parse_str( html_entity_decode( $queries[0] ), $vars );
+
+		$this->assertSame( 'publish', $vars['post_status'] );
+	}
+
+	/**
+	 * A custom query written to a post's meta, which the shortcode and the
+	 * Saved block read from any post, is checked too.
+	 *
+	 * @return void
+	 */
+	public function test_a_custom_query_in_meta_is_checked() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'author' ) ) );
+
+		$post_id = self::factory()->post->create( array( 'post_author' => get_current_user_id() ) );
+
+		add_post_meta( $post_id, 'vp_posts_custom_query', 'post_type=post&post_status=draft' );
+
+		$this->assertSame( 'publish', $this->asked_statuses( get_post_meta( $post_id, 'vp_posts_custom_query', true ) ) );
 	}
 
 	/**

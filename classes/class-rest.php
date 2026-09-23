@@ -676,12 +676,6 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 						$result = sanitize_text_field( wp_unslash( $data[ $prefixed_name ] ) );
 					}
 
-					// A Saved Layout's custom query is checked on save, like one
-					// saved in a block.
-					if ( 'vp_posts_custom_query' === $prefixed_name ) {
-						$result = Visual_Portfolio_Custom_Query_Guard::restrict_query_string( $result );
-					}
-
 					update_post_meta( $post_id, $prefixed_name, $result );
 				}
 			}

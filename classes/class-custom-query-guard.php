@@ -22,11 +22,23 @@ class Visual_Portfolio_Custom_Query_Guard {
 	const SINGLE_POST_VARS = array( 'p', 'page_id', 'name', 'pagename', 'attachment', 'attachment_id', 'subpost', 'subpost_id' );
 
 	/**
+	 * Of those, the vars that ask for an attachment, which is shown in the
+	 * status it inherits.
+	 *
+	 * @var array
+	 */
+	const ATTACHMENT_VARS = array( 'attachment', 'attachment_id', 'subpost', 'subpost_id' );
+
+	/**
 	 * Visual_Portfolio_Custom_Query_Guard constructor.
 	 */
 	public function __construct() {
 		// check the custom queries of the galleries a post is saved with.
 		add_filter( 'wp_insert_post_data', array( $this, 'guard_post_content' ), 10, 2 );
+
+		// And the one a Saved Layout keeps in meta, whichever way it is written:
+		// the shortcode and the Saved block read that meta from any post.
+		add_filter( 'sanitize_post_meta_vp_posts_custom_query', array( $this, 'guard_meta' ) );
 	}
 
 	/**
@@ -52,7 +64,7 @@ class Visual_Portfolio_Custom_Query_Guard {
 			return $args;
 		}
 
-		$allowed = self::get_allowed_statuses( $types );
+		$allowed = self::get_allowed_statuses( $types, $args );
 		$kept    = array_values( array_intersect( self::get_statuses( $args ), $allowed ) );
 
 		$args['post_status'] = empty( $kept ) ? $allowed : $kept;
@@ -65,9 +77,12 @@ class Visual_Portfolio_Custom_Query_Guard {
 	 * read.
 	 *
 	 * The query is read the way a gallery reads it when it renders, and one
-	 * that would reach other statuses gets the statuses allowed to the user
-	 * appended: `parse_str()` keeps the last value of a name. Everything the
-	 * user wrote stays as written.
+	 * that would reach other statuses is written again from what was read,
+	 * with the statuses allowed to the user. Written again rather than added
+	 * to: `parse_str()` stops at `max_input_vars`, so a status added after a
+	 * long enough query would never be read. For the same reason a query past
+	 * that limit is always written again, from the part that is read. A query
+	 * that needs no change stays exactly as written.
 	 *
 	 * @param string $query_string - custom query, as stored.
 	 *
@@ -79,25 +94,68 @@ class Visual_Portfolio_Custom_Query_Guard {
 		}
 
 		$sanitized = Visual_Portfolio_Security::sanitize_attributes( array( 'posts_custom_query' => $query_string ) );
+		$pairs     = explode( '&', html_entity_decode( (string) ( $sanitized['posts_custom_query'] ?? '' ) ) );
+		$limit     = (int) ini_get( 'max_input_vars' );
+		$long      = $limit > 0 && count( $pairs ) > $limit;
 		$vars      = array();
 
-		parse_str( html_entity_decode( (string) ( $sanitized['posts_custom_query'] ?? '' ) ), $vars );
+		parse_str( implode( '&', $long ? array_slice( $pairs, 0, $limit ) : $pairs ), $vars );
+
+		if ( ! $long && empty( $vars['post_status'] ) && ! array_filter( array_intersect_key( $vars, array_flip( self::SINGLE_POST_VARS ) ) ) ) {
+			return $query_string;
+		}
 
 		// The type the custom query source falls back to.
-		$vars = array_merge( array( 'post_type' => 'any' ), $vars );
-
-		if ( empty( $vars['post_status'] ) && ! array_filter( array_intersect_key( $vars, array_flip( self::SINGLE_POST_VARS ) ) ) ) {
-			return $query_string;
-		}
-
 		$asked   = self::get_statuses( $vars );
-		$allowed = self::get_statuses( self::restrict_args( $vars ) );
+		$allowed = self::get_statuses( self::restrict_args( array_merge( array( 'post_type' => 'any' ), $vars ) ) );
 
-		if ( $asked === $allowed ) {
+		if ( ! $long && $asked === $allowed ) {
 			return $query_string;
 		}
 
-		return $query_string . '&post_status=' . implode( ',', $allowed );
+		if ( $asked !== $allowed ) {
+			$vars['post_status'] = implode( ',', $allowed );
+		}
+
+		return implode( '&', self::build_pairs( $vars ) );
+	}
+
+	/**
+	 * Restrict a Saved Layout's custom query written by a user.
+	 *
+	 * @param mixed $value - meta value.
+	 *
+	 * @return mixed
+	 */
+	public function guard_meta( $value ) {
+		return get_current_user_id() ? self::restrict_query_string( $value ) : $value;
+	}
+
+	/**
+	 * The `name=value` pairs `parse_str()` reads back as the given vars.
+	 *
+	 * Values go in as they are: the sanitizing a gallery runs drops every
+	 * `%XX` sequence, so an encoded value could never have been read anyway.
+	 *
+	 * @param array  $vars   - query vars.
+	 * @param string $prefix - name the vars are nested under.
+	 *
+	 * @return string[]
+	 */
+	private static function build_pairs( $vars, $prefix = '' ) {
+		$pairs = array();
+
+		foreach ( $vars as $key => $value ) {
+			$name = '' === $prefix ? (string) $key : $prefix . '[' . $key . ']';
+
+			if ( is_array( $value ) ) {
+				$pairs = array_merge( $pairs, self::build_pairs( $value, $name ) );
+			} else {
+				$pairs[] = $name . '=' . $value;
+			}
+		}
+
+		return $pairs;
 	}
 
 	/**
@@ -193,13 +251,14 @@ class Visual_Portfolio_Custom_Query_Guard {
 	 * Statuses anyone may see posts of the given types in.
 	 *
 	 * @param string[] $types - post types.
+	 * @param array    $args  - `WP_Query` arguments.
 	 *
 	 * @return string[]
 	 */
-	private static function get_allowed_statuses( $types ) {
+	private static function get_allowed_statuses( $types, $args ) {
 		$allowed = array_values( get_post_stati( array( 'public' => true ) ) );
 
-		if ( array( 'attachment' ) === array_values( array_unique( $types ) ) ) {
+		if ( array( 'attachment' ) === array_values( array_unique( $types ) ) || array_filter( array_intersect_key( $args, array_flip( self::ATTACHMENT_VARS ) ) ) ) {
 			$allowed[] = 'inherit';
 		}
 

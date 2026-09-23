@@ -30,12 +30,13 @@ same picker.
 
 A *Custom Query* is kept as its author wrote it, with one exception. When the
 user who saves it cannot read other users' private posts, the statuses they may
-not read are dropped. The query gets the public statuses appended as a last
-`post_status`, which is the value `parse_str()` keeps. The same holds for a
+not read are dropped, and the query is written again from what a gallery reads
+of it, with the public statuses as its `post_status`. The same holds for a
 query for one post by id or slug, which checks no status otherwise. This runs
-when a post, a template or a Saved Layout is saved by a user; an import or a
-command run without one is left alone. The editor previews such a user's query
-the same way.
+when a user saves a post or a template with a Gallery Loop or classic block,
+and whenever a user writes the `vp_posts_custom_query` meta that Saved Layouts,
+the shortcode and the Saved block read; an import or a command run without a
+user is left alone. The editor previews such a user's query the same way.
 
 **Item image.** On a gallery of images the toolbar of the item image carries
 the two media tools the core Image block has: *Crop* and *Replace*. Both act on
