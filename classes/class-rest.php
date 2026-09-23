@@ -126,9 +126,19 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	 * @return int $max_pages Response max pages data.
 	 */
 	public function calculate_max_pages( $params ) {
-		return Visual_Portfolio_Get::calculate_max_pages(
+		// Anyone who edits a post reaches this endpoint, so a custom query
+		// counts only the statuses the user may read.
+		$restrict_statuses = array( 'Visual_Portfolio_Custom_Query_Guard', 'restrict_args' );
+
+		add_filter( 'vpf_extend_query_args', $restrict_statuses, PHP_INT_MAX );
+
+		$max_pages = Visual_Portfolio_Get::calculate_max_pages(
 			Visual_Portfolio_Convert_Attributes::modern_to_legacy( $params )
 		);
+
+		remove_filter( 'vpf_extend_query_args', $restrict_statuses, PHP_INT_MAX );
+
+		return $max_pages;
 	}
 
 	/**
@@ -510,11 +520,17 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			$query->set( 'perm', 'readable' );
 		};
 
+		// The statuses the saved gallery will ask for, so the preview shows what
+		// visitors will see; see `Visual_Portfolio_Custom_Query_Guard`.
+		$restrict_statuses = array( 'Visual_Portfolio_Custom_Query_Guard', 'restrict_args' );
+
+		add_filter( 'vpf_extend_query_args', $restrict_statuses, PHP_INT_MAX );
 		add_action( 'pre_get_posts', $restrict_to_readable );
 
 		$result = Visual_Portfolio_Get::get_loop_items( $options, $query_id );
 
 		remove_action( 'pre_get_posts', $restrict_to_readable );
+		remove_filter( 'vpf_extend_query_args', $restrict_statuses, PHP_INT_MAX );
 
 		$response = array(
 			'items'     => array(),

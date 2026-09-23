@@ -28,6 +28,16 @@ ordering, offsets and manual selections) or a gallery of images managed inside
 the block. Visual Portfolio Pro adds social networks and taxonomy sources to the
 same picker.
 
+A *Custom Query* is kept as its author wrote it, with one exception. When the
+user who saves it cannot read other users' private posts, the statuses they may
+not read are dropped, and the query is written again from what a gallery reads
+of it, with the public statuses as its `post_status`. The same holds for a
+query for one post by id or slug, which checks no status otherwise. This runs
+when a user saves a post or a template with a Gallery Loop or classic block,
+and whenever a user writes the `vp_posts_custom_query` meta that Saved Layouts,
+the shortcode and the Saved block read; an import or a command run without a
+user is left alone. The editor previews such a user's query the same way.
+
 **Item image.** On a gallery of images the toolbar of the item image carries
 the two media tools the core Image block has: *Crop* and *Replace*. Both act on
 the entry of the item in the loop's gallery — the same entry the gallery

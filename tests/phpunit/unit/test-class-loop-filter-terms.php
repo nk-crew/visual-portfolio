@@ -614,6 +614,31 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A query for one post by id counts no draft for a visitor, although
+	 * `WP_Query` skips its status check when it is asked for ids.
+	 *
+	 * @return void
+	 */
+	public function test_a_query_for_one_draft_counts_nothing_for_visitors() {
+		$draft = self::factory()->post->create(
+			array(
+				'post_status'   => 'draft',
+				'post_category' => array( self::$categories['delta'] ),
+			)
+		);
+
+		$this->assertSame(
+			array(),
+			$this->render_filter(
+				array(
+					'source'      => 'custom_query',
+					'customQuery' => 'p=' . $draft,
+				)
+			)
+		);
+	}
+
+	/**
 	 * A window of dates moves with the clock, so it is counted on every render.
 	 *
 	 * @return void
