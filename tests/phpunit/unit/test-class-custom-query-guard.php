@@ -128,7 +128,7 @@ class ClassCustomQueryGuard extends WP_UnitTestCase {
 
 		$queries = $this->stored_queries( $this->save_as( $content, 'author' ) );
 
-		$this->assertSame( 'post_type=post&post_status=publish', $queries[0] );
+		$this->assertSame( 'post_status=publish&post_type=post', $queries[0] );
 		$this->assertSame( 'publish', $this->asked_statuses( $queries[0] ) );
 		$this->assertSame( 'publish', $this->asked_statuses( $queries[1] ) );
 	}
@@ -152,13 +152,26 @@ class ClassCustomQueryGuard extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_a_long_query_cannot_outrun_the_guard() {
-		$query   = 'post_type=post&post_status=draft,private' . str_repeat( '&x=1', 1200 );
-		$queries = $this->stored_queries( $this->save_as( $this->loop_block( $query ), 'author' ) );
-		$vars    = array();
+		$padding = '';
 
-		parse_str( html_entity_decode( $queries[0] ), $vars );
+		for ( $i = 0; $i < 1200; $i++ ) {
+			$padding .= '&k' . $i . '=1';
+		}
 
-		$this->assertSame( 'publish', $vars['post_status'] );
+		$queries = $this->stored_queries(
+			$this->save_as(
+				$this->loop_block( 'post_type=post&post_status=draft,private' . $padding ) . $this->loop_block( 'p=123' . $padding ),
+				'author'
+			)
+		);
+
+		foreach ( $queries as $query ) {
+			$vars = array();
+
+			parse_str( html_entity_decode( $query ), $vars );
+
+			$this->assertSame( 'publish', $vars['post_status'] );
+		}
 	}
 
 	/**

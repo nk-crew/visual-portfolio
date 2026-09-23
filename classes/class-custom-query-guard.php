@@ -117,7 +117,14 @@ class Visual_Portfolio_Custom_Query_Guard {
 			$vars['post_status'] = implode( ',', $allowed );
 		}
 
-		return implode( '&', self::build_pairs( $vars ) );
+		// The status leads, so the limit never cuts it off.
+		if ( isset( $vars['post_status'] ) ) {
+			$vars = array_merge( array( 'post_status' => $vars['post_status'] ), $vars );
+		}
+
+		$pairs = self::build_pairs( $vars );
+
+		return implode( '&', $limit > 0 ? array_slice( $pairs, 0, $limit ) : $pairs );
 	}
 
 	/**
