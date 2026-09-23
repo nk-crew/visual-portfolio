@@ -559,13 +559,12 @@ async function loadNextPage(trigger, context, byClick) {
 		});
 
 		// Read before the trigger can go: a removed node drops the focus it
-		// held on the body. Moved only for a visitor who asked for the page or
-		// reached the trigger from the keyboard: a trigger clicked earlier keeps
-		// the focus of that click, and the scroll that loads the last page must
-		// not pull the view to the new items.
+		// held on the body. Moved only for a visitor who asked for this page:
+		// one the observer loaded arrives while they scroll, and the trigger may
+		// still hold the focus of an earlier click, so moving it would pull the
+		// view to the new items.
 		const hadFocus =
-			trigger.contains(window.document.activeElement) &&
-			(byClick || trigger.matches(':focus-visible'));
+			byClick && trigger.contains(window.document.activeElement);
 
 		advanceTrigger(trigger, nextLoop, loop);
 		refreshLayout(list, added);
@@ -573,8 +572,8 @@ async function loadNextPage(trigger, context, byClick) {
 
 		// The last page took the trigger away. The first of the items that
 		// arrived is where the visitor was going.
-		if (hadFocus && !trigger.isConnected) {
-			focusIn(added[0] || list);
+		if (hadFocus && !trigger.isConnected && added.length) {
+			focusIn(added[0]);
 		}
 
 		return APPENDED;

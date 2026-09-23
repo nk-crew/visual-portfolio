@@ -258,9 +258,10 @@ select leads with a prompt. Without JavaScript a Filter or Sort button submits
 the select. With it, changing the select swaps the gallery and the focus stays
 on the select.
 
-When the last Load More takes the trigger away from a visitor who pressed it or
-reached it from the keyboard, the focus moves to the first link of the first
-item that arrived, or to that item itself when it holds none.
+When the last Load More takes the trigger away from a visitor who pressed it,
+the focus moves to the first link of the first item that arrived, or to that
+item itself when it holds none. A last page the infinite scroll loads by itself
+leaves the focus where it is.
 
 ## Anatomy
 
