@@ -19,7 +19,6 @@ import {
 	FlexItem,
 	MenuGroup,
 	MenuItem,
-	Notice,
 	__experimentalNumberControl as NumberControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	RangeControl,
@@ -1368,28 +1367,18 @@ export default function BlockEdit({
 				label={__('Effect', 'visual-portfolio')}
 				onDeselect={() => setAttributes({ carouselEffect: 'none' })}
 			>
-				<VStack spacing={2}>
-					<SelectControl
-						label={__('Effect', 'visual-portfolio')}
-						help={__(
-							'How one slide gives way to the next.',
-							'visual-portfolio'
-						)}
-						value={carouselEffect}
-						options={getEffectOptions()}
-						onChange={(value) =>
-							setAttributes({ carouselEffect: value })
-						}
-					/>
-					{'none' !== carouselEffect && (
-						<Notice status="info" isDismissible={false}>
-							{__(
-								'Effects are drawn by the browser as the carousel scrolls. Browsers without scroll-driven animations simply show the carousel without them.',
-								'visual-portfolio'
-							)}
-						</Notice>
+				<SelectControl
+					label={__('Effect', 'visual-portfolio')}
+					help={__(
+						'How one slide gives way to the next.',
+						'visual-portfolio'
 					)}
-				</VStack>
+					value={carouselEffect}
+					options={getEffectOptions()}
+					onChange={(value) =>
+						setAttributes({ carouselEffect: value })
+					}
+				/>
 			</ToolsPanelItem>
 
 			<ToolsPanelItem

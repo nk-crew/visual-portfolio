@@ -25,6 +25,7 @@ const JS_ENTRY_PATTERNS = [
 	'./assets/js/**/*.js',
 	'./assets/admin/js/**/*.js',
 	'./gutenberg/**/view.js',
+	'./gutenberg/blocks/item-template/timelines.js',
 	'./gutenberg/index.js',
 	'./gutenberg/custom-post-meta.js',
 	'./gutenberg/layouts-editor.js',

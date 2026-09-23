@@ -14,6 +14,7 @@ const EFFECT_OPTIONS = [
 		value: 'slideshow',
 		columns: false,
 	},
+	{ label: __('Fade', 'visual-portfolio'), value: 'fade', columns: false },
 ];
 
 /**

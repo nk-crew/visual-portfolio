@@ -259,8 +259,8 @@ const AUTOPLAY_EVENT = 'vp-carousel-autoplay';
 
 // Dispatched on the list, and bubbling, once the module runs a carousel and
 // again just before it lets go of one - so that a script that is not a module
-// of ours can run alongside it for as long as it runs. Pro keeps the
-// timelines of an effect by hand on this pair where the browser has none.
+// of ours can run alongside it for as long as it runs. `timelines.js` keeps
+// the timelines of an effect by hand on this pair where the browser has none.
 //
 // `vp-carousel-start`  the carousel is running.
 // `vp-carousel-stop`   it is about to be torn down.
