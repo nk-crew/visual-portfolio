@@ -183,6 +183,9 @@ class Visual_Portfolio_Block_Item_Template {
 			'3|1,1|2,1|1,1|2,0.5|1,1|',
 			'3|1,1|2,1|1,1|1,1|1,1|1,1|2,0.5|1,1|',
 			'3|1,2|2,0.5|1,1|1,2|2,0.5|',
+			// The Tiles Mosaic pattern, so a gallery started from it finds its
+			// shape among the presets.
+			'3|1,1|2,0.5|1,1|1,2|1,1|',
 			'4|1,1|',
 			'4|1,1|1,1.34|1,1|1,1.34|1,1.34|1,1.34|1,1|1,1|',
 			'4|1,0.8|1,1|1,0.8|1,1|1,1|1,1|1,0.8|1,0.8|',
@@ -658,6 +661,7 @@ class Visual_Portfolio_Block_Item_Template {
 		$columns = $this->get_layout_columns( $attributes, $layout_type );
 		$classes = array();
 		$gap     = visual_portfolio_get_block_gap( $attributes['style']['spacing']['blockGap'] ?? '' );
+		$row_gap = visual_portfolio_get_block_gap( $attributes['style']['spacing']['blockGap'] ?? '', 'top' );
 
 		// Auto mode reads the count as a maximum, and zero lifts it - which is
 		// what the control promises. `get_layout_columns()` floors it at one,
@@ -669,6 +673,11 @@ class Visual_Portfolio_Block_Item_Template {
 
 		if ( '' !== $gap ) {
 			$styles .= sprintf( '--vp-layout-gap:%s;', $gap );
+		}
+
+		// Unset or the same, the rows keep the gap of the columns.
+		if ( '' !== $row_gap && $row_gap !== $gap ) {
+			$styles .= sprintf( '--vp-layout-row-gap:%s;', $row_gap );
 		}
 
 		if ( $is_auto ) {
@@ -1081,6 +1090,12 @@ class Visual_Portfolio_Block_Item_Template {
 		$classes = array_merge( array( 'vp-layout-' . $layout_type ), $layout_classes );
 		$extra   = array();
 		$before  = '';
+
+		// A grid row is as tall as its tallest item. Left unset, the others
+		// stretch to fill it; aligned, they keep their height and sit where asked.
+		if ( 'grid' === $layout_type && in_array( $attributes['verticalAlignment'] ?? '', array( 'top', 'center', 'bottom' ), true ) ) {
+			$classes[] = 'are-vertically-aligned-' . $attributes['verticalAlignment'];
+		}
 
 		// A control beside a list that is not a carousel is rendered switched
 		// off and stays that way - see the nav block - so it is printed all

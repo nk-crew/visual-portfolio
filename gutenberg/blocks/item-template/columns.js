@@ -166,9 +166,10 @@ export function getViewportBreakpoints(viewport) {
  *
  * @param {Object} attributes - block attributes.
  * @param {string} blockGap   - resolved block spacing, or an empty string.
+ * @param {string} rowGap     - resolved spacing between rows, or an empty string.
  * @return {{className: string, style: Object}} layout props.
  */
-export function getColumnsProps(attributes, blockGap) {
+export function getColumnsProps(attributes, blockGap, rowGap = '') {
 	const isAuto = isAutoColumns(attributes);
 	const classNames = [];
 	const style = {
@@ -194,6 +195,11 @@ export function getColumnsProps(attributes, blockGap) {
 		style['--vp-layout-gap'] = /^0(\.0+)?$/.test(blockGap)
 			? '0px'
 			: blockGap;
+	}
+
+	// Unset or the same, the rows keep the gap of the columns.
+	if (rowGap && rowGap !== blockGap) {
+		style['--vp-layout-row-gap'] = rowGap;
 	}
 
 	if (isAuto) {

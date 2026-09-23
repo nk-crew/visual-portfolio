@@ -4,19 +4,18 @@
  * A mirror of `visual_portfolio_get_block_gap()`, which stays the source of
  * truth for what a page renders. Core's own `getGapCSSValue()` answers with the
  * two-value `row column` shorthand, and these layouts work their track widths
- * out inside `calc()`, where a shorthand is not a length. One axis is all the
- * blocks declare, and the control writes it as `left`, so that axis is the
- * one that is read. A `top` beside it is carried over from a value that was
- * once a plain string, and stays there once the field is cleared, so it is
- * not read even where `left` is gone.
+ * out inside `calc()`, where a shorthand is not a length. So each axis is asked
+ * for on its own: `left` is the gap between columns, `top` the gap between
+ * rows. A plain string is the value of both.
  *
- * @param {string|Object} gap - `style.spacing.blockGap` of a block.
+ * @param {string|Object} gap  - `style.spacing.blockGap` of a block.
+ * @param {string}        axis - `left` or `top`.
  *
  * @return {string} CSS length, or an empty string when the theme decides.
  */
-export default function getBlockGapValue(gap) {
+export default function getBlockGapValue(gap, axis = 'left') {
 	if (gap && 'object' === typeof gap) {
-		return getBlockGapValue(gap.left);
+		return getBlockGapValue(gap[axis]);
 	}
 
 	if ('string' !== typeof gap || '' === gap) {

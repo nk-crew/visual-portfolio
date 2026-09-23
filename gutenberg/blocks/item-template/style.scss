@@ -12,6 +12,11 @@
 // count is capped there as the screen narrows.
 $item: ".wp-block-visual-portfolio-item-template__item";
 
+// The gap between rows, which is the gap between columns unless the block sets
+// one of its own in `--vp-layout-row-gap`. A carousel has one row and no use
+// for it.
+$row-gap: var(--vp-layout-row-gap, var(--vp-layout-gap, 1.5rem));
+
 // The two boxes a carousel effect is drawn on. They are rendered inside the
 // item and only for an effect - the item itself stays the box the browser snaps
 // to and the module measures, so a card that turns never moves the slide it
@@ -98,16 +103,17 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 }
 
 // The layout Masonry positions by hand. Item widths come from here - Masonry
-// reads them, it does not calculate them. The gap is declared as `column-gap`
-// for the same reason: it does nothing to a block container, it is where the
-// script module reads the gutter from.
+// reads them, it does not calculate them. The gaps are declared as `column-gap`
+// and `row-gap` for the same reason: they do nothing to a block container, they
+// are where the scripts read the gutters from.
 @mixin masonry-script {
 	position: relative;
 	column-gap: var(--vp-layout-gap, 1.5rem);
+	row-gap: $row-gap;
 
 	> #{$item} {
 		width: calc((100% - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
-		margin-bottom: var(--vp-layout-gap, 1.5rem);
+		margin-bottom: $row-gap;
 	}
 }
 
@@ -131,7 +137,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 
 	> #{$item} {
 		width: auto;
-		margin-bottom: var(--vp-layout-gap, 1.5rem);
+		margin-bottom: $row-gap;
 		break-inside: avoid;
 	}
 }
@@ -142,7 +148,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 @mixin masonry-lanes {
 	display: grid-lanes;
 	grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
-	gap: var(--vp-layout-gap, 1.5rem);
+	gap: $row-gap var(--vp-layout-gap, 1.5rem);
 
 	&.vp-layout-auto-columns {
 		grid-template-columns: repeat(var(--vp-layout-auto-placement), minmax(var(--vp-layout-track, min(16rem, 100%)), 1fr));
@@ -192,7 +198,19 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	&.vp-layout-grid {
 		display: grid;
 		grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
-		gap: var(--vp-layout-gap, 1.5rem);
+		gap: $row-gap var(--vp-layout-gap, 1.5rem);
+
+		&.are-vertically-aligned-top {
+			align-items: start;
+		}
+
+		&.are-vertically-aligned-center {
+			align-items: center;
+		}
+
+		&.are-vertically-aligned-bottom {
+			align-items: end;
+		}
 	}
 
 	// A grid in auto mode needs no script: the browser fits as many tracks as
@@ -249,7 +267,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		container-type: inline-size;
 		grid-auto-flow: row dense;
 		grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
-		gap: var(--vp-layout-gap, 1.5rem);
+		gap: $row-gap var(--vp-layout-gap, 1.5rem);
 
 		> #{$item} {
 			// A tile is never wider than the grid it is in: two columns of a
@@ -260,7 +278,10 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			--vp-tile-span: min(var(--vp-tile-columns, 1), var(--vp-layout-current-columns));
 
 			grid-column: span var(--vp-tile-span);
-			height: calc((100cqw + var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns) * var(--vp-tile-height, 1) * var(--vp-tile-span) - var(--vp-layout-gap, 1.5rem));
+			// A column's width plus a row gap per unit of height, less the one
+			// gap below the tile: a tile of two rows is then exactly two tiles of
+			// one and the gap between them.
+			height: calc(((100cqw + var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns) - var(--vp-layout-gap, 1.5rem) + #{$row-gap}) * var(--vp-tile-height, 1) * var(--vp-tile-span) - #{$row-gap});
 
 			// A tile is a cell of a fixed size, the way it has always been in
 			// this layout - what does not fit one is cut off rather than
@@ -298,7 +319,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		position: relative;
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--vp-layout-gap, 1.5rem);
+		gap: $row-gap var(--vp-layout-gap, 1.5rem);
 
 		> #{$item} {
 			flex: 1 1 auto;

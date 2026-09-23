@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/loop-pagination-end",
+	"title": "End of List",
+	"category": "media",
+	"description": "Contains the blocks shown once the last page of the gallery is on screen.",
+	"parent": ["visual-portfolio/loop-pagination"],
+	"textdomain": "visual-portfolio",
+	"usesContext": [
+		"vp/blockId",
+		"vp/queryId",
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery",
+		"vp/sourceQuery"
+	],
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"color": {
+			"text": true,
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": { "fontSize": true }
+		},
+		"spacing": {
+			"padding": true,
+			"margin": ["top", "bottom"]
+		}
+	}
+}

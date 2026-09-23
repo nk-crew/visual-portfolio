@@ -875,12 +875,13 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The gap is one length however the editor stored it: the axis its
-	 * control edits, a zero with a unit, a preset as the theme's variable.
+	 * Each axis of the gap is one length however the editor stored it: the
+	 * columns in `--vp-layout-gap`, the rows in `--vp-layout-row-gap`, a zero
+	 * with a unit, a preset as the theme's variable.
 	 *
 	 * @return void
 	 */
-	public function test_the_gap_is_printed_as_one_length() {
+	public function test_the_gap_is_printed_per_axis() {
 		$axial = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
 			array(
@@ -890,7 +891,19 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertStringContainsString( '--vp-layout-gap:3rem"', $axial );
+		$this->assertStringContainsString( '--vp-layout-gap:3rem;--vp-layout-row-gap:2.5rem"', $axial );
+
+		// One value for both axes is the gap of the columns, and the rows
+		// follow it without a variable of their own.
+		$single = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'style' => array( 'spacing' => array( 'blockGap' => '2rem' ) ),
+			)
+		);
+
+		$this->assertStringContainsString( '--vp-layout-gap:2rem;', $single );
+		$this->assertStringNotContainsString( '--vp-layout-row-gap', $single );
 
 		$none = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
@@ -910,15 +923,45 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( '--vp-layout-gap:var(--wp--preset--spacing--40);', $preset );
 
-		// The field cleared: the `top` a string once left behind is not a gap.
-		$cleared = $this->render_loop(
+		// Rows alone: the columns keep the theme's gap.
+		$rows = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
 			array(
 				'style' => array( 'spacing' => array( 'blockGap' => array( 'top' => '2.5rem' ) ) ),
 			)
 		);
 
-		$this->assertStringNotContainsString( '--vp-layout-gap:', $cleared );
+		$this->assertStringNotContainsString( '--vp-layout-gap:', $rows );
+		$this->assertStringContainsString( '--vp-layout-row-gap:2.5rem', $rows );
+	}
+
+	/**
+	 * A grid places short items where it is told, and only a grid does: the
+	 * other layouts have no rows of items to align.
+	 *
+	 * @return void
+	 */
+	public function test_a_grid_aligns_its_items_vertically() {
+		$grid = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'verticalAlignment' => 'center' )
+		);
+
+		$this->assertStringContainsString( 'are-vertically-aligned-center', $grid );
+
+		$masonry = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'layoutType'        => 'masonry',
+				'verticalAlignment' => 'center',
+			)
+		);
+
+		$this->assertStringNotContainsString( 'are-vertically-aligned', $masonry );
+
+		$unset = $this->render_loop( '<!-- wp:visual-portfolio/item-image /-->' );
+
+		$this->assertStringNotContainsString( 'are-vertically-aligned', $unset );
 	}
 
 	/**

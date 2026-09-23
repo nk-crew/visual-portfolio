@@ -66,6 +66,12 @@ layout ends up a single column on a narrow screen. A tile is capped with it and
 keeps its proportions, so a pattern narrows into a stack instead of spilling out
 of the grid. Auto mode is untouched: fitting the container is already what it
 does. The gap is **Block spacing** in the Dimensions panel, like any other block.
+Unlinked, it sets the gap between columns and the gap between rows apart; a
+side left empty takes the value of the other.
+
+A grid row is as tall as its tallest item, and the other items of the row
+stretch to its height. The block toolbar of a grid aligns them to the top, the
+middle or the bottom of the row instead, as it does for the core Columns block.
 
 Pro lets a manual count answer for one screen at a time, and the screen is the
 one the editor is already previewing: switch the View to *Tablet* or *Mobile*
@@ -88,10 +94,12 @@ What a theme overrides in CSS, without touching the markup:
 | `--vp-layout-min-column-width` | Minimum column width, auto mode only |
 | `--vp-layout-track` | The `minmax()` track a grid repeats, auto mode only |
 | `--vp-layout-gap` | Block spacing |
+| `--vp-layout-row-gap` | Block spacing between rows, printed only when it differs from the columns |
 | `--vp-layout-row-height` | Justified row height |
 
 Auto mode also puts `vp-layout-auto-columns` on the list, and
-`vp-layout-auto-fit` when empty tracks collapse.
+`vp-layout-auto-fit` when empty tracks collapse. An aligned grid carries
+`are-vertically-aligned-top`, `-center` or `-bottom`.
 
 **Patterns.** An empty loop asks for a source, then for the images if that is
 the source, and then opens the pattern chooser — the same modal the core Query
@@ -106,7 +114,10 @@ Photo Wall, Carousel Showcase and Posts Cards. Six more take a shape and add one
 thing the blocks can do: Grid Rounded, Masonry Reveal, Filtered Portfolio Grid,
 Paged Posts Grid, Carousel Coverflow and Blog Roll. A pattern is a starting
 point and nothing more: everything in it is ordinary blocks, and it is inserted
-unlocked.
+unlocked. Every pattern, and the blank start, comes with a **No Results** block
+that says so when the query finds nothing. The wizard's Load More and infinite
+scroll add an **End of List** block, which is shown once the last page is on
+screen.
 
 **Inspector.** The loop sorts its settings the way the core Query block sorts
 its own, in this order:
@@ -241,7 +252,8 @@ visual-portfolio/loop                      query, block id, layout wrapper
 │   └── loop-carousel-{previous,next,indicator,autoplay,thumbnails}
 ├── visual-portfolio/loop-no-results
 └── visual-portfolio/loop-pagination
-    └── loop-pagination-{previous,numbers,next} or loop-pagination-trigger
+    ├── loop-pagination-{previous,numbers,next} or loop-pagination-trigger
+    └── visual-portfolio/loop-pagination-end
 ```
 
 The five carousel controls declare the **loop** as their ancestor rather than
@@ -259,6 +271,12 @@ nothing — `get_loop_items()` memoizes per request.
 One trigger block covers both the button and the scroll: `loop-pagination-trigger`
 carries a `triggerType` of `load-more` or `infinite`, offered as two variations,
 and block transforms convert between it and the three paged children.
+
+`loop-pagination-end` holds the blocks shown at the end of the list. The server
+prints it on the last page of a gallery that has more than one, so paged
+navigation shows it there. Load More and infinite scroll never reload the page:
+when the page they fetched has no trigger, they put its copy of this block where
+the trigger was.
 
 Items are resolved once, by `Visual_Portfolio_Get::get_loop_items()`, which is
 the same query pipeline the legacy gallery uses. Every item block reads its data

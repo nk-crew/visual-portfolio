@@ -10,7 +10,8 @@
 		"visual-portfolio/loop-pagination-previous",
 		"visual-portfolio/loop-pagination-numbers",
 		"visual-portfolio/loop-pagination-next",
-		"visual-portfolio/loop-pagination-trigger"
+		"visual-portfolio/loop-pagination-trigger",
+		"visual-portfolio/loop-pagination-end"
 	],
 	"textdomain": "visual-portfolio",
 	"supports": {

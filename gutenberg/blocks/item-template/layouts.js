@@ -57,19 +57,24 @@ function getItems(list) {
  * theme override all reach the layout through the one place they are declared.
  *
  * @param {HTMLElement} list - item template list.
- * @return {{gap: number, columns: number, rowHeight: number, width: number}} metrics.
+ * @return {{gap: number, rowGap: number, columns: number, rowHeight: number, width: number}} metrics.
  */
 function getMetrics(list) {
 	const view = list.ownerDocument.defaultView || window;
 	const styles = view.getComputedStyle(list);
 	const width = list.clientWidth;
-	const gap = styles.columnGap.endsWith('%')
-		? (parseFloat(styles.columnGap) / 100) * width
-		: parseFloat(styles.columnGap);
+	const toPixels = (value) =>
+		value.endsWith('%')
+			? (parseFloat(value) / 100) * width
+			: parseFloat(value);
+	const gap = toPixels(styles.columnGap) || 0;
+	const rowGap = toPixels(styles.rowGap);
 
 	return {
 		width,
-		gap: gap || 0,
+		gap,
+		// A list that declares no gap between rows has the gap of its columns.
+		rowGap: Number.isNaN(rowGap) ? gap : rowGap,
 		columns: Math.max(
 			1,
 			parseInt(
@@ -108,7 +113,7 @@ function resetItem(item) {
  * @param {HTMLElement} list - item template list.
  */
 export function layoutMasonry(list) {
-	const { width, gap, columns } = getMetrics(list);
+	const { width, gap, rowGap, columns } = getMetrics(list);
 	const items = getItems(list);
 
 	if (!items.length || !width) {
@@ -128,10 +133,10 @@ export function layoutMasonry(list) {
 		item.style.left = `${shortest * (itemWidth + gap)}px`;
 		item.style.top = `${heights[shortest]}px`;
 
-		heights[shortest] += item.offsetHeight + gap;
+		heights[shortest] += item.offsetHeight + rowGap;
 	});
 
-	list.style.height = `${Math.max(...heights) - gap}px`;
+	list.style.height = `${Math.max(...heights) - rowGap}px`;
 }
 
 /**
@@ -159,7 +164,7 @@ function getItemRatio(item) {
  * @param {Object}      options - justified settings of the block.
  */
 export function layoutJustified(list, options) {
-	const { width, gap, rowHeight } = getMetrics(list);
+	const { width, gap, rowGap, rowHeight } = getMetrics(list);
 	const items = getItems(list);
 
 	if (!items.length || !width) {
@@ -247,7 +252,7 @@ export function layoutJustified(list, options) {
 			left += itemWidth + gap;
 		});
 
-		top += advance + gap;
+		top += advance + rowGap;
 	});
 
 	// Rows past the maximum are not rendered at all, the way the front end
@@ -272,7 +277,7 @@ export function layoutJustified(list, options) {
 		});
 	});
 
-	list.style.height = `${Math.max(0, top - gap)}px`;
+	list.style.height = `${Math.max(0, top - rowGap)}px`;
 }
 
 /**

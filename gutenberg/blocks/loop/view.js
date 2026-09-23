@@ -24,6 +24,7 @@ const LIST_SELECTOR = '.wp-block-visual-portfolio-item-template';
 const ITEM_SELECTOR = '.wp-block-visual-portfolio-item-template__item';
 const PAGINATION_SELECTOR = '.vp-block-loop-pagination';
 const TRIGGER_SELECTOR = '.vp-block-loop-pagination-trigger';
+const END_SELECTOR = '.vp-block-loop-pagination-end';
 const MASONRY_CLASS = 'vp-layout-masonry';
 
 // Written on the list once Masonry is positioning the items, and read by the
@@ -434,7 +435,19 @@ function advanceTrigger(trigger, nextLoop, loop) {
 		return;
 	}
 
-	// The fetched page has no trigger of its own: that was the last one.
+	// The fetched page has no trigger of its own: that was the last one. Its
+	// end of the list, when the gallery has one, takes the trigger's place. It
+	// has no behaviour of its own, so a copy inserted by hand is complete.
+	const end = nextLoop.querySelector(END_SELECTOR);
+
+	if (end) {
+		const copy = window.document.importNode(end, true);
+
+		trigger.replaceWith(copy);
+		registerUndo(loop, () => copy.replaceWith(trigger));
+		return;
+	}
+
 	const node = trigger.closest(PAGINATION_SELECTOR) || trigger;
 	const parent = node.parentNode;
 	const sibling = node.nextSibling;

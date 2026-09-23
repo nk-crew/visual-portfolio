@@ -10,6 +10,7 @@ import './blocks/loop-pagination-trigger';
 import './blocks/loop-pagination-next';
 import './blocks/loop-pagination-numbers';
 import './blocks/loop-pagination-previous';
+import './blocks/loop-pagination-end';
 import './blocks/loop-carousel-nav';
 import './blocks/loop-carousel-previous';
 import './blocks/loop-carousel-next';

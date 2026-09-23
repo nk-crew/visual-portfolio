@@ -34,6 +34,10 @@
 			"type": "string",
 			"default": "3|1,1|"
 		},
+		"verticalAlignment": {
+			"type": "string",
+			"enum": ["top", "center", "bottom"]
+		},
 		"justifiedRowHeight": {
 			"type": "number",
 			"default": 320
@@ -139,7 +143,7 @@
 		"spacing": {
 			"padding": true,
 			"margin": ["top", "bottom"],
-			"blockGap": ["horizontal"],
+			"blockGap": ["horizontal", "vertical"],
 			"__experimentalDefaultControls": {
 				"blockGap": true
 			}

@@ -24,6 +24,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<!-- wp:visual-portfolio/loop-carousel-next {"className":"is-style-filled"} /-->
 		<!-- /wp:visual-portfolio/loop-carousel-nav -->
 	<!-- /wp:visual-portfolio/item-template -->
+	<!-- wp:visual-portfolio/loop-no-results -->
+		<!-- wp:paragraph -->
+		<p><?php esc_html_e( 'No items were found matching your selection.', 'visual-portfolio' ); ?></p>
+		<!-- /wp:paragraph -->
+	<!-- /wp:visual-portfolio/loop-no-results -->
 	<!-- wp:visual-portfolio/loop-carousel-nav -->
 		<!-- wp:visual-portfolio/loop-carousel-indicator /-->
 	<!-- /wp:visual-portfolio/loop-carousel-nav -->
