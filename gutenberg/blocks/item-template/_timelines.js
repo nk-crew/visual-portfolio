@@ -13,8 +13,8 @@
  * at all: the native rules apply, and the numbers would go unread. Except
  * under RTL: Chromium measures an RTL list's view timelines from the wrong
  * end (a slide at rest reads -300% rather than 50%), so an RTL list is kept
- * here whatever the browser has, and its mark takes the animations off the
- * browser's timelines.
+ * here whatever the browser has. The stylesheet lays its effect out from the
+ * first frame and starts the animations with the mark.
  *
  * Shared by the page and the editor preview: `timelines.js` beside this file
  * runs it on the page, on the events the view module announces a carousel
@@ -178,41 +178,27 @@ function draw(list) {
 		);
 	});
 
-	if (!list.classList.contains(SCRIPTED_CLASS)) {
-		list.classList.add(SCRIPTED_CLASS);
-		restart(list);
-	}
+	list.classList.add(SCRIPTED_CLASS);
 }
 
 /**
- * Start the animations of a list over, once it is marked.
+ * Whether a list is RTL the way the stylesheet reads it.
  *
- * Under RTL the native rules have run the animations on the browser's
- * timelines before the mark, and an animation keeps the time its timeline
- * gave it when the rules hand it to the paused one. Started over, it is held
- * where the numbers say.
+ * By `:dir()`, which follows the `dir` attribute, and not by the computed
+ * `direction`: the stylesheet holds an RTL list's animations off until the
+ * mark, and a list it does not see as RTL keeps its native animations, which
+ * a mark could no longer take over.
  *
  * @param {HTMLElement} list - item template list.
+ * @return {boolean} True for an RTL list.
  */
-function restart(list) {
-	const boxes = new Set(
-		list
-			.getAnimations({ subtree: true })
-			.map((animation) => animation.effect?.target)
-	);
-
-	boxes.delete(undefined);
-	boxes.delete(null);
-	boxes.forEach((box) => {
-		box.style.animationName = 'none';
-	});
-
-	// One style pass with no animations, so the ones put back are new.
-	list.getBoundingClientRect();
-
-	boxes.forEach((box) => {
-		box.style.removeProperty('animation-name');
-	});
+function isRtl(list) {
+	try {
+		return list.matches(':dir(rtl)');
+	} catch {
+		// No `:dir()`, so no RTL rules in the stylesheet either.
+		return false;
+	}
 }
 
 /**
@@ -230,8 +216,7 @@ export function driveTimelines(list) {
 
 	if (
 		!list.classList.contains(EFFECT_CLASS) ||
-		(supportsTimelines(view) &&
-			'rtl' !== view.getComputedStyle(list).direction) ||
+		(supportsTimelines(view) && !isRtl(list)) ||
 		view.matchMedia('(prefers-reduced-motion: reduce)').matches
 	) {
 		return noop;

@@ -551,6 +551,18 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			scroll-timeline-axis: inline;
 		}
 
+		// An RTL list is laid out by the rules below and animated only once
+		// `timelines.js` has marked it: Chromium's timelines put its cards in
+		// the wrong place, and an animation started on them keeps the time
+		// they gave it when the scripted rules take it over.
+		&.vp-layout-carousel.vp-carousel-effect:dir(rtl):not(.vp-carousel-scripted) {
+			> #{$item},
+			#{$slide},
+			#{$card} {
+				animation-name: none;
+			}
+		}
+
 		// A visitor who asked for less motion is left the plain carousel, the
 		// way `timelines.js` leaves them one: stopped, an effect is its first
 		// frame, and a cover flow stopped is a pile of overlapping cards.

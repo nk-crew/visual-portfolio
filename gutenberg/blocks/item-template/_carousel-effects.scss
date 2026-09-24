@@ -9,8 +9,10 @@
 // so the two cannot drift. Pro describes its own effects the same way.
 //
 // Under RTL both apply: the native rules lay the effect out from the first
-// frame, and once the script has marked the list its rules, one class
-// heavier, take the animations off the browser's timelines.
+// frame, `style.scss` holds its animations off until the script has marked
+// the list, and the scripted rules, one class heavier, bind them to the
+// numbers - over the native moved-round rules too, which leave a marked list
+// alone.
 
 $item: ".wp-block-visual-portfolio-item-template__item";
 $slide: ".wp-block-visual-portfolio-item-template__slide";
@@ -162,7 +164,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		}
 
 		@if $native {
-			> #{$item}.vp-carousel-moved-round {
+			&:not(.vp-carousel-scripted) > #{$item}.vp-carousel-moved-round {
 				&,
 				#{$slide},
 				#{$card} {
@@ -199,7 +201,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		}
 
 		@if $native {
-			> #{$item}.vp-carousel-moved-round #{$card} {
+			&:not(.vp-carousel-scripted) > #{$item}.vp-carousel-moved-round #{$card} {
 				animation-range: var(--vp-carousel-copy-cover);
 				animation-timeline: --vp-carousel-scroll;
 			}
@@ -251,7 +253,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		}
 
 		@if $native {
-			> #{$item}.vp-carousel-moved-round {
+			&:not(.vp-carousel-scripted) > #{$item}.vp-carousel-moved-round {
 				&,
 				#{$card} {
 					animation-range: var(--vp-carousel-copy-cover);
