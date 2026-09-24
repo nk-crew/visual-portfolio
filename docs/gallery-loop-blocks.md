@@ -706,6 +706,11 @@ add_filter(
 Anything a source writes into legacy options and later needs for counting pages
 must also be registered through `vpf_allowed_max_pages_params`.
 
+The sources a loop offers to switch to pass through the `vpf.loopSources`
+JavaScript filter (the registered sources, and `{ value }` with the loop's
+current one), so a post type that works with one source alone can offer only
+it. A source left out stays registered, and a loop saved with it keeps it.
+
 Per-image fields in the gallery manager are added through the
 `VP.LoopImageSettings` slot. The formats its Format list offers come from the
 `vpf.loopImageFormats` filter (`{ label, value }`): the fields of a format are a

@@ -126,6 +126,36 @@ test.describe('Gallery Loop and Pro settings', () => {
 		).toHaveCount(0);
 	});
 
+	test('an extension can narrow the sources a loop offers', async ({
+		page,
+		editor,
+	}) => {
+		await page.evaluate(() =>
+			window.wp.hooks.addFilter(
+				'vpf.loopSources',
+				'e2e/only-images',
+				(sources) => sources.filter(({ name }) => 'images' === name)
+			)
+		);
+
+		await editor.setContent(getMarkup(images));
+
+		const [loop] = await editor.getBlocks({ full: true });
+
+		await page.evaluate(
+			(id) =>
+				window.wp.data.dispatch('core/block-editor').selectBlock(id),
+			loop.clientId
+		);
+
+		const picker = page.locator('.vpf-loop-source-picker').first();
+
+		await expect(
+			picker.locator('.vpf-loop-source-picker__item')
+		).toHaveCount(1);
+		await expect(picker).toContainText('Media');
+	});
+
 	test('the gallery manager offers a format an extension adds', async ({
 		page,
 		editor,

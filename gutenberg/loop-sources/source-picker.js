@@ -1,4 +1,5 @@
 import { Button } from '@wordpress/components';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames/dedupe';
 
@@ -18,7 +19,17 @@ const { pro: isProPlugin } = window.VPGutenbergVariables;
  * @return {Element} component.
  */
 export default function SourcePicker({ value, onChange }) {
-	const sources = useLoopSources();
+	/**
+	 * Filters the sources a loop may be switched to, such as images alone in
+	 * a post type that only works with them. Registered sources stay
+	 * registered: a loop saved with another one keeps it.
+	 *
+	 * @param {Array}  sources - registered sources.
+	 * @param {Object} args    - `{ value }`, the loop's current source.
+	 */
+	const sources = applyFilters('vpf.loopSources', useLoopSources(), {
+		value,
+	});
 
 	return (
 		<div className="vpf-loop-source-picker">
