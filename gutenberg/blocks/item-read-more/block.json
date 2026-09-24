@@ -20,7 +20,6 @@
 		"clickAction": {
 			"type": "string",
 			"default": "url",
-			"enum": ["none", "url", "popup"],
 			"role": "content"
 		},
 		"rel": {

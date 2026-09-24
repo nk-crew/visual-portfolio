@@ -50,13 +50,10 @@ class Visual_Portfolio_Block_Item_Title {
 	private function get_click_wrapper( $title, $attributes, $context ) {
 		// A title saved before the click action existed keeps meaning what its
 		// link toggle said - only an unset action falls back to it.
-		$action = $attributes['clickAction'] ?? ( empty( $attributes['isLink'] ) ? 'none' : 'url' );
+		list( $action, $extension ) = Visual_Portfolio_Popup::resolve_click_action( $attributes['clickAction'] ?? ( empty( $attributes['isLink'] ) ? 'none' : 'url' ), $context );
 
-		// An item the lightbox has nothing to show but that has an address of
-		// its own - an image with a link, a post without a picture - follows
-		// it, as the classic gallery does.
-		if ( 'popup' === $action && ! Visual_Portfolio_Popup::has_popup( $context ) ) {
-			$action = 'url';
+		if ( $extension ) {
+			return sprintf( '<a%1$s>%2$s</a>', Visual_Portfolio_Popup::get_attributes_html( $extension ), $title );
 		}
 
 		if ( 'url' === $action && ! empty( $context['vp/itemUrl'] ) ) {

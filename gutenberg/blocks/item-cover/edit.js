@@ -33,6 +33,7 @@ import classnames from 'classnames/dedupe';
  * Internal dependencies
  */
 import { getMissingTeasers } from '../../components/pro-teaser';
+import { getClickActions } from '../../utils/click-actions';
 import { AspectRatioTool, ScaleTool } from '../../utils/dimensions-tools';
 import {
 	useImageSizeOnInsert,
@@ -97,12 +98,6 @@ const SHOW_CONTENT_OPTIONS = [
 	{ label: __('On hover', 'visual-portfolio'), value: 'hover' },
 	{ label: __('Except on hover', 'visual-portfolio'), value: 'default' },
 	{ label: __('Always', 'visual-portfolio'), value: 'always' },
-];
-
-const CLICK_ACTION_OPTIONS = [
-	{ label: __('None', 'visual-portfolio'), value: 'none' },
-	{ label: __('Open the item', 'visual-portfolio'), value: 'url' },
-	{ label: __('Open the lightbox', 'visual-portfolio'), value: 'popup' },
 ];
 
 // The nine positions of core Cover, under the class names core gives them.
@@ -479,7 +474,7 @@ export default function ItemCoverEdit({
 										'visual-portfolio'
 									)}
 									value={clickAction}
-									options={CLICK_ACTION_OPTIONS}
+									options={getClickActions()}
 									onChange={(value) =>
 										setAttributes({ clickAction: value })
 									}

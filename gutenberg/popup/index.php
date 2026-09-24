@@ -139,6 +139,69 @@ class Visual_Portfolio_Popup {
 	}
 
 	/**
+	 * What a click on an item block does, with the link an extension renders
+	 * for an action of its own.
+	 *
+	 * An item the lightbox has nothing to show but that has an address of its
+	 * own - an image with a link, a post without a picture - follows it, as the
+	 * classic gallery does. So does an action nothing renders: one saved while
+	 * an extension that is gone was active.
+	 *
+	 * @param string $action  - saved click action.
+	 * @param array  $context - block context of the item block.
+	 *
+	 * @return array `[ action, attributes ]`, the attributes of the extension's
+	 *               link and the action `extension` when there is one.
+	 */
+	public static function resolve_click_action( $action, $context ) {
+		if ( 'popup' === $action && ! self::has_popup( $context ) ) {
+			return array( 'url', array() );
+		}
+
+		if ( in_array( $action, array( 'none', 'url', 'popup' ), true ) ) {
+			return array( $action, array() );
+		}
+
+		/**
+		 * Filters the link an item block renders for a click action an extension
+		 * added in the editor through `vpf.itemClickActions`.
+		 *
+		 * @param array  $attributes attribute name to value, unescaped; without an
+		 *                           `href` the item links to its own address.
+		 * @param string $action     click action.
+		 * @param array  $context    block context of the item block.
+		 */
+		$attributes = (array) apply_filters( 'vpf_loop_item_click_attributes', array(), $action, $context );
+
+		if ( empty( $attributes['href'] ) ) {
+			return array( 'url', array() );
+		}
+
+		return array( 'extension', $attributes );
+	}
+
+	/**
+	 * Attributes of a link, escaped and ready to print after the tag name.
+	 *
+	 * @param array $attributes - attribute name to value.
+	 *
+	 * @return string
+	 */
+	public static function get_attributes_html( $attributes ) {
+		$html = '';
+
+		foreach ( $attributes as $name => $value ) {
+			$html .= sprintf(
+				' %1$s="%2$s"',
+				esc_attr( $name ),
+				'href' === $name ? esc_url( $value ) : esc_attr( $value )
+			);
+		}
+
+		return $html;
+	}
+
+	/**
 	 * Whether an item has something for the lightbox to show.
 	 *
 	 * @param array $context - block context of the item block.

@@ -18,7 +18,6 @@
 		},
 		"clickAction": {
 			"type": "string",
-			"enum": ["none", "url", "popup"],
 			"role": "content"
 		},
 		"isLink": {

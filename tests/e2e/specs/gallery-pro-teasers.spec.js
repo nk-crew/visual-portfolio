@@ -169,5 +169,13 @@ test.describe('Gallery Loop and Pro settings', () => {
 		await expect(
 			settings.getByText('Draw the content below the picture')
 		).toBeVisible();
+
+		// Quick View is a click action of Pro's, offered and not chosen.
+		const quickView = settings
+			.getByRole('combobox', { name: 'On click' })
+			.locator('option', { hasText: 'Quick View (Pro)' });
+
+		await expect(quickView).toHaveCount(1);
+		await expect(quickView).toBeDisabled();
 	});
 });

@@ -15,16 +15,11 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
+import { getClickActions } from '../../utils/click-actions';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
-
-const CLICK_ACTION_OPTIONS = [
-	{ label: __('None', 'visual-portfolio'), value: 'none' },
-	{ label: __('Open the item', 'visual-portfolio'), value: 'url' },
-	{ label: __('Open the lightbox', 'visual-portfolio'), value: 'popup' },
-];
 
 export default function ItemReadMoreEdit({
 	attributes: { text, showArrow, clickAction, rel, linkTarget },
@@ -82,7 +77,7 @@ export default function ItemReadMoreEdit({
 							<SelectControl
 								label={__('On click', 'visual-portfolio')}
 								value={clickAction}
-								options={CLICK_ACTION_OPTIONS}
+								options={getClickActions()}
 								onChange={(value) =>
 									setAttributes({ clickAction: value })
 								}

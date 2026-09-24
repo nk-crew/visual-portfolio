@@ -174,17 +174,18 @@ class Visual_Portfolio_Block_Item_Cover {
 	 * @return string
 	 */
 	private function get_trigger( $attributes, $context ) {
-		$action = $attributes['clickAction'] ?? 'none';
-
-		// An item the lightbox has nothing to show but that has an address of
-		// its own - an image with a link, a post without a picture - follows
-		// it, as the classic gallery does.
-		if ( 'popup' === $action && ! Visual_Portfolio_Popup::has_popup( $context ) ) {
-			$action = 'url';
-		}
+		list( $action, $extension ) = Visual_Portfolio_Popup::resolve_click_action( $attributes['clickAction'] ?? 'none', $context );
 
 		// The anchor has no text of its own, so the label is not optional.
 		$aria_label = $context['vp/itemAriaLabel'] ?? '';
+
+		if ( $extension ) {
+			return sprintf(
+				'<a class="wp-block-visual-portfolio-item-cover__link"%1$s aria-label="%2$s"></a>',
+				Visual_Portfolio_Popup::get_attributes_html( $extension ),
+				esc_attr( $aria_label )
+			);
+		}
 
 		if ( 'url' === $action && ! empty( $context['vp/itemUrl'] ) ) {
 			return sprintf(

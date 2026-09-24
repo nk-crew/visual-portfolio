@@ -19,17 +19,12 @@ import {
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import { getClickActions } from '../../utils/click-actions';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
-
-const CLICK_ACTION_OPTIONS = [
-	{ label: __('None', 'visual-portfolio'), value: 'none' },
-	{ label: __('Open the item', 'visual-portfolio'), value: 'url' },
-	{ label: __('Open the lightbox', 'visual-portfolio'), value: 'popup' },
-];
 
 export default function ItemTitleEdit({
 	attributes,
@@ -102,7 +97,7 @@ export default function ItemTitleEdit({
 								<SelectControl
 									label={__('On click', 'visual-portfolio')}
 									value={clickAction}
-									options={CLICK_ACTION_OPTIONS}
+									options={getClickActions()}
 									onChange={(value) =>
 										setAttributes({ clickAction: value })
 									}
