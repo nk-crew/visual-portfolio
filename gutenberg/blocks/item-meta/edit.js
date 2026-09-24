@@ -21,7 +21,7 @@ import {
 /**
  * Internal dependencies
  */
-import { getMetaText, META_TYPES } from './meta-types';
+import { getMetaTypes } from './meta-types';
 
 export default function ItemMetaEdit({
 	attributes: { metaType, showIcon, showZero, prefix, suffix, isLink },
@@ -33,7 +33,8 @@ export default function ItemMetaEdit({
 	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 
-	const meta = META_TYPES[metaType] || META_TYPES.comments;
+	const metaTypes = getMetaTypes();
+	const meta = metaTypes[metaType] || metaTypes.comments;
 	const value = context[meta.contextKey];
 
 	// An item without the value still needs something to lay out against, and
@@ -47,7 +48,7 @@ export default function ItemMetaEdit({
 			{showIcon && <Icon aria-hidden="true" focusable="false" />}
 			<span>
 				{prefix}
-				{getMetaText(metaType, previewValue)}
+				{meta.getText(previewValue)}
 				{suffix}
 			</span>
 		</>

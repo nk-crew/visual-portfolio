@@ -14,17 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Visual_Portfolio_Block_Item_Meta {
 	/**
-	 * Context key every meta type reads its value from.
-	 *
-	 * @var array
-	 */
-	const VALUE_CONTEXT = array(
-		'comments'     => 'vp/itemCommentsCount',
-		'views'        => 'vp/itemViewsCount',
-		'reading-time' => 'vp/itemReadingTime',
-	);
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -38,10 +27,65 @@ class Visual_Portfolio_Block_Item_Meta {
 		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-item-meta', 'build/gutenberg/blocks/item-meta/style' );
 		wp_style_add_data( 'visual-portfolio-block-item-meta', 'rtl', 'replace' );
 
+		$uses_context = array( 'vp/itemCommentsUrl' );
+
+		foreach ( self::get_meta_types() as $meta_type ) {
+			$uses_context[] = $meta_type['context'];
+		}
+
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/item-meta',
 			array(
 				'render_callback' => array( $this, 'block_render' ),
+
+				// The editor hands a block only the context it names, so the key
+				// of a type an extension adds has to be named here as well.
+				'uses_context'    => array_values( array_unique( $uses_context ) ),
+			)
+		);
+	}
+
+	/**
+	 * The meta types this install offers.
+	 *
+	 * @return array type name => array( 'context', 'text', 'icon' ).
+	 */
+	public static function get_meta_types() {
+		$icons = visual_portfolio()->plugin_path . 'gutenberg/block-icons/item-meta-';
+
+		/**
+		 * Filters the meta types of the item meta block.
+		 *
+		 * A type is keyed by its name, the value of the `metaType` attribute,
+		 * and gives:
+		 *
+		 * - `context` - the context key the item carries the value in.
+		 * - `text`    - callable( $value, $attributes ) returning the unescaped
+		 *               phrase the value reads as.
+		 * - `icon`    - path to the SVG file of its mark.
+		 *
+		 * A block saved with a type the list lacks renders nothing.
+		 *
+		 * @param array $types meta types.
+		 */
+		return (array) apply_filters(
+			'vpf_item_meta_types',
+			array(
+				'comments'     => array(
+					'context' => 'vp/itemCommentsCount',
+					'text'    => array( __CLASS__, 'get_comments_text' ),
+					'icon'    => $icons . 'comments.svg',
+				),
+				'views'        => array(
+					'context' => 'vp/itemViewsCount',
+					'text'    => array( __CLASS__, 'get_views_text' ),
+					'icon'    => $icons . 'views.svg',
+				),
+				'reading-time' => array(
+					'context' => 'vp/itemReadingTime',
+					'text'    => array( __CLASS__, 'get_reading_time_text' ),
+					'icon'    => $icons . 'reading-time.svg',
+				),
 			)
 		);
 	}
@@ -66,34 +110,13 @@ class Visual_Portfolio_Block_Item_Meta {
 	}
 
 	/**
-	 * The phrase a meta value reads as.
+	 * The phrase a number of comments reads as.
 	 *
-	 * @param string $meta_type - meta type of the block.
-	 * @param mixed  $value - raw context value.
+	 * @param mixed $value - raw context value.
 	 *
 	 * @return string unescaped text.
 	 */
-	private static function get_text( $meta_type, $value ) {
-		if ( 'views' === $meta_type ) {
-			return sprintf(
-				// translators: %s number of views.
-				_n( '%s View', '%s Views', (int) $value, 'visual-portfolio' ),
-				number_format_i18n( (int) $value )
-			);
-		}
-
-		if ( 'reading-time' === $meta_type ) {
-			// `Visual_Portfolio_Custom_Post_Meta::get_reading_time()` answers with
-			// the string `< 1` for anything shorter than a minute.
-			$is_text = ! is_numeric( $value );
-
-			return sprintf(
-				// translators: %s reading time in minutes.
-				_n( '%s Min Read', '%s Mins Read', $is_text ? 1 : (int) $value, 'visual-portfolio' ),
-				$is_text ? (string) $value : number_format_i18n( (int) $value )
-			);
-		}
-
+	public static function get_comments_text( $value ) {
 		if ( ! (int) $value ) {
 			return __( 'No Comments', 'visual-portfolio' );
 		}
@@ -106,24 +129,56 @@ class Visual_Portfolio_Block_Item_Meta {
 	}
 
 	/**
+	 * The phrase a number of views reads as.
+	 *
+	 * @param mixed $value - raw context value.
+	 *
+	 * @return string unescaped text.
+	 */
+	public static function get_views_text( $value ) {
+		return sprintf(
+			// translators: %s number of views.
+			_n( '%s View', '%s Views', (int) $value, 'visual-portfolio' ),
+			number_format_i18n( (int) $value )
+		);
+	}
+
+	/**
+	 * The phrase a reading time reads as.
+	 *
+	 * @param mixed $value - raw context value.
+	 *
+	 * @return string unescaped text.
+	 */
+	public static function get_reading_time_text( $value ) {
+		// `Visual_Portfolio_Custom_Post_Meta::get_reading_time()` answers with
+		// the string `< 1` for anything shorter than a minute.
+		$is_text = ! is_numeric( $value );
+
+		return sprintf(
+			// translators: %s reading time in minutes.
+			_n( '%s Min Read', '%s Mins Read', $is_text ? 1 : (int) $value, 'visual-portfolio' ),
+			$is_text ? (string) $value : number_format_i18n( (int) $value )
+		);
+	}
+
+	/**
 	 * The icon of a meta type.
 	 *
 	 * The same file the editor imports, so the mark is identical on both sides
-	 * of the editor boundary. It ships with the plugin, and is read once per
-	 * request rather than once per item.
+	 * of the editor boundary. It ships with the plugin that adds the type, and
+	 * is read once per request rather than once per item.
 	 *
-	 * @param string $meta_type - meta type of the block.
+	 * @param string $path - path to the SVG file.
 	 *
 	 * @return string
 	 */
-	private static function get_icon( $meta_type ) {
+	private static function get_icon( $path ) {
 		static $cache = array();
 
-		if ( isset( $cache[ $meta_type ] ) ) {
-			return $cache[ $meta_type ];
+		if ( isset( $cache[ $path ] ) ) {
+			return $cache[ $path ];
 		}
-
-		$path = visual_portfolio()->plugin_path . 'gutenberg/block-icons/item-meta-' . $meta_type . '.svg';
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$icon = is_readable( $path ) ? (string) file_get_contents( $path ) : '';
@@ -142,7 +197,7 @@ class Visual_Portfolio_Block_Item_Meta {
 			}
 		}
 
-		$cache[ $meta_type ] = $icon;
+		$cache[ $path ] = $icon;
 
 		return $icon;
 	}
@@ -158,22 +213,24 @@ class Visual_Portfolio_Block_Item_Meta {
 	 */
 	public function block_render( $attributes, $content, $block ) {
 		$meta_type = isset( $attributes['metaType'] ) ? (string) $attributes['metaType'] : 'comments';
+		$types     = self::get_meta_types();
 
-		if ( ! isset( self::VALUE_CONTEXT[ $meta_type ] ) ) {
+		if ( ! isset( $types[ $meta_type ] ) ) {
 			return '';
 		}
 
-		$value = $block->context[ self::VALUE_CONTEXT[ $meta_type ] ] ?? '';
+		$type  = $types[ $meta_type ];
+		$value = $block->context[ $type['context'] ] ?? '';
 
 		if ( self::is_empty_value( $value ) && empty( $attributes['showZero'] ) ) {
 			return '';
 		}
 
 		$text = esc_html( $attributes['prefix'] ?? '' ) .
-			esc_html( self::get_text( $meta_type, $value ) ) .
+			esc_html( call_user_func( $type['text'], $value, $attributes ) ) .
 			esc_html( $attributes['suffix'] ?? '' );
 
-		$icon = empty( $attributes['showIcon'] ) ? '' : self::get_icon( $meta_type );
+		$icon = empty( $attributes['showIcon'] ) ? '' : self::get_icon( $type['icon'] );
 
 		$inner = $icon . '<span>' . $text . '</span>';
 		$url   = 'comments' === $meta_type ? ( $block->context['vp/itemCommentsUrl'] ?? '' ) : '';

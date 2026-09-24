@@ -45,7 +45,9 @@
  *   block and reaches PHP untouched (`vpf_image_item_args` reads the same
  *   object). Keys the free plugin owns: `id`, `imgUrl`, `imgThumbnailUrl`,
  *   `title`, `description`, `categories`, `format`, `video_url`, `url`,
- *   `author`, `author_url`, `focalPoint`.
+ *   `author`, `author_url`, `focalPoint`. The fields of a format added through
+ *   the `vpf.loopImageFormats` filter are a fill that renders only while
+ *   `image.format` is that format.
  * - `index` - position of the image in the gallery.
  * - `updateImage( values )` - shallow-merges `values` into that image.
  * - `clientId` - client id of the loop block.
