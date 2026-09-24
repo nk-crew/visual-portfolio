@@ -12,6 +12,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
 /**
  * External dependencies
  */
@@ -19,10 +20,42 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { ProTeaserPanel } from '../../components/pro-teaser';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
+
+// The infinite scroll settings Pro adds, for an install without them.
+const INFINITE_TEASERS = [
+	{
+		name: 'startupLoadMore',
+		label: __('Load More on startup', 'visual-portfolio'),
+		line: __(
+			'Load the next page as soon as the gallery is shown.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_infinite_startup',
+	},
+	{
+		name: 'everyPage',
+		label: __('Pause every', 'visual-portfolio'),
+		line: __(
+			'Stop after a few pages and wait for a click.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_infinite_pause',
+	},
+	{
+		name: 'threshold',
+		label: __('Threshold Distance', 'visual-portfolio'),
+		line: __(
+			'How far from the end of the gallery the next page starts to load.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_infinite_threshold',
+	},
+];
 
 export default function Edit({ attributes, setAttributes }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -69,6 +102,12 @@ export default function Edit({ attributes, setAttributes }) {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
+			{isInfinite && (
+				<ProTeaserPanel
+					label={__('Infinite Scroll', 'visual-portfolio')}
+					items={INFINITE_TEASERS}
+				/>
+			)}
 
 			<a
 				href="#pagination-trigger-pseudo-link"

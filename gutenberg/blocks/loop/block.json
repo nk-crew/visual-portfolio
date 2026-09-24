@@ -74,6 +74,10 @@
 		"previewLayout": {
 			"type": "string",
 			"default": "default"
+		},
+		"extensions": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"viewScriptModule": "visual-portfolio-block-loop-view",

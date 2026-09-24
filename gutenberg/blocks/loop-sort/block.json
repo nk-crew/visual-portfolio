@@ -31,6 +31,10 @@
 		"displayAsDropdown": {
 			"type": "boolean",
 			"default": true
+		},
+		"extensions": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"supports": {

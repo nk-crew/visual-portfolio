@@ -16,6 +16,9 @@
 		"vp/imagesQuery",
 		"vp/sourceQuery"
 	],
+	"attributes": {
+		"extensions": { "type": "object", "default": {} }
+	},
 	"supports": {
 		"html": false,
 		"reusable": false,

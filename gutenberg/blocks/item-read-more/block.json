@@ -32,6 +32,10 @@
 			"type": "string",
 			"default": "_self",
 			"role": "content"
+		},
+		"extensions": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"styles": [

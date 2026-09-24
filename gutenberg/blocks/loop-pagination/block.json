@@ -59,7 +59,8 @@
 	"styles": [{ "name": "fill", "label": "Fill" }],
 	"attributes": {
 		"showLabel": { "type": "boolean", "default": true },
-		"showArrow": { "type": "boolean", "default": true }
+		"showArrow": { "type": "boolean", "default": true },
+		"extensions": { "type": "object", "default": {} }
 	},
 	"style": "visual-portfolio-block-loop-pagination"
 }

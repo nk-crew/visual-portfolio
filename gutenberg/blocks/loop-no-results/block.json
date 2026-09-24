@@ -16,6 +16,9 @@
 		"vp/sourceQuery",
 		"vp/blockId"
 	],
+	"attributes": {
+		"extensions": { "type": "object", "default": {} }
+	},
 	"supports": {
 		"html": false,
 		"reusable": false,

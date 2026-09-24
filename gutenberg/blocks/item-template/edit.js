@@ -49,6 +49,7 @@ import ProNote from '../../components/pro-note';
 /**
  * Internal dependencies
  */
+import { ProLine } from '../../components/pro-teaser';
 import getBlockGapValue from '../../utils/block-gap';
 import { CONTROL_BLOCKS } from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
@@ -62,7 +63,9 @@ import {
 	effectPeeks,
 	effectRepeats,
 	effectTakesColumns,
-	getEffectOptions,
+	getEffectSelectOptions,
+	hasEffectTeasers,
+	isDrawnEffect,
 } from './effects';
 import { getTileStyles, getTilesColumns } from './tiles';
 import { TilesPresetsSelect, TilesPresetsToolbarButton } from './tiles-presets';
@@ -961,7 +964,7 @@ export default function BlockEdit({
 				classes.push('vp-carousel-stretch-slides');
 			}
 
-			if ('none' !== carouselEffect) {
+			if (isDrawnEffect(carouselEffect)) {
 				classes.push('vp-carousel-effect');
 				classes.push(`vp-carousel-${carouselEffect}`);
 			}
@@ -982,7 +985,8 @@ export default function BlockEdit({
 
 	// A carousel effect is drawn on two boxes inside the item, and only a
 	// carousel has them.
-	const slideEffect = 'carousel' === layoutType && 'none' !== carouselEffect;
+	const slideEffect =
+		'carousel' === layoutType && isDrawnEffect(carouselEffect);
 
 	// Justified and masonry are measured by a library on both sides.
 	const listRef = useEditorLayout({
@@ -1389,12 +1393,23 @@ export default function BlockEdit({
 			>
 				<SelectControl
 					label={__('Effect', 'visual-portfolio')}
-					help={__(
-						'How one slide gives way to the next.',
-						'visual-portfolio'
-					)}
+					help={
+						hasEffectTeasers() ? (
+							<ProLine campaign="teaser_carousel_effects">
+								{__(
+									'How one slide gives way to the next. Ten more effects come with Pro.',
+									'visual-portfolio'
+								)}
+							</ProLine>
+						) : (
+							__(
+								'How one slide gives way to the next.',
+								'visual-portfolio'
+							)
+						)
+					}
 					value={carouselEffect}
-					options={getEffectOptions()}
+					options={getEffectSelectOptions()}
 					onChange={(value) =>
 						setAttributes({ carouselEffect: value })
 					}

@@ -71,6 +71,7 @@
 		"filter": { "type": "string", "default": "*" },
 		"taxonomyId": { "type": "number", "default": 0 },
 		"count": { "type": "number", "default": 0 },
-		"style": { "type": "object" }
+		"style": { "type": "object" },
+		"extensions": { "type": "object", "default": {} }
 	}
 }

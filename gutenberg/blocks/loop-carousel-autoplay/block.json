@@ -19,7 +19,8 @@
 			"default": "play-pause",
 			"enum": ["play-pause", "play-stop"]
 		},
-		"showOnHover": { "type": "boolean", "default": false }
+		"showOnHover": { "type": "boolean", "default": false },
+		"extensions": { "type": "object", "default": {} }
 	},
 	"supports": {
 		"html": false,

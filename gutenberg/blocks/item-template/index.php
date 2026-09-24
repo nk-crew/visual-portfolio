@@ -246,7 +246,7 @@ class Visual_Portfolio_Block_Item_Template {
 			$asset['version']
 		);
 
-		$block_type = register_block_type_from_metadata(
+		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/item-template',
 			array(
 				'render_callback'   => array( $this, 'block_render' ),
@@ -256,13 +256,6 @@ class Visual_Portfolio_Block_Item_Template {
 				'skip_inner_blocks' => true,
 			)
 		);
-
-		// The metadata lists the effects the free plugin draws, and an
-		// attribute outside the list is dropped before the render callback ever
-		// sees it. An install that adds one has to be able to keep it.
-		if ( $block_type instanceof WP_Block_Type && isset( $block_type->attributes['carouselEffect'] ) ) {
-			$block_type->attributes['carouselEffect']['enum'] = array_merge( array( 'none' ), array_keys( self::get_carousel_effects() ) );
-		}
 	}
 
 	/**

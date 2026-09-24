@@ -17,6 +17,10 @@
 		"limit": {
 			"type": "number",
 			"default": 0
+		},
+		"extensions": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"example": {

@@ -22,6 +22,14 @@
 			"type": "number",
 			"default": 3
 		},
+		"layoutColumnCountTablet": {
+			"type": "number",
+			"default": 0
+		},
+		"layoutColumnCountMobile": {
+			"type": "number",
+			"default": 0
+		},
 		"layoutMinimumColumnWidth": {
 			"type": "string",
 			"default": "16rem"
@@ -33,6 +41,14 @@
 		"layoutTiles": {
 			"type": "string",
 			"default": "3|1,1|"
+		},
+		"layoutTilesTablet": {
+			"type": "string",
+			"default": ""
+		},
+		"layoutTilesMobile": {
+			"type": "string",
+			"default": ""
 		},
 		"verticalAlignment": {
 			"type": "string",
@@ -70,8 +86,7 @@
 		},
 		"carouselEffect": {
 			"type": "string",
-			"default": "none",
-			"enum": ["none", "coverflow", "slideshow", "fade"]
+			"default": "none"
 		},
 		"carouselRepeat": {
 			"type": "boolean",
@@ -113,6 +128,10 @@
 		"carouselSlidesPerGroup": {
 			"type": "number",
 			"default": 1
+		},
+		"extensions": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"supports": {

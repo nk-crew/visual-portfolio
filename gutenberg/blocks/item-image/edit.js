@@ -28,6 +28,7 @@ import { crop, fullscreen, link, linkOff } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { ProTeaserPanel } from '../../components/pro-teaser';
 import { ALLOWED_MEDIA_TYPES } from '../../loop-sources/gallery-manager/prepare-images';
 import { DimensionsTool } from '../../utils/dimensions-tools';
 import {
@@ -47,6 +48,19 @@ import {
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
 import { getGalleryImageId, useGalleryImage } from './gallery-image';
+
+// The watermark Pro puts on a picture, for an install without it.
+const WATERMARK_TEASERS = [
+	{
+		name: 'watermark',
+		label: __('Watermark', 'visual-portfolio'),
+		line: __(
+			'Serve the watermarked copy of the picture instead of the original one.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_watermark',
+	},
+];
 
 const CLICK_ACTION_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
@@ -441,6 +455,10 @@ export default function ItemImageEdit({
 							)}
 						</ToolsPanel>
 					</InspectorControls>
+					<ProTeaserPanel
+						label={__('Protection', 'visual-portfolio')}
+						items={WATERMARK_TEASERS}
+					/>
 				</>
 			)}
 			<figure {...blockProps}>

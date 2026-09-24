@@ -4,6 +4,11 @@
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { getProLabel } from '../../components/pro-teaser';
+
 // `columns: false` says the effect spreads one slide over the width of the
 // gallery and owns that width, so the columns control is not offered beside it.
 // `peek: false` says it lays the slides out itself, so no edge is left for the
@@ -26,6 +31,21 @@ const EFFECT_OPTIONS = [
 		columns: false,
 		peek: false,
 	},
+];
+
+// The effects Pro adds, named here so that a gallery saved with one keeps it
+// in an install without Pro, and so that the list can say what there is.
+const PRO_EFFECTS = [
+	{ label: __('Cards', 'visual-portfolio'), value: 'cards' },
+	{ label: __('Flipbook', 'visual-portfolio'), value: 'flipbook' },
+	{ label: __('Cover', 'visual-portfolio'), value: 'cover' },
+	{ label: __('Reveal', 'visual-portfolio'), value: 'reveal' },
+	{ label: __('Warp', 'visual-portfolio'), value: 'warp' },
+	{ label: __('Drop', 'visual-portfolio'), value: 'drop' },
+	{ label: __('Stack', 'visual-portfolio'), value: 'stack' },
+	{ label: __('Panorama', 'visual-portfolio'), value: 'panorama' },
+	{ label: __('Panorama out', 'visual-portfolio'), value: 'panorama-out' },
+	{ label: __('Zoom', 'visual-portfolio'), value: 'zoom' },
 ];
 
 /**
@@ -82,4 +102,49 @@ export function effectPeeks(effect) {
 	const option = getEffectOptions().find((item) => item.value === effect);
 
 	return !option || false !== option.peek;
+}
+
+/**
+ * The options of the Effect list: the effects this install offers, then a
+ * disabled one for each Pro effect it lacks.
+ *
+ * @return {Array} select options.
+ */
+export function getEffectSelectOptions() {
+	const options = getEffectOptions();
+
+	return [
+		...options,
+		...PRO_EFFECTS.filter(
+			({ value }) => !options.some((option) => option.value === value)
+		).map(({ label, value }) => ({
+			label: getProLabel(label),
+			value,
+			disabled: true,
+		})),
+	];
+}
+
+/**
+ * Whether the gallery is drawn with an effect: one this install has. A Pro
+ * effect saved without Pro is a plain carousel, the way the page draws it.
+ *
+ * @param {string} effect - selected effect.
+ *
+ * @return {boolean} True when the effect is drawn.
+ */
+export function isDrawnEffect(effect) {
+	return (
+		'none' !== effect &&
+		getEffectOptions().some((option) => option.value === effect)
+	);
+}
+
+/**
+ * Whether the Effect list holds effects this install lacks.
+ *
+ * @return {boolean} True when some Pro effect is missing.
+ */
+export function hasEffectTeasers() {
+	return getEffectSelectOptions().some((option) => option.disabled);
 }

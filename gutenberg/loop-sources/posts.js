@@ -13,6 +13,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
+import { getMissingTeasers } from '../components/pro-teaser';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
@@ -20,6 +21,43 @@ import {
 import { PostsIcon } from './icons';
 import { registerLoopSource } from './registry';
 import useEntitySearch from './use-entity-search';
+
+// The filters Pro adds to a posts query, for an install without them.
+const PRO_FILTERS = [
+	{
+		name: 'authors',
+		label: __('Authors', 'visual-portfolio'),
+		line: __(
+			'Only posts written by the authors you list.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_filter_authors',
+	},
+	{
+		name: 'date',
+		label: __('Date', 'visual-portfolio'),
+		line: __('Only posts published between two dates.', 'visual-portfolio'),
+		campaign: 'teaser_filter_date',
+	},
+	{
+		name: 'exclude-no-thumb',
+		label: __('Thumbnail', 'visual-portfolio'),
+		line: __(
+			'Keep out the posts that have no featured image to show.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_filter_thumbnail',
+	},
+	{
+		name: 'sticky',
+		label: __('Sticky posts', 'visual-portfolio'),
+		line: __(
+			'Sticky posts always appear first, regardless of their publish date.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_filter_sticky',
+	},
+];
 
 // Sources that describe how to build the query rather than which post type to
 // query, so most of the panel does not apply to them.
@@ -462,6 +500,7 @@ function PostsFiltersPanel(props) {
 	// through this; its `resetAllFilter` is what "Reset all" writes back for it,
 	// in the same `postsQuery` the built-in filters live in.
 	const extraItems = applyFilters('vpf.loopPostsFilterItems', [], props);
+	const teasers = getMissingTeasers(extraItems, PRO_FILTERS);
 
 	return (
 		<ToolsPanel
@@ -477,7 +516,7 @@ function PostsFiltersPanel(props) {
 				)
 			}
 		>
-			{extraItems.map(({ name, Item }) => (
+			{[...extraItems, ...teasers].map(({ name, Item }) => (
 				<Item key={name} {...props} />
 			))}
 
