@@ -1049,6 +1049,56 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(page.locator(NEXT_ARROW)).toBeDisabled();
 	});
 
+	test('an RTL carousel asked to repeat runs as a plain one', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.addInitScript(() => {
+			document.addEventListener('readystatechange', () => {
+				document.documentElement.dir = 'rtl';
+			});
+		});
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - repeat under RTL',
+			blockId: 'e2e-repeat-rtl',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 1,
+				carouselRepeat: true,
+			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+
+		// The library carries its loop in LTR scroll positions only, so the
+		// module leaves it out: the carousel rests on its first slide, and
+		// the arrow steps to the next.
+		await expect(list).toHaveClass(/vp-has-script/);
+		await expect(list).not.toHaveAttribute('data-vp-carousel-repeat');
+
+		await page.locator(NEXT_ARROW).click();
+
+		// The second slide rests against the right edge, where the first did.
+		await expect
+			.poll(() =>
+				list.evaluate((node) => {
+					const second = node.querySelectorAll(
+						'.wp-block-visual-portfolio-item-template__item'
+					)[1];
+
+					return Math.round(
+						node.getBoundingClientRect().right -
+							second.getBoundingClientRect().right
+					);
+				})
+			)
+			.toBe(0);
+	});
+
 	test('the loop is taken up where a narrower screen no longer fits the slides', async ({
 		page,
 		requestUtils,
@@ -1199,6 +1249,61 @@ test.describe('Gallery Item Template layouts', () => {
 		// And the carousel moved by its arrow lights the thumbnail it lands on.
 		await page.locator(NEXT_ARROW).click();
 		await expect.poll(current, { timeout: 10000 }).toBe(4);
+	});
+
+	test('an RTL carousel keeps the thumbnail of its slide in the middle of the strip', async ({
+		page,
+		requestUtils,
+	}) => {
+		// Narrow enough for the strip to overflow, so it has to scroll.
+		await page.setViewportSize({ width: 360, height: 800 });
+		await page.addInitScript(() => {
+			document.addEventListener('readystatechange', () => {
+				document.documentElement.dir = 'rtl';
+			});
+		});
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - thumbnails under RTL',
+			blockId: 'e2e-thumbnails-rtl',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 1,
+			},
+			carousel: ['loop-carousel-next', 'loop-carousel-thumbnails'],
+		});
+
+		const thumbs = page.locator('.vp-block-loop-carousel-thumb');
+		// How far the current thumbnail's middle is from the strip's.
+		const offCentre = () =>
+			thumbs.evaluateAll((nodes) => {
+				const thumb = nodes.find(
+					(node) => 'true' === node.getAttribute('aria-current')
+				);
+				const strip = thumb.parentElement.getBoundingClientRect();
+				const box = thumb.getBoundingClientRect();
+
+				return Math.round(
+					box.left + box.width / 2 - (strip.left + strip.width / 2)
+				);
+			});
+
+		await page.locator(NEXT_ARROW).click();
+		await page.locator(NEXT_ARROW).click();
+		await page.locator(NEXT_ARROW).click();
+
+		await expect
+			.poll(() =>
+				thumbs.evaluateAll((nodes) =>
+					nodes.findIndex(
+						(node) => 'true' === node.getAttribute('aria-current')
+					)
+				)
+			)
+			.toBe(3);
+		await expect.poll(offCentre).toBe(0);
 	});
 
 	test('the progress bar can be dragged and steered by the keyboard', async ({

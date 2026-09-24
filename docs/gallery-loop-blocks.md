@@ -513,7 +513,9 @@ slides all fit the frame, which has nothing to run round. The first is settled
 on the server. The second is the frame's to say. Three slides fit three columns
 on a desktop and overflow the one column of a phone, so the module counts the
 slides against the columns, and counts again whenever the columns change,
-starting the carousel over as a loop or as a plain one.
+starting the carousel over as a loop or as a plain one. An RTL carousel runs as
+a plain one as well: the carousel library carries its loop in the scroll
+positions of LTR only.
 
 `peek` says whether the effect leaves an edge for a slide of the next one to
 show at, and is `true` unless the effect says otherwise. An effect that lays
