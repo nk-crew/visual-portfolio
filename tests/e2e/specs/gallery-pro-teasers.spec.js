@@ -42,6 +42,7 @@ function getMarkup(images) {
 		'<!-- wp:visual-portfolio/item-title /-->',
 		'<!-- /wp:visual-portfolio/item-cover -->',
 		'<!-- wp:visual-portfolio/item-meta {"metaType":"album-count"} /-->',
+		'<!-- wp:visual-portfolio/item-meta {"metaType":"constructor"} /-->',
 		'<!-- /wp:visual-portfolio/item-template -->',
 		'<!-- wp:visual-portfolio/loop-pagination -->',
 		'<!-- wp:visual-portfolio/loop-pagination-trigger {"triggerType":"infinite","extensions":{"threshold":300}} /-->',
@@ -101,6 +102,14 @@ test.describe('Gallery Loop and Pro settings', () => {
 		);
 
 		await editor.setContent(getMarkup(images));
+
+		// A name every object inherits is no type either.
+		await expect(
+			editor.canvas
+				.getByText('Unavailable meta: constructor')
+				.filter({ visible: true })
+				.first()
+		).toBeVisible();
 
 		// Not as comments, which the page would not print either.
 		await expect(

@@ -34,7 +34,10 @@ export default function ItemMetaEdit({
 	const blockEditingMode = useBlockEditingMode();
 
 	const metaTypes = getMetaTypes();
-	const meta = metaTypes[metaType];
+	// Own names only: an attribute such as `constructor` is a string too.
+	const meta = Object.hasOwn(metaTypes, metaType)
+		? metaTypes[metaType]
+		: undefined;
 	const value = meta ? context[meta.contextKey] : undefined;
 
 	// An item without the value still needs something to lay out against, and
