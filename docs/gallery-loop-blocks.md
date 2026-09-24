@@ -398,6 +398,7 @@ it reads — no hook involved:
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |
 | `vpf_loop_tiles_presets` | filter `( $presets )` | Tiles notations offered in the editor |
 | `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers, `name => settings`. See below |
+| `vpf_loop_popup_enqueue` | action | Fires once on a page where a loop opens the lightbox: where what extends the lightbox loads its assets |
 | `vpf_rest_loop_items_source_configs` | filter | Allow-list of source parameters the editor preview endpoint accepts |
 
 ### The query
