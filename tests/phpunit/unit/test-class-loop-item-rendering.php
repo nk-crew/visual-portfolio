@@ -191,6 +191,65 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A cover effect this install does not have, a Pro one saved before Pro was
+	 * turned off, is kept in the block and drawn as a fade.
+	 *
+	 * @return void
+	 */
+	public function test_a_cover_effect_this_install_lacks_is_a_fade() {
+		$block = parse_blocks( '<!-- wp:visual-portfolio/item-cover {"effect":"caption-move"} /-->' )[0];
+
+		$this->assertSame( 'caption-move', ( new WP_Block( $block ) )->attributes['effect'] );
+
+		// Pro registers caption move when it runs this suite.
+		$drop_caption_move = function ( $effects ) {
+			return array_diff( $effects, array( 'caption-move' ) );
+		};
+
+		add_filter( 'vpf_item_cover_effects', $drop_caption_move, PHP_INT_MAX );
+
+		try {
+			$output = $this->render_loop(
+				'<!-- wp:visual-portfolio/item-cover {"effect":"caption-move"} --><!-- wp:visual-portfolio/item-title /--><!-- /wp:visual-portfolio/item-cover -->',
+				array( 'layoutType' => 'grid' )
+			);
+		} finally {
+			remove_filter( 'vpf_item_cover_effects', $drop_caption_move, PHP_INT_MAX );
+		}
+
+		$this->assertSame( count( self::$images ), substr_count( $output, 'vp-effect-fade' ) );
+		$this->assertStringNotContainsString( 'caption-move', $output );
+	}
+
+	/**
+	 * A cover effect an install adds is a class on the cover, for its
+	 * stylesheet to draw.
+	 *
+	 * @return void
+	 */
+	public function test_a_cover_effect_an_install_adds_is_a_class() {
+		$add_slide = function ( $effects ) {
+			$effects[] = 'acme-slide';
+
+			return $effects;
+		};
+
+		add_filter( 'vpf_item_cover_effects', $add_slide );
+
+		try {
+			$output = $this->render_loop(
+				'<!-- wp:visual-portfolio/item-cover {"effect":"acme-slide"} --><!-- wp:visual-portfolio/item-title /--><!-- /wp:visual-portfolio/item-cover -->',
+				array( 'layoutType' => 'grid' )
+			);
+		} finally {
+			remove_filter( 'vpf_item_cover_effects', $add_slide );
+		}
+
+		$this->assertSame( count( self::$images ), substr_count( $output, 'vp-effect-acme-slide' ) );
+		$this->assertStringNotContainsString( 'vp-effect-fade', $output );
+	}
+
+	/**
 	 * A carousel with no effect is the item and its blocks, and nothing else.
 	 *
 	 * @return void

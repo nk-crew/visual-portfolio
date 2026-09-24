@@ -57,6 +57,11 @@ import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
+import {
+	getDrawnEffect,
+	getEffectSelectOptions,
+	IMAGE_EFFECT_TEASERS,
+} from './effects';
 
 // The cover settings Pro adds, for an install without them.
 const PRO_SETTINGS = [
@@ -68,6 +73,17 @@ const PRO_SETTINGS = [
 			'visual-portfolio'
 		),
 		campaign: 'teaser_cover_move_under_image',
+	},
+	...IMAGE_EFFECT_TEASERS,
+	{
+		name: 'emergeSkew',
+		label: __('Skew', 'visual-portfolio'),
+		line: __(
+			'How far the edge of the emerging panel slants.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_emerge_skew',
+		shows: (attributes) => 'emerge' === attributes.effect,
 	},
 ];
 
@@ -89,13 +105,6 @@ const TEMPLATE = [
 		'visual-portfolio/item-title',
 		{ style: { typography: { textAlign: 'center' } } },
 	],
-];
-
-const EFFECT_OPTIONS = [
-	{ label: __('None', 'visual-portfolio'), value: 'none' },
-	{ label: __('Fade', 'visual-portfolio'), value: 'fade' },
-	{ label: __('Fly', 'visual-portfolio'), value: 'fly' },
-	{ label: __('Emerge', 'visual-portfolio'), value: 'emerge' },
 ];
 
 // The three states the legacy gallery offers, in its own order.
@@ -210,11 +219,12 @@ export default function ItemCoverEdit({
 	});
 	const teasers = getMissingTeasers(extraSettings, PRO_SETTINGS, {
 		withPanelId: true,
+		attributes,
 	});
 
 	const blockProps = useBlockProps({
 		className: classnames(
-			`vp-effect-${effect}`,
+			`vp-effect-${getDrawnEffect(effect)}`,
 			`vp-show-content-${showContent}`,
 			CONTENT_POSITION_CLASSES[contentPosition]
 		),
@@ -389,7 +399,7 @@ export default function ItemCoverEdit({
 										'visual-portfolio'
 									)}
 									value={effect}
-									options={EFFECT_OPTIONS}
+									options={getEffectSelectOptions()}
 									onChange={(value) =>
 										setAttributes({ effect: value })
 									}
