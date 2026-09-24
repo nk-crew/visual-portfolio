@@ -30,6 +30,7 @@ class Visual_Portfolio_3rd_Elementor {
 		// since caching plugins place jQuery in the footer, and our script depends on it.
 		add_action( 'wp_body_open', array( $this, 'maybe_fix_elementor_lightbox_conflict' ) );
 		add_action( 'wp_footer', array( $this, 'maybe_fix_elementor_lightbox_conflict' ), 20 );
+		add_filter( 'render_block_visual-portfolio/loop', array( $this, 'disable_loop_lightbox' ) );
 
 		// Compatibility code for Swiper library.
 		add_action( 'wp_enqueue_scripts', array( $this, 'fix_elementor_swiper_assets' ), 101 );
@@ -42,6 +43,30 @@ class Visual_Portfolio_3rd_Elementor {
 		require_once visual_portfolio()->plugin_path . 'classes/3rd/plugins/class-elementor-widget.php';
 
 		\Elementor\Plugin::instance()->widgets_manager->register( new Visual_Portfolio_3rd_Elementor_Widget() );
+	}
+
+	/**
+	 * Keep Elementor's lightbox off the triggers of a Gallery Loop, which link
+	 * to the image files it would open too.
+	 *
+	 * @param string $block_content - rendered loop.
+	 *
+	 * @return string
+	 */
+	public function disable_loop_lightbox( $block_content ) {
+		if ( ! defined( 'ELEMENTOR_VERSION' ) || ! $block_content || false === strpos( $block_content, Visual_Portfolio_Popup::DATA_ATTRIBUTE ) ) {
+			return $block_content;
+		}
+
+		$processor = new WP_HTML_Tag_Processor( $block_content );
+
+		while ( $processor->next_tag( 'a' ) ) {
+			if ( null !== $processor->get_attribute( Visual_Portfolio_Popup::DATA_ATTRIBUTE ) ) {
+				$processor->set_attribute( 'data-elementor-open-lightbox', 'no' );
+			}
+		}
+
+		return $processor->get_updated_html();
 	}
 
 	/**

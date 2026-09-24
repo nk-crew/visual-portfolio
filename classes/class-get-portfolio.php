@@ -3115,6 +3115,17 @@ class Visual_Portfolio_Get {
 	 * @param array $args - item args.
 	 */
 	private static function item_popup_data( $args ) {
+		echo self::get_item_popup_output( $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- passed through wp_kses there.
+	}
+
+	/**
+	 * Item popup data, the `<template>` the lightbox reads an item from.
+	 *
+	 * @param array $args - item args.
+	 *
+	 * @return string
+	 */
+	public static function get_item_popup_output( $args ) {
 		$popup_image  = false;
 		$popup_video  = false;
 		$popup_output = false;
@@ -3137,7 +3148,7 @@ class Visual_Portfolio_Get {
 
 		$popup_output = apply_filters( 'vpf_popup_output', $popup_output, $args );
 
-		echo wp_kses( $popup_output, 'vp_popup' );
+		return wp_kses( (string) $popup_output, 'vp_popup' );
 	}
 
 	/**

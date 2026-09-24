@@ -182,7 +182,8 @@
 		"vp/postsQuery",
 		"vp/imagesQuery",
 		"vp/sourceQuery",
-		"vp/blockId"
+		"vp/blockId",
+		"vp/lightbox"
 	],
 	"providesContext": {
 		"vp/layoutType": "layoutType",

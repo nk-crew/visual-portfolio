@@ -296,11 +296,13 @@ const VPPopupAPI = {
 		let video;
 		let videoData;
 
-		// Find all gallery items
+		// Find all gallery items, and the items of a Gallery Loop list.
 		// Skip Swiper slider duplicates.
 		// Previously we also used the `:not(.swiper-slide-duplicate-active)`, but it contains a valid first slide.
 		$gallery
-			.find('.vp-portfolio__item-wrap:not(.swiper-slide-duplicate)')
+			.find(
+				'.vp-portfolio__item-wrap:not(.swiper-slide-duplicate), .wp-block-visual-portfolio-item-template__item'
+			)
 			.each(function () {
 				const itemData = VPPopupAPI.parseItem(this);
 

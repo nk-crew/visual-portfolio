@@ -34,6 +34,7 @@ class Visual_Portfolio_3rd_Enfold {
 
 		// Disable Enfold lightbox by adding classname.
 		add_filter( 'vpf_extend_portfolio_class', array( $this, 'disable_lightbox_class' ) );
+		add_filter( 'render_block_visual-portfolio/loop', array( $this, 'disable_loop_lightbox' ) );
 
 		// Disable our lazyload if Enfold lazyload enabled.
 		add_filter( 'vpf_images_lazyload', array( $this, 'disable_lazy_load' ) );
@@ -49,6 +50,25 @@ class Visual_Portfolio_3rd_Enfold {
 	public function disable_lightbox_class( $class_name ) {
 		$class_name .= ' noLightbox';
 		return $class_name;
+	}
+
+	/**
+	 * Disable Enfold lightbox on a Gallery Loop.
+	 *
+	 * @param string $block_content - rendered loop.
+	 *
+	 * @return string
+	 */
+	public function disable_loop_lightbox( $block_content ) {
+		$processor = new WP_HTML_Tag_Processor( $block_content );
+
+		if ( ! $processor->next_tag() ) {
+			return $block_content;
+		}
+
+		$processor->add_class( 'noLightbox' );
+
+		return $processor->get_updated_html();
 	}
 
 	/**

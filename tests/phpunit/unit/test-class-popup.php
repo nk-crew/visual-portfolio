@@ -85,17 +85,21 @@ class ClassPopup extends WP_UnitTestCase {
 	}
 
 	/**
-	 * An image item carries everything the lightbox draws it with.
+	 * An image item carries the `<template>` the classic lightbox reads, and
+	 * the full size image a click opens without it.
 	 *
 	 * @return void
 	 */
-	public function test_image_item_carries_its_full_size() {
-		$data = Visual_Portfolio_Popup::get_item_data( $this->get_item(), array() );
+	public function test_image_item_carries_the_classic_template() {
+		$url   = wp_get_attachment_url( self::$attachment_id );
+		$popup = Visual_Portfolio_Popup::get_item_popup( $this->get_item(), Visual_Portfolio_Get::get_options( array() ) );
 
-		$this->assertSame( 'image', $data['type'] );
-		$this->assertSame( wp_get_attachment_url( self::$attachment_id ), $data['src'] );
-		$this->assertSame( 'Item title', $data['title'] );
-		$this->assertSame( 'Caption of the picture', $data['caption'] );
+		$this->assertSame( $url, $popup['src'] );
+		$this->assertStringContainsString( '<template class="vp-portfolio__item-popup"', $popup['markup'] );
+		$this->assertStringContainsString( 'data-vp-popup-img="' . esc_url( $url ) . '"', $popup['markup'] );
+
+		// The item title leads unless the loop picks another source.
+		$this->assertStringContainsString( '<h3 class="vp-portfolio__item-popup-title">Item title</h3>', $popup['markup'] );
 	}
 
 	/**
@@ -104,54 +108,74 @@ class ClassPopup extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_video_item_carries_the_video_url() {
-		$data = Visual_Portfolio_Popup::get_item_data(
+		$popup = Visual_Portfolio_Popup::get_item_popup(
 			$this->get_item( array( 'video' => 'https://youtu.be/aBcDeFgHiJk' ) ),
-			array()
+			Visual_Portfolio_Get::get_options( array() )
 		);
 
-		$this->assertSame( 'video', $data['type'] );
-		$this->assertSame( 'https://youtu.be/aBcDeFgHiJk', $data['src'] );
-
-		// The image of the item is what is shown until the video plays.
-		$this->assertNotEmpty( $data['poster'] );
+		$this->assertSame( 'https://youtu.be/aBcDeFgHiJk', $popup['src'] );
+		$this->assertStringContainsString( 'data-vp-popup-video="https://youtu.be/aBcDeFgHiJk"', $popup['markup'] );
 	}
 
 	/**
 	 * An item the pipeline refused a popup gets none.
 	 *
-	 * A gallery whose images link somewhere is the case that produces this: an
-	 * image with a URL of its own is an image that leads to it.
-	 *
 	 * @return void
 	 */
 	public function test_item_without_a_popup_returns_nothing() {
-		$data = Visual_Portfolio_Popup::get_item_data(
+		$popup = Visual_Portfolio_Popup::get_item_popup(
 			$this->get_item( array( 'allow_popup' => false ) ),
-			array()
+			Visual_Portfolio_Get::get_options( array() )
 		);
 
-		$this->assertSame( array(), $data );
+		$this->assertSame( array(), $popup );
 	}
 
 	/**
-	 * The data is filterable, which is how Pro adds what free has no idea about.
+	 * The caption follows the sources of the loop, and a source the classic
+	 * templates do not know is the default.
 	 *
 	 * @return void
 	 */
-	public function test_popup_data_is_filterable() {
-		$filter = static function ( $data ) {
-			$data['embedUrl'] = 'https://example.org/embed/';
+	public function test_caption_follows_the_sources_of_the_loop() {
+		$options = Visual_Portfolio_Get::get_options( array() );
 
-			return $data;
+		$caption = Visual_Portfolio_Popup::get_item_popup(
+			$this->get_item(),
+			$options,
+			array(
+				'title'       => 'caption',
+				'description' => 'none',
+			)
+		);
+
+		$this->assertStringContainsString( '<h3 class="vp-portfolio__item-popup-title">Caption of the picture</h3>', $caption['markup'] );
+		$this->assertStringNotContainsString( 'vp-portfolio__item-popup-description', $caption['markup'] );
+
+		$unknown = Visual_Portfolio_Popup::get_item_popup( $this->get_item(), $options, array( 'title' => 'no-such-source' ) );
+
+		$this->assertStringContainsString( '<h3 class="vp-portfolio__item-popup-title">Item title</h3>', $unknown['markup'] );
+	}
+
+	/**
+	 * The markup goes through `vpf_popup_output`, the filter Pro extends the
+	 * classic lightbox with, and the no-JS address follows what it changed.
+	 *
+	 * @return void
+	 */
+	public function test_popup_output_is_filtered() {
+		$filter = static function ( $output ) {
+			return str_replace( 'data-vp-popup-img="', 'data-vp-popup-pid="7" data-vp-popup-img="https://example.org/custom.jpg" data-vp-popup-old="', $output );
 		};
 
-		add_filter( 'vpf_loop_item_popup_data', $filter );
+		add_filter( 'vpf_popup_output', $filter );
 
-		$data = Visual_Portfolio_Popup::get_item_data( $this->get_item(), array() );
+		$popup = Visual_Portfolio_Popup::get_item_popup( $this->get_item(), Visual_Portfolio_Get::get_options( array() ) );
 
-		remove_filter( 'vpf_loop_item_popup_data', $filter );
+		remove_filter( 'vpf_popup_output', $filter );
 
-		$this->assertSame( 'https://example.org/embed/', $data['embedUrl'] );
+		$this->assertStringContainsString( 'data-vp-popup-pid="7"', $popup['markup'] );
+		$this->assertSame( 'https://example.org/custom.jpg', $popup['src'] );
 	}
 
 	/**
@@ -164,9 +188,11 @@ class ClassPopup extends WP_UnitTestCase {
 		$url   = do_blocks( $this->get_loop_markup( 'url' ) );
 		$none  = do_blocks( $this->get_loop_markup( 'none' ) );
 
-		$this->assertStringContainsString( 'data-vp-popup=', $popup );
-		$this->assertStringNotContainsString( 'data-vp-popup=', $url );
-		$this->assertStringNotContainsString( 'data-vp-popup=', $none );
+		$this->assertStringContainsString( ' data-vp-popup', $popup );
+		$this->assertStringContainsString( 'vp-portfolio__item-popup', $popup );
+		$this->assertStringNotContainsString( 'data-vp-popup', $url );
+		$this->assertStringNotContainsString( 'vp-portfolio__item-popup', $url );
+		$this->assertStringNotContainsString( 'data-vp-popup', $none );
 
 		// A trigger is a link to the full size image, which is what a click
 		// without any JavaScript on the page opens.
@@ -180,44 +206,70 @@ class ClassPopup extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The loop a trigger stands in listens for it.
-	 *
-	 * One listener for the whole loop, so that an item appended after the page
-	 * was hydrated opens the lightbox as well.
+	 * An image with a link of its own follows it, as the classic gallery does.
 	 *
 	 * @return void
 	 */
-	public function test_loop_of_a_trigger_carries_the_listener() {
-		$popup = do_blocks( $this->get_loop_markup( 'popup' ) );
-		$url   = do_blocks( $this->get_loop_markup( 'url' ) );
+	public function test_item_with_a_link_of_its_own_follows_it() {
+		$output = do_blocks( $this->get_loop_markup( 'popup', array( 'url' => 'https://example.org/elsewhere/' ) ) );
+
+		$this->assertStringContainsString( '<a href="https://example.org/elsewhere/"', $output );
+		$this->assertStringNotContainsString( 'data-vp-popup', $output );
+	}
+
+	/**
+	 * A trigger loads the lightbox the classic gallery uses.
+	 *
+	 * @return void
+	 */
+	public function test_trigger_loads_the_lightbox() {
+		wp_dequeue_script( Visual_Portfolio_Popup::SCRIPT );
+
+		do_blocks( $this->get_loop_markup( 'url' ) );
+
+		$this->assertFalse( wp_script_is( Visual_Portfolio_Popup::SCRIPT, 'enqueued' ) );
+
+		do_blocks( $this->get_loop_markup( 'popup' ) );
+
+		$this->assertTrue( wp_script_is( Visual_Portfolio_Popup::SCRIPT, 'enqueued' ) );
+	}
+
+	/**
+	 * Under Enfold a loop keeps the theme's lightbox off its images.
+	 *
+	 * @return void
+	 */
+	public function test_enfold_lightbox_is_kept_off_a_loop() {
+		$enfold = new Visual_Portfolio_3rd_Enfold();
 
 		$this->assertStringContainsString(
-			'data-wp-on--click="visual-portfolio/popup::actions.openPopup"',
-			$popup
+			'class="vp-block-loop noLightbox"',
+			$enfold->disable_loop_lightbox( '<div class="vp-block-loop"><a href="a.jpg"></a></div>' )
 		);
-
-		// Nothing to open, nothing to listen for.
-		$this->assertStringNotContainsString( 'openPopup', $url );
 	}
 
 	/**
 	 * Serialized markup of a loop whose items carry the given click action.
 	 *
 	 * @param string $click_action - `none`, `url` or `popup`.
+	 * @param array  $image        - values of the image to change.
 	 *
 	 * @return string
 	 */
-	private function get_loop_markup( $click_action ) {
+	private function get_loop_markup( $click_action, $image = array() ) {
 		$attributes = array(
 			'block_id'    => 'popup-test-' . $click_action,
 			'queryType'   => 'images',
 			'baseQuery'   => array( 'perPage' => 1 ),
 			'imagesQuery' => array(
 				'images' => array(
-					array(
-						'id'         => self::$attachment_id,
-						'title'      => 'Item title',
-						'categories' => array(),
+					array_merge(
+						array(
+							'id'         => self::$attachment_id,
+							'title'      => 'Item title',
+							'categories' => array(),
+						),
+						$image
 					),
 				),
 			),

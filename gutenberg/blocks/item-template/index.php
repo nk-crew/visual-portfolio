@@ -326,9 +326,9 @@ class Visual_Portfolio_Block_Item_Template {
 	/**
 	 * Whether anything inside the item opens the lightbox.
 	 *
-	 * Asked once for the list rather than per item: resolving the popup payload
-	 * reads the attachment and its meta, and a gallery whose items are plain
-	 * links has nothing to open.
+	 * Asked once for the list rather than per item: resolving the popup of an
+	 * item reads the attachment and its meta, and a gallery whose items are
+	 * plain links has nothing to open.
 	 *
 	 * @param array $blocks - inner blocks of the item template.
 	 *
@@ -359,11 +359,12 @@ class Visual_Portfolio_Block_Item_Template {
 	 * @param array  $options - portfolio options the item was resolved with.
 	 * @param string $prefix  - prefix of the returned keys. Block context is namespaced,
 	 *                          a REST response is not.
-	 * @param bool   $with_popup - whether anything in the item opens the lightbox.
+	 * @param array  $popup   - the item's popup, see `Visual_Portfolio_Popup::get_item_popup()`,
+	 *                          when anything in the item opens the lightbox.
 	 *
 	 * @return array
 	 */
-	public static function map_item_to_context( $item, $options, $prefix = 'vp/', $with_popup = true ) {
+	public static function map_item_to_context( $item, $options, $prefix = 'vp/', $popup = array() ) {
 		$context = array(
 			'vp/itemId'            => $item['uid'] ?? '',
 			'vp/itemPostId'        => $item['post_id'] ?? '',
@@ -392,11 +393,10 @@ class Visual_Portfolio_Block_Item_Template {
 			'vp/itemViewsCount'    => $item['views_count'] ?? '',
 			'vp/itemReadingTime'   => $item['reading_time'] ?? '',
 
-			// Everything the lightbox needs to show this item, resolved here so
-			// that an item block only has to decide whether to open it. Reading
-			// it costs an attachment lookup and half a dozen meta reads per
-			// item, so a gallery with nothing to open asks for nothing.
-			'vp/itemPopupData'     => $with_popup ? Visual_Portfolio_Popup::get_item_data( $item, $options ) : array(),
+			// Resolved by the caller, so that an item block only has to decide
+			// whether to open it, and a gallery with nothing to open asks for
+			// nothing.
+			'vp/itemPopupData'     => $popup,
 		);
 
 		/**
@@ -1072,6 +1072,11 @@ class Visual_Portfolio_Block_Item_Template {
 		$warm    = $repeats ? $this->get_seam_size( $attributes, $first_row, count( $items ) ) : 0;
 
 		$with_popup = self::opens_a_popup( $block->parsed_block['innerBlocks'] ?? array() );
+		$lightbox   = $block->context['vp/lightbox'] ?? array();
+		$sources    = array(
+			'title'       => $lightbox['titleSource'] ?? '',
+			'description' => $lightbox['descriptionSource'] ?? '',
+		);
 
 		// The controls are rendered once, after the list, with the context of
 		// the gallery rather than of an item.
@@ -1084,8 +1089,9 @@ class Visual_Portfolio_Block_Item_Template {
 		}
 
 		foreach ( $items as $item ) {
+			$popup        = $with_popup ? Visual_Portfolio_Popup::get_item_popup( $item, $result['options'], $sources ) : array();
 			$item_context = array_merge(
-				self::map_item_to_context( $item, $result['options'], 'vp/', $with_popup ),
+				self::map_item_to_context( $item, $result['options'], 'vp/', $popup ),
 				array( 'vp/itemImageLoading' => $this->get_image_loading_attributes( $index, $first_row, $warm && $index > $last - $warm ) )
 			);
 
@@ -1110,6 +1116,9 @@ class Visual_Portfolio_Block_Item_Template {
 			$item_content = ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
 
 			remove_filter( 'render_block_context', $filter_block_context, 1 );
+
+			// Last, so no `:first-child` rule of an item block meets it.
+			$item_content .= $popup['markup'] ?? '';
 
 			$content .= $effect
 				? sprintf(

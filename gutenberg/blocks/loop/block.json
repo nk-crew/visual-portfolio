@@ -67,6 +67,10 @@
 			"type": "object",
 			"default": {}
 		},
+		"lightbox": {
+			"type": "object",
+			"default": {}
+		},
 		"preview_image_example": {
 			"type": "string",
 			"default": ""
@@ -136,6 +140,7 @@
 		"vp/postsQuery": "postsQuery",
 		"vp/imagesQuery": "imagesQuery",
 		"vp/sourceQuery": "sourceQuery",
-		"vp/blockId": "block_id"
+		"vp/blockId": "block_id",
+		"vp/lightbox": "lightbox"
 	}
 }
