@@ -38,7 +38,7 @@ const PRO_FILTERS = [
 		name: 'date',
 		label: __('Date', 'visual-portfolio'),
 		line: __(
-			'Only posts published in the past day, week, month, or between two dates.',
+			'Only posts published in the past day, week, month, quarter or year, or between two dates.',
 			'visual-portfolio'
 		),
 		campaign: 'teaser_filter_date',
