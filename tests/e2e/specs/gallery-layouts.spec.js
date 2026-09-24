@@ -2437,8 +2437,8 @@ test.describe('Gallery Item Template layouts', () => {
 			},
 		});
 
-		expect(
-			await page.locator(LIST).evaluate((list) => {
+		const offCentre = () =>
+			page.locator(LIST).evaluate((list) => {
 				const item = list.querySelector(
 					'.wp-block-visual-portfolio-item-template__item'
 				);
@@ -2448,8 +2448,15 @@ test.describe('Gallery Item Template layouts', () => {
 						item.offsetWidth / 2 -
 						list.clientWidth / 2
 				);
-			})
-		).toBeLessThan(2);
+			});
+
+		expect(await offCentre()).toBeLessThan(2);
+
+		// Asked for less motion, it is the plain carousel, centred all the
+		// same.
+		await page.emulateMedia({ reducedMotion: 'reduce' });
+
+		expect(await offCentre()).toBeLessThan(2);
 	});
 
 	test('coverflow keeps the size of its cards when the carousel repeats', async ({

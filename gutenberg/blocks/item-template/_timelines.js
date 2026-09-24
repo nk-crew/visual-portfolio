@@ -13,7 +13,8 @@
  * at all: the native rules apply, and the numbers would go unread. Except
  * under RTL: Chromium measures an RTL list's view timelines from the wrong
  * end (a slide at rest reads -300% rather than 50%), so an RTL list is kept
- * here whatever the browser has, and the native rules name LTR lists only.
+ * here whatever the browser has, and its mark takes the animations off the
+ * browser's timelines.
  *
  * Shared by the page and the editor preview: `timelines.js` beside this file
  * runs it on the page, on the events the view module announces a carousel
@@ -177,7 +178,41 @@ function draw(list) {
 		);
 	});
 
-	list.classList.add(SCRIPTED_CLASS);
+	if (!list.classList.contains(SCRIPTED_CLASS)) {
+		list.classList.add(SCRIPTED_CLASS);
+		restart(list);
+	}
+}
+
+/**
+ * Start the animations of a list over, once it is marked.
+ *
+ * Under RTL the native rules have run the animations on the browser's
+ * timelines before the mark, and an animation keeps the time its timeline
+ * gave it when the rules hand it to the paused one. Started over, it is held
+ * where the numbers say.
+ *
+ * @param {HTMLElement} list - item template list.
+ */
+function restart(list) {
+	const boxes = new Set(
+		list
+			.getAnimations({ subtree: true })
+			.map((animation) => animation.effect?.target)
+	);
+
+	boxes.delete(undefined);
+	boxes.delete(null);
+	boxes.forEach((box) => {
+		box.style.animationName = 'none';
+	});
+
+	// One style pass with no animations, so the ones put back are new.
+	list.getBoundingClientRect();
+
+	boxes.forEach((box) => {
+		box.style.removeProperty('animation-name');
+	});
 }
 
 /**

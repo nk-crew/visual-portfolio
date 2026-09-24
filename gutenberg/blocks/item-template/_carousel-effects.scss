@@ -7,6 +7,10 @@
 // RTL, whose timelines Chromium measures from the wrong end - where the same
 // rules are held still at the time it names. One description of an effect,
 // so the two cannot drift. Pro describes its own effects the same way.
+//
+// Under RTL both apply: the native rules lay the effect out from the first
+// frame, and once the script has marked the list its rules, one class
+// heavier, take the animations off the browser's timelines.
 
 $item: ".wp-block-visual-portfolio-item-template__item";
 $slide: ".wp-block-visual-portfolio-item-template__slide";
@@ -58,6 +62,8 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		animation-duration: 1s;
 		animation-play-state: paused;
 		animation-delay: calc(#{$covered} * -1s);
+		animation-range: normal;
+		animation-timeline: auto;
 	}
 }
 
@@ -72,9 +78,9 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 //
 // @param {boolean} $native Whether the browser drives the animations.
 @mixin carousel-effects($native) {
-	// An LTR carousel where the browser has the timelines, and one
-	// `timelines.js` has marked everywhere else.
-	$lists: if($native, ":dir(ltr)", ".vp-carousel-scripted");
+	// Any carousel where the browser has the timelines, and one
+	// `timelines.js` has marked.
+	$lists: if($native, "", ".vp-carousel-scripted");
 
 	// Cards one whole slide wide over boxes half that, so every card
 	// overhangs its neighbours by a quarter of itself on each side. The
@@ -87,8 +93,14 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		// against the narrowed list, which is the one way of writing it
 		// that does not depend on its own outcome.
 		gap: 0;
-		padding-inline: calc(50cqw - 25cqw / max(var(--vp-layout-current-columns), 2));
-		scroll-padding-inline: 0;
+
+		// Over the padding a centred carousel is given too, which weighs one
+		// class more than the list and comes earlier.
+		&,
+		&.vp-carousel-snap-center {
+			padding-inline: calc(50cqw - 25cqw / max(var(--vp-layout-current-columns), 2));
+			scroll-padding-inline: 0;
+		}
 
 		> #{$item} {
 			// The one snapping box the padding narrows the list to, stated
