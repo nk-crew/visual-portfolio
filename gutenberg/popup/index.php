@@ -36,6 +36,13 @@ class Visual_Portfolio_Popup {
 	const CAPTION_SOURCES = array( 'none', 'title', 'caption', 'alt', 'description', 'item_title', 'item_description', 'item_excerpt', 'item_author' );
 
 	/**
+	 * Whether this request has told extensions that a loop opens the lightbox.
+	 *
+	 * @var bool
+	 */
+	private static $announced = false;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -175,17 +182,15 @@ class Visual_Portfolio_Popup {
 	 * @return void
 	 */
 	public static function enqueue() {
-		static $done = false;
-
 		Visual_Portfolio_Assets::enqueue_popup_assets();
 
 		wp_enqueue_script( self::SCRIPT );
 
-		if ( $done ) {
+		if ( self::$announced ) {
 			return;
 		}
 
-		$done = true;
+		self::$announced = true;
 
 		/**
 		 * Fires once on a page where a Gallery Loop opens the lightbox.

@@ -253,6 +253,15 @@ class ClassPopup extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_loop_popup_assets_are_announced_once() {
+		// Once per request, and every test is a request of its own.
+		$announced = new ReflectionProperty( 'Visual_Portfolio_Popup', 'announced' );
+
+		if ( method_exists( $announced, 'setAccessible' ) ) {
+			$announced->setAccessible( true );
+		}
+
+		$announced->setValue( null, false );
+
 		do_blocks( $this->get_loop_markup( 'popup' ) );
 		do_blocks( $this->get_loop_markup( 'popup' ) );
 
