@@ -36,7 +36,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { memo, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
-import { __, _x, isRTL, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	alignNone,
 	justifyCenter,
@@ -69,8 +69,11 @@ import { TilesPresetsSelect, TilesPresetsToolbarButton } from './tiles-presets';
 import useEditorLayout from './use-editor-layout';
 import variations from './variations';
 
-const { plugin_version: pluginVersion, pro: isProPlugin } =
-	window.VPGutenbergVariables;
+const {
+	plugin_version: pluginVersion,
+	pro: isProPlugin,
+	site_rtl: isSiteRtl,
+} = window.VPGutenbergVariables;
 
 const ITEM_CLASS_NAME = 'wp-block-visual-portfolio-item-template__item';
 
@@ -262,7 +265,7 @@ function canRepeat(attributes) {
 	return (
 		effectRepeats(attributes.carouselEffect) &&
 		!attributes.carouselAutoWidth &&
-		!isRTL()
+		!isSiteRtl
 	);
 }
 
@@ -288,7 +291,7 @@ function getRepeatHelp(attributes) {
 		);
 	}
 
-	if (isRTL()) {
+	if (isSiteRtl) {
 		return __(
 			'A right-to-left carousel cannot run round, so it stops at its ends.',
 			'visual-portfolio'
