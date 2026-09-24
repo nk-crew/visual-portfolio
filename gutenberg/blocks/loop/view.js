@@ -706,8 +706,12 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 			}),
 		]);
 	} catch {
-		release();
-		window.location.assign(href);
+		// Only the navigation still wanted may fall back to a full load: an
+		// older one would take the visitor off the control they used since.
+		if (release()) {
+			window.location.assign(href);
+		}
+
 		return false;
 	}
 
@@ -770,7 +774,8 @@ function restoreSearch(loop, name, index, hadFocus) {
 	const typed = typedSearches.get(loop);
 	const input = getSearchInput(loop, name, index);
 
-	if (!typed || !input) {
+	// What was typed belongs to the field it was typed in.
+	if (!typed || !input || typed.name !== name || typed.index !== index) {
 		return;
 	}
 
@@ -826,13 +831,15 @@ function* searchLoop(loop, name, index, context) {
 
 	// Already there, or already on the way: an Enter right after a pause
 	// would push the same address twice.
-	if (href === window.location.href || href === searchesInFlight.get(loop)) {
+	// Without the hash, which a search address never carries.
+	const here = window.location.href.split('#')[0];
+
+	if (href === here || href === searchesInFlight.get(loop)) {
 		return;
 	}
 
 	const replace =
-		searchesInFlight.has(loop) ||
-		searchAddresses.get(loop) === window.location.href;
+		searchesInFlight.has(loop) || searchAddresses.get(loop) === here;
 	const hadFocus = input === window.document.activeElement;
 
 	searchesInFlight.set(loop, href);
@@ -936,18 +943,20 @@ store('visual-portfolio/loop', {
 
 			window.clearTimeout(searchTimers.get(loop));
 			searchTimers.delete(loop);
-			typedSearches.set(loop, {
-				value: input.value,
-				start: input.selectionStart,
-				end: input.selectionEnd,
-			});
-
 			const { name } = input;
 			const index = Array.from(
 				loop.querySelectorAll(
 					`${SEARCH_INPUT_SELECTOR}[name="${name}"]`
 				)
 			).indexOf(input);
+
+			typedSearches.set(loop, {
+				name,
+				index,
+				value: input.value,
+				start: input.selectionStart,
+				end: input.selectionEnd,
+			});
 			const context = getLoopContext();
 			const run = function* () {
 				yield* searchLoop(loop, name, index, context);
