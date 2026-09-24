@@ -457,6 +457,30 @@ Three of them need a word for sources that are neither posts nor images:
   Entries are `option => type`, where the type is `ids`, `text`, `boolean` or
   `number` and names the sanitizer the value passes through on the way in.
 
+### Settings of an extension
+
+Every block of the family declares one free-form attribute, `extensions`, an
+object with no keys of its own. An extension keeps its settings for a block there,
+under names of its own, and reads them back from `$attributes['extensions']` in a
+`render_block_{name}` filter. A block attribute the extension declared itself is
+dropped the first time the page is saved in an editor without the extension; a
+key of `extensions` is kept. The per-screen columns and tiles of the item template
+are the exception, declared by the free plugin beside `layoutColumnCount` and
+`layoutTiles`: its preview builds the per-screen column classes from the counts,
+and takes the patterns from an extension through `vpf.itemTemplateTiles`.
+
+A value list an extension adds to is left open for the same reason. The carousel
+effect is a plain string, and the server draws only an effect this install has;
+an effect it lacks is a plain carousel, and the value stays in the block.
+
+The editor lists an extension adds to take `{ name, Item }` entries, where `Item`
+is a `ToolsPanelItem`: `vpf.loopPostsFilterItems` (the loop's Filters panel) and
+`vpf.itemCoverSettingsItems` (the cover's Settings panel). Without Pro, the free
+plugin adds a teaser for each Pro entry the list lacks, under the same `name`:
+a panel menu item marked "(Pro)" that shows one line and a link. An entry under
+that name replaces it. The Effect list does the same by `value`, with a disabled
+option.
+
 ### Carousel effects
 
 The free plugin draws three: cover flow, slideshow and fade. An effect is a pair

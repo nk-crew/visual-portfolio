@@ -381,14 +381,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 			return $effects;
 		};
 
-		// An install adds its effect before the block is registered, and the
-		// schema lists it from then on. A filter added here is too late for
-		// that, so the list is widened by hand the way registration does it.
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'visual-portfolio/item-template' );
-		$schema     = $block_type->attributes['carouselEffect'];
-
 		add_filter( 'vpf_carousel_effects', $add_deck );
-		$block_type->attributes['carouselEffect']['enum'] = array_merge( array( 'none' ), array_keys( Visual_Portfolio_Block_Item_Template::get_carousel_effects() ) );
 
 		try {
 			$output = $this->render_loop(
@@ -401,7 +394,6 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 			);
 		} finally {
 			remove_filter( 'vpf_carousel_effects', $add_deck );
-			$block_type->attributes['carouselEffect'] = $schema;
 		}
 
 		$this->assertStringContainsString( 'vp-carousel-acme-deck', $output );
@@ -419,6 +411,42 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 		);
 
 		$this->assertStringContainsString( 'data-vp-carousel-repeat="true"', $output );
+	}
+
+	/**
+	 * An effect this install does not have, a Pro one saved before Pro was
+	 * turned off, is kept in the block and drawn as a plain carousel.
+	 *
+	 * @return void
+	 */
+	public function test_an_effect_this_install_lacks_is_a_plain_carousel() {
+		$block = parse_blocks( '<!-- wp:visual-portfolio/item-template {"layoutType":"carousel","carouselEffect":"cards"} /-->' )[0];
+
+		$this->assertSame( 'cards', ( new WP_Block( $block ) )->attributes['carouselEffect'] );
+
+		// Pro registers cards when it runs this suite.
+		$drop_cards = function ( $effects ) {
+			unset( $effects['cards'] );
+
+			return $effects;
+		};
+
+		add_filter( 'vpf_carousel_effects', $drop_cards, PHP_INT_MAX );
+
+		try {
+			$output = $this->render_loop(
+				'<!-- wp:visual-portfolio/item-image /-->',
+				array(
+					'layoutType'     => 'carousel',
+					'carouselEffect' => 'cards',
+				)
+			);
+		} finally {
+			remove_filter( 'vpf_carousel_effects', $drop_cards, PHP_INT_MAX );
+		}
+
+		$this->assertStringNotContainsString( 'vp-carousel-effect', $output );
+		$this->assertStringNotContainsString( 'vp-carousel-cards', $output );
 	}
 
 	/**

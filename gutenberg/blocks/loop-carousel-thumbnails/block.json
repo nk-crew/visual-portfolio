@@ -25,7 +25,8 @@
 		"sizeSlug": { "type": "string", "default": "thumbnail" },
 		"thumbHeight": { "type": "number", "default": 72 },
 		"aspectRatio": { "type": "string", "default": "1" },
-		"showOnHover": { "type": "boolean", "default": false }
+		"showOnHover": { "type": "boolean", "default": false },
+		"extensions": { "type": "object", "default": {} }
 	},
 	"supports": {
 		"html": false,

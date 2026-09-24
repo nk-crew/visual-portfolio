@@ -16,6 +16,10 @@
 		"excerptLength": {
 			"type": "number",
 			"default": 15
+		},
+		"extensions": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"example": {

@@ -36,7 +36,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { memo, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import {
 	alignNone,
 	justifyCenter,
@@ -49,6 +49,7 @@ import ProNote from '../../components/pro-note';
 /**
  * Internal dependencies
  */
+import { ProLine } from '../../components/pro-teaser';
 import getBlockGapValue from '../../utils/block-gap';
 import { CONTROL_BLOCKS } from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
@@ -59,10 +60,12 @@ import {
 import { useIsPreview } from '../../utils/use-is-preview';
 import { getColumnsProps, getViewportBreakpoints } from './columns';
 import {
+	countEffectTeasers,
 	effectPeeks,
 	effectRepeats,
 	effectTakesColumns,
-	getEffectOptions,
+	getEffectSelectOptions,
+	isDrawnEffect,
 } from './effects';
 import { getTileStyles, getTilesColumns } from './tiles';
 import { TilesPresetsSelect, TilesPresetsToolbarButton } from './tiles-presets';
@@ -881,6 +884,9 @@ export default function BlockEdit({
 	// one to show at, so its peek is greyed the same way, and not drawn.
 	const peekable = effectPeeks(carouselEffect);
 
+	// The Pro effects this install lacks, which the Effect list names.
+	const effectTeasers = countEffectTeasers();
+
 	// Tiles carry their columns in the notation, so that is where the layout
 	// reads them, whatever the columns controls say. The counts for the
 	// narrower screens go along, so a Tablet or Mobile preview draws the
@@ -961,7 +967,7 @@ export default function BlockEdit({
 				classes.push('vp-carousel-stretch-slides');
 			}
 
-			if ('none' !== carouselEffect) {
+			if (isDrawnEffect(carouselEffect)) {
 				classes.push('vp-carousel-effect');
 				classes.push(`vp-carousel-${carouselEffect}`);
 			}
@@ -982,7 +988,8 @@ export default function BlockEdit({
 
 	// A carousel effect is drawn on two boxes inside the item, and only a
 	// carousel has them.
-	const slideEffect = 'carousel' === layoutType && 'none' !== carouselEffect;
+	const slideEffect =
+		'carousel' === layoutType && isDrawnEffect(carouselEffect);
 
 	// Justified and masonry are measured by a library on both sides.
 	const listRef = useEditorLayout({
@@ -1389,12 +1396,29 @@ export default function BlockEdit({
 			>
 				<SelectControl
 					label={__('Effect', 'visual-portfolio')}
-					help={__(
-						'How one slide gives way to the next.',
-						'visual-portfolio'
-					)}
+					help={
+						effectTeasers ? (
+							<ProLine campaign="teaser_carousel_effects">
+								{sprintf(
+									/* translators: %d: number of effects that come with Pro. */
+									_n(
+										'How one slide gives way to the next. %d more effect comes with Pro.',
+										'How one slide gives way to the next. %d more effects come with Pro.',
+										effectTeasers,
+										'visual-portfolio'
+									),
+									effectTeasers
+								)}
+							</ProLine>
+						) : (
+							__(
+								'How one slide gives way to the next.',
+								'visual-portfolio'
+							)
+						)
+					}
 					value={carouselEffect}
-					options={getEffectOptions()}
+					options={getEffectSelectOptions()}
 					onChange={(value) =>
 						setAttributes({ carouselEffect: value })
 					}

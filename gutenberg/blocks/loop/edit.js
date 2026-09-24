@@ -23,6 +23,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
+import { ProTeaserPanel } from '../../components/pro-teaser';
 import GalleryManager from '../../loop-sources/gallery-manager';
 import { useLoopSource } from '../../loop-sources/registry';
 import SourcePicker from '../../loop-sources/source-picker';
@@ -33,6 +34,28 @@ import {
 import { useIsPreview } from '../../utils/use-is-preview';
 import PatternSetup from './pattern-setup';
 import { applyChoices, PAGINATION_OPTIONS } from './starting-choices';
+
+// The protection Pro adds to a gallery, for an install without it.
+const PROTECTION_TEASERS = [
+	{
+		name: 'password',
+		label: __('Password Protection', 'visual-portfolio'),
+		line: __(
+			'Ask for a password before the gallery is shown.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_protection_password',
+	},
+	{
+		name: 'age',
+		label: __('Age Gate Protection', 'visual-portfolio'),
+		line: __(
+			'Ask for a date of birth before the gallery is shown.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_protection_age',
+	},
+];
 
 const {
 	plugin_url: pluginUrl,
@@ -737,6 +760,10 @@ export default function BlockEdit(props) {
 					setAttributes={setAttributes}
 				/>
 			</InspectorControls>
+			<ProTeaserPanel
+				label={__('Protection', 'visual-portfolio')}
+				items={PROTECTION_TEASERS}
+			/>
 			<div {...innerBlocksProps} />
 		</div>
 	);

@@ -16,6 +16,10 @@
 			"type": "boolean",
 			"default": false,
 			"role": "content"
+		},
+		"extensions": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"example": {

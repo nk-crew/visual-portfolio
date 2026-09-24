@@ -20,6 +20,10 @@
 		"midSize": {
 			"type": "number",
 			"default": 2
+		},
+		"extensions": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"supports": {

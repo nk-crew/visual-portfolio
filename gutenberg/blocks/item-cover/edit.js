@@ -32,6 +32,7 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
+import { getMissingTeasers } from '../../components/pro-teaser';
 import { AspectRatioTool, ScaleTool } from '../../utils/dimensions-tools';
 import {
 	useImageSizeOnInsert,
@@ -50,6 +51,19 @@ import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
+
+// The cover settings Pro adds, for an install without them.
+const PRO_SETTINGS = [
+	{
+		name: 'moveUnderImage',
+		label: __('Move under image', 'visual-portfolio'),
+		line: __(
+			'Draw the content below the picture under a screen width you choose.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_cover_move_under_image',
+	},
+];
 
 const ALLOWED_BLOCKS = [
 	'visual-portfolio/item-title',
@@ -189,6 +203,9 @@ export default function ItemCoverEdit({
 		attributes,
 		setAttributes,
 		clientId,
+	});
+	const teasers = getMissingTeasers(extraSettings, PRO_SETTINGS, {
+		withPanelId: true,
 	});
 
 	const blockProps = useBlockProps({
@@ -522,14 +539,16 @@ export default function ItemCoverEdit({
 									</ToolsPanelItem>
 								</>
 							)}
-							{extraSettings.map(({ name, Item }) => (
-								<Item
-									key={name}
-									attributes={attributes}
-									setAttributes={setAttributes}
-									clientId={clientId}
-								/>
-							))}
+							{[...extraSettings, ...teasers].map(
+								({ name, Item }) => (
+									<Item
+										key={name}
+										attributes={attributes}
+										setAttributes={setAttributes}
+										clientId={clientId}
+									/>
+								)
+							)}
 						</ToolsPanel>
 					</InspectorControls>
 				</>

@@ -63,7 +63,8 @@
 	"attributes": {
 		"showCount": { "type": "boolean", "default": false },
 		"showAllItem": { "type": "boolean", "default": true },
-		"displayAsDropdown": { "type": "boolean", "default": false }
+		"displayAsDropdown": { "type": "boolean", "default": false },
+		"extensions": { "type": "object", "default": {} }
 	},
 	"style": "visual-portfolio-block-loop-filter"
 }

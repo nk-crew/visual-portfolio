@@ -17,7 +17,8 @@
 	"textdomain": "visual-portfolio",
 	"usesContext": ["vp/queryType"],
 	"attributes": {
-		"showOnHover": { "type": "boolean", "default": false }
+		"showOnHover": { "type": "boolean", "default": false },
+		"extensions": { "type": "object", "default": {} }
 	},
 	"supports": {
 		"html": false,

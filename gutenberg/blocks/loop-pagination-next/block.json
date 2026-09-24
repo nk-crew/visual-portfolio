@@ -19,7 +19,8 @@
 		"vp/showArrow"
 	],
 	"attributes": {
-		"label": { "type": "string" }
+		"label": { "type": "string" },
+		"extensions": { "type": "object", "default": {} }
 	},
 	"supports": {
 		"reusable": false,

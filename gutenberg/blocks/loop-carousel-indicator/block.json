@@ -28,7 +28,8 @@
 		},
 		"showOnHover": { "type": "boolean", "default": false },
 		"maxDots": { "type": "number", "default": 0 },
-		"isDraggable": { "type": "boolean", "default": true }
+		"isDraggable": { "type": "boolean", "default": true },
+		"extensions": { "type": "object", "default": {} }
 	},
 	"supports": {
 		"html": false,

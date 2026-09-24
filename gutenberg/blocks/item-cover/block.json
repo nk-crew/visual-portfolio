@@ -101,6 +101,10 @@
 			"type": "string",
 			"default": "",
 			"role": "content"
+		},
+		"extensions": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"example": {
