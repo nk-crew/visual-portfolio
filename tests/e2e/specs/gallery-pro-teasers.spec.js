@@ -38,7 +38,7 @@ function getMarkup(images) {
 		'<div class="wp-block-visual-portfolio-loop vp-block-loop">',
 		`<!-- wp:visual-portfolio/item-template ${JSON.stringify(template)} -->`,
 		'<!-- wp:visual-portfolio/item-image {"extensions":{"watermark":true}} /-->',
-		'<!-- wp:visual-portfolio/item-cover -->',
+		'<!-- wp:visual-portfolio/item-cover {"effect":"caption-move"} -->',
 		'<!-- wp:visual-portfolio/item-title /-->',
 		'<!-- /wp:visual-portfolio/item-cover -->',
 		'<!-- /wp:visual-portfolio/item-template -->',
@@ -84,6 +84,7 @@ test.describe('Gallery Loop and Pro settings', () => {
 		expect(content).toContain('"carouselEffect":"cards"');
 		expect(content).toContain('"layoutColumnCountTablet":2');
 		expect(content).toContain('"layoutTilesMobile":"2|1,1|"');
+		expect(content).toContain('"effect":"caption-move"');
 		expect(content).toContain('"extensions":{"watermark":true}');
 		expect(content).toContain('"extensions":{"threshold":300}');
 	});
@@ -182,5 +183,80 @@ test.describe('Gallery Loop and Pro settings', () => {
 
 		await expect(quickView).toHaveCount(1);
 		await expect(quickView).toBeDisabled();
+	});
+
+	test('without Pro, the picture blocks name the Pro image effects', async ({
+		page,
+		editor,
+	}) => {
+		test.skip(
+			await page.evaluate(() => window.VPGutenbergVariables.pro),
+			'Pro draws its own settings.'
+		);
+
+		await editor.setContent(getMarkup(images));
+
+		const blocks = await editor.getBlocks({ full: true });
+		const [image, cover] = blocks[0].innerBlocks[0].innerBlocks;
+		const settings = page.locator('.components-tools-panel', {
+			has: page.getByRole('heading', { name: 'Settings' }),
+		});
+		const imageEffects = [
+			'Image filter (Pro)',
+			'Hover transform (Pro)',
+			'Blend mode (Pro)',
+			'Tilt (Pro)',
+		];
+
+		for (const { clientId } of [image, cover]) {
+			await page.evaluate(
+				(id) =>
+					window.wp.data
+						.dispatch('core/block-editor')
+						.selectBlock(id),
+				clientId
+			);
+			await settings.getByRole('button', { name: /options/i }).click();
+
+			for (const name of imageEffects) {
+				await expect(
+					page.getByRole('menuitemcheckbox', { name })
+				).toBeVisible();
+			}
+
+			// The skew belongs to the emerge effect, and the cover is saved
+			// with another one.
+			await expect(
+				page.getByRole('menuitemcheckbox', { name: 'Skew (Pro)' })
+			).toHaveCount(0);
+			await page.keyboard.press('Escape');
+		}
+
+		// The cover's effect list names Caption move, and cannot pick it.
+		const captionMove = settings
+			.getByRole('combobox', { name: 'Effect' })
+			.locator('option[value="caption-move"]');
+
+		await expect(captionMove).toHaveText('Caption move (Pro)');
+		await expect(captionMove).toBeDisabled();
+
+		// A Pro effect this install lacks is drawn as a fade, as on the page.
+		await expect(
+			editor.canvas
+				.locator('.wp-block-visual-portfolio-item-cover')
+				.first()
+		).toHaveClass(/\bvp-effect-fade\b/);
+
+		await page.evaluate(
+			(id) =>
+				window.wp.data
+					.dispatch('core/block-editor')
+					.updateBlockAttributes(id, { effect: 'emerge' }),
+			cover.clientId
+		);
+		await settings.getByRole('button', { name: /options/i }).click();
+		await expect(
+			page.getByRole('menuitemcheckbox', { name: 'Skew (Pro)' })
+		).toBeVisible();
 	});
 });

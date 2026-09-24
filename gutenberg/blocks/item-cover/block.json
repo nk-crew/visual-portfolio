@@ -47,8 +47,7 @@
 		},
 		"effect": {
 			"type": "string",
-			"default": "fade",
-			"enum": ["none", "fade", "fly", "emerge"]
+			"default": "fade"
 		},
 		"showContent": {
 			"type": "string",

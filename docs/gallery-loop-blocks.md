@@ -398,6 +398,7 @@ it reads — no hook involved:
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |
 | `vpf_loop_tiles_presets` | filter `( $presets )` | Tiles notations offered in the editor |
 | `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers, `name => settings`. See below |
+| `vpf_item_cover_effects` | filter `( $effects )` | Effects the item cover offers, a list of names. The cover gets the class `vp-effect-{name}`, so an effect is a stylesheet and this name; a saved effect not in the list is drawn as `fade` |
 | `vpf_loop_popup_enqueue` | action | Fires once on a page where a loop opens the lightbox: where what extends the lightbox loads its assets |
 | `vpf_loop_item_picture` | filter `( $picture, $context, $attributes, $block_name, $img_attr )` | The picture of an item image or item cover, before its overlay and link: where media beside the image goes. An item without an image comes in empty and may leave with a picture, cropped by the `img` attributes of the block |
 | `vpf_loop_item_click_attributes` | filter `( $attributes, $action, $context )` | The link an item block renders for a click action an extension added; without `href` the item links to its own address |
@@ -474,15 +475,18 @@ and takes the patterns from an extension through `vpf.itemTemplateTiles`.
 
 A value list an extension adds to is left open for the same reason. The carousel
 effect is a plain string, and the server draws only an effect this install has;
-an effect it lacks is a plain carousel, and the value stays in the block.
+an effect it lacks is a plain carousel, and the value stays in the block. The
+cover effect is the same, and an effect the install lacks is drawn as a fade.
 
 The editor lists an extension adds to take `{ name, Item }` entries, where `Item`
-is a `ToolsPanelItem`: `vpf.loopPostsFilterItems` (the loop's Filters panel) and
-`vpf.itemCoverSettingsItems` (the cover's Settings panel). Without Pro, the free
+is a `ToolsPanelItem`: `vpf.loopPostsFilterItems` (the loop's Filters panel),
+`vpf.itemCoverSettingsItems` (the cover's Settings panel) and
+`vpf.itemImageSettingsItems` (the image's Settings panel). Without Pro, the free
 plugin adds a teaser for each Pro entry the list lacks, under the same `name`:
 a panel menu item marked "(Pro)" that shows one line and a link. An entry under
-that name replaces it. The Effect list does the same by `value`, with a disabled
-option.
+that name replaces it. The Effect lists do the same by `value`, with a disabled
+option: `vpf.carouselEffects` for the item template and `vpf.itemCoverEffects`
+(`{ label, value }`) for the cover.
 
 ### Carousel effects
 
@@ -625,8 +629,9 @@ Anything a source writes into legacy options and later needs for counting pages
 must also be registered through `vpf_allowed_max_pages_params`.
 
 Per-image fields in the gallery manager are added through the
-`VP.LoopImageSettings` slot. Settings of the Item Cover block are added through
-the `vpf.itemCoverSettingsItems` JavaScript filter, which is given an empty array
+`VP.LoopImageSettings` slot. Settings of the Item Cover and Item Image blocks are
+added through the `vpf.itemCoverSettingsItems` and `vpf.itemImageSettingsItems`
+JavaScript filters, each of which is given an empty array
 and `{ attributes, setAttributes, clientId }` and returns `ToolsPanelItem`
 children — ordinary children of the block's Settings panel, registering with it
 the way the built-in ones do.

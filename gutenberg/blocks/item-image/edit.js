@@ -23,12 +23,13 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { crop, fullscreen, link, linkOff } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { ProTeaserPanel } from '../../components/pro-teaser';
+import { getMissingTeasers, ProTeaserPanel } from '../../components/pro-teaser';
 import { ALLOWED_MEDIA_TYPES } from '../../loop-sources/gallery-manager/prepare-images';
 import { getClickActions } from '../../utils/click-actions';
 import { DimensionsTool } from '../../utils/dimensions-tools';
@@ -53,7 +54,11 @@ import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
+import { IMAGE_EFFECT_TEASERS } from '../item-cover/effects';
 import { getGalleryImageId, useGalleryImage } from './gallery-image';
+
+// The image settings Pro adds, for an install without them.
+const PRO_SETTINGS = IMAGE_EFFECT_TEASERS;
 
 // The watermark Pro puts on a picture, for an install without it.
 const WATERMARK_TEASERS = [
@@ -179,6 +184,19 @@ export default function ItemImageEdit({
 	}, [isSelected]);
 
 	const overlay = getOverlayValues(attributes, OVERLAY_ATTRIBUTES);
+
+	// Anything else this install lets an image be set to, as `ToolsPanelItem`
+	// children of the Settings panel, the way `vpf.itemCoverSettingsItems`
+	// does for the cover.
+	const extraSettings = applyFilters('vpf.itemImageSettingsItems', [], {
+		attributes,
+		setAttributes,
+		clientId,
+	});
+	const teasers = getMissingTeasers(extraSettings, PRO_SETTINGS, {
+		withPanelId: true,
+		attributes,
+	});
 
 	// The rules of the core Featured Image block: a ratio owns the width, an
 	// explicit width or height takes it back, and the scale only means
@@ -464,6 +482,16 @@ export default function ItemImageEdit({
 										/>
 									</ToolsPanelItem>
 								</>
+							)}
+							{[...extraSettings, ...teasers].map(
+								({ name, Item }) => (
+									<Item
+										key={name}
+										attributes={attributes}
+										setAttributes={setAttributes}
+										clientId={clientId}
+									/>
+								)
 							)}
 							<FormatBadgeSettings
 								attributes={attributes}

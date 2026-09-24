@@ -243,6 +243,24 @@ class Visual_Portfolio_Block_Item_Cover {
 	}
 
 	/**
+	 * The effects the content of a cover can appear with.
+	 *
+	 * An effect is the class `vp-effect-` and its name on the cover, so an
+	 * effect an install adds needs a stylesheet and this filter and nothing
+	 * else.
+	 *
+	 * @return array effect names.
+	 */
+	private static function get_effects() {
+		/**
+		 * Filters the effects an item cover offers.
+		 *
+		 * @param array $effects effect names, the values of the `effect` attribute.
+		 */
+		return (array) apply_filters( 'vpf_item_cover_effects', array( 'none', 'fade', 'fly', 'emerge' ) );
+	}
+
+	/**
 	 * Attributes of the cover itself.
 	 *
 	 * @param array  $attributes   - block attributes.
@@ -326,8 +344,10 @@ class Visual_Portfolio_Block_Item_Cover {
 	public function block_render( $attributes, $content, $block ) {
 		$context = $block->context;
 
+		// A Pro effect saved on a site without Pro stays in the block and is
+		// drawn as the default.
 		$effect = $attributes['effect'] ?? 'fade';
-		$effect = in_array( $effect, array( 'none', 'fade', 'fly', 'emerge' ), true ) ? $effect : 'fade';
+		$effect = in_array( $effect, self::get_effects(), true ) ? $effect : 'fade';
 
 		// The three states the legacy gallery offers, under the names it uses:
 		// hover state only, default state only, always.
