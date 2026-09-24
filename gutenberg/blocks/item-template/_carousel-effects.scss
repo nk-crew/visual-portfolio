@@ -2,10 +2,17 @@
 //
 // A partial rather than rules of its own, because it is included twice by
 // `style.scss`: once for the browsers that drive the animations from their own
-// timelines, and once for the browsers that have none - Firefox, Safari before
-// 26 - where `timelines.js` keeps the timelines by hand and the same rules are
-// held still at the time it names. One description of an effect, so the two
-// cannot drift. Pro describes its own effects the same way.
+// timelines, and once for the lists `timelines.js` keeps the timelines of by
+// hand - where the browser has none, Firefox and Safari before 26, and under
+// RTL, whose timelines Chromium measures from the wrong end - where the same
+// rules are held still at the time it names. One description of an effect,
+// so the two cannot drift. Pro describes its own effects the same way.
+//
+// Under RTL both apply: the native rules lay the effect out from the first
+// frame, `style.scss` holds its animations off until the script has marked
+// the list, and the scripted rules, one class heavier, bind them to the
+// numbers - over the native moved-round rules too, which leave a marked list
+// alone.
 
 $item: ".wp-block-visual-portfolio-item-template__item";
 $slide: ".wp-block-visual-portfolio-item-template__slide";
@@ -57,6 +64,8 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		animation-duration: 1s;
 		animation-play-state: paused;
 		animation-delay: calc(#{$covered} * -1s);
+		animation-range: normal;
+		animation-timeline: auto;
 	}
 }
 
@@ -72,22 +81,28 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 // @param {boolean} $native Whether the browser drives the animations.
 @mixin carousel-effects($native) {
 	// Any carousel where the browser has the timelines, and one
-	// `timelines.js` has marked where it has not.
-	$scripted: if($native, "", ".vp-carousel-scripted");
+	// `timelines.js` has marked.
+	$lists: if($native, "", ".vp-carousel-scripted");
 
 	// Cards one whole slide wide over boxes half that, so every card
 	// overhangs its neighbours by a quarter of itself on each side. The
 	// overlap is what makes a cover flow read as a stack seen edge on,
 	// rather than as a row of pictures that happen to be tilted.
-	&.vp-layout-carousel#{$scripted}.vp-carousel-coverflow {
+	&.vp-layout-carousel#{$lists}.vp-carousel-coverflow {
 		// The list is narrowed to one snapping box and the rest of the
 		// width is padding, so the first and the last card can come to the
 		// middle like any other. Stated against the block rather than
 		// against the narrowed list, which is the one way of writing it
 		// that does not depend on its own outcome.
 		gap: 0;
-		padding-inline: calc(50cqw - 25cqw / max(var(--vp-layout-current-columns), 2));
-		scroll-padding-inline: 0;
+
+		// Over the padding a centred carousel is given too, which weighs one
+		// class more than the list and comes earlier.
+		&,
+		&.vp-carousel-snap-center {
+			padding-inline: calc(50cqw - 25cqw / max(var(--vp-layout-current-columns), 2));
+			scroll-padding-inline: 0;
+		}
 
 		> #{$item} {
 			// The one snapping box the padding narrows the list to, stated
@@ -149,7 +164,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		}
 
 		@if $native {
-			> #{$item}.vp-carousel-moved-round {
+			&:not(.vp-carousel-scripted) > #{$item}.vp-carousel-moved-round {
 				&,
 				#{$slide},
 				#{$card} {
@@ -163,7 +178,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 	// One slide riding over the one it replaces. The picture travels at half
 	// the speed of the carousel, so the arriving slide covers the leaving
 	// one rather than dissolving into it - nothing here touches opacity.
-	&.vp-layout-carousel#{$scripted}.vp-carousel-slideshow {
+	&.vp-layout-carousel#{$lists}.vp-carousel-slideshow {
 		// Slides that touch, so the arriving one meets the leaving one
 		// rather than following it across a gutter.
 		gap: 0;
@@ -186,7 +201,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		}
 
 		@if $native {
-			> #{$item}.vp-carousel-moved-round #{$card} {
+			&:not(.vp-carousel-scripted) > #{$item}.vp-carousel-moved-round #{$card} {
 				animation-range: var(--vp-carousel-copy-cover);
 				animation-timeline: --vp-carousel-scroll;
 			}
@@ -201,7 +216,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 	// neighbours until it reaches the middle - so scrolled on, the next card
 	// fades in over the current one, and scrolled back, the current card
 	// fades out over the previous one.
-	&.vp-layout-carousel#{$scripted}.vp-carousel-fade {
+	&.vp-layout-carousel#{$lists}.vp-carousel-fade {
 		// A slide is carried two of its widths over its passage, one of them
 		// to the middle, so a card held over the frame is carried back by its
 		// own width.
@@ -238,7 +253,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		}
 
 		@if $native {
-			> #{$item}.vp-carousel-moved-round {
+			&:not(.vp-carousel-scripted) > #{$item}.vp-carousel-moved-round {
 				&,
 				#{$card} {
 					animation-range: var(--vp-carousel-copy-cover);

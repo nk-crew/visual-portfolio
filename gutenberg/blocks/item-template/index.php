@@ -894,14 +894,20 @@ class Visual_Portfolio_Block_Item_Template {
 		 * The key is the value of the `carouselEffect` attribute, and the class
 		 * the list is given is `vp-carousel-` and that name.
 		 *
-		 * @param array $effects effect name to `array( 'columns' => bool, 'repeat' => bool )`.
+		 * @param array $effects effect name to `array( 'columns' => bool, 'repeat' => bool, 'peek' => bool )`.
 		 */
 		$effects = apply_filters(
 			'vpf_carousel_effects',
 			array(
-				'coverflow' => array( 'columns' => true ),
+				'coverflow' => array(
+					'columns' => true,
+					'peek'    => false,
+				),
 				'slideshow' => array( 'columns' => false ),
-				'fade'      => array( 'columns' => false ),
+				'fade'      => array(
+					'columns' => false,
+					'peek'    => false,
+				),
 			)
 		);
 
@@ -915,6 +921,7 @@ class Visual_Portfolio_Block_Item_Template {
 			$known[ $name ] = array(
 				'columns' => ! isset( $settings['columns'] ) || (bool) $settings['columns'],
 				'repeat'  => ! isset( $settings['repeat'] ) || (bool) $settings['repeat'],
+				'peek'    => ! isset( $settings['peek'] ) || (bool) $settings['peek'],
 			);
 		}
 
@@ -963,6 +970,19 @@ class Visual_Portfolio_Block_Item_Template {
 		$effects = self::get_carousel_effects();
 
 		return ! isset( $effects[ $effect ] ) || $effects[ $effect ]['repeat'];
+	}
+
+	/**
+	 * Whether an effect leaves room for a slide of the next one at the edge.
+	 *
+	 * @param string $effect - effect name.
+	 *
+	 * @return bool
+	 */
+	private function effect_peeks( $effect ) {
+		$effects = self::get_carousel_effects();
+
+		return ! isset( $effects[ $effect ] ) || $effects[ $effect ]['peek'];
 	}
 
 	/**
@@ -1034,6 +1054,14 @@ class Visual_Portfolio_Block_Item_Template {
 		// per slide, and slides of different widths have no step.
 		if ( ( $effect && ! $this->effect_repeats( $effect ) ) || ! empty( $attributes['carouselAutoWidth'] ) ) {
 			$attributes['carouselRepeat'] = false;
+		}
+
+		// An effect that lays the slides out itself - over the frame, in a
+		// pile, or turned about the middle - leaves no edge for the next one
+		// to show at, and the padding a peek adds only moved its slides off
+		// the middle. The setting is kept for the next effect.
+		if ( $effect && ! $this->effect_peeks( $effect ) ) {
+			$attributes['carouselPeek'] = 0;
 		}
 
 		// The widest the layout ever gets, which is the row a desktop sees first.

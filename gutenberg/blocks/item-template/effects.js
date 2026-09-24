@@ -6,15 +6,26 @@ import { __ } from '@wordpress/i18n';
 
 // `columns: false` says the effect spreads one slide over the width of the
 // gallery and owns that width, so the columns control is not offered beside it.
+// `peek: false` says it lays the slides out itself, so no edge is left for the
+// next one to show at.
 const EFFECT_OPTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
-	{ label: __('Coverflow', 'visual-portfolio'), value: 'coverflow' },
+	{
+		label: __('Coverflow', 'visual-portfolio'),
+		value: 'coverflow',
+		peek: false,
+	},
 	{
 		label: __('Slideshow', 'visual-portfolio'),
 		value: 'slideshow',
 		columns: false,
 	},
-	{ label: __('Fade', 'visual-portfolio'), value: 'fade', columns: false },
+	{
+		label: __('Fade', 'visual-portfolio'),
+		value: 'fade',
+		columns: false,
+		peek: false,
+	},
 ];
 
 /**
@@ -58,4 +69,17 @@ export function effectRepeats(effect) {
 	const option = getEffectOptions().find((item) => item.value === effect);
 
 	return !option || false !== option.repeat;
+}
+
+/**
+ * Whether an effect leaves room for a slide of the next one at the edge.
+ *
+ * @param {string} effect - selected effect.
+ *
+ * @return {boolean} True when the peek control does something.
+ */
+export function effectPeeks(effect) {
+	const option = getEffectOptions().find((item) => item.value === effect);
+
+	return !option || false !== option.peek;
 }

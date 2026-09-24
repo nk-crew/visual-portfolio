@@ -10,7 +10,11 @@
  * how far through `cover` and through `contain` the slide is - on the item,
  * and the stylesheet holds the same animations still, paused, at the time
  * those numbers name. Where the browser has the timelines this does nothing
- * at all: the native rules apply, and the numbers would go unread.
+ * at all: the native rules apply, and the numbers would go unread. Except
+ * under RTL: Chromium measures an RTL list's view timelines from the wrong
+ * end (a slide at rest reads -300% rather than 50%), so an RTL list is kept
+ * here whatever the browser has. The stylesheet lays its effect out from the
+ * first frame and starts the animations with the mark.
  *
  * Shared by the page and the editor preview: `timelines.js` beside this file
  * runs it on the page, on the events the view module announces a carousel
@@ -178,6 +182,26 @@ function draw(list) {
 }
 
 /**
+ * Whether a list is RTL the way the stylesheet reads it.
+ *
+ * By `:dir()`, which follows the `dir` attribute, and not by the computed
+ * `direction`: the stylesheet holds an RTL list's animations off until the
+ * mark, and a list it does not see as RTL keeps its native animations, which
+ * a mark could no longer take over.
+ *
+ * @param {HTMLElement} list - item template list.
+ * @return {boolean} True for an RTL list.
+ */
+function isRtl(list) {
+	try {
+		return list.matches(':dir(rtl)');
+	} catch {
+		// No `:dir()`, so no RTL rules in the stylesheet either.
+		return false;
+	}
+}
+
+/**
  * Keep the timelines of a carousel effect where the browser has none.
  *
  * A visitor who asked for less motion is left the plain carousel the
@@ -192,7 +216,7 @@ export function driveTimelines(list) {
 
 	if (
 		!list.classList.contains(EFFECT_CLASS) ||
-		supportsTimelines(view) ||
+		(supportsTimelines(view) && !isRtl(list)) ||
 		view.matchMedia('(prefers-reduced-motion: reduce)').matches
 	) {
 		return noop;
