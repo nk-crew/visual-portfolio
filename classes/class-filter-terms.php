@@ -85,9 +85,10 @@ class Visual_Portfolio_Filter_Terms {
 			// A social source that has not fetched anything has no images yet.
 			$terms = isset( $query_opts['images'] ) ? Visual_Portfolio_Get::get_images_terms( $query_opts, false )['terms'] : array();
 		} else {
-			// A gallery of the current query on a search page is keyed by what
-			// the visitor typed, which is too many keys to keep.
-			$terms = self::get_posts_terms( $query_opts, ! ( is_search() && 'current_query' === ( $options['posts_source'] ?? '' ) ) );
+			// A gallery of the current query on a search page, or one a visitor
+			// searches, is keyed by what they typed, which is too many keys to
+			// keep.
+			$terms = self::get_posts_terms( $query_opts, ! ( is_search() && 'current_query' === ( $options['posts_source'] ?? '' ) ) && '' === Visual_Portfolio_Get::get_current_search( $options, $query_id ) );
 
 			// The post being viewed is taken off the shared answer here, rather
 			// than out of the query, which would give every post a key of its own.

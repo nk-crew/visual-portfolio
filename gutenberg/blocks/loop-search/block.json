@@ -1,0 +1,60 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "visual-portfolio/loop-search",
+	"title": "Gallery Search (Experimental)",
+	"description": "Lets visitors search the items of Gallery Loop. Block is experimental and will change in future releases. Please use with caution.",
+	"category": "media",
+	"ancestor": ["visual-portfolio/loop"],
+	"textdomain": "visual-portfolio",
+	"usesContext": [
+		"vp/blockId",
+		"vp/queryId",
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery",
+		"vp/sourceQuery"
+	],
+	"attributes": {
+		"placeholder": {
+			"type": "string",
+			"default": ""
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"extensions": {
+			"type": "object",
+			"default": {}
+		}
+	},
+	"supports": {
+		"html": false,
+		"className": false,
+		"anchor": true,
+		"color": {
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"padding": true,
+			"margin": ["top", "bottom"]
+		}
+	},
+	"selectors": { "root": ".vp-block-loop-search" },
+	"style": "visual-portfolio-block-loop-search"
+}

@@ -18,6 +18,7 @@ import './blocks/loop-carousel-indicator';
 import './blocks/loop-carousel-autoplay';
 import './blocks/loop-carousel-thumbnails';
 import './blocks/loop-sort';
+import './blocks/loop-search';
 import './blocks/loop-no-results';
 import './blocks/item-template';
 import './blocks/item-image';

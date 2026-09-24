@@ -103,6 +103,7 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 	 */
 	public function tear_down() {
 		wp_set_current_user( 0 );
+		unset( $_GET['vp-7-search'] );
 
 		parent::tear_down();
 	}
@@ -418,6 +419,47 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 		$this->new_request();
 
 		$this->assertContains( 'Gamma (1)', $this->render_filter( $query ) );
+	}
+
+	/**
+	 * A visitor search narrows the filter to the terms of what it found, and
+	 * those are counted on every request, since what visitors type has no end.
+	 *
+	 * @return void
+	 */
+	public function test_a_visitor_search_counts_the_terms_it_found_every_time() {
+		global $wpdb;
+
+		add_filter( 'vpf_loop_search', '__return_true' );
+		add_filter(
+			'vpf_extend_query_args',
+			static function ( $args, $options ) {
+				if ( 'fourth' === ( $options['loop_search'] ?? '' ) ) {
+					$args['post__in'] = array( self::$posts[3] );
+				}
+
+				return $args;
+			},
+			10,
+			2
+		);
+
+		$_GET['vp-7-search'] = 'fourth';
+
+		$this->assertSame( array( 'All', 'Gamma (1)' ), $this->render_filter( array( 'source' => 'post' ) ) );
+
+		// Behind WordPress' back, so only a new count would see it.
+		$wpdb->insert(
+			$wpdb->term_relationships,
+			array(
+				'object_id'        => self::$posts[3],
+				'term_taxonomy_id' => get_term( self::$categories['alpha'] )->term_taxonomy_id,
+			)
+		);
+
+		$this->new_request();
+
+		$this->assertSame( array( 'All', 'Alpha (1)', 'Gamma (1)' ), $this->render_filter( array( 'source' => 'post' ) ) );
 	}
 
 	/**

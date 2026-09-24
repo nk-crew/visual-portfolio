@@ -2,6 +2,7 @@ import {
 	getContext,
 	getElement,
 	store,
+	withScope,
 	withSyncEvent,
 } from '@wordpress/interactivity';
 
@@ -26,6 +27,10 @@ const PAGINATION_SELECTOR = '.vp-block-loop-pagination';
 const TRIGGER_SELECTOR = '.vp-block-loop-pagination-trigger';
 const END_SELECTOR = '.vp-block-loop-pagination-end';
 const MASONRY_CLASS = 'vp-layout-masonry';
+const SEARCH_INPUT_SELECTOR = '.vp-block-loop-search__input';
+
+// How long a search waits for the visitor to stop typing.
+const SEARCH_DELAY = 500;
 
 // Written on the list once Masonry is positioning the items, and read by the
 // stylesheet: until then the browser packs them into columns on its own. Not
@@ -61,6 +66,13 @@ const loopUndoAddresses = new WeakMap();
 // the newest of them owns the loading state - the first one to settle would
 // otherwise clear the flag for both.
 const navigating = new WeakMap();
+
+// Per loop: the search waiting for the visitor to stop typing, what they typed
+// last with where the caret was, and the address the last finished search
+// wrote.
+const searchTimers = new WeakMap();
+const typedSearches = new WeakMap();
+const searchAddresses = new WeakMap();
 
 /**
  * Context of the loop the current element belongs to.
@@ -620,6 +632,203 @@ async function loadNextPage(trigger, context, byClick) {
 	}
 }
 
+/**
+ * Swap a loop for its state at another address.
+ *
+ * The region comes back from a single server render, so the items and every
+ * control around them stay consistent, and the router owns the URL.
+ *
+ * @param {HTMLElement} ref             Control that asked.
+ * @param {string}      href            Address of the state.
+ * @param {Object}      context         Loop context.
+ * @param {Object}      options         Options.
+ * @param {boolean}     options.replace Whether the address replaces the current
+ *                                      history entry rather than adding one.
+ *
+ * @return {Generator} Whether the swap was the loop's latest and is done.
+ */
+function* swapLoop(ref, href, context, { replace = false } = {}) {
+	// The loop wrapper is the region root, so the router keeps this
+	// node while everything inside it is replaced.
+	const loop = ref.closest(LOOP_SELECTOR);
+
+	if (loop) {
+		// A Load More still in flight would append its page under the
+		// one the router is about to render, and register undos for a
+		// rollback that already ran.
+		pendingRequests.get(loop)?.abort();
+		pendingRequests.delete(loop);
+
+		undoManualEdits(loop);
+	}
+
+	context.isLoading = true;
+
+	// Named so that a navigation the visitor started over the top of
+	// this one can be told apart from it: whichever is the loop's
+	// current one is the one that gets to say it has finished.
+	const token = {};
+
+	if (loop) {
+		navigating.set(loop, token);
+	}
+
+	// Ends the loading state, and says whether this navigation was
+	// still the loop's own to end. A newer one owns the loop from the
+	// moment it starts, this one leaves everything to it.
+	const release = () => {
+		if (loop && navigating.get(loop) !== token) {
+			return false;
+		}
+
+		context.isLoading = false;
+
+		if (loop) {
+			navigating.delete(loop);
+		}
+
+		return true;
+	};
+
+	try {
+		const router = yield import('@wordpress/interactivity-router');
+
+		yield Promise.race([
+			router.actions.navigate(href, { replace }),
+			new Promise((resolve) => {
+				window.setTimeout(resolve, NAVIGATION_TIMEOUT);
+			}),
+		]);
+	} catch {
+		release();
+		window.location.assign(href);
+		return false;
+	}
+
+	if (!release()) {
+		return false;
+	}
+
+	const list = loop ? loop.querySelector(LIST_SELECTOR) : null;
+
+	if (list) {
+		refreshLayout(list);
+	}
+
+	return true;
+}
+
+/**
+ * The address a search form leads to, the one it submits to without
+ * JavaScript. An empty search is the default state, left out of the address.
+ *
+ * @param {HTMLInputElement} input Search input.
+ *
+ * @return {string} Address.
+ */
+function getSearchUrl(input) {
+	// Not `form.action`, which a preserved parameter named `action` shadows.
+	const url = new window.URL(
+		input.form.getAttribute('action'),
+		window.location.href
+	);
+	const params = new window.URLSearchParams(new window.FormData(input.form));
+
+	if (!input.value.trim()) {
+		params.delete(input.name);
+	}
+
+	url.search = params.toString();
+
+	return url.href;
+}
+
+/**
+ * Put back what the visitor was typing, when a swap took it away.
+ *
+ * The router renders the input again with the term the server read, which is
+ * behind whatever was typed while the page was on its way, and a node it
+ * rendered anew takes the focus with it.
+ *
+ * @param {HTMLElement} loop     Loop wrapper.
+ * @param {string}      name     Name of the search input.
+ * @param {boolean}     hadFocus Whether the input held the focus before the swap.
+ */
+function restoreSearch(loop, name, hadFocus) {
+	const typed = typedSearches.get(loop);
+	const input = loop.querySelector(
+		`${SEARCH_INPUT_SELECTOR}[name="${name}"]`
+	);
+
+	if (!typed || !input) {
+		return;
+	}
+
+	let moved = false;
+
+	if (input.value !== typed.value) {
+		input.value = typed.value;
+		moved = true;
+	}
+
+	const active = window.document.activeElement;
+
+	// Only a focus the swap dropped, not one the visitor took elsewhere.
+	if (
+		hadFocus &&
+		input !== active &&
+		(!active || window.document.body === active)
+	) {
+		input.focus();
+		moved = true;
+	}
+
+	if (moved && input === window.document.activeElement) {
+		input.setSelectionRange(typed.start, typed.end);
+	}
+}
+
+/**
+ * Swap a loop for the search in its input.
+ *
+ * A search adds a history entry, and every search right after it replaces
+ * that entry, so Back leaves the search rather than stepping through it a few
+ * letters at a time.
+ *
+ * @param {HTMLElement} loop    Loop wrapper.
+ * @param {string}      name    Name of the search input.
+ * @param {Object}      context Loop context.
+ *
+ * @return {Generator} Done.
+ */
+function* searchLoop(loop, name, context) {
+	searchTimers.delete(loop);
+
+	// Asked for again: a swap since the visitor typed may have rendered it
+	// anew.
+	const input = loop.querySelector(
+		`${SEARCH_INPUT_SELECTOR}[name="${name}"]`
+	);
+
+	if (!input || !input.form) {
+		return;
+	}
+
+	const href = getSearchUrl(input);
+
+	if (href === window.location.href) {
+		return;
+	}
+
+	const replace = searchAddresses.get(loop) === window.location.href;
+	const hadFocus = input === window.document.activeElement;
+
+	if (yield* swapLoop(input, href, context, { replace })) {
+		searchAddresses.set(loop, href);
+		restoreSearch(loop, name, hadFocus);
+	}
+}
+
 store('visual-portfolio/loop', {
 	state: {
 		// True wherever this module is running, which is the only thing a
@@ -658,73 +867,12 @@ store('visual-portfolio/loop', {
 
 			event.preventDefault();
 
-			const context = getLoopContext();
-			// The loop wrapper is the region root, so the router keeps this
-			// node while everything inside it is replaced.
+			if (!(yield* swapLoop(ref, href, getLoopContext()))) {
+				return;
+			}
+
 			const loop = ref.closest(LOOP_SELECTOR);
-
-			if (loop) {
-				// A Load More still in flight would append its page under the
-				// one the router is about to render, and register undos for a
-				// rollback that already ran.
-				pendingRequests.get(loop)?.abort();
-				pendingRequests.delete(loop);
-
-				undoManualEdits(loop);
-			}
-
-			context.isLoading = true;
-
-			// Named so that a navigation the visitor started over the top of
-			// this one can be told apart from it: whichever is the loop's
-			// current one is the one that gets to say it has finished.
-			const token = {};
-
-			if (loop) {
-				navigating.set(loop, token);
-			}
-
-			// Ends the loading state, and says whether this navigation was
-			// still the loop's own to end. A newer one owns the loop from the
-			// moment it starts, this one leaves everything to it.
-			const release = () => {
-				if (loop && navigating.get(loop) !== token) {
-					return false;
-				}
-
-				context.isLoading = false;
-
-				if (loop) {
-					navigating.delete(loop);
-				}
-
-				return true;
-			};
-
-			try {
-				const router = yield import('@wordpress/interactivity-router');
-
-				yield Promise.race([
-					router.actions.navigate(href),
-					new Promise((resolve) => {
-						window.setTimeout(resolve, NAVIGATION_TIMEOUT);
-					}),
-				]);
-			} catch {
-				release();
-				window.location.assign(href);
-				return;
-			}
-
-			if (!release()) {
-				return;
-			}
-
 			const list = loop ? loop.querySelector(LIST_SELECTOR) : null;
-
-			if (list) {
-				refreshLayout(list);
-			}
 
 			// The node that was activated is either gone - the last page has
 			// no Next - or still standing there meaning something else, and
@@ -735,6 +883,58 @@ store('visual-portfolio/loop', {
 			if (list && !(ref instanceof window.HTMLSelectElement)) {
 				focusIn(list);
 			}
+		}),
+
+		/**
+		 * Search the loop for what the visitor typed.
+		 *
+		 * Typing waits for a pause, Enter searches at once. The input lives in
+		 * the region it swaps, so the focus, the caret and anything typed while
+		 * the page was on its way are put back afterwards.
+		 *
+		 * @param {Event} event Input or submit event.
+		 */
+		search: withSyncEvent(function* (event) {
+			const { ref } = getElement();
+			const loop = ref.closest(LOOP_SELECTOR);
+			const input = ref
+				.closest('form')
+				?.querySelector(SEARCH_INPUT_SELECTOR);
+
+			// An input method is still composing the text.
+			if (!loop || !input || event.isComposing) {
+				return;
+			}
+
+			const isSubmit = 'submit' === event.type;
+
+			if (isSubmit) {
+				event.preventDefault();
+			}
+
+			window.clearTimeout(searchTimers.get(loop));
+			searchTimers.delete(loop);
+			typedSearches.set(loop, {
+				value: input.value,
+				start: input.selectionStart,
+				end: input.selectionEnd,
+			});
+
+			const { name } = input;
+			const context = getLoopContext();
+			const run = function* () {
+				yield* searchLoop(loop, name, context);
+			};
+
+			if (isSubmit) {
+				yield* run();
+				return;
+			}
+
+			searchTimers.set(
+				loop,
+				window.setTimeout(withScope(run), SEARCH_DELAY)
+			);
 		}),
 
 		/**

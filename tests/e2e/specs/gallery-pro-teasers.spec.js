@@ -10,6 +10,7 @@
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import { getFixturePath } from '../utils/fixture-path';
+import { openPublishedPage } from '../utils/open-published-page';
 import { getPluginSlug } from '../utils/plugin-slug';
 
 /**
@@ -267,6 +268,59 @@ test.describe('Gallery Loop and Pro settings', () => {
 
 		await expect(quickView).toHaveCount(1);
 		await expect(quickView).toBeDisabled();
+	});
+
+	test('without Pro, the search block says what it would do and the page shows none', async ({
+		page,
+		editor,
+	}) => {
+		test.skip(
+			await page.evaluate(() => window.VPGutenbergVariables.pro),
+			'Pro runs the search.'
+		);
+
+		await editor.setContent(getMarkup(images));
+
+		const [loop] = await editor.getBlocks({ full: true });
+
+		// Refused by the editor anywhere but inside a loop.
+		await editor.insertBlock({ name: 'visual-portfolio/loop-search' });
+		await editor.insertBlock(
+			{ name: 'visual-portfolio/loop-search' },
+			{ clientId: loop.clientId }
+		);
+
+		const blocks = await editor.getBlocks({ full: true });
+		const search = blocks[0].innerBlocks.find(
+			(block) => 'visual-portfolio/loop-search' === block.name
+		);
+
+		expect(blocks).toHaveLength(1);
+		expect(search).toBeTruthy();
+
+		await page.evaluate(
+			(id) =>
+				window.wp.data.dispatch('core/block-editor').selectBlock(id),
+			search.clientId
+		);
+
+		const settings = page.locator('.components-tools-panel', {
+			has: page.getByRole('heading', { name: 'Settings' }),
+		});
+
+		await expect(
+			settings.getByText('Let visitors search the gallery.')
+		).toBeVisible();
+		await expect(
+			settings.getByRole('link', { name: /Go Pro/ })
+		).toHaveAttribute('href', /utm_campaign=teaser_loop_search/);
+
+		await editor.publishPost();
+
+		const frontend = await openPublishedPage(page);
+
+		await expect(frontend.locator('.vp-block-loop')).toHaveCount(1);
+		await expect(frontend.locator('.vp-block-loop-search')).toHaveCount(0);
 	});
 
 	test('without Pro, the picture blocks name the Pro image effects', async ({

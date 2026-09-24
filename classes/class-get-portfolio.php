@@ -83,7 +83,14 @@ class Visual_Portfolio_Get {
 	 *
 	 * @var array
 	 */
-	private static $loop_query_vars = array( 'page', 'filter', 'sort' );
+	private static $loop_query_vars = array( 'page', 'filter', 'sort', 'search' );
+
+	/**
+	 * Longest visitor search a loop reads, in characters. The rest is cut off.
+	 *
+	 * @var int
+	 */
+	const LOOP_SEARCH_MAX_LENGTH = 100;
 
 	/**
 	 * Query string name of a loop state parameter.
@@ -93,7 +100,7 @@ class Visual_Portfolio_Get {
 	 * caller without an id gets the legacy global names: the legacy renderer
 	 * goes through these very helpers, and its URLs are public.
 	 *
-	 * @param string          $name     - `page`, `filter` or `sort`.
+	 * @param string          $name     - `page`, `filter`, `sort` or `search`.
 	 * @param int|string|null $query_id - id of the loop, or null for the legacy names.
 	 *
 	 * @return string
@@ -123,6 +130,64 @@ class Visual_Portfolio_Get {
 		$query_id = (int) $query_id;
 
 		return $query_id > 0 ? $query_id : null;
+	}
+
+	/**
+	 * Whether a Gallery Loop can be searched by its visitors.
+	 *
+	 * The free plugin reads the term and hands it over, and an extension that
+	 * applies it to the query says so through `vpf_loop_search`. Without one the
+	 * term changes nothing. Social and taxonomy sources have no text to match. A
+	 * loop without a query id would read `vp_search`, the parameter of the
+	 * classic search element, which every gallery on the page shares.
+	 *
+	 * @param array           $options  - options of the loop, in the legacy format.
+	 * @param int|string|null $query_id - id of the loop.
+	 *
+	 * @return bool
+	 */
+	public static function supports_loop_search( $options, $query_id ) {
+		if ( null === self::sanitize_query_id( $query_id ) || in_array( $options['content_source'] ?? '', array( 'social-stream', 'taxonomies' ), true ) ) {
+			return false;
+		}
+
+		/**
+		 * Filters whether an extension applies the visitor search of a Gallery
+		 * Loop to its query.
+		 *
+		 * The term reaches `vpf_extend_options_before_query_args` and
+		 * `vpf_extend_query_args` as `$options['loop_search']`.
+		 *
+		 * @param bool  $handled - whether the search is applied.
+		 * @param array $options - options of the loop, in the legacy format.
+		 */
+		return (bool) apply_filters( 'vpf_loop_search', false, $options );
+	}
+
+	/**
+	 * The term a visitor searches a Gallery Loop for.
+	 *
+	 * ?vp-3-search=forest for the loop with query id 3.
+	 *
+	 * @param array           $options  - options of the loop, in the legacy format.
+	 * @param int|string|null $query_id - id of the loop.
+	 *
+	 * @return string Empty when there is none, or nothing applies it.
+	 */
+	public static function get_current_search( $options, $query_id ) {
+		if ( ! self::supports_loop_search( $options, $query_id ) ) {
+			return '';
+		}
+
+		$name = self::get_query_var_name( 'search', $query_id );
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET[ $name ] ) ) {
+			return '';
+		}
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return trim( mb_substr( sanitize_text_field( wp_unslash( $_GET[ $name ] ) ), 0, self::LOOP_SEARCH_MAX_LENGTH ) );
 	}
 
 	/**
@@ -1850,6 +1915,14 @@ class Visual_Portfolio_Get {
 	 * @return array
 	 */
 	public static function get_query_params( $options, $for_filter = false, $layout_id = false, $query_id = null ) {
+		// Handed over rather than applied, see `supports_loop_search()`. A filter
+		// list asks for it too: its terms follow the searched items.
+		$search = self::get_current_search( $options, $query_id );
+
+		if ( '' !== $search ) {
+			$options['loop_search'] = $search;
+		}
+
 		$options    = apply_filters( 'vpf_extend_options_before_query_args', $options, $layout_id );
 		$query_opts = array();
 		$is_images  = 'images' === $options['content_source'];
@@ -3604,7 +3677,7 @@ class Visual_Portfolio_Get {
 	 * Return current page url with paged support.
 	 *
 	 * Arguments are always named after the legacy parameters (`vp_page`,
-	 * `vp_filter`, `vp_sort`). With a query id they are written under the names
+	 * `vp_filter`, `vp_sort`, `vp_search`). With a query id they are written under the names
 	 * of that loop instead, so every caller builds a link the same way and only
 	 * the loop decides which parameters it owns. Parameters of other loops are
 	 * part of the current URL and survive untouched.
@@ -3620,6 +3693,7 @@ class Visual_Portfolio_Get {
 		$names = array(
 			'vp_filter' => self::get_query_var_name( 'filter', $query_id ),
 			'vp_sort'   => self::get_query_var_name( 'sort', $query_id ),
+			'vp_search' => self::get_query_var_name( 'search', $query_id ),
 			'vp_page'   => self::get_query_var_name( 'page', $query_id ),
 		);
 
@@ -3633,9 +3707,9 @@ class Visual_Portfolio_Get {
 			$query_arg = $renamed;
 		}
 
-		// An empty filter or sort, and the first page, are the default state -
-		// they are dropped from the URL rather than written into it.
-		foreach ( array( 'vp_filter', 'vp_sort' ) as $legacy_name ) {
+		// An empty filter, sort or search, and the first page, are the default
+		// state - they are dropped from the URL rather than written into it.
+		foreach ( array( 'vp_filter', 'vp_sort', 'vp_search' ) as $legacy_name ) {
 			$name = $names[ $legacy_name ];
 
 			if ( isset( $query_arg[ $name ] ) && ! $query_arg[ $name ] ) {

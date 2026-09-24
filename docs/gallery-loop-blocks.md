@@ -3,8 +3,8 @@
 The block-native gallery of Visual Portfolio: a `visual-portfolio/loop` block holds
 a query, a `visual-portfolio/item-template` inside it lays the items out, and
 `item-*` blocks inside that draw one item. `loop-filter`, `loop-sort`,
-`loop-pagination` and the `loop-carousel-*` blocks are the controls around
-them.
+`loop-search`, `loop-pagination` and the `loop-carousel-*` blocks are the
+controls around them.
 
 Every block of the family is marked **(Experimental)** and registered only on
 **WordPress 7.1 and newer**. The legacy `visual-portfolio/block`,
@@ -257,6 +257,16 @@ select leads with a prompt. Without JavaScript a Filter or Sort button submits
 the select. With it, changing the select swaps the gallery and the focus stays
 on the select.
 
+**Search.** The Gallery Search block is a search field for its loop. It searches
+as the visitor types, once they pause for half a second, and at once on Enter.
+The field keeps the focus, the caret and anything typed while the results load.
+A new search starts at page one and keeps the filter and the sort. Without
+JavaScript the field submits as an ordinary form. The search itself comes with
+Pro: without it the block renders nothing on the page, and the editor says so
+with a link to Pro. Social and taxonomy sources cannot be searched, and the
+block renders nothing there either. *Placeholder* and *Label* set the text in
+the field and the name screen readers announce.
+
 When the last Load More takes the trigger away from a visitor who pressed it,
 the focus moves to the first link of the first item that arrived, or to that
 item itself when it holds none. A last page the infinite scroll loads by itself
@@ -269,6 +279,7 @@ visual-portfolio/loop                      query, block id, layout wrapper
 ├── visual-portfolio/loop-filter           links, one per term, or a GET form around a <select>
 │   └── visual-portfolio/loop-filter-item
 ├── visual-portfolio/loop-sort             a GET form around a <select>, or links
+├── visual-portfolio/loop-search           a GET form around a search input, Pro applies the term
 ├── visual-portfolio/item-template         runs the query, renders <ul><li>
 │   ├── visual-portfolio/item-image
 │   ├── visual-portfolio/item-cover        image with blocks on top of it
@@ -396,6 +407,7 @@ it reads — no hook involved:
 | `vpf_loop_item_context` | filter `( $context, $item, $options )` | Add context keys to one item |
 | `vpf_loop_custom_output` | filter `( false\|string, $options, $block )` | Replace the whole item template output, before a single item is rendered. Content protection uses this |
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |
+| `vpf_loop_search` | filter `( false, $options )` | Whether an extension applies the visitor search of a loop. Until one returns true the search block renders nothing and the term reaches no query. See below |
 | `vpf_loop_tiles_presets` | filter `( $presets )` | Tiles notations offered in the editor |
 | `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers, `name => settings`. See below |
 | `vpf_item_cover_effects` | filter `( $effects )` | Effects the item cover offers, a list of names. The cover gets the class `vp-effect-{name}`, so an effect is a stylesheet and this name; a saved effect not in the list is drawn as `fade` |
@@ -416,6 +428,17 @@ so every one of these keeps working unchanged: `vpf_get_options`,
 `vpf_custom_filter_terms`, else from the taxonomies `vpf_allow_taxonomy_for_filter`
 allows; `vpf_extend_filter_items` belongs to the legacy filter markup and is not
 applied.
+
+**The visitor search.** The free plugin reads `vp-{queryId}-search` and hands
+the term over without applying it. When `vpf_loop_search` returns true for the
+loop, `Visual_Portfolio_Get::get_query_params()` puts the term on the options as
+`$options['loop_search']` before `vpf_extend_options_before_query_args` runs, so
+both that filter and `vpf_extend_query_args` receive it. The term is run through
+`sanitize_text_field()`, trimmed and cut to 100 characters, and an empty search
+is no key at all. It is never set for a loop without a query id, for social and
+taxonomy sources, or for the classic gallery. The filter block counts its terms
+over the searched items, and does not cache them while a search is active,
+since what visitors type has no end.
 
 Three of them need a word for sources that are neither posts nor images:
 
@@ -728,7 +751,7 @@ without any change here.
 
 | Store | Module | What it does |
 |---|---|---|
-| `visual-portfolio/loop` | `build/gutenberg/blocks/loop/view.js` | Navigation of the whole family: `actions.navigate`, `actions.loadMore`, `callbacks.initLayout` (masonry), `callbacks.observeInfinite`, `state.isLoading`, `state.ariaLiveMessage`, `state.isEnhanced` |
+| `visual-portfolio/loop` | `build/gutenberg/blocks/loop/view.js` | Navigation of the whole family: `actions.navigate`, `actions.search`, `actions.loadMore`, `callbacks.initLayout` (masonry), `callbacks.observeInfinite`, `state.isLoading`, `state.ariaLiveMessage`, `state.isEnhanced` |
 | `visual-portfolio/item-template` | `build/gutenberg/blocks/item-template/view.js` | Justified and carousel layouts, the carousel controls (`actions.carouselPrev`, `actions.carouselNext`, `actions.carouselGoTo`), native masonry detection |
 | `visual-portfolio/item-cover` | `build/gutenberg/blocks/item-cover/view.js` | The `fly` effect only |
 
@@ -813,13 +836,19 @@ so two galleries on one page never move each other:
 | Page | `vp_page` | `vp-{queryId}-page` |
 | Filter | `vp_filter` | `vp-{queryId}-filter` |
 | Sort | `vp_sort` | `vp-{queryId}-sort` |
+| Search | none, see below | `vp-{queryId}-search` |
 | Random seed | `vpf_random_seed` | shared by the page |
 
-Defaults are never written: page one, an empty filter and the default sort are
-removed from the URL rather than spelled out. The canonical view of a page is
+Defaults are never written: page one, an empty filter, the default sort and an
+empty search are removed from the URL rather than spelled out. The canonical view of a page is
 therefore the URL with no parameters at all. A filter or sort form submitted
 without JavaScript is the exception. It names its parameter even for "All" or the
 default order, and an empty value reads the same as none.
+
+The search has no legacy name. `vp_search` belongs to the classic search element,
+and every gallery on the page reads it, so a loop searches only under its own
+query id. A search replaces the history entry of the search before it rather
+than adding one per pause in the typing, so Back leaves the search in one step.
 
 **The portfolio archive.** A loop with the Current Query source on the page mapped
 to the portfolio archive keeps its category and its page in the path, the way the
@@ -841,6 +870,7 @@ distinct combination below is a separate cacheable URL:
 | `vp-1-page=N` | yes | One entry per page. `noindex, follow`, with `rel="prev"`/`rel="next"` in the head |
 | `vp-1-filter=…` | yes | One entry per term shown by the filter |
 | `vp-1-sort=…` | yes | One entry per sort option |
+| `vp-1-search=…` | unbounded | One entry per term a visitor types |
 | Combinations of the above | yes | The product of them, which is what to keep an eye on: three galleries with four filters and four sort options each is already a large surface |
 | `vpf_random_seed=…` | unbounded | See below |
 
@@ -864,7 +894,7 @@ ones above — GET navigation, no cookies, no `Vary`, state in the query string 
 and the one setting worth checking on any of them is the treatment of query
 strings: a cache configured to ignore unknown parameters entirely will serve
 page one for every page of a gallery. Add `vp_page`, `vp_filter`, `vp_sort` and
-`vp-*-page|filter|sort` to the list of parameters that form the cache key, and
+`vp-*-page|filter|sort|search` to the list of parameters that form the cache key, and
 `vpf_random_seed` to the list that does not.
 
 **Pro's ajax cache module** is not wired into this family and will not be. It is
