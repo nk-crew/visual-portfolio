@@ -20,6 +20,11 @@ class ClassPopup extends WP_UnitTestCase {
 		parent::set_up();
 
 		$this->skip_without_loop_blocks();
+
+		// What the free plugin does on its own: Pro opens its media from
+		// this filter when it runs the suite. The hooks are restored after
+		// every test.
+		remove_all_filters( 'vpf_popup_output' );
 	}
 
 	/**
@@ -123,7 +128,12 @@ class ClassPopup extends WP_UnitTestCase {
 	 */
 	public function test_video_item_carries_the_video_url() {
 		$popup = Visual_Portfolio_Popup::get_item_popup(
-			$this->get_item( array( 'video' => 'https://youtu.be/aBcDeFgHiJk' ) ),
+			$this->get_item(
+				array(
+					'format' => 'video',
+					'video'  => 'https://youtu.be/aBcDeFgHiJk',
+				)
+			),
 			$this->get_options()
 		);
 
