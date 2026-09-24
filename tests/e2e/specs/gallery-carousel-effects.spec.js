@@ -146,6 +146,99 @@ test.describe('Carousel effects', () => {
 		).toBe('none');
 	});
 
+	test('a visitor who asked for less motion gets the plain carousel', async ({
+		page,
+		requestUtils,
+	}) => {
+		// The suite asks for less motion.
+		await publishLoop(requestUtils, page, {
+			title: 'Carousel effects - coverflow, less motion',
+			blockId: 'e2e-coverflow-reduced',
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselEffect: 'coverflow',
+			},
+		});
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveClass(/vp-carousel-coverflow/);
+
+		// No turn, and no card twice the width of its slide.
+		expect(
+			await list.evaluate((node) => {
+				const slide = node.querySelector(
+					'.wp-block-visual-portfolio-item-template__slide'
+				);
+
+				return [
+					window.getComputedStyle(slide.firstElementChild)
+						.animationName,
+					slide.offsetWidth === slide.parentElement.offsetWidth,
+				];
+			})
+		).toEqual(['none', true]);
+	});
+
+	// Chromium measures an RTL list's view timelines from the wrong end, so
+	// the module keeps them there too, and the cards are turned the other
+	// way.
+	test.describe('an effect under RTL', () => {
+		test.use({
+			contextOptions: {
+				reducedMotion: 'no-preference',
+				strictSelectors: true,
+			},
+		});
+
+		test('rests the card on show over its own slide', async ({
+			page,
+			requestUtils,
+		}) => {
+			await page.addInitScript(() => {
+				document.addEventListener('readystatechange', () => {
+					document.documentElement.dir = 'rtl';
+				});
+			});
+
+			await publishLoop(requestUtils, page, {
+				title: 'Carousel effects - fade under RTL',
+				blockId: 'e2e-fade-rtl',
+				layout: {
+					layoutType: 'carousel',
+					carouselEffect: 'fade',
+				},
+			});
+
+			const list = page.locator(LIST);
+
+			await expect(list).toHaveClass(/vp-carousel-scripted/);
+
+			// At rest the first card is shown over the frame, and the next
+			// waits hidden, the way LTR draws them.
+			await expect
+				.poll(() =>
+					list.evaluate((node) => {
+						const frame = node.getBoundingClientRect();
+
+						return Array.from(
+							node.querySelectorAll(
+								'.wp-block-visual-portfolio-item-template__card'
+							),
+							(card) => {
+								const box = card.getBoundingClientRect();
+
+								return `${Math.round(frame.right - box.right)} ${window.getComputedStyle(card).visibility}`;
+							}
+						).slice(0, 2);
+					})
+				)
+				.toEqual(['0 visible', '0 hidden']);
+		});
+	});
+
 	// The module keeps the timelines of an effect where the browser has none
 	// - Firefox, Safari before 26 - and the browser here has them, so the
 	// question the module asks of `CSS.supports` is answered for it before

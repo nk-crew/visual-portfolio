@@ -515,20 +515,31 @@ on a desktop and overflow the one column of a phone, so the module counts the
 slides against the columns, and counts again whenever the columns change,
 starting the carousel over as a loop or as a plain one.
 
+`peek` says whether the effect leaves an edge for a slide of the next one to
+show at, and is `true` unless the effect says otherwise. An effect that lays
+the slides out itself (cover flow turns them about the middle, fade and a deck
+hold them over the frame) has none, so with `peek: false` a saved *Peek* is
+left out of the page and the control is greyed with the reason.
+
 The list is given the classes `vp-carousel-effect` and `vp-carousel-acme-flip`,
 and the stylesheet is the install's own to enqueue —
 `render_block_visual-portfolio/item-template` is where Pro does it. Everything
 geometric belongs inside
-`@supports (animation-timeline: view())`: without it the two boxes are still
-rendered and the carousel is the plain carousel it would have been anyway.
-Firefox and Safari before 26 have no such timelines. The plugin keeps them by
-hand there, for every effect the install has, with a classic script that runs
-on the `vp-carousel-start` and `vp-carousel-stop` events below. It writes on
-each slide how far through `cover` and through `contain` a view timeline would
-have it, as `--vp-carousel-cover` and `--vp-carousel-contain`, and marks the
-list `vp-carousel-scripted`. An effect then states the same animations under
-`@supports not (animation-timeline: view())` for that marked list, paused and
-held at those times, the way `_carousel-effects.scss` does for the free ones.
+`@supports (animation-timeline: view())`, for an LTR list (`:dir(ltr)`) and
+under `prefers-reduced-motion: no-preference`: without it the two boxes are
+still rendered and the carousel is the plain carousel it would have been anyway,
+which is also what a visitor who asked for less motion gets.
+Firefox and Safari before 26 have no such timelines, and Chromium measures an
+RTL list's timelines from the wrong end. The plugin keeps them by hand in both
+cases, for every effect the install has, with a classic script that runs on the
+`vp-carousel-start` and `vp-carousel-stop` events below. It writes on each slide
+how far through `cover` and through `contain` a view timeline would have it, as
+`--vp-carousel-cover` and `--vp-carousel-contain`, and marks the list
+`vp-carousel-scripted`. An effect then states the same animations for that
+marked list, paused and held at those times, the way `_carousel-effects.scss`
+does for the free ones. Under RTL the next slide comes from the left, so an
+RTL list carries `--vp-carousel-direction: -1`, and every horizontal move and
+turn of an effect's keyframes is multiplied by it.
 
 The frame around the list is an inline-size query container, so a width is
 stated in `cqw` rather than in a percentage of the list — a carousel that

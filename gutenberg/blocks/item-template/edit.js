@@ -58,7 +58,12 @@ import {
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
 import { getColumnsProps, getViewportBreakpoints } from './columns';
-import { effectRepeats, effectTakesColumns, getEffectOptions } from './effects';
+import {
+	effectPeeks,
+	effectRepeats,
+	effectTakesColumns,
+	getEffectOptions,
+} from './effects';
 import { getTileStyles, getTilesColumns } from './tiles';
 import { TilesPresetsSelect, TilesPresetsToolbarButton } from './tiles-presets';
 import useEditorLayout from './use-editor-layout';
@@ -861,6 +866,10 @@ export default function BlockEdit({
 	// greyed, the way the container control is.
 	const repeatable = canRepeat(attributes);
 
+	// An effect that lays the slides out itself leaves no edge for the next
+	// one to show at, so its peek is greyed the same way, and not drawn.
+	const peekable = effectPeeks(carouselEffect);
+
 	// Tiles carry their columns in the notation, so that is where the layout
 	// reads them, whatever the columns controls say. The counts for the
 	// narrower screens go along, so a Tablet or Mobile preview draws the
@@ -990,7 +999,7 @@ export default function BlockEdit({
 						...columnsProps.style,
 						'--vp-layout-row-height': `${justifiedRowHeight}px`,
 						'--vp-carousel-snap-align': carouselSnapAlign,
-						'--vp-carousel-peek': `${Math.max(0, Math.min(200, carouselPeek))}px`,
+						'--vp-carousel-peek': `${peekable ? Math.max(0, Math.min(200, carouselPeek)) : 0}px`,
 						'--vp-carousel-slide-height':
 							carouselSlideHeight || undefined,
 						// A preview rests where the carousel starts, and the
@@ -1444,17 +1453,25 @@ export default function BlockEdit({
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
-				hasValue={() => 0 !== carouselPeek}
+				hasValue={() => 0 !== carouselPeek && peekable}
 				label={__('Peek', 'visual-portfolio')}
 				onDeselect={() => setAttributes({ carouselPeek: 0 })}
 			>
 				<RangeControl
 					label={__('Peek', 'visual-portfolio')}
-					help={__(
-						'How much of the next slide shows at the edge, as an invitation to scroll.',
-						'visual-portfolio'
-					)}
-					value={carouselPeek}
+					help={
+						peekable
+							? __(
+									'How much of the next slide shows at the edge, as an invitation to scroll.',
+									'visual-portfolio'
+								)
+							: __(
+									'This effect lays the slides out itself, so no part of the next one shows at the edge.',
+									'visual-portfolio'
+								)
+					}
+					value={peekable ? carouselPeek : 0}
+					disabled={!peekable}
 					onChange={(value) => setAttributes({ carouselPeek: value })}
 					min={0}
 					max={200}

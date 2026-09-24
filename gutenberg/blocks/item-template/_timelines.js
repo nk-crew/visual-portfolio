@@ -10,7 +10,10 @@
  * how far through `cover` and through `contain` the slide is - on the item,
  * and the stylesheet holds the same animations still, paused, at the time
  * those numbers name. Where the browser has the timelines this does nothing
- * at all: the native rules apply, and the numbers would go unread.
+ * at all: the native rules apply, and the numbers would go unread. Except
+ * under RTL: Chromium measures an RTL list's view timelines from the wrong
+ * end (a slide at rest reads -300% rather than 50%), so an RTL list is kept
+ * here whatever the browser has, and the native rules name LTR lists only.
  *
  * Shared by the page and the editor preview: `timelines.js` beside this file
  * runs it on the page, on the events the view module announces a carousel
@@ -192,7 +195,8 @@ export function driveTimelines(list) {
 
 	if (
 		!list.classList.contains(EFFECT_CLASS) ||
-		supportsTimelines(view) ||
+		(supportsTimelines(view) &&
+			'rtl' !== view.getComputedStyle(list).direction) ||
 		view.matchMedia('(prefers-reduced-motion: reduce)').matches
 	) {
 		return noop;

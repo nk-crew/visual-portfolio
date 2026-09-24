@@ -371,6 +371,15 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		// the padding leaves came out at nothing at all.
 		--vp-carousel-slide-width: calc((100cqw - var(--vp-carousel-inset, 0px) * 2 - var(--vp-carousel-peek, 0px) - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
 
+		// Which way the next slide comes from. A view timeline runs towards
+		// the inline end, which is the left under RTL, and the effects move
+		// and turn their cards along the physical x axis, so every horizontal
+		// move and turn of their keyframes is multiplied by this. The list's
+		// own direction, so an RTL section of an LTR page is mirrored too.
+		&:dir(rtl) {
+			--vp-carousel-direction: -1;
+		}
+
 		// Makes the list the box an item measures its `offsetLeft` from, which
 		// is how the module reads slide positions: a layout number, and so the
 		// same number under an effect that turns a card or pins it in place.
@@ -448,8 +457,10 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		// neither could reach the middle, and every slide that could not
 		// rested where the one before it did - a press on the arrow, and on
 		// the dot of such a slide, went nowhere. Not for slides of their own
-		// width, which the padding cannot be worked out from.
-		&.vp-carousel-snap-center:not(.vp-carousel-auto-width) {
+		// width, which the padding cannot be worked out from, and not for a
+		// cover flow, which rests every card in the middle with a padding of
+		// its own.
+		&.vp-carousel-snap-center:not(.vp-carousel-auto-width, .vp-carousel-coverflow) {
 			padding-inline: calc((100cqw - var(--vp-carousel-slide-width)) / 2);
 			scroll-padding-inline: 0;
 		}
@@ -525,10 +536,9 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	}
 
 	// Scroll driven effects, and nothing else - where the timeline is missing
-	// the rules below never apply and the carousel is exactly the carousel it
-	// was without them. `timelines.js` keeps the timelines by hand there, and
-	// the same mixin draws the list it marks - see `_carousel-effects.scss` -
-	// so an effect is described once.
+	// the native rules below never apply. `timelines.js` keeps the timelines
+	// by hand there, and under RTL, and the same mixin draws the list it
+	// marks - see `_carousel-effects.scss` - so an effect is described once.
 	@supports (animation-timeline: view()) {
 		// The scroll of the list, named for the slides a repeating carousel
 		// has moved round. Their own view timelines are measured from where
@@ -541,10 +551,17 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			scroll-timeline-axis: inline;
 		}
 
-		@include effects.carousel-effects(true);
+		// A visitor who asked for less motion is left the plain carousel, the
+		// way `timelines.js` leaves them one: stopped, an effect is its first
+		// frame, and a cover flow stopped is a pile of overlapping cards.
+		@media (prefers-reduced-motion: no-preference) {
+			@include effects.carousel-effects(true);
+		}
 	}
 
-	@supports not (animation-timeline: view()) {
+	// Only for a list `timelines.js` has marked, so no `@supports` is needed:
+	// it marks one wherever the native rules do not apply.
+	@media (prefers-reduced-motion: no-preference) {
 		@include effects.carousel-effects(false);
 	}
 }
@@ -570,7 +587,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 
 @keyframes vp-carousel-coverflow-slide {
 	0% {
-		transform: translateX(30%);
+		transform: translateX(calc(30% * var(--vp-carousel-direction, 1)));
 	}
 
 	50% {
@@ -578,7 +595,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	}
 
 	100% {
-		transform: translateX(-30%);
+		transform: translateX(calc(-30% * var(--vp-carousel-direction, 1)));
 	}
 }
 
@@ -590,7 +607,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 // left is the size difference a cover flow is read by.
 @keyframes vp-carousel-coverflow-card {
 	0% {
-		transform: rotateY(-55deg) scale(0.8);
+		transform: rotateY(calc(-55deg * var(--vp-carousel-direction, 1))) scale(0.8);
 	}
 
 	50% {
@@ -598,7 +615,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	}
 
 	100% {
-		transform: rotateY(55deg) scale(0.8);
+		transform: rotateY(calc(55deg * var(--vp-carousel-direction, 1))) scale(0.8);
 	}
 }
 
@@ -624,7 +641,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 // takes the clicks meant for the one under it.
 @keyframes vp-carousel-fade-card {
 	0% {
-		translate: calc(-1 * var(--vp-carousel-pin));
+		translate: calc(-1 * var(--vp-carousel-pin) * var(--vp-carousel-direction, 1));
 		opacity: 0;
 		visibility: hidden;
 	}
@@ -640,7 +657,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	}
 
 	100% {
-		translate: var(--vp-carousel-pin);
+		translate: calc(var(--vp-carousel-pin) * var(--vp-carousel-direction, 1));
 		opacity: 1;
 	}
 }
@@ -648,7 +665,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 // Half the speed of the carousel, which is what parallax is.
 @keyframes vp-carousel-slideshow-card {
 	0% {
-		transform: translateX(-50%);
+		transform: translateX(calc(-50% * var(--vp-carousel-direction, 1)));
 	}
 
 	50% {
@@ -656,31 +673,13 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	}
 
 	100% {
-		transform: translateX(50%);
+		transform: translateX(calc(50% * var(--vp-carousel-direction, 1)));
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.wp-block-visual-portfolio-item-template.vp-layout-carousel {
 		scroll-behavior: auto;
-
-		> .wp-block-visual-portfolio-item-template__item,
-		.wp-block-visual-portfolio-item-template__slide,
-		.wp-block-visual-portfolio-item-template__card {
-			animation: none;
-		}
-
-		// Stopped, fade is the plain carousel it is drawn over. Its rules name
-		// the list by one more class than the rule above, and the scripted
-		// ones by two, so these do too.
-		&.vp-carousel-fade,
-		&.vp-carousel-fade.vp-carousel-scripted {
-			> .wp-block-visual-portfolio-item-template__item,
-			.wp-block-visual-portfolio-item-template__slide,
-			.wp-block-visual-portfolio-item-template__card {
-				animation: none;
-			}
-		}
 	}
 }
 

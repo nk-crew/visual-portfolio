@@ -2372,6 +2372,10 @@ test.describe('Gallery Item Template layouts', () => {
 		page,
 		requestUtils,
 	}) => {
+		// A visitor who asked for less motion gets the plain carousel, and
+		// Playwright asks for less motion by default.
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
 		await publishLoop(requestUtils, page, {
 			title: 'Layouts - carousel coverflow',
 			blockId: 'e2e-carousel-coverflow',
@@ -2417,12 +2421,45 @@ test.describe('Gallery Item Template layouts', () => {
 		});
 
 		expect(geometry).toEqual({ slide: 2, centred: true });
+
+		// Snap to center leaves the cover flow's own padding alone: the first
+		// card rests in the middle the same.
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel coverflow centred',
+			blockId: 'e2e-carousel-coverflow-centred',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselEffect: 'coverflow',
+				carouselSnapAlign: 'center',
+			},
+		});
+
+		expect(
+			await page.locator(LIST).evaluate((list) => {
+				const item = list.querySelector(
+					'.wp-block-visual-portfolio-item-template__item'
+				);
+
+				return Math.abs(
+					item.offsetLeft +
+						item.offsetWidth / 2 -
+						list.clientWidth / 2
+				);
+			})
+		).toBeLessThan(2);
 	});
 
 	test('coverflow keeps the size of its cards when the carousel repeats', async ({
 		page,
 		requestUtils,
 	}) => {
+		// A visitor who asked for less motion gets the plain carousel, and
+		// Playwright asks for less motion by default.
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
 		await publishLoop(requestUtils, page, {
 			title: 'Layouts - carousel coverflow repeat',
 			blockId: 'e2e-carousel-coverflow-repeat',

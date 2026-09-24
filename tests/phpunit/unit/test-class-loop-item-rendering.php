@@ -313,6 +313,31 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An effect that lays the slides out itself leaves no edge for a slide of
+	 * the next one, so a saved peek is left out of it; the slideshow keeps it.
+	 *
+	 * @return void
+	 */
+	public function test_an_effect_that_lays_out_its_slides_takes_no_peek() {
+		foreach ( array(
+			'fade'      => false,
+			'coverflow' => false,
+			'slideshow' => true,
+		) as $effect => $peeks ) {
+			$output = $this->render_loop(
+				'<!-- wp:visual-portfolio/item-image /-->',
+				array(
+					'layoutType'     => 'carousel',
+					'carouselEffect' => $effect,
+					'carouselPeek'   => 80,
+				)
+			);
+
+			$this->assertSame( $peeks, false !== strpos( $output, '--vp-carousel-peek:80px' ), $effect );
+		}
+	}
+
+	/**
 	 * A carousel with an effect brings the script that keeps its timelines
 	 * where the browser has none, and a plain one does not.
 	 *
