@@ -139,7 +139,7 @@ test.describe('Gallery Loop and Pro settings', () => {
 				'e2e/gallery-format',
 				(options) => [
 					...options,
-					{ label: 'Gallery', value: 'gallery' },
+					{ label: 'E2E format', value: 'e2e-format' },
 				]
 			)
 		);
@@ -158,11 +158,11 @@ test.describe('Gallery Loop and Pro settings', () => {
 			.getByRole('dialog', { name: 'Image Settings' })
 			.getByRole('combobox', { name: 'Format' });
 
-		await expect(format.locator('option[value="gallery"]')).toHaveText(
-			'Gallery'
+		await expect(format.locator('option[value="e2e-format"]')).toHaveText(
+			'E2E format'
 		);
 
-		await format.selectOption('gallery');
+		await format.selectOption('e2e-format');
 
 		await expect
 			.poll(async () => {
@@ -170,7 +170,7 @@ test.describe('Gallery Loop and Pro settings', () => {
 
 				return block.attributes.imagesQuery.images[0].format;
 			})
-			.toBe('gallery');
+			.toBe('e2e-format');
 	});
 
 	test('without Pro, a Pro setting says what it would do', async ({
