@@ -80,7 +80,7 @@ class Visual_Portfolio_Block_Loop_Search {
 		$placeholder = trim( (string) ( $attributes['placeholder'] ?? '' ) );
 
 		return sprintf(
-			'<form role="search" method="get" action="%1$s" %2$s data-wp-interactive="%3$s" data-wp-on--submit="actions.search">%4$s<label><span class="vp-block-loop-search__label">%5$s</span><input type="search" class="vp-block-loop-search__input" name="%6$s" value="%7$s" placeholder="%8$s" maxlength="%9$d" data-wp-on--input="actions.search" /></label></form>',
+			'<form role="search" method="get" action="%1$s" %2$s data-wp-interactive="%3$s" data-wp-on--submit="actions.search">%4$s<label><span class="vp-block-loop-search__label">%5$s</span><input type="search" class="vp-block-loop-search__input" name="%6$s" value="%7$s" placeholder="%8$s" maxlength="%9$d" data-wp-on--input="actions.search" data-wp-on--compositionend="actions.search" /></label></form>',
 			esc_url( $action[0] ),
 			get_block_wrapper_attributes(
 				array(

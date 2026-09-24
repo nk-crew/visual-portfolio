@@ -440,6 +440,10 @@ taxonomy sources, or for the classic gallery. The filter block counts its terms
 over the searched items, and does not cache them while a search is active,
 since what visitors type has no end.
 
+The options of a loop's query carry `$options['is_loop'] = true`, so a query
+filter that should act on the classic gallery alone, such as one reading a
+classic URL parameter, can tell the two apart.
+
 Three of them need a word for sources that are neither posts nor images:
 
 - **`vpf_custom_query_result`** answers for the items *and* for the page count.

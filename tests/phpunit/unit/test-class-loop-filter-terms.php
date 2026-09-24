@@ -434,13 +434,15 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 		add_filter(
 			'vpf_extend_query_args',
 			static function ( $args, $options ) {
+				// The search of this test, in place of any other that runs.
 				if ( 'fourth' === ( $options['loop_search'] ?? '' ) ) {
 					$args['post__in'] = array( self::$posts[3] );
+					unset( $args['s'] );
 				}
 
 				return $args;
 			},
-			10,
+			PHP_INT_MAX,
 			2
 		);
 

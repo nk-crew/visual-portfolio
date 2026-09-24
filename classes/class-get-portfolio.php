@@ -1198,6 +1198,10 @@ class Visual_Portfolio_Get {
 			$options['pagination'] = 'paged';
 		}
 
+		// Tells the query filters a loop from a classic gallery, whose options
+		// are otherwise the same.
+		$options['is_loop'] = true;
+
 		/**
 		 * Fires before the loop items are resolved.
 		 *
@@ -1658,6 +1662,7 @@ class Visual_Portfolio_Get {
 		}
 
 		$options['items_count'] = $items_count;
+		$options['is_loop']     = true;
 
 		$query_opts = self::get_query_params( $options, false, false, $query_id );
 

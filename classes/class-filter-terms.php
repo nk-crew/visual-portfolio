@@ -69,8 +69,9 @@ class Visual_Portfolio_Filter_Terms {
 			return array();
 		}
 
-		$source     = $options['content_source'];
-		$query_opts = Visual_Portfolio_Get::get_query_params( $options, true, false, $query_id );
+		$source             = $options['content_source'];
+		$options['is_loop'] = true;
+		$query_opts         = Visual_Portfolio_Get::get_query_params( $options, true, false, $query_id );
 
 		if ( Visual_Portfolio_Archive_Mapping::is_archive( $options ) ) {
 			$query_opts = Visual_Portfolio_Archive_Mapping::without_address_terms( $query_opts );

@@ -71,6 +71,7 @@ const navigating = new WeakMap();
 // last with where the caret was, and the address the last finished search
 // wrote.
 const searchTimers = new WeakMap();
+const searchesInFlight = new WeakMap();
 const typedSearches = new WeakMap();
 const searchAddresses = new WeakMap();
 
@@ -653,6 +654,11 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 	const loop = ref.closest(LOOP_SELECTOR);
 
 	if (loop) {
+		// A search still waiting for a pause in the typing would follow this
+		// navigation from the page it replaces.
+		window.clearTimeout(searchTimers.get(loop));
+		searchTimers.delete(loop);
+
 		// A Load More still in flight would append its page under the
 		// one the router is about to render, and register undos for a
 		// rollback that already ran.
@@ -754,11 +760,15 @@ function getSearchUrl(input) {
  * @param {string}      name     Name of the search input.
  * @param {boolean}     hadFocus Whether the input held the focus before the swap.
  */
-function restoreSearch(loop, name, hadFocus) {
+function getSearchInput(loop, name, index) {
+	return loop.querySelectorAll(`${SEARCH_INPUT_SELECTOR}[name="${name}"]`)[
+		index
+	];
+}
+
+function restoreSearch(loop, name, index, hadFocus) {
 	const typed = typedSearches.get(loop);
-	const input = loop.querySelector(
-		`${SEARCH_INPUT_SELECTOR}[name="${name}"]`
-	);
+	const input = getSearchInput(loop, name, index);
 
 	if (!typed || !input) {
 		return;
@@ -801,14 +811,12 @@ function restoreSearch(loop, name, hadFocus) {
  *
  * @return {Generator} Done.
  */
-function* searchLoop(loop, name, context) {
+function* searchLoop(loop, name, index, context) {
 	searchTimers.delete(loop);
 
 	// Asked for again: a swap since the visitor typed may have rendered it
-	// anew.
-	const input = loop.querySelector(
-		`${SEARCH_INPUT_SELECTOR}[name="${name}"]`
-	);
+	// anew. By its place, since a loop may hold two of them.
+	const input = getSearchInput(loop, name, index);
 
 	if (!input || !input.form) {
 		return;
@@ -816,16 +824,28 @@ function* searchLoop(loop, name, context) {
 
 	const href = getSearchUrl(input);
 
-	if (href === window.location.href) {
+	// Already there, or already on the way: an Enter right after a pause
+	// would push the same address twice.
+	if (href === window.location.href || href === searchesInFlight.get(loop)) {
 		return;
 	}
 
-	const replace = searchAddresses.get(loop) === window.location.href;
+	const replace =
+		searchesInFlight.has(loop) ||
+		searchAddresses.get(loop) === window.location.href;
 	const hadFocus = input === window.document.activeElement;
 
-	if (yield* swapLoop(input, href, context, { replace })) {
+	searchesInFlight.set(loop, href);
+
+	const done = yield* swapLoop(input, href, context, { replace });
+
+	if (searchesInFlight.get(loop) === href) {
+		searchesInFlight.delete(loop);
+	}
+
+	if (done) {
 		searchAddresses.set(loop, href);
-		restoreSearch(loop, name, hadFocus);
+		restoreSearch(loop, name, index, hadFocus);
 	}
 }
 
@@ -867,11 +887,13 @@ store('visual-portfolio/loop', {
 
 			event.preventDefault();
 
+			// Found before the swap, which may take the control out.
+			const loop = ref.closest(LOOP_SELECTOR);
+
 			if (!(yield* swapLoop(ref, href, getLoopContext()))) {
 				return;
 			}
 
-			const loop = ref.closest(LOOP_SELECTOR);
 			const list = loop ? loop.querySelector(LIST_SELECTOR) : null;
 
 			// The node that was activated is either gone - the last page has
@@ -921,9 +943,14 @@ store('visual-portfolio/loop', {
 			});
 
 			const { name } = input;
+			const index = Array.from(
+				loop.querySelectorAll(
+					`${SEARCH_INPUT_SELECTOR}[name="${name}"]`
+				)
+			).indexOf(input);
 			const context = getLoopContext();
 			const run = function* () {
-				yield* searchLoop(loop, name, context);
+				yield* searchLoop(loop, name, index, context);
 			};
 
 			if (isSubmit) {

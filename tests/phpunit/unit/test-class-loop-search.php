@@ -57,6 +57,10 @@ class ClassLoopSearch extends WP_UnitTestCase {
 
 		$this->skip_without_loop_blocks();
 
+		// Pro handles the search; these tests say for themselves whether
+		// anything does.
+		remove_all_filters( 'vpf_loop_search' );
+
 		$this->handed = array();
 
 		foreach ( array( 'vpf_extend_options_before_query_args', 'vpf_extend_query_args' ) as $hook ) {
@@ -187,7 +191,7 @@ class ClassLoopSearch extends WP_UnitTestCase {
 		$html = $this->render_loop( '<!-- wp:visual-portfolio/loop-search {"label":"Find images","placeholder":"Type a name"} /-->' );
 
 		$this->assertMatchesRegularExpression(
-			'/<form role="search" method="get" action="[^"?]*" [^>]*class="[^"]*vp-block-loop-search[^"]*"[^>]*data-wp-on--submit="actions.search">(.*?)<label><span class="vp-block-loop-search__label">Find images<\/span><input type="search" class="vp-block-loop-search__input" name="vp-1-search" value="Forest &quot;path&quot;" placeholder="Type a name" maxlength="100" data-wp-on--input="actions.search" \/><\/label><\/form>/s',
+			'/<form role="search" method="get" action="[^"?]*" [^>]*class="[^"]*vp-block-loop-search[^"]*"[^>]*data-wp-on--submit="actions.search">(.*?)<label><span class="vp-block-loop-search__label">Find images<\/span><input type="search" class="vp-block-loop-search__input" name="vp-1-search" value="Forest &quot;path&quot;" placeholder="Type a name" maxlength="100" data-wp-on--input="actions.search" data-wp-on--compositionend="actions.search" \/><\/label><\/form>/s',
 			$html
 		);
 
