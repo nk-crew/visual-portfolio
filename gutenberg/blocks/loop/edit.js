@@ -56,6 +56,15 @@ const PROTECTION_TEASERS = [
 		),
 		campaign: 'teaser_protection_age',
 	},
+	{
+		name: 'rightClick',
+		label: __('Right-click Protection', 'visual-portfolio'),
+		line: __(
+			'Keep visitors from saving the pictures with a right click or by dragging them.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_protection_right_click',
+	},
 ];
 
 const {

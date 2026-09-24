@@ -128,6 +128,11 @@ test.describe('Gallery Loop and Pro settings', () => {
 		});
 
 		await protection.getByRole('button', { name: /options/i }).click();
+		await expect(
+			page.getByRole('menuitemcheckbox', {
+				name: 'Right-click Protection (Pro)',
+			})
+		).toBeVisible();
 		await page
 			.getByRole('menuitemcheckbox', {
 				name: 'Password Protection (Pro)',

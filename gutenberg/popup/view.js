@@ -36,9 +36,13 @@ function getGallery(loop) {
 	if (!gallery) {
 		lastUid += 1;
 
+		// The loop's own id where it has one, so what names a gallery in an
+		// address - Pro's deep links - finds the same loop on the next visit.
+		const region = loop.getAttribute('data-wp-router-region') || '';
+
 		gallery = {
 			$item: $(loop),
-			uid: `loop-${lastUid}`,
+			uid: region.replace(/^vp-loop-/, '') || `loop-${lastUid}`,
 			options: { itemsClickAction: 'popup_gallery' },
 			isPreview: () => false,
 			emitEvent(event, data) {

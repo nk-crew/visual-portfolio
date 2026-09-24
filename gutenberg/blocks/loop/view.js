@@ -54,6 +54,7 @@ const resizeObservers = new WeakMap();
 const observedWidths = new WeakMap();
 const pendingRequests = new WeakMap();
 const loopUndos = new WeakMap();
+const loopUndoAddresses = new WeakMap();
 
 // Loops whose region the router is replacing right now, each against the token
 // of the navigation doing it. Two clicks in a row are two navigations, and only
@@ -375,8 +376,21 @@ function announceUpdate(context) {
 function registerUndo(loop, undo) {
 	const undos = loopUndos.get(loop) || [];
 
+	if (!undos.length) {
+		loopUndoAddresses.set(loop, getPageAddress());
+	}
+
 	undos.push(undo);
 	loopUndos.set(loop, undos);
+}
+
+/**
+ * The address of the page, without the hash.
+ *
+ * @return {string} Address.
+ */
+function getPageAddress() {
+	return window.location.pathname + window.location.search;
 }
 
 /**
@@ -404,8 +418,15 @@ function undoManualEdits(loop) {
 // would be looking at two pages at once. Registered while the module is
 // evaluated, which is before the router is ever imported, so this listener is
 // always the earlier of the two.
+//
+// A step in the history of the hash alone - Pro's deep links write one for
+// every slide a lightbox shows - leaves the page, and the edits, where they are.
 window.addEventListener('popstate', () => {
-	window.document.querySelectorAll(LOOP_SELECTOR).forEach(undoManualEdits);
+	window.document.querySelectorAll(LOOP_SELECTOR).forEach((loop) => {
+		if (loopUndoAddresses.get(loop) !== getPageAddress()) {
+			undoManualEdits(loop);
+		}
+	});
 });
 
 /**
