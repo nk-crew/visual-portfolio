@@ -1,3 +1,5 @@
+@use "../../utils/item-format-badge/style";
+
 // The panel of a cover is one box: the hover overlay and the blocks on it. That
 // is how the legacy gallery builds every one of its item styles, and it is what
 // makes a state a single answer - a panel is somewhere, or it is not, and the

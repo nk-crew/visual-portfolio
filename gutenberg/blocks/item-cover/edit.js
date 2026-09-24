@@ -36,6 +36,11 @@ import { getMissingTeasers } from '../../components/pro-teaser';
 import { getClickActions } from '../../utils/click-actions';
 import { AspectRatioTool, ScaleTool } from '../../utils/dimensions-tools';
 import {
+	FORMAT_BADGE_DEFAULTS,
+	FormatBadgeSettings,
+	ItemFormatBadge,
+} from '../../utils/item-format-badge';
+import {
 	useImageSizeOnInsert,
 	useImageSizeOptions,
 } from '../../utils/item-image-size';
@@ -126,6 +131,7 @@ const DEFAULT_ATTRIBUTES = {
 	clickAction: 'none',
 	linkTarget: '_self',
 	rel: '',
+	...FORMAT_BADGE_DEFAULTS,
 };
 
 export default function ItemCoverEdit({
@@ -149,6 +155,8 @@ export default function ItemCoverEdit({
 		linkTarget,
 		rel,
 		style,
+		showFormatBadge,
+		formatBadgePosition,
 	} = attributes;
 
 	const {
@@ -156,6 +164,7 @@ export default function ItemCoverEdit({
 		'vp/itemImgAlt': itemImgAlt,
 		'vp/itemImageSizes': itemImageSizes,
 		'vp/itemFocalPoint': itemFocalPoint,
+		'vp/itemFormat': itemFormat,
 		'vp/layoutColumns': layoutColumns,
 	} = context;
 
@@ -544,6 +553,11 @@ export default function ItemCoverEdit({
 									/>
 								)
 							)}
+							<FormatBadgeSettings
+								attributes={attributes}
+								setAttributes={setAttributes}
+								panelId={clientId}
+							/>
 						</ToolsPanel>
 					</InspectorControls>
 				</>
@@ -573,6 +587,12 @@ export default function ItemCoverEdit({
 						<ItemOverlay
 							className={OVERLAY_CLASS}
 							overlay={overlay}
+						/>
+					)}
+					{showFormatBadge && (
+						<ItemFormatBadge
+							format={itemFormat}
+							position={formatBadgePosition}
 						/>
 					)}
 				</div>

@@ -184,6 +184,21 @@ class Visual_Portfolio_Block_Item_Image {
 			$image = Visual_Portfolio_Images::get_attachment_image( $context['vp/itemNoImgId'], $size, false, $img_attr );
 		}
 
+		/**
+		 * Filters the picture of a loop item block, before its overlay and link.
+		 *
+		 * Where media beside the image goes, such as the Pro hover image and
+		 * video thumbnail. An item with no image comes in empty and may leave
+		 * with a picture, which takes the block's crop from `$img_attr`.
+		 *
+		 * @param string $image      picture markup, empty for an item without an image.
+		 * @param array  $context    block context of the item.
+		 * @param array  $attributes block attributes.
+		 * @param string $block_name `visual-portfolio/item-image` or `visual-portfolio/item-cover`.
+		 * @param array  $img_attr   attributes the block gives its `img`: class, style, loading.
+		 */
+		$image = apply_filters( 'vpf_loop_item_picture', $image, $context, $attributes, 'visual-portfolio/item-image', $img_attr );
+
 		// An item without an image renders nothing at all - an empty item is a
 		// valid gallery item.
 		if ( ! $image ) {
@@ -207,6 +222,12 @@ class Visual_Portfolio_Block_Item_Image {
 			)
 		);
 		$image  = $this->get_click_wrapper( $image, $attributes, $context );
+
+		// Beside the link rather than in it: the link is named by its label, and
+		// the badge names the format on its own.
+		if ( ! empty( $attributes['showFormatBadge'] ) ) {
+			$image .= visual_portfolio_get_item_format_badge( $context['vp/itemFormat'] ?? '', $attributes['formatBadgePosition'] ?? '' );
+		}
 
 		return sprintf( '<figure %1$s>%2$s</figure>', get_block_wrapper_attributes(), $image );
 	}

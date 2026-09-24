@@ -146,6 +146,10 @@ class Visual_Portfolio_Block_Item_Cover {
 			$image = Visual_Portfolio_Images::get_attachment_image( $context['vp/itemNoImgId'], $size, false, $img_attr );
 		}
 
+		// See `vpf_loop_item_picture` in the item image block. The ratio of the
+		// cover is read off the first picture, so media added after it keeps the box.
+		$image = apply_filters( 'vpf_loop_item_picture', $image, $context, $attributes, 'visual-portfolio/item-cover', $img_attr );
+
 		// The assets walker only knows about galleries of the legacy block, so the
 		// lazy loading scripts of this one are requested here.
 		if ( $image && Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' ) ) {
@@ -358,6 +362,11 @@ class Visual_Portfolio_Block_Item_Cover {
 				'customGradient' => $attributes['customGradient'] ?? '',
 			)
 		);
+
+		// Part of the picture, so it goes wherever a stylesheet moves the picture.
+		if ( ! empty( $attributes['showFormatBadge'] ) ) {
+			$media .= visual_portfolio_get_item_format_badge( $context['vp/itemFormat'] ?? '', $attributes['formatBadgePosition'] ?? '' );
+		}
 
 		$hover_overlay = visual_portfolio_get_item_overlay(
 			self::OVERLAY_CLASS,

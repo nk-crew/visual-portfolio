@@ -16,6 +16,7 @@
 		"vp/itemFocalPoint",
 		"vp/itemUrl",
 		"vp/itemAriaLabel",
+		"vp/itemFormat",
 		"vp/itemPopupData",
 		"vp/itemImageLoading",
 		"vp/layoutColumns"
@@ -100,6 +101,15 @@
 			"type": "string",
 			"default": "",
 			"role": "content"
+		},
+		"showFormatBadge": {
+			"type": "boolean",
+			"default": false
+		},
+		"formatBadgePosition": {
+			"type": "string",
+			"enum": ["top-left", "top-right", "bottom-left", "bottom-right"],
+			"default": "top-right"
 		},
 		"extensions": {
 			"type": "object",
