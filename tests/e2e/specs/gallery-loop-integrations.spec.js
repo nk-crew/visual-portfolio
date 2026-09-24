@@ -413,6 +413,55 @@ test.describe('Gallery Loop integrations', () => {
 		expect(new URL(page.url()).searchParams.get('vp-1-page')).toBe('3');
 	});
 
+	test('a page fetched ahead that never comes loads in full', async ({
+		page,
+		requestUtils,
+	}) => {
+		test.setTimeout(60000);
+
+		await publishPrefetchingLoop(
+			requestUtils,
+			page,
+			'Integrations - prefetch that hangs',
+			'<!-- wp:visual-portfolio/loop-pagination --><!-- wp:visual-portfolio/loop-pagination-numbers /--><!-- /wp:visual-portfolio/loop-pagination -->'
+		);
+
+		// Only the fetch ahead hangs, past the loop's ten seconds.
+		let hung = false;
+
+		await page.route(
+			(url) => '2' === url.searchParams.get('vp-1-page'),
+			async (route) => {
+				if (hung) {
+					await route.fallback();
+					return;
+				}
+
+				hung = true;
+				await new Promise((resolve) => setTimeout(resolve, 15000));
+				await route.fallback().catch(() => {});
+			}
+		);
+
+		const link = page.locator(
+			`${LOOP} .vp-block-loop-pagination-numbers a`,
+			{ hasText: '2' }
+		);
+
+		await link.hover();
+		await expect.poll(() => hung).toBe(true);
+		await link.click();
+
+		await page.waitForURL(/vp-1-page=2/, { timeout: 20000 });
+		await expect(page.locator(`${LOOP} ${ITEM} ${TITLE}`)).toHaveText([
+			'Prefetch C',
+			'Prefetch D',
+		]);
+		expect(await page.evaluate(() => window.__vpSameDocument)).toBe(
+			undefined
+		);
+	});
+
 	test('the next page of a load more is fetched ahead and used', async ({
 		page,
 		requestUtils,

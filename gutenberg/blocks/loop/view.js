@@ -850,20 +850,35 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 	try {
 		const router = yield import('@wordpress/interactivity-router');
 
-		yield Promise.race([
+		let asked = false;
+
+		const timedOut = yield Promise.race([
 			// A prefetch of this address still on its way is the request the
 			// router would make again. Once it failed, the router makes its own.
 			// The router takes the last navigation it is asked for, so one the
 			// visitor has since replaced asks for nothing.
-			Promise.resolve(prefetchedLinks.get(href)).then(() => {
+			Promise.resolve(prefetchedLinks.get(href)).then(async () => {
 				if (!loop || latestNavigations.get(loop) === token) {
-					return router.actions.navigate(href, { replace });
+					asked = true;
+					await router.actions.navigate(href, { replace });
 				}
+
+				return false;
 			}),
 			new Promise((resolve) => {
-				window.setTimeout(resolve, NAVIGATION_TIMEOUT);
+				window.setTimeout(() => resolve(true), NAVIGATION_TIMEOUT);
 			}),
 		]);
+
+		// A page fetched ahead that has not come by the deadline is given up,
+		// and the address loads in full, as when the router's own fetch hangs.
+		if (timedOut && !asked) {
+			if (loop) {
+				latestNavigations.set(loop, {});
+			}
+
+			throw new Error('Timeout');
+		}
 	} catch {
 		// Only the navigation still wanted may fall back to a full load: an
 		// older one would take the visitor off the control they used since.
