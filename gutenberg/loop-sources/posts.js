@@ -22,7 +22,8 @@ import { PostsIcon } from './icons';
 import { registerLoopSource } from './registry';
 import useEntitySearch from './use-entity-search';
 
-// The filters Pro adds to a posts query, for an install without them.
+// The filters Pro adds to a posts query, for an install without them, shown
+// where Pro draws them.
 const PRO_FILTERS = [
 	{
 		name: 'authors',
@@ -36,8 +37,13 @@ const PRO_FILTERS = [
 	{
 		name: 'date',
 		label: __('Date', 'visual-portfolio'),
-		line: __('Only posts published between two dates.', 'visual-portfolio'),
+		line: __(
+			'Only posts published in the past day, week, month, or between two dates.',
+			'visual-portfolio'
+		),
 		campaign: 'teaser_filter_date',
+		shows: (attributes) =>
+			'current_query' !== attributes.postsQuery?.source,
 	},
 	{
 		name: 'exclude-no-thumb',
@@ -47,15 +53,18 @@ const PRO_FILTERS = [
 			'visual-portfolio'
 		),
 		campaign: 'teaser_filter_thumbnail',
+		shows: (attributes) =>
+			'current_query' !== attributes.postsQuery?.source,
 	},
 	{
 		name: 'sticky',
 		label: __('Sticky posts', 'visual-portfolio'),
 		line: __(
-			'Sticky posts always appear first, regardless of their publish date.',
+			'Include, ignore, leave out or show only the sticky posts.',
 			'visual-portfolio'
 		),
 		campaign: 'teaser_filter_sticky',
+		shows: (attributes) => 'post' === attributes.postsQuery?.source,
 	},
 ];
 
@@ -500,7 +509,9 @@ function PostsFiltersPanel(props) {
 	// through this; its `resetAllFilter` is what "Reset all" writes back for it,
 	// in the same `postsQuery` the built-in filters live in.
 	const extraItems = applyFilters('vpf.loopPostsFilterItems', [], props);
-	const teasers = getMissingTeasers(extraItems, PRO_FILTERS);
+	const teasers = getMissingTeasers(extraItems, PRO_FILTERS, {
+		attributes: props.attributes,
+	});
 
 	return (
 		<ToolsPanel
@@ -516,7 +527,7 @@ function PostsFiltersPanel(props) {
 				)
 			}
 		>
-			{[...extraItems, ...teasers].map(({ name, Item }) => (
+			{extraItems.map(({ name, Item }) => (
 				<Item key={name} {...props} />
 			))}
 
@@ -573,6 +584,11 @@ function PostsFiltersPanel(props) {
 					/>
 				</VStack>
 			</ToolsPanelItem>
+
+			{/* After the filters there are, so the menu leads with those. */}
+			{teasers.map(({ name, Item }) => (
+				<Item key={name} {...props} />
+			))}
 		</ToolsPanel>
 	);
 }

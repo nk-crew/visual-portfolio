@@ -465,7 +465,8 @@ under names of its own, and reads them back from `$attributes['extensions']` in 
 `render_block_{name}` filter. A block attribute the extension declared itself is
 dropped the first time the page is saved in an editor without the extension; a
 key of `extensions` is kept. The per-screen columns and tiles of the item template
-are the exception: the free plugin reads them itself, so it declares them.
+are the exception: the free plugin names those keys, the ones its preview builds
+the per-screen classes from, so it declares them.
 
 A value list an extension adds to is left open for the same reason. The carousel
 effect is a plain string, and the server draws only an effect this install has;

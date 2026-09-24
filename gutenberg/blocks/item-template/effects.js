@@ -141,10 +141,10 @@ export function isDrawnEffect(effect) {
 }
 
 /**
- * Whether the Effect list holds effects this install lacks.
+ * How many Pro effects the Effect list holds that this install lacks.
  *
- * @return {boolean} True when some Pro effect is missing.
+ * @return {number} count.
  */
-export function hasEffectTeasers() {
-	return getEffectSelectOptions().some((option) => option.disabled);
+export function countEffectTeasers() {
+	return getEffectSelectOptions().filter((option) => option.disabled).length;
 }

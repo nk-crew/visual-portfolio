@@ -38,6 +38,9 @@ function getMarkup(images) {
 		'<div class="wp-block-visual-portfolio-loop vp-block-loop">',
 		`<!-- wp:visual-portfolio/item-template ${JSON.stringify(template)} -->`,
 		'<!-- wp:visual-portfolio/item-image {"extensions":{"watermark":true}} /-->',
+		'<!-- wp:visual-portfolio/item-cover -->',
+		'<!-- wp:visual-portfolio/item-title /-->',
+		'<!-- /wp:visual-portfolio/item-cover -->',
 		'<!-- /wp:visual-portfolio/item-template -->',
 		'<!-- wp:visual-portfolio/loop-pagination -->',
 		'<!-- wp:visual-portfolio/loop-pagination-trigger {"triggerType":"infinite","extensions":{"threshold":300}} /-->',
@@ -135,5 +138,36 @@ test.describe('Gallery Loop and Pro settings', () => {
 		await expect(
 			protection.getByRole('link', { name: /Go Pro/ })
 		).toHaveAttribute('href', /utm_campaign=teaser_protection_password/);
+
+		// A teaser in a list the cover shares with Pro stays picked when the
+		// block draws again.
+		const cover = blocks[0].innerBlocks[0].innerBlocks[1].clientId;
+
+		await page.evaluate(
+			(id) =>
+				window.wp.data.dispatch('core/block-editor').selectBlock(id),
+			cover
+		);
+
+		const settings = page.locator('.components-tools-panel', {
+			has: page.getByRole('heading', { name: 'Settings' }),
+		});
+
+		await settings.getByRole('button', { name: /options/i }).click();
+		await page
+			.getByRole('menuitemcheckbox', { name: 'Move under image (Pro)' })
+			.click();
+		await page.keyboard.press('Escape');
+		await page.evaluate(
+			(id) =>
+				window.wp.data
+					.dispatch('core/block-editor')
+					.updateBlockAttributes(id, { minHeight: '200px' }),
+			cover
+		);
+
+		await expect(
+			settings.getByText('Draw the content below the picture')
+		).toBeVisible();
 	});
 });

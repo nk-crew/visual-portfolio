@@ -36,7 +36,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { memo, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import {
 	alignNone,
 	justifyCenter,
@@ -60,11 +60,11 @@ import {
 import { useIsPreview } from '../../utils/use-is-preview';
 import { getColumnsProps, getViewportBreakpoints } from './columns';
 import {
+	countEffectTeasers,
 	effectPeeks,
 	effectRepeats,
 	effectTakesColumns,
 	getEffectSelectOptions,
-	hasEffectTeasers,
 	isDrawnEffect,
 } from './effects';
 import { getTileStyles, getTilesColumns } from './tiles';
@@ -884,6 +884,9 @@ export default function BlockEdit({
 	// one to show at, so its peek is greyed the same way, and not drawn.
 	const peekable = effectPeeks(carouselEffect);
 
+	// The Pro effects this install lacks, which the Effect list names.
+	const effectTeasers = countEffectTeasers();
+
 	// Tiles carry their columns in the notation, so that is where the layout
 	// reads them, whatever the columns controls say. The counts for the
 	// narrower screens go along, so a Tablet or Mobile preview draws the
@@ -1394,11 +1397,17 @@ export default function BlockEdit({
 				<SelectControl
 					label={__('Effect', 'visual-portfolio')}
 					help={
-						hasEffectTeasers() ? (
+						effectTeasers ? (
 							<ProLine campaign="teaser_carousel_effects">
-								{__(
-									'How one slide gives way to the next. Ten more effects come with Pro.',
-									'visual-portfolio'
+								{sprintf(
+									/* translators: %d: number of effects that come with Pro. */
+									_n(
+										'How one slide gives way to the next. %d more effect comes with Pro.',
+										'How one slide gives way to the next. %d more effects come with Pro.',
+										effectTeasers,
+										'visual-portfolio'
+									),
+									effectTeasers
 								)}
 							</ProLine>
 						) : (

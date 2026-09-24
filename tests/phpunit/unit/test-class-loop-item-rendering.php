@@ -424,13 +424,26 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 
 		$this->assertSame( 'cards', ( new WP_Block( $block ) )->attributes['carouselEffect'] );
 
-		$output = $this->render_loop(
-			'<!-- wp:visual-portfolio/item-image /-->',
-			array(
-				'layoutType'     => 'carousel',
-				'carouselEffect' => 'cards',
-			)
-		);
+		// Pro registers cards when it runs this suite.
+		$drop_cards = function ( $effects ) {
+			unset( $effects['cards'] );
+
+			return $effects;
+		};
+
+		add_filter( 'vpf_carousel_effects', $drop_cards, PHP_INT_MAX );
+
+		try {
+			$output = $this->render_loop(
+				'<!-- wp:visual-portfolio/item-image /-->',
+				array(
+					'layoutType'     => 'carousel',
+					'carouselEffect' => 'cards',
+				)
+			);
+		} finally {
+			remove_filter( 'vpf_carousel_effects', $drop_cards, PHP_INT_MAX );
+		}
 
 		$this->assertStringNotContainsString( 'vp-carousel-effect', $output );
 		$this->assertStringNotContainsString( 'vp-carousel-cards', $output );

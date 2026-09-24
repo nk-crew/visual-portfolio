@@ -58,7 +58,7 @@ const PRO_SETTINGS = [
 		name: 'moveUnderImage',
 		label: __('Move under image', 'visual-portfolio'),
 		line: __(
-			'Draw the content below the picture on narrow screens, which cannot hover.',
+			'Draw the content below the picture under a screen width you choose.',
 			'visual-portfolio'
 		),
 		campaign: 'teaser_cover_move_under_image',
@@ -204,7 +204,9 @@ export default function ItemCoverEdit({
 		setAttributes,
 		clientId,
 	});
-	const teasers = getMissingTeasers(extraSettings, PRO_SETTINGS, clientId);
+	const teasers = getMissingTeasers(extraSettings, PRO_SETTINGS, {
+		withPanelId: true,
+	});
 
 	const blockProps = useBlockProps({
 		className: classnames(

@@ -15,6 +15,11 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+
 const { plugin_version: pluginVersion, pro: isProPlugin } =
 	window.VPGutenbergVariables;
 
@@ -88,29 +93,67 @@ export function ProTeaserItem({ label, campaign, children, panelId }) {
 	);
 }
 
+// One component per teaser and panel kind, made once. A component made on
+// every render is a new type to React, which mounts it again - and the panel
+// forgets that the item was picked.
+const teaserItems = new WeakMap();
+
+/**
+ * The item a teaser is drawn as.
+ *
+ * @param {Object}  teaser      - `{ label, line, campaign }` of the Pro item.
+ * @param {boolean} withPanelId - whether the panel names its items by the block.
+ *
+ * @return {Function} component.
+ */
+function getTeaserItem(teaser, withPanelId) {
+	const items = teaserItems.get(teaser) || {};
+
+	if (!items[withPanelId]) {
+		items[withPanelId] = ({ clientId }) => (
+			<ProTeaserItem
+				label={teaser.label}
+				campaign={teaser.campaign}
+				panelId={withPanelId ? clientId : undefined}
+			>
+				{teaser.line}
+			</ProTeaserItem>
+		);
+
+		teaserItems.set(teaser, items);
+	}
+
+	return items[withPanelId];
+}
+
 /**
  * Teasers for the Pro items a `{ name, Item }` list lacks.
  *
- * @param {Array}  items   - the list after its filter has run.
- * @param {Array}  teasers - `{ name, label, line, campaign }` of the Pro items.
- * @param {string} panelId - the panel's id, where the panel names one.
+ * @param {Array}   items               - the list after its filter has run.
+ * @param {Array}   teasers             - `{ name, label, line, campaign, shows }`
+ *                                        of the Pro items; `shows( attributes )`
+ *                                        says where Pro draws the item.
+ * @param {Object}  options             - how the list is drawn.
+ * @param {Object}  options.attributes  - attributes of the block.
+ * @param {boolean} options.withPanelId - whether the panel names its items by
+ *                                        the block's client id.
  *
  * @return {Array} `{ name, Item }` of the missing ones.
  */
-export function getMissingTeasers(items, teasers, panelId) {
+export function getMissingTeasers(
+	items,
+	teasers,
+	{ attributes = {}, withPanelId = false } = {}
+) {
 	return teasers
-		.filter(({ name }) => !items.some((item) => item.name === name))
-		.map(({ name, label, line, campaign }) => ({
-			name,
-			Item: () => (
-				<ProTeaserItem
-					label={label}
-					campaign={campaign}
-					panelId={panelId}
-				>
-					{line}
-				</ProTeaserItem>
-			),
+		.filter(
+			(teaser) =>
+				!items.some((item) => item.name === teaser.name) &&
+				(!teaser.shows || teaser.shows(attributes))
+		)
+		.map((teaser) => ({
+			name: teaser.name,
+			Item: getTeaserItem(teaser, withPanelId),
 		}));
 }
 
@@ -125,13 +168,19 @@ export function getMissingTeasers(items, teasers, panelId) {
  * @return {Element|null} component.
  */
 export function ProTeaserPanel({ label, items }) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	if (isProPlugin) {
 		return null;
 	}
 
 	return (
 		<InspectorControls>
-			<ToolsPanel label={label} resetAll={() => {}}>
+			<ToolsPanel
+				label={label}
+				resetAll={() => {}}
+				dropdownMenuProps={dropdownMenuProps}
+			>
 				{items.map((item) => (
 					<ProTeaserItem
 						key={item.name}
