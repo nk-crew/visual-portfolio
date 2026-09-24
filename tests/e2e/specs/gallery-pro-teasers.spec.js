@@ -91,6 +91,31 @@ test.describe('Gallery Loop and Pro settings', () => {
 		expect(content).toContain('"metaType":"album-count"');
 	});
 
+	test('a meta type this install lacks is shown as unavailable', async ({
+		page,
+		editor,
+	}) => {
+		test.skip(
+			await page.evaluate(() => window.VPGutenbergVariables.pro),
+			'Pro offers the type.'
+		);
+
+		await editor.setContent(getMarkup(images));
+
+		// Not as comments, which the page would not print either.
+		await expect(
+			editor.canvas
+				.getByText('Unavailable meta: album-count')
+				.filter({ visible: true })
+				.first()
+		).toBeVisible();
+		await expect(
+			editor.canvas.locator('.wp-block-visual-portfolio-item-meta', {
+				hasText: /Comment/,
+			})
+		).toHaveCount(0);
+	});
+
 	test('the gallery manager offers a format an extension adds', async ({
 		page,
 		editor,
