@@ -251,9 +251,11 @@ const VPPopupAPI = {
 	parseItem(itemElement) {
 		let result = false;
 
+		// The item's own data, a child of it: a gallery inside the item's
+		// content carries data of its own further down.
 		const $dataElement =
 			itemElement &&
-			itemElement.querySelector('.vp-portfolio__item-popup');
+			itemElement.querySelector(':scope > .vp-portfolio__item-popup');
 
 		if ($dataElement) {
 			result = {
@@ -296,87 +298,93 @@ const VPPopupAPI = {
 		let video;
 		let videoData;
 
-		// Find all gallery items
+		// Find all gallery items.
 		// Skip Swiper slider duplicates.
 		// Previously we also used the `:not(.swiper-slide-duplicate-active)`, but it contains a valid first slide.
-		$gallery
-			.find('.vp-portfolio__item-wrap:not(.swiper-slide-duplicate)')
-			.each(function () {
-				const itemData = VPPopupAPI.parseItem(this);
+		// A Gallery Loop list holds its items as children, and a gallery inside
+		// the content of one of them is not its.
+		const $items = $gallery.is('.wp-block-visual-portfolio-item-template')
+			? $gallery.children(
+					'.wp-block-visual-portfolio-item-template__item'
+				)
+			: $gallery.find(
+					'.vp-portfolio__item-wrap:not(.swiper-slide-duplicate)'
+				);
 
-				if (itemData) {
-					size = (
-						itemData?.data?.vpPopupImgSize || '1920x1080'
-					).split('x');
-					video = itemData?.data?.vpPopupVideo;
-					videoData = false;
+		$items.each(function () {
+			const itemData = VPPopupAPI.parseItem(this);
 
-					if (video) {
-						videoData = VPPopupAPI.parseVideo(
-							video,
-							itemData?.data?.vpPopupPoster
-						);
-					}
+			if (itemData) {
+				size = (itemData?.data?.vpPopupImgSize || '1920x1080').split(
+					'x'
+				);
+				video = itemData?.data?.vpPopupVideo;
+				videoData = false;
 
-					if (videoData) {
-						item = {
-							type: 'embed',
-							el: this,
-							poster: videoData.poster,
-							src: videoData.embedUrl,
-							embed: videoData.embed,
-							width: videoData.width || 1920,
-							height: videoData.height || 1080,
-						};
-					} else {
-						// create slide object
-						item = {
-							type: 'image',
-							el: this,
-							src: itemData?.data?.vpPopupImg,
-							srcset: itemData?.data?.vpPopupImgSrcset,
-							width: parseInt(size[0], 10),
-							height: parseInt(size[1], 10),
-						};
-
-						const srcSmall =
-							itemData?.data?.vpPopupSmImg || item.src;
-						if (srcSmall) {
-							const smallSize = (
-								itemData?.data?.vpPopupSmImgSize ||
-								itemData?.data?.vpPopupImgSize ||
-								'1920x1080'
-							).split('x');
-
-							item.srcSmall = srcSmall;
-							item.srcSmallWidth = parseInt(smallSize[0], 10);
-							item.srcSmallHeight = parseInt(smallSize[1], 10);
-						}
-
-						const srcMedium =
-							itemData?.data?.vpPopupMdImg || item.src;
-						if (srcMedium) {
-							const mediumSize = (
-								itemData?.data?.vpPopupMdImgSize ||
-								itemData?.data?.vpPopupImgSize ||
-								'1920x1080'
-							).split('x');
-
-							item.srcMedium = srcMedium;
-							item.srcMediumWidth = parseInt(mediumSize[0], 10);
-							item.srcMediumHeight = parseInt(mediumSize[1], 10);
-						}
-					}
-
-					if (itemData?.$title || itemData?.$description) {
-						item.caption =
-							(itemData?.$title?.outerHTML || '') +
-							(itemData?.$description?.outerHTML || '');
-					}
-
-					items.push(item);
+				if (video) {
+					videoData = VPPopupAPI.parseVideo(
+						video,
+						itemData?.data?.vpPopupPoster
+					);
 				}
-			});
+
+				if (videoData) {
+					item = {
+						type: 'embed',
+						el: this,
+						poster: videoData.poster,
+						src: videoData.embedUrl,
+						embed: videoData.embed,
+						width: videoData.width || 1920,
+						height: videoData.height || 1080,
+					};
+				} else {
+					// create slide object
+					item = {
+						type: 'image',
+						el: this,
+						src: itemData?.data?.vpPopupImg,
+						srcset: itemData?.data?.vpPopupImgSrcset,
+						width: parseInt(size[0], 10),
+						height: parseInt(size[1], 10),
+					};
+
+					const srcSmall = itemData?.data?.vpPopupSmImg || item.src;
+					if (srcSmall) {
+						const smallSize = (
+							itemData?.data?.vpPopupSmImgSize ||
+							itemData?.data?.vpPopupImgSize ||
+							'1920x1080'
+						).split('x');
+
+						item.srcSmall = srcSmall;
+						item.srcSmallWidth = parseInt(smallSize[0], 10);
+						item.srcSmallHeight = parseInt(smallSize[1], 10);
+					}
+
+					const srcMedium = itemData?.data?.vpPopupMdImg || item.src;
+					if (srcMedium) {
+						const mediumSize = (
+							itemData?.data?.vpPopupMdImgSize ||
+							itemData?.data?.vpPopupImgSize ||
+							'1920x1080'
+						).split('x');
+
+						item.srcMedium = srcMedium;
+						item.srcMediumWidth = parseInt(mediumSize[0], 10);
+						item.srcMediumHeight = parseInt(mediumSize[1], 10);
+					}
+				}
+
+				if (itemData?.$title || itemData?.$description) {
+					item.caption =
+						(itemData?.$title?.outerHTML || '') +
+						(itemData?.$description?.outerHTML || '');
+				}
+
+				items.push(item);
+			}
+		});
 
 		return items;
 	},

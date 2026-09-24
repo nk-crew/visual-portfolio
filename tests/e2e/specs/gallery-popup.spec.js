@@ -3,9 +3,9 @@
  *
  * `clickAction` is the whole of the model - a link, a lightbox, or nothing -
  * and only the rendered page can say which of the three an item ended up being.
- * The lightbox is asserted the way a visitor meets it: opened from a click,
- * walked with the keyboard, closed with Escape and with the backdrop, and
- * asked to give the focus back afterwards.
+ * The lightbox is the classic gallery's, the vendor chosen in Settings, and it
+ * is asserted the way a visitor meets it: opened from a click, walked with the
+ * keyboard, closed with Escape, and asked to give the focus back afterwards.
  *
  * Pages are published straight through REST: every test here is about the front
  * end, and one of them runs with JavaScript switched off.
@@ -18,18 +18,22 @@ import { getPluginSlug } from '../utils/plugin-slug';
 const LIST = 'ul.wp-block-visual-portfolio-item-template';
 const ITEM = '.wp-block-visual-portfolio-item-template__item';
 const TRIGGER = '[data-vp-popup]';
-const POPUP = '.pswp';
-const COUNTER = '.pswp__counter';
-const CAPTION = '.vp-popup-caption';
-// The slide holders of the neighbours are kept, and are off screen: only the
-// current one is a thing a visitor can click.
-const SLIDE = '.pswp__item[aria-hidden="false"]';
-const SLIDE_IMAGE = '.pswp__img:not(.pswp__img--placeholder)';
+const TEMPLATE = 'template.vp-portfolio__item-popup';
 const LOAD_MORE = '.vp-block-loop-pagination-trigger';
 const PAGE_NUMBER = '.vp-block-loop-pagination-numbers a';
 
+const FANCYBOX = '.fancybox-container';
+const FANCYBOX_INDEX = `${FANCYBOX} [data-fancybox-index]`;
+const FANCYBOX_COUNT = `${FANCYBOX} [data-fancybox-count]`;
+const FANCYBOX_CAPTION = `${FANCYBOX} .fancybox-caption__body`;
+// Open and done animating in: the library ignores the keyboard until then.
+const PHOTOSWIPE = '.pswp.pswp--open.pswp--animated-in';
+const PHOTOSWIPE_COUNTER = '.pswp__counter';
+
 const IMAGES_COUNT = 4;
+const TITLE_TEXT = 'The first image';
 const CAPTION_TEXT = 'A caption of the first image';
+const LINK_URL = 'https://example.com/an-image-of-its-own';
 
 // Long enough to be recognised as a YouTube id, and never requested: the test
 // asserts the address of the frame, not what the address answers.
@@ -39,8 +43,7 @@ const VIDEO_URL = 'https://www.youtube.com/watch?v=aBcDeFgHiJk';
  * The images of a spec, as the source of a loop wants them.
  *
  * The `url` the spec carries alongside every image is its own note of where the
- * file lives. It must not reach the source: an image with a URL is an image the
- * gallery links somewhere, and the plugin gives it no popup at all.
+ * file lives. `link` is the address an image of the gallery points to.
  *
  * @param {Array} items - images of the spec.
  * @return {Array} images of the source.
@@ -48,6 +51,14 @@ const VIDEO_URL = 'https://www.youtube.com/watch?v=aBcDeFgHiJk';
 function toQueryImages(items) {
 	return items.map((item) => {
 		const image = { id: item.id };
+
+		if (item.title) {
+			image.title = item.title;
+		}
+
+		if (item.link) {
+			image.url = item.link;
+		}
 
 		if (item.videoUrl) {
 			image.format = 'video';
@@ -61,14 +72,17 @@ function toQueryImages(items) {
 /**
  * Block markup of a loop whose items carry the given click action.
  *
- * @param {Object}  options              - loop options.
- * @param {string}  options.blockId      - id the loop resolves its query with.
- * @param {number}  options.queryId      - id the URL parameters of the loop are named after.
- * @param {Array}   options.images       - images of the source.
- * @param {string}  options.clickAction  - `none`, `url` or `popup`.
- * @param {number}  [options.perPage]    - items per page.
- * @param {boolean} [options.cover]      - render an item cover instead of an item image.
- * @param {Array}   [options.controls]   - inner blocks of the pagination block.
+ * @param {Object}  options             - loop options.
+ * @param {string}  options.blockId     - id the loop resolves its query with.
+ * @param {number}  options.queryId     - id the URL parameters of the loop are named after.
+ * @param {Array}   options.images      - images of the source.
+ * @param {string}  options.clickAction - `none`, `url` or `popup`.
+ * @param {number}  [options.perPage]   - items per page.
+ * @param {boolean} [options.cover]     - render an item cover instead of an item image.
+ * @param {boolean} [options.title]     - add an item title that opens the lightbox too.
+ * @param {Object}  [options.lightbox]  - caption sources of the loop.
+ * @param {Array}   [options.controls]  - inner blocks of the pagination block.
+ * @param {Object}  [options.layout]    - attributes of the item template.
  * @return {string} serialized blocks.
  */
 function getLoopMarkup({
@@ -78,7 +92,10 @@ function getLoopMarkup({
 	clickAction,
 	perPage = IMAGES_COUNT,
 	cover = false,
+	title = false,
+	lightbox,
 	controls = [],
+	layout = { layoutType: 'grid', layoutColumns: 2 },
 }) {
 	const loop = {
 		block_id: blockId,
@@ -86,9 +103,10 @@ function getLoopMarkup({
 		queryType: 'images',
 		baseQuery: { perPage, maxPages: 0 },
 		imagesQuery: { images: toQueryImages(images) },
+		...(lightbox ? { lightbox } : {}),
 	};
 
-	const item = cover
+	let item = cover
 		? `<!-- wp:visual-portfolio/item-cover ${JSON.stringify({
 				aspectRatio: '1',
 				clickAction,
@@ -97,6 +115,12 @@ function getLoopMarkup({
 				aspectRatio: '1',
 				clickAction,
 			})} /-->`;
+
+	if (title) {
+		item += `<!-- wp:visual-portfolio/item-title ${JSON.stringify({
+			clickAction,
+		})} /-->`;
+	}
 
 	const pagination = controls.length
 		? `<!-- wp:visual-portfolio/loop-pagination -->${controls
@@ -107,7 +131,7 @@ function getLoopMarkup({
 	return [
 		`<!-- wp:visual-portfolio/loop ${JSON.stringify(loop)} -->`,
 		'<div class="wp-block-visual-portfolio-loop vp-block-loop">',
-		'<!-- wp:visual-portfolio/item-template {"layoutType":"grid","layoutColumns":2} -->',
+		`<!-- wp:visual-portfolio/item-template ${JSON.stringify(layout)} -->`,
 		item,
 		'<!-- /wp:visual-portfolio/item-template -->',
 		pagination,
@@ -117,17 +141,62 @@ function getLoopMarkup({
 }
 
 /**
- * Popup data of every trigger of the page, in the order they are rendered.
+ * The popup data of every item of the page, in the order they are rendered.
  *
  * @param {import('@playwright/test').Page} page - page under test.
- * @return {Promise<Array>} parsed `data-vp-popup` payloads.
+ * @return {Promise<Array>} `{ img, video, title, description }` per item.
  */
-function getTriggerData(page) {
-	return page
-		.locator(TRIGGER)
-		.evaluateAll((nodes) =>
-			nodes.map((node) => JSON.parse(node.getAttribute('data-vp-popup')))
-		);
+function getItemPopups(page) {
+	return page.locator(ITEM).evaluateAll(
+		(nodes, selector) =>
+			nodes.map((node) => {
+				const template = node.querySelector(selector);
+
+				return template
+					? {
+							img: template.dataset.vpPopupImg,
+							video: template.dataset.vpPopupVideo,
+							title: template.content
+								.querySelector(
+									'.vp-portfolio__item-popup-title'
+								)
+								?.textContent.trim(),
+							description: template.content
+								.querySelector(
+									'.vp-portfolio__item-popup-description'
+								)
+								?.textContent.trim(),
+						}
+					: null;
+			}),
+		TEMPLATE
+	);
+}
+
+/**
+ * Pick the lightbox vendor in Settings, the way a site owner does.
+ *
+ * @param {Object} admin  - admin utils.
+ * @param {Object} page   - Playwright page.
+ * @param {string} vendor - `fancybox` or `photoswipe`.
+ */
+async function setVendor(admin, page, vendor) {
+	await admin.visitAdminPage(
+		'edit.php',
+		'post_type=portfolio&page=visual-portfolio-settings'
+	);
+
+	// The field sits on a tab of its own, so it is set rather than clicked.
+	await page
+		.locator('select[name="vp_popup_gallery[vendor]"]')
+		.evaluate((node, value) => {
+			node.value = value;
+
+			// The form has a field named `submit`, which hides the method.
+			HTMLFormElement.prototype.submit.call(node.form);
+		}, vendor);
+
+	await page.waitForURL(/settings-updated=true/);
 }
 
 test.describe('Gallery Loop click actions and lightbox', () => {
@@ -148,7 +217,11 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			images.push({ id: uploaded.id, url: uploaded.source_url });
 		}
 
-		// The caption of an attachment is what the lightbox shows under it.
+		// Every item has a title, so every item title opens the lightbox.
+		images.forEach((image, index) => {
+			image.title = index ? `Image ${index + 1}` : TITLE_TEXT;
+		});
+
 		await requestUtils.rest({
 			path: `/wp/v2/media/${images[0].id}`,
 			method: 'POST',
@@ -186,7 +259,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 	 *
 	 * @param {Object} requestUtils - REST utils.
 	 * @param {Object} page         - Playwright page.
-	 * @param {Object} options      - see `getLoopMarkup()`, plus a title.
+	 * @param {Object} options      - see `getLoopMarkup()`, plus a page title.
 	 * @return {Promise<string>} URL of the published page.
 	 */
 	async function publishLoop(requestUtils, page, options) {
@@ -194,7 +267,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			path: '/wp/v2/pages',
 			method: 'POST',
 			data: {
-				title: options.title,
+				title: options.pageTitle,
 				status: 'publish',
 				content: getLoopMarkup(options),
 			},
@@ -212,21 +285,22 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		requestUtils,
 	}) => {
 		await publishLoop(requestUtils, page, {
-			title: 'Popup - click action url',
+			pageTitle: 'Popup - click action url',
 			blockId: 'e2e-popup-url',
 			queryId: 1,
 			images,
 			clickAction: 'url',
 		});
 
-		const links = page.locator(`${ITEM} figure a`);
-
-		await expect(links).toHaveCount(IMAGES_COUNT);
+		await expect(page.locator(`${ITEM} figure a`)).toHaveCount(
+			IMAGES_COUNT
+		);
 		// A link is a link and nothing more - no popup data rides along.
 		await expect(page.locator(TRIGGER)).toHaveCount(0);
+		await expect(page.locator(TEMPLATE)).toHaveCount(0);
 
 		await publishLoop(requestUtils, page, {
-			title: 'Popup - click action none',
+			pageTitle: 'Popup - click action none',
 			blockId: 'e2e-popup-none',
 			queryId: 1,
 			images,
@@ -237,107 +311,187 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await expect(page.locator(`${ITEM} figure a`)).toHaveCount(0);
 
 		await publishLoop(requestUtils, page, {
-			title: 'Popup - click action popup',
+			pageTitle: 'Popup - click action popup',
 			blockId: 'e2e-popup-data',
 			queryId: 1,
 			images,
 			clickAction: 'popup',
 		});
 
-		const triggers = page.locator(TRIGGER);
+		await expect(page.locator(TRIGGER)).toHaveCount(IMAGES_COUNT);
+		await expect(page.locator(TRIGGER).first()).toHaveAttribute(
+			'href',
+			images[0].url
+		);
 
-		await expect(triggers).toHaveCount(IMAGES_COUNT);
+		// The item title leads, the way the lightbox of a loop captions a
+		// slide unless told otherwise.
+		const popups = await getItemPopups(page);
 
-		const data = await getTriggerData(page);
-
-		expect(data[0]).toMatchObject({
-			type: 'image',
-			src: images[0].url,
-			caption: CAPTION_TEXT,
+		expect(popups[0]).toMatchObject({
+			img: images[0].url,
+			title: TITLE_TEXT,
 		});
-		expect(data[0].width).toBeGreaterThan(0);
-		expect(data[0].height).toBeGreaterThan(0);
 	});
 
-	test('the lightbox opens, walks with the keyboard and hands the focus back', async ({
+	test('the caption follows the sources the loop picked', async ({
 		page,
 		requestUtils,
 	}) => {
 		await publishLoop(requestUtils, page, {
-			title: 'Popup - keyboard',
+			pageTitle: 'Popup - caption sources',
+			blockId: 'e2e-popup-sources',
+			queryId: 1,
+			images,
+			clickAction: 'popup',
+			lightbox: { titleSource: 'none', descriptionSource: 'caption' },
+		});
+
+		const popups = await getItemPopups(page);
+
+		expect(popups[0].title).toBeUndefined();
+		expect(popups[0].description).toBe(CAPTION_TEXT);
+	});
+
+	test('an image with a link of its own follows it', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - own link',
+			blockId: 'e2e-popup-own-link',
+			queryId: 1,
+			images: [{ ...images[0], link: LINK_URL }, images[1]],
+			clickAction: 'popup',
+		});
+
+		const links = page.locator(`${ITEM} figure a`);
+
+		await expect(links.first()).toHaveAttribute('href', LINK_URL);
+		await expect(links.first()).not.toHaveAttribute('data-vp-popup');
+		await expect(links.nth(1)).toHaveAttribute('data-vp-popup');
+
+		// The lightbox holds the items it can show, and the linked one is not
+		// among them - not even through a gallery inside its content.
+		await page
+			.locator(ITEM)
+			.first()
+			.evaluate((item) => {
+				item.insertAdjacentHTML(
+					'afterbegin',
+					'<div class="vp-portfolio__item-wrap"><template class="vp-portfolio__item-popup" data-vp-popup-img="https://example.org/nested.jpg"></template></div>'
+				);
+			});
+
+		await links.nth(1).click();
+		await expect(page.locator(FANCYBOX)).toBeVisible();
+		await expect(page.locator(FANCYBOX_COUNT)).toHaveText('1');
+	});
+
+	test('the lightbox opens one slide per item, walks with the keyboard and hands the focus back', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - keyboard',
 			blockId: 'e2e-popup-keyboard',
 			queryId: 1,
 			images,
 			clickAction: 'popup',
+			title: true,
 		});
 
-		const trigger = page.locator(TRIGGER).first();
+		// The picture and the title of every item open it, and it holds each
+		// item once.
+		await expect(page.locator(TRIGGER)).toHaveCount(IMAGES_COUNT * 2);
 
-		await trigger.click();
+		await page.locator(TRIGGER).nth(1).click();
 
-		const popup = page.locator(POPUP);
-
-		await expect(popup).toBeVisible();
-		await expect(page.locator(COUNTER)).toHaveText(`1 / ${IMAGES_COUNT}`);
-		await expect(page.locator(CAPTION)).toContainText(CAPTION_TEXT);
-
-		// The dialog took the focus, which is what makes the keys below arrive
-		// at the lightbox rather than at the page under it.
-		await expect
-			.poll(() =>
-				page.evaluate(() => !!document.activeElement?.closest('.pswp'))
-			)
-			.toBe(true);
+		await expect(page.locator(FANCYBOX)).toBeVisible();
+		await expect(page.locator(FANCYBOX_COUNT)).toHaveText(
+			`${IMAGES_COUNT}`
+		);
+		await expect(page.locator(FANCYBOX_INDEX)).toHaveText('1');
+		await expect(page.locator(FANCYBOX_CAPTION)).toContainText(TITLE_TEXT);
 
 		await page.keyboard.press('ArrowRight');
-		await expect(page.locator(COUNTER)).toHaveText(`2 / ${IMAGES_COUNT}`);
-
-		// Where the focus goes while the dialog is open.
-		const seq = [];
-
-		for (let step = 0; step < 8; step++) {
-			await page.keyboard.press('Tab');
-			seq.push(
-				await page.evaluate(() => {
-					const active = document.activeElement;
-
-					if (active === document.body) {
-						return 'nowhere';
-					}
-
-					return active?.closest('.pswp') ? 'lightbox' : 'page';
-				})
-			);
-		}
-
-		// Nothing behind the dialog is ever reached. The tab order walks the
-		// buttons of the lightbox and then leaves the document - in a browser
-		// that is the address bar - and coming back in lands in the dialog
-		// again, because the dialog takes any focus that was not meant for it.
-		expect(seq).not.toContain('page');
-		expect(seq).toContain('lightbox');
-		expect(seq[seq.length - 1]).toBe('lightbox');
+		await expect(page.locator(FANCYBOX_INDEX)).toHaveText('2');
 
 		await page.keyboard.press('Escape');
-		await expect(popup).toBeHidden();
+		await expect(page.locator(FANCYBOX)).toBeHidden();
 
-		// Back on the element the visitor left, not on the top of the document.
+		// Back on the item of the slide the visitor left, not on the top of
+		// the document.
 		await expect
 			.poll(() =>
-				page.evaluate(() =>
-					document.activeElement?.hasAttribute('data-vp-popup')
+				page.evaluate(
+					(selector) =>
+						document.activeElement?.closest(selector) ===
+						document.querySelectorAll(selector)[1],
+					ITEM
 				)
 			)
 			.toBe(true);
 	});
 
-	test('a click on the backdrop closes the lightbox', async ({
-		page,
-		requestUtils,
-	}) => {
+	[
+		['a grid', { layoutType: 'grid', layoutColumns: 2 }],
+		[
+			'a carousel whose effect wraps the items',
+			{ layoutType: 'carousel', carouselEffect: 'slideshow' },
+		],
+	].forEach(([name, layout]) => {
+		test(`a gallery inside the content of an item stays out of its lightbox, in ${name}`, async ({
+			page,
+			requestUtils,
+		}) => {
+			await publishLoop(requestUtils, page, {
+				pageTitle: `Popup - nested gallery in ${name}`,
+				blockId: `e2e-popup-nested-${layout.layoutType}`,
+				queryId: 1,
+				images,
+				clickAction: 'popup',
+				layout,
+			});
+
+			// What an item description showing a post's content brings with
+			// it: a classic gallery, whose items carry popup data of their
+			// own, ahead of the item's own.
+			await page
+				.locator(ITEM)
+				.nth(1)
+				.evaluate((item) => {
+					(
+						item.querySelector(
+							'.wp-block-visual-portfolio-item-template__card'
+						) || item
+					).insertAdjacentHTML(
+						'afterbegin',
+						'<div class="vp-portfolio__item-wrap"><template class="vp-portfolio__item-popup" data-vp-popup-img="https://example.org/nested.jpg"><h3 class="vp-portfolio__item-popup-title">Nested</h3></template></div>'
+					);
+				});
+
+			await page
+				.locator(ITEM)
+				.nth(1)
+				.locator(TRIGGER)
+				.first()
+				.dispatchEvent('click');
+
+			await expect(page.locator(FANCYBOX_COUNT)).toHaveText(
+				`${IMAGES_COUNT}`
+			);
+			await expect(page.locator(FANCYBOX_INDEX)).toHaveText('2');
+			await expect(page.locator(FANCYBOX_CAPTION)).toContainText(
+				'Image 2'
+			);
+		});
+	});
+
+	test('the cover opens the lightbox', async ({ page, requestUtils }) => {
 		await publishLoop(requestUtils, page, {
-			title: 'Popup - backdrop',
-			blockId: 'e2e-popup-backdrop',
+			pageTitle: 'Popup - cover',
+			blockId: 'e2e-popup-cover',
 			queryId: 1,
 			images,
 			clickAction: 'popup',
@@ -347,26 +501,16 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		// The cover renders its trigger as the anchor that covers the whole
 		// item, which is the other of the two blocks that can open a popup.
 		await page.locator(TRIGGER).first().click();
-		await expect(page.locator(POPUP)).toBeVisible();
-
-		// The slide holder, not the backdrop element behind it: it is the one
-		// covering the viewport, and the library reads a click on it as a click
-		// beside the picture. Left of the image, below the toolbar and above
-		// the arrows - the three things a click there would mean instead.
-		await page
-			.locator(SLIDE)
-			.first()
-			.click({ position: { x: 5, y: 120 } });
-
-		await expect(page.locator(POPUP)).toBeHidden();
+		await expect(page.locator(FANCYBOX)).toBeVisible();
+		await expect(page.locator(FANCYBOX_INDEX)).toHaveText('1');
 	});
 
-	test('a video item is played in a frame, and only while it is on screen', async ({
+	test('a video item is played in a frame', async ({
 		page,
 		requestUtils,
 	}) => {
 		await publishLoop(requestUtils, page, {
-			title: 'Popup - video',
+			pageTitle: 'Popup - video',
 			blockId: 'e2e-popup-video',
 			queryId: 1,
 			images: [
@@ -377,11 +521,11 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			clickAction: 'popup',
 		});
 
-		const data = await getTriggerData(page);
+		const popups = await getItemPopups(page);
 
-		expect(data[1]).toMatchObject({ type: 'video', src: VIDEO_URL });
+		expect(popups[1].video).toBe(VIDEO_URL);
 
-		// The video URL is also where a click goes without the module: a video
+		// The video URL is also where a click goes without the script: a video
 		// has no full size image to fall back to.
 		await expect(page.locator(TRIGGER).nth(1)).toHaveAttribute(
 			'href',
@@ -390,18 +534,9 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 
 		await page.locator(TRIGGER).nth(1).click();
 
-		const frame = page.locator('.vp-popup-video iframe');
-
-		await expect(frame).toHaveAttribute(
-			'src',
-			/youtube\.com\/embed\/aBcDeFgHiJk/
-		);
-
-		// Off the slide, the frame stops being pointed at anything: the
-		// neighbouring slides stay loaded, and a video one swipe away must not
-		// be playing.
-		await page.keyboard.press('ArrowRight');
-		await expect(frame).not.toHaveAttribute('src', /youtube/);
+		await expect(
+			page.locator(`${FANCYBOX} .fancybox-slide--current iframe`)
+		).toHaveAttribute('src', /youtube\.com\/embed\/aBcDeFgHiJk/);
 	});
 
 	test('the lightbox holds the items a load more appended', async ({
@@ -409,7 +544,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		requestUtils,
 	}) => {
 		await publishLoop(requestUtils, page, {
-			title: 'Popup - load more',
+			pageTitle: 'Popup - load more',
 			blockId: 'e2e-popup-load-more',
 			queryId: 1,
 			images,
@@ -423,14 +558,13 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await page.locator(LOAD_MORE).click();
 		await expect(page.locator(TRIGGER)).toHaveCount(IMAGES_COUNT);
 
-		// The appended trigger opens the lightbox as well. Its own directives
-		// were never hydrated - it arrived after the page was - so this is the
-		// listener on the loop answering for it.
+		// The appended trigger opens the lightbox as well: the gallery is read
+		// off the page at the click.
 		await page.locator(TRIGGER).last().click();
 
-		await expect(page.locator(POPUP)).toBeVisible();
-		await expect(page.locator(COUNTER)).toHaveText(
-			`${IMAGES_COUNT} / ${IMAGES_COUNT}`
+		await expect(page.locator(FANCYBOX)).toBeVisible();
+		await expect(page.locator(FANCYBOX_INDEX)).toHaveText(
+			`${IMAGES_COUNT}`
 		);
 	});
 
@@ -439,7 +573,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		requestUtils,
 	}) => {
 		await publishLoop(requestUtils, page, {
-			title: 'Popup - region swap',
+			pageTitle: 'Popup - region swap',
 			blockId: 'e2e-popup-swap',
 			queryId: 1,
 			images,
@@ -448,30 +582,86 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			controls: ['loop-pagination-numbers'],
 		});
 
-		const firstPage = await getTriggerData(page);
+		const firstPage = await getItemPopups(page);
 
 		await page.locator(PAGE_NUMBER).getByText('2').click();
 
 		// The swap replaced the items rather than adding to them, so the
 		// gallery is the second page and nothing else.
 		await expect
-			.poll(async () => (await getTriggerData(page))[0].src)
-			.not.toBe(firstPage[0].src);
+			.poll(async () => (await getItemPopups(page))[0].img)
+			.not.toBe(firstPage[0].img);
+
+		const swapped = await getItemPopups(page);
 
 		await page.locator(TRIGGER).first().click();
 
-		await expect(page.locator(POPUP)).toBeVisible();
-		await expect(page.locator(COUNTER)).toHaveText('1 / 2');
+		await expect(page.locator(FANCYBOX)).toBeVisible();
+		await expect(page.locator(FANCYBOX_COUNT)).toHaveText('2');
+		// The picture on screen is the one of the page that was swapped in, in
+		// whichever of its sizes the vendor picked.
+		const file = swapped[0].img
+			.split('/')
+			.pop()
+			.replace(/\.\w+$/, '');
 
-		const swapped = await getTriggerData(page);
+		await expect(
+			page
+				.locator(
+					`${FANCYBOX} .fancybox-slide--current img.fancybox-image`
+				)
+				.last()
+		).toHaveAttribute('src', new RegExp(file));
+	});
 
-		// The picture on screen is the one of the page that was swapped in.
-		// Asserted rather than read once: the library shows the size the grid
-		// already had until the full one has loaded.
-		await expect(page.locator(SLIDE_IMAGE).first()).toHaveAttribute(
-			'src',
-			swapped[0].src
-		);
+	test.describe('with PhotoSwipe chosen in Settings', () => {
+		test.beforeEach(async ({ admin, page }) => {
+			await setVendor(admin, page, 'photoswipe');
+		});
+
+		test.afterEach(async ({ admin, page }) => {
+			await setVendor(admin, page, 'fancybox');
+		});
+
+		test('the lightbox is PhotoSwipe, one slide per item', async ({
+			page,
+			requestUtils,
+		}) => {
+			await publishLoop(requestUtils, page, {
+				pageTitle: 'Popup - photoswipe',
+				blockId: 'e2e-popup-photoswipe',
+				queryId: 1,
+				images,
+				clickAction: 'popup',
+				title: true,
+			});
+
+			await page.locator(TRIGGER).first().click();
+
+			await expect(page.locator(PHOTOSWIPE)).toBeVisible();
+			await expect(page.locator(PHOTOSWIPE_COUNTER)).toHaveText(
+				`1 / ${IMAGES_COUNT}`
+			);
+
+			await page.keyboard.press('ArrowRight');
+			await expect(page.locator(PHOTOSWIPE_COUNTER)).toHaveText(
+				`2 / ${IMAGES_COUNT}`
+			);
+
+			await page.keyboard.press('Escape');
+			await expect(page.locator(PHOTOSWIPE)).toBeHidden();
+
+			await expect
+				.poll(() =>
+					page.evaluate(
+						(selector) =>
+							document.activeElement?.closest(selector) ===
+							document.querySelectorAll(selector)[1],
+						ITEM
+					)
+				)
+				.toBe(true);
+		});
 	});
 
 	test.describe('without JavaScript', () => {
@@ -482,7 +672,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			requestUtils,
 		}) => {
 			await publishLoop(requestUtils, page, {
-				title: 'Popup - no js',
+				pageTitle: 'Popup - no js',
 				blockId: 'e2e-popup-nojs',
 				queryId: 1,
 				images,
@@ -496,7 +686,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			await trigger.click();
 			await page.waitForURL(images[0].url);
 
-			// Nothing was lost by the module not being there: the page the
+			// Nothing was lost by the script not being there: the page the
 			// click led to is the picture the lightbox would have shown.
 			expect(page.url()).toBe(images[0].url);
 		});

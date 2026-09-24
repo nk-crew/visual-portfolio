@@ -32,6 +32,7 @@ import {
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
+import LightboxPanel from './lightbox-panel';
 import PatternSetup from './pattern-setup';
 import { applyChoices, PAGINATION_OPTIONS } from './starting-choices';
 
@@ -531,8 +532,7 @@ function LoopPlaceholder({ attributes, setAttributes, clientId }) {
 
 	const insert = (blocks) => replaceInnerBlocks(clientId, blocks);
 
-	const startBlank = () =>
-		insert(createBlocksFromInnerBlocksTemplate(TEMPLATE));
+	const blank = () => createBlocksFromInnerBlocksTemplate(TEMPLATE);
 
 	if ('source' === step) {
 		return (
@@ -588,7 +588,10 @@ function LoopPlaceholder({ attributes, setAttributes, clientId }) {
 						>
 							{__('Continue', 'visual-portfolio')}
 						</Button>
-						<Button variant="tertiary" onClick={startBlank}>
+						<Button
+							variant="tertiary"
+							onClick={() => insert(blank())}
+						>
 							{__('Start blank', 'visual-portfolio')}
 						</Button>
 					</HStack>
@@ -663,7 +666,18 @@ function LoopPlaceholder({ attributes, setAttributes, clientId }) {
 					>
 						{__('Choose a gallery', 'visual-portfolio')}
 					</Button>
-					<Button variant="tertiary" onClick={startBlank}>
+					<Button
+						variant="tertiary"
+						onClick={() =>
+							insert(
+								applyChoices(
+									blank(),
+									choices,
+									attributes.queryType
+								)
+							)
+						}
+					>
 						{__('Start blank', 'visual-portfolio')}
 					</Button>
 				</HStack>
@@ -758,6 +772,12 @@ export default function BlockEdit(props) {
 				<DisplayPanel
 					attributes={attributes}
 					setAttributes={setAttributes}
+				/>
+
+				<LightboxPanel
+					attributes={attributes}
+					setAttributes={setAttributes}
+					clientId={clientId}
 				/>
 			</InspectorControls>
 			<ProTeaserPanel

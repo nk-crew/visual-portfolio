@@ -107,6 +107,13 @@ class Visual_Portfolio_Block_Item_Image {
 	private function get_click_wrapper( $image, $attributes, $context ) {
 		$action = $attributes['clickAction'] ?? 'none';
 
+		// An item the lightbox has nothing to show but that has an address of
+		// its own - an image with a link, a post without a picture - follows
+		// it, as the classic gallery does.
+		if ( 'popup' === $action && ! Visual_Portfolio_Popup::has_popup( $context ) ) {
+			$action = 'url';
+		}
+
 		if ( 'url' === $action && ! empty( $context['vp/itemUrl'] ) ) {
 			return sprintf(
 				'<a href="%1$s" target="%2$s"%3$s%4$s>%5$s</a>',
@@ -124,16 +131,9 @@ class Visual_Portfolio_Block_Item_Image {
 
 		$trigger = Visual_Portfolio_Popup::get_trigger_attributes( $context );
 
-		// An item the lightbox has nothing to show - a Pro source that refused
-		// it, an image that no longer exists - is not made clickable.
-		if ( empty( $trigger ) ) {
-			return $image;
-		}
-
 		return sprintf(
-			'<a href="%1$s" data-vp-popup="%2$s"%3$s>%4$s</a>',
+			'<a href="%1$s" data-vp-popup%2$s>%3$s</a>',
 			esc_url( $trigger['href'] ),
-			esc_attr( $trigger['data-vp-popup'] ),
 			empty( $context['vp/itemAriaLabel'] ) ? '' : ' aria-label="' . esc_attr( $context['vp/itemAriaLabel'] ) . '"',
 			$image
 		);

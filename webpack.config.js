@@ -42,7 +42,6 @@ const JS_MODULE_ENTRY_PATTERNS = [
 	'./gutenberg/blocks/loop/view.js',
 	'./gutenberg/blocks/item-cover/view.js',
 	'./gutenberg/blocks/item-template/view.js',
-	'./gutenberg/popup/view.js',
 ];
 
 const CSS_ENTRY_PATTERNS = [
@@ -51,7 +50,6 @@ const CSS_ENTRY_PATTERNS = [
 	'./templates/**/style.scss',
 	'./gutenberg/blocks/**/style.scss',
 	'./gutenberg/blocks/**/editor.scss',
-	'./gutenberg/popup/style.scss',
 ];
 
 const WATCH_IGNORED = [
@@ -131,17 +129,6 @@ const vendorFiles = [
 	{
 		source: 'node_modules/photoswipe/dist/default-skin/preloader.gif',
 		destination: 'assets/vendor/photoswipe/dist/default-skin/preloader.gif',
-	},
-	// PhotoSwipe 5 is the lightbox of the Gallery Loop family, and lives beside
-	// the 4 above rather than replacing it: that one belongs to the legacy
-	// gallery, is loaded as a classic script and is driven by jQuery.
-	{
-		source: 'node_modules/photoswipe-5/dist/photoswipe.esm.min.js',
-		destination: 'assets/vendor/photoswipe-5/photoswipe.esm.min.js',
-	},
-	{
-		source: 'node_modules/photoswipe-5/dist/photoswipe.css',
-		destination: 'assets/vendor/photoswipe-5/photoswipe.css',
 	},
 	// Blossom drives the carousel of the Gallery Loop family. The module is
 	// imported by address at run time rather than bundled, so the file has to

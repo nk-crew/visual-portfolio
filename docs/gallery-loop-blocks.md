@@ -345,6 +345,7 @@ from block context; none of them queries anything.
 | `vp/baseQuery` | object | `perPage`, `maxPages` |
 | `vp/postsQuery` / `vp/imagesQuery` | object | Settings of the built-in sources |
 | `vp/sourceQuery` | object | Settings of any other source |
+| `vp/lightbox` | object | Caption sources of the lightbox, `titleSource` and `descriptionSource` |
 
 ### From the item template
 
@@ -397,7 +398,6 @@ it reads — no hook involved:
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |
 | `vpf_loop_tiles_presets` | filter `( $presets )` | Tiles notations offered in the editor |
 | `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers, `name => settings`. See below |
-| `vpf_loop_item_popup_data` | filter `( $data, $item, $options )` | Lightbox data of one item |
 | `vpf_rest_loop_items_source_configs` | filter | Allow-list of source parameters the editor preview endpoint accepts |
 
 ### The query
@@ -669,7 +669,6 @@ without any change here.
 | `visual-portfolio/loop` | `build/gutenberg/blocks/loop/view.js` | Navigation of the whole family: `actions.navigate`, `actions.loadMore`, `callbacks.initLayout` (masonry), `callbacks.observeInfinite`, `state.isLoading`, `state.ariaLiveMessage`, `state.isEnhanced` |
 | `visual-portfolio/item-template` | `build/gutenberg/blocks/item-template/view.js` | Justified and carousel layouts, the carousel controls (`actions.carouselPrev`, `actions.carouselNext`, `actions.carouselGoTo`), native masonry detection |
 | `visual-portfolio/item-cover` | `build/gutenberg/blocks/item-cover/view.js` | The `fly` effect only |
-| `visual-portfolio/popup` | `build/gutenberg/popup/view.js` | The lightbox |
 
 Compose onto a namespace with another `store()` call, and **add** actions rather
 than replace the ones already there.
@@ -684,37 +683,33 @@ They are directives and actions and nothing else — between 0.4 and 4.4 KB each
 with `@wordpress/interactivity` from the WordPress bundle as the only static
 dependency. Everything larger is fetched at the moment it is used and never
 bundled: `@wordpress/interactivity-router` on the first region swap, the Blossom
-carousel from the address on the markup, PhotoSwipe when a lightbox opens. A
-gallery that is a plain grid downloads none of the three.
+carousel from the address on the markup. A gallery that is a plain grid
+downloads neither.
 
-No jQuery is involved anywhere on the front end. The layouts that need a library
-use `masonry` and `imagesloaded` from WordPress and a jQuery-free build of
-fjGallery registered under a handle of the family's own.
+The layouts that need a library use `masonry` and `imagesloaded` from WordPress
+and a jQuery-free build of fjGallery registered under a handle of the family's
+own. jQuery comes in with the lightbox only.
 
-### Lightbox events
+### Lightbox
 
-The lightbox is a script module, so it announces itself with DOM events on
-`document` rather than with the jQuery events the legacy gallery fires. Pro
-listens to these; so may anyone else.
+The lightbox is the classic gallery's: `VPPopupAPI` with the vendor chosen in
+Settings, Fancybox or PhotoSwipe, and every Popup Gallery setting. An item
+carries the same `<template class="vp-portfolio__item-popup">` a classic item
+does, built by `Visual_Portfolio_Get::get_item_popup_output()` and filtered by
+`vpf_popup_output`; its triggers are anchors with `data-vp-popup` and the full
+size image as `href`. `build/gutenberg/popup/view.js` opens the vendor with the
+items of the list, one slide per item, and a stand-in for the classic gallery
+instance per loop (`$item`, `uid`, `options`, `isPreview()`, `emitEvent()`), so
+the vendor events (`initFancybox.vpf`, `beforeInitPhotoSwipe.vpf` and the rest)
+fire on the loop element with the stand-in first, as they do for a classic
+gallery. The caption sources are the loop's `lightbox` attribute,
+`titleSource` and `descriptionSource`, with the values of the classic Title and
+Description Source; defaults `item_title` and `item_excerpt`. An item the
+lightbox has nothing to show and that has an address of its own links to it.
 
-| Event | When |
-|---|---|
-| `vp-popup-open` | the lightbox is on screen |
-| `vp-popup-change` | the slide changed |
-| `vp-popup-close` | the lightbox is closing |
+### Carousel events
 
-All three carry the same `detail`:
-
-| Key | What it is |
-|---|---|
-| `loop` | the loop element the lightbox was opened from — its items and its pagination hang below this |
-| `gallery` | the root element of the lightbox itself |
-| `index` | index of the slide being shown |
-| `total` | how many slides the lightbox holds right now |
-| `item` | the trigger the shown slide was built from; the item is its `closest()` |
-| `refresh()` | picks up the triggers the loop has grown since the lightbox opened, and returns the new `total` |
-
-The carousel takes commands the same way, on the list element of an item
+The carousel takes commands as DOM events on the list element of an item
 template:
 
 | Event | Payload |
