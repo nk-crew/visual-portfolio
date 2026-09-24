@@ -335,7 +335,9 @@ class Visual_Portfolio_Block_Item_Cover {
 			wp_enqueue_script_module( self::VIEW_MODULE );
 		}
 
-		$image = $this->get_image( $attributes, $context );
+		// See `vpf_loop_item_picture` in the item image block. The ratio below is
+		// read off the first picture, so media added after it keeps the box.
+		$image = apply_filters( 'vpf_loop_item_picture', $this->get_image( $attributes, $context ), $context, $attributes, 'visual-portfolio/item-cover' );
 
 		$aspect_ratio = trim( preg_replace( '#[^0-9./ ]#', '', (string) ( $attributes['aspectRatio'] ?? '' ) ) );
 
@@ -358,6 +360,11 @@ class Visual_Portfolio_Block_Item_Cover {
 				'customGradient' => $attributes['customGradient'] ?? '',
 			)
 		);
+
+		// Part of the picture, so it goes wherever a stylesheet moves the picture.
+		if ( ! empty( $attributes['showFormatBadge'] ) ) {
+			$media .= visual_portfolio_get_item_format_badge( $context['vp/itemFormat'] ?? '', $attributes['formatBadgePosition'] ?? '' );
+		}
 
 		$hover_overlay = visual_portfolio_get_item_overlay(
 			self::OVERLAY_CLASS,

@@ -363,6 +363,7 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 				// and by those that lay their children out on a gap.
 				require_once $this->plugin_path . 'gutenberg/utils/block-gap/index.php';
 				require_once $this->plugin_path . 'gutenberg/utils/item-overlay/index.php';
+				require_once $this->plugin_path . 'gutenberg/utils/item-format-badge/index.php';
 
 				require_once $this->plugin_path . 'gutenberg/blocks/item-template/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/item-image/index.php';

@@ -1,0 +1,40 @@
+// Badge naming the format of a gallery item, over a corner of its picture.
+.vp-item-format-badge {
+	position: absolute;
+	// Above the overlays painted on the picture.
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2em;
+	height: 2em;
+	color: #fff;
+	pointer-events: none;
+	background-color: rgba(0, 0, 0, 0.6);
+	border-radius: 50%;
+
+	.vp-svg-icon {
+		width: 1em;
+		height: 1em;
+	}
+
+	&.is-position-top-left {
+		top: 0.75em;
+		left: 0.75em;
+	}
+
+	&.is-position-top-right {
+		top: 0.75em;
+		right: 0.75em;
+	}
+
+	&.is-position-bottom-left {
+		bottom: 0.75em;
+		left: 0.75em;
+	}
+
+	&.is-position-bottom-right {
+		right: 0.75em;
+		bottom: 0.75em;
+	}
+}

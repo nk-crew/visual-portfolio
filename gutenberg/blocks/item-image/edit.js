@@ -33,6 +33,11 @@ import { ALLOWED_MEDIA_TYPES } from '../../loop-sources/gallery-manager/prepare-
 import { getClickActions } from '../../utils/click-actions';
 import { DimensionsTool } from '../../utils/dimensions-tools';
 import {
+	FORMAT_BADGE_DEFAULTS,
+	FormatBadgeSettings,
+	ItemFormatBadge,
+} from '../../utils/item-format-badge';
+import {
 	useImageSizeOnInsert,
 	useImageSizeOptions,
 } from '../../utils/item-image-size';
@@ -76,6 +81,7 @@ const DEFAULT_ATTRIBUTES = {
 	rel: '',
 	linkTarget: '_self',
 	sizeSlug: 'large',
+	...FORMAT_BADGE_DEFAULTS,
 };
 
 // The overlay lives in the Color panel and the proportions in Dimensions, each
@@ -99,6 +105,8 @@ export default function ItemImageEdit({
 		width,
 		height,
 		scale,
+		showFormatBadge,
+		formatBadgePosition,
 	} = attributes;
 
 	const {
@@ -109,6 +117,7 @@ export default function ItemImageEdit({
 		'vp/itemImageSizes': itemImageSizes,
 		'vp/itemFocalPoint': itemFocalPoint,
 		'vp/itemUrl': itemUrl,
+		'vp/itemFormat': itemFormat,
 		'vp/layoutColumns': layoutColumns,
 	} = context;
 
@@ -456,6 +465,11 @@ export default function ItemImageEdit({
 									</ToolsPanelItem>
 								</>
 							)}
+							<FormatBadgeSettings
+								attributes={attributes}
+								setAttributes={setAttributes}
+								panelId={clientId}
+							/>
 						</ToolsPanel>
 					</InspectorControls>
 					<ProTeaserPanel
@@ -477,6 +491,12 @@ export default function ItemImageEdit({
 					</a>
 				) : (
 					imageElement
+				)}
+				{showFormatBadge && (
+					<ItemFormatBadge
+						format={itemFormat}
+						position={formatBadgePosition}
+					/>
 				)}
 			</figure>
 		</>
