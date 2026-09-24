@@ -1494,7 +1494,7 @@ class Visual_Portfolio_Archive_Mapping {
 	 * the archive for "All", and one that keeps the filter stays under the
 	 * current address. The rest of the query string travels along.
 	 *
-	 * @param array           $query_arg - what the link sets, under the legacy names `vp_filter`, `vp_page` and `vp_sort`, values encoded.
+	 * @param array           $query_arg - what the link sets, under the legacy names `vp_filter`, `vp_page`, `vp_sort` and `vp_search`, values encoded.
 	 * @param int|string|null $query_id  - id of the loop.
 	 *
 	 * @return string Unescaped URL.
@@ -1504,6 +1504,7 @@ class Visual_Portfolio_Archive_Mapping {
 			'vp_filter' => Visual_Portfolio_Get::get_query_var_name( 'filter', $query_id ),
 			'vp_page'   => Visual_Portfolio_Get::get_query_var_name( 'page', $query_id ),
 			'vp_sort'   => Visual_Portfolio_Get::get_query_var_name( 'sort', $query_id ),
+			'vp_search' => Visual_Portfolio_Get::get_query_var_name( 'search', $query_id ),
 		);
 
 		$current = explode( '?', Visual_Portfolio_Get::get_current_url(), 2 );
@@ -1530,11 +1531,15 @@ class Visual_Portfolio_Archive_Mapping {
 			$base = preg_replace( '#/page/\d+/?$#', '', untrailingslashit( $current[0] ) );
 		}
 
-		if ( array_key_exists( 'vp_sort', $query_arg ) ) {
-			unset( $query[ $names['vp_sort'] ] );
+		foreach ( array( 'vp_sort', 'vp_search' ) as $key ) {
+			if ( ! array_key_exists( $key, $query_arg ) ) {
+				continue;
+			}
 
-			if ( '' !== (string) $query_arg['vp_sort'] ) {
-				$query[ $names['vp_sort'] ] = rawurldecode( (string) $query_arg['vp_sort'] );
+			unset( $query[ $names[ $key ] ] );
+
+			if ( '' !== (string) $query_arg[ $key ] ) {
+				$query[ $names[ $key ] ] = rawurldecode( (string) $query_arg[ $key ] );
 			}
 		}
 

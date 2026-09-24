@@ -233,6 +233,20 @@ test.describe('Gallery Loop blocks', () => {
 		await expect(
 			frontend.locator('.vp-block-loop-pagination-next')
 		).toHaveCount(0);
+
+		// The Next that was followed is gone, and the focus went on to the
+		// items that arrived rather than back to the page.
+		await expect
+			.poll(() =>
+				frontend.evaluate(() =>
+					document
+						.querySelector(
+							'ul.wp-block-visual-portfolio-item-template'
+						)
+						?.contains(document.activeElement)
+				)
+			)
+			.toBe(true);
 	});
 
 	test('load more disappears once the last page is loaded', async ({

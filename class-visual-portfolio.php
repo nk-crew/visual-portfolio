@@ -353,6 +353,7 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-carousel-autoplay/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-carousel-thumbnails/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-sort/index.php';
+				require_once $this->plugin_path . 'gutenberg/blocks/loop-search/index.php';
 				require_once $this->plugin_path . 'gutenberg/blocks/loop-no-results/index.php';
 
 				// Before the item blocks: they ask it for the attributes that
