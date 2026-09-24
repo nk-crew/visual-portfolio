@@ -258,7 +258,13 @@ export default function ItemImageEdit({
 					{!isCropping && (
 						<BlockControls group="block">
 							<ToolbarDropdownMenu
-								icon={CLICK_ACTION_ICONS[clickAction] || link}
+								icon={
+									getClickActions().find(
+										({ value }) => value === clickAction
+									)?.icon ||
+									CLICK_ACTION_ICONS[clickAction] ||
+									link
+								}
 								label={__('On click', 'visual-portfolio')}
 								controls={getClickActions().map((option) => ({
 									title: option.label,
