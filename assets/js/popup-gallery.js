@@ -251,11 +251,11 @@ const VPPopupAPI = {
 	parseItem(itemElement) {
 		let result = false;
 
-		// The item's own data before any a gallery inside its content carries.
+		// The item's own data, a child of it: a gallery inside the item's
+		// content carries data of its own further down.
 		const $dataElement =
 			itemElement &&
-			(itemElement.querySelector(':scope > .vp-portfolio__item-popup') ||
-				itemElement.querySelector('.vp-portfolio__item-popup'));
+			itemElement.querySelector(':scope > .vp-portfolio__item-popup');
 
 		if ($dataElement) {
 			result = {

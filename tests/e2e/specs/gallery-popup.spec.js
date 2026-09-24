@@ -372,7 +372,17 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await expect(links.nth(1)).toHaveAttribute('data-vp-popup');
 
 		// The lightbox holds the items it can show, and the linked one is not
-		// among them.
+		// among them - not even through a gallery inside its content.
+		await page
+			.locator(ITEM)
+			.first()
+			.evaluate((item) => {
+				item.insertAdjacentHTML(
+					'afterbegin',
+					'<div class="vp-portfolio__item-wrap"><template class="vp-portfolio__item-popup" data-vp-popup-img="https://example.org/nested.jpg"></template></div>'
+				);
+			});
+
 		await links.nth(1).click();
 		await expect(page.locator(FANCYBOX)).toBeVisible();
 		await expect(page.locator(FANCYBOX_COUNT)).toHaveText('1');
