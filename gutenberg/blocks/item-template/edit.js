@@ -69,8 +69,11 @@ import { TilesPresetsSelect, TilesPresetsToolbarButton } from './tiles-presets';
 import useEditorLayout from './use-editor-layout';
 import variations from './variations';
 
-const { plugin_version: pluginVersion, pro: isProPlugin } =
-	window.VPGutenbergVariables;
+const {
+	plugin_version: pluginVersion,
+	pro: isProPlugin,
+	site_rtl: isSiteRtl,
+} = window.VPGutenbergVariables;
 
 const ITEM_CLASS_NAME = 'wp-block-visual-portfolio-item-template__item';
 
@@ -261,7 +264,8 @@ function getCarouselInset(attributes) {
 function canRepeat(attributes) {
 	return (
 		effectRepeats(attributes.carouselEffect) &&
-		!attributes.carouselAutoWidth
+		!attributes.carouselAutoWidth &&
+		!isSiteRtl
 	);
 }
 
@@ -283,6 +287,13 @@ function getRepeatHelp(attributes) {
 	if (!effectRepeats(attributes.carouselEffect)) {
 		return __(
 			'This effect pins its slides in place, so the carousel cannot run round.',
+			'visual-portfolio'
+		);
+	}
+
+	if (isSiteRtl) {
+		return __(
+			'A right-to-left carousel cannot run round, so it stops at its ends.',
 			'visual-portfolio'
 		);
 	}

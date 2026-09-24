@@ -216,12 +216,36 @@ export function driveTimelines(list) {
 
 	if (
 		!list.classList.contains(EFFECT_CLASS) ||
-		(supportsTimelines(view) && !isRtl(list)) ||
-		view.matchMedia('(prefers-reduced-motion: reduce)').matches
+		(supportsTimelines(view) && !isRtl(list))
 	) {
 		return noop;
 	}
 
+	// Followed rather than read once: a visitor may ask for less motion, or
+	// stop asking, without leaving the page.
+	const motion = view.matchMedia('(prefers-reduced-motion: reduce)');
+	let stop = motion.matches ? noop : drive(list, view);
+	const follow = () => {
+		stop();
+		stop = motion.matches ? noop : drive(list, view);
+	};
+
+	motion.addEventListener('change', follow);
+
+	return () => {
+		motion.removeEventListener('change', follow);
+		stop();
+	};
+}
+
+/**
+ * Draw a list's timelines on every scroll and resize, until torn down.
+ *
+ * @param {HTMLElement} list - item template list.
+ * @param {Window}      view - the window the list is in.
+ * @return {Function} teardown.
+ */
+function drive(list, view) {
 	let queued = 0;
 
 	// Once a frame however many things asked, the way a scroll is drawn.

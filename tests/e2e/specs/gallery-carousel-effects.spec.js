@@ -315,6 +315,39 @@ test.describe('Carousel effects', () => {
 			await expect.poll(covered, { timeout: 10000 }).toEqual([1, 0.5, 0]);
 		});
 
+		test('the module starts once less motion is no longer asked for', async ({
+			page,
+			requestUtils,
+		}) => {
+			await page.addInitScript(() => {
+				const supports = window.CSS.supports.bind(window.CSS);
+
+				window.CSS.supports = (...args) =>
+					!String(args[0]).includes('animation-timeline') &&
+					supports(...args);
+			});
+			await page.emulateMedia({ reducedMotion: 'reduce' });
+
+			await publishLoop(requestUtils, page, {
+				title: 'Carousel effects - motion switched on',
+				blockId: 'e2e-motion-switch',
+				layout: {
+					layoutType: 'carousel',
+					carouselEffect: 'slideshow',
+				},
+			});
+
+			const list = page.locator(LIST);
+
+			await expect(list).toHaveClass(/vp-has-script/);
+			await expect(list).not.toHaveClass(/vp-carousel-scripted/);
+
+			// The visitor switches the setting off without leaving the page.
+			await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+			await expect(list).toHaveClass(/vp-carousel-scripted/);
+		});
+
 		test('the editor preview keeps them the same way', async ({
 			page,
 			admin,

@@ -261,6 +261,26 @@ class Visual_Portfolio_Gutenberg {
 	}
 
 	/**
+	 * Whether the site's language reads right to left.
+	 *
+	 * The front end speaks the site's language and the editor the user's, and
+	 * `is_rtl()` answers for whichever is loaded: an Arabic profile on an
+	 * English site read as RTL. The editor asks about the page it previews.
+	 *
+	 * @return bool
+	 */
+	public static function is_site_rtl() {
+		$switched = switch_to_locale( get_locale() );
+		$rtl      = is_rtl();
+
+		if ( $switched ) {
+			restore_previous_locale();
+		}
+
+		return $rtl;
+	}
+
+	/**
 	 * Sort options the Gallery Sort block offers in the editor.
 	 *
 	 * An ordered list rather than a slug-keyed map: the default sorting has an
@@ -361,6 +381,7 @@ class Visual_Portfolio_Gutenberg {
 				'pro'                      => visual_portfolio()->is_pro(),
 				'loop_blocks'              => $loop_blocks,
 				'loop_sort_options'        => $loop_blocks ? self::get_loop_sort_options() : array(),
+				'site_rtl'                 => $loop_blocks && self::is_site_rtl(),
 				'admin_url'                => get_admin_url(),
 				'attributes'               => $attributes,
 				'controls'                 => Visual_Portfolio_Controls::get_registered_array(),

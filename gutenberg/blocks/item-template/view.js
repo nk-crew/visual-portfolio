@@ -413,13 +413,20 @@ function isRepeating(list) {
  * and a measure would have to undo the padding the loop is carried in, the
  * library's included, to find the same.
  *
+ * An RTL carousel is run as a plain one too: the library carries its loop in
+ * the positive scroll positions of LTR, and under RTL, where they run
+ * negative, it opened a fade on the far end and an arrow moved nothing.
+ *
  * @param {HTMLElement} list    Item template list.
  * @param {number}      columns Slides the frame holds.
  *
  * @return {boolean} True when the slides overflow the frame.
  */
 function hasLoop(list, columns) {
-	return list.querySelectorAll(ITEM_SELECTOR).length > Math.max(1, columns);
+	return (
+		!isRtl(list) &&
+		list.querySelectorAll(ITEM_SELECTOR).length > Math.max(1, columns)
+	);
 }
 
 /**
@@ -1103,10 +1110,11 @@ function getSlideTargets(list) {
 
 	// The start of a carousel, not its left: on a right to left page the first
 	// slide sits against the right edge, and measuring from the left one marked
-	// the last slide as the current one for the whole carousel.
+	// the last slide as the current one for the whole carousel. The browsers
+	// count an RTL list's `offsetLeft` from its right edge, the overflow
+	// running negative, so a slide starts where the list's width leaves it.
 	const rtl = isRtl(list);
-	const content = list.scrollWidth;
-	const furthest = Math.max(0, content - list.clientWidth);
+	const furthest = Math.max(0, list.scrollWidth - list.clientWidth);
 	// Where a slide comes to rest is the browser's answer, and these are the
 	// two properties it reads it from - the alignment from the slide, the
 	// padding it is held off the edge by from the container.
@@ -1120,13 +1128,19 @@ function getSlideTargets(list) {
 
 	return items.map((item) => {
 		const start = rtl
-			? content - item.offsetLeft - item.offsetWidth
+			? list.clientWidth - item.offsetLeft - item.offsetWidth
 			: item.offsetLeft;
 		const lead = centred
 			? (list.clientWidth - item.offsetWidth) / 2
 			: padding;
 
-		return Math.max(0, Math.min(furthest, start - lead));
+		const place = Math.max(0, Math.min(furthest, start - lead));
+
+		// Three rounded numbers under RTL, one in LTR, so a place can fall up
+		// to a pixel and a half short of the end - and the snap put the list
+		// back at the end on every step towards the start. No step is two
+		// pixels long, so a place that close is the end.
+		return furthest - place < 2 ? furthest : place;
 	});
 }
 
@@ -1627,17 +1641,16 @@ function showThumb(strip, current) {
 	// unpositioned strip handed back a distance from the frame the carousel
 	// scrolls in - so the thumbnail brought into view was never the right one.
 	//
-	// On a right to left page the strip starts at its right, its scroll runs
-	// from zero to minus the overflow, and the same thumbnail is centred by
-	// scrolling back from the far end rather than on from the start.
+	// On a right to left page the strip starts at its right and its scroll
+	// runs from zero to minus the overflow - and its `offsetLeft` runs negative
+	// the same way, so the thumbnail is centred by the same sum, held to the
+	// range the other side of zero.
 	const centre = thumb.offsetLeft + thumb.offsetWidth / 2;
 	const furthest = strip.scrollWidth - strip.clientWidth;
+	const wanted = centre - strip.clientWidth / 2;
 	const left = isRtl(strip)
-		? Math.max(
-				-furthest,
-				Math.min(0, centre - strip.scrollWidth + strip.clientWidth / 2)
-			)
-		: Math.max(0, Math.min(furthest, centre - strip.clientWidth / 2));
+		? Math.max(-furthest, Math.min(0, wanted))
+		: Math.max(0, Math.min(furthest, wanted));
 
 	strip.scrollTo({ left, behavior: getScrollBehavior() });
 }
