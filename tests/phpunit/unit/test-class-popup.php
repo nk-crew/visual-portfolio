@@ -179,6 +179,30 @@ class ClassPopup extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An item the pipeline allows no popup still reaches the filter, which is
+	 * how Pro opens its media for an image with a link, and any root the
+	 * classic lightbox reads counts.
+	 *
+	 * @return void
+	 */
+	public function test_filter_can_give_a_popup_to_an_item_without_one() {
+		$filter = static function ( $output ) {
+			return $output ? $output : '<div class="vp-portfolio__item-popup" data-vp-popup-img="https://example.org/media.jpg"></div>';
+		};
+
+		add_filter( 'vpf_popup_output', $filter );
+
+		$popup = Visual_Portfolio_Popup::get_item_popup(
+			$this->get_item( array( 'allow_popup' => false ) ),
+			Visual_Portfolio_Get::get_options( array() )
+		);
+
+		remove_filter( 'vpf_popup_output', $filter );
+
+		$this->assertSame( 'https://example.org/media.jpg', $popup['src'] );
+	}
+
+	/**
 	 * Every click action renders the thing it names.
 	 *
 	 * @return void

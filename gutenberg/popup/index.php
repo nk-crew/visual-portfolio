@@ -70,9 +70,10 @@ class Visual_Portfolio_Popup {
 	 *               lightbox has nothing to show.
 	 */
 	public static function get_item_popup( $item, $options, $sources = array() ) {
-		if ( empty( $item['allow_popup'] ) ) {
-			return array();
-		}
+		// An item the pipeline allows no popup still goes through the filter:
+		// Pro opens its media from there, as it does for the classic gallery.
+		// The filter callbacks read the options of a gallery that opens a popup.
+		$options['items_click_action'] = 'popup_gallery';
 
 		$options['items_click_action_popup_title_source']       = self::get_caption_source( $sources['title'] ?? '', 'item_title' );
 		$options['items_click_action_popup_description_source'] = self::get_caption_source( $sources['description'] ?? '', 'item_excerpt' );
@@ -92,7 +93,7 @@ class Visual_Portfolio_Popup {
 		// it there too.
 		$processor = new WP_HTML_Tag_Processor( $markup );
 
-		if ( ! $processor->next_tag( 'template' ) ) {
+		if ( ! $processor->next_tag( array( 'class_name' => 'vp-portfolio__item-popup' ) ) ) {
 			return array();
 		}
 

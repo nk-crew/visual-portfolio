@@ -422,6 +422,39 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			.toBe(true);
 	});
 
+	test('a gallery inside the content of an item stays out of its lightbox', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - nested gallery',
+			blockId: 'e2e-popup-nested',
+			queryId: 1,
+			images,
+			clickAction: 'popup',
+		});
+
+		// What an item description showing a post's content brings with it:
+		// a classic gallery, whose items carry popup data of their own.
+		await page
+			.locator(ITEM)
+			.nth(1)
+			.evaluate((item) => {
+				item.insertAdjacentHTML(
+					'afterbegin',
+					'<div class="vp-portfolio__item-wrap"><template class="vp-portfolio__item-popup" data-vp-popup-img="https://example.org/nested.jpg"><h3 class="vp-portfolio__item-popup-title">Nested</h3></template></div>'
+				);
+			});
+
+		await page.locator(TRIGGER).nth(1).click();
+
+		await expect(page.locator(FANCYBOX_COUNT)).toHaveText(
+			`${IMAGES_COUNT}`
+		);
+		await expect(page.locator(FANCYBOX_INDEX)).toHaveText('2');
+		await expect(page.locator(FANCYBOX_CAPTION)).toContainText('Image 2');
+	});
+
 	test('the cover opens the lightbox', async ({ page, requestUtils }) => {
 		await publishLoop(requestUtils, page, {
 			pageTitle: 'Popup - cover',
