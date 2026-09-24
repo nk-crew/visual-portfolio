@@ -132,14 +132,57 @@ class ClassLoopItemMedia extends WP_UnitTestCase {
 
 		$this->assertStringNotContainsString( '<figure', $this->render_loop( $images, '<!-- wp:visual-portfolio/item-image /-->' ) );
 
+		$crops = array();
+
+		add_filter(
+			'vpf_loop_item_picture',
+			static function ( $picture, $context, $attributes, $block_name, $img_attr ) use ( &$crops ) {
+				$crops[] = $img_attr['style'] ?? '';
+
+				return '' === $picture ? '<img class="e2e-stand-in" alt="">' : $picture;
+			},
+			10,
+			5
+		);
+
+		$this->assertMatchesRegularExpression( '#<figure [^>]*><img class="e2e-stand-in" alt="">#', $this->render_loop( $images, '<!-- wp:visual-portfolio/item-image {"aspectRatio":"4/3"} /-->' ) );
+
+		// The stand-in can take the crop of the block.
+		$this->assertStringContainsString( 'aspect-ratio:4/3', $crops[0] );
+	}
+
+	/**
+	 * A cover whose only picture came from a filter still loads its lazy
+	 * loading scripts.
+	 *
+	 * @return void
+	 */
+	public function test_a_filtered_cover_picture_brings_the_lazy_loading() {
+		update_option( 'vp_images', array( 'lazy_loading' => 'vp' ) );
+		Visual_Portfolio_Images::init_lazyload();
+		Visual_Portfolio_Assets::remove_stored_assets( 'visual-portfolio-lazyload' );
+
 		add_filter(
 			'vpf_loop_item_picture',
 			static function ( $picture ) {
-				return '' === $picture ? '<img class="e2e-stand-in" alt="">' : $picture;
+				return '' === $picture ? '<img class="vp-lazyload" alt="">' : $picture;
 			}
 		);
 
-		$this->assertMatchesRegularExpression( '#<figure [^>]*><img class="e2e-stand-in" alt="">#', $this->render_loop( $images, '<!-- wp:visual-portfolio/item-image /-->' ) );
+		$this->render_loop(
+			array(
+				array(
+					'id'    => PHP_INT_MAX,
+					'title' => 'No file',
+				),
+			),
+			'<!-- wp:visual-portfolio/item-cover --><!-- wp:visual-portfolio/item-title /--><!-- /wp:visual-portfolio/item-cover -->'
+		);
+
+		$stored = new ReflectionProperty( 'Visual_Portfolio_Assets', 'stored_assets' );
+		$stored->setAccessible( true );
+
+		$this->assertArrayHasKey( 'visual-portfolio-lazyload', $stored->getValue()['script'] );
 	}
 
 	/**

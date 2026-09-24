@@ -399,7 +399,7 @@ it reads — no hook involved:
 | `vpf_loop_tiles_presets` | filter `( $presets )` | Tiles notations offered in the editor |
 | `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers, `name => settings`. See below |
 | `vpf_loop_popup_enqueue` | action | Fires once on a page where a loop opens the lightbox: where what extends the lightbox loads its assets |
-| `vpf_loop_item_picture` | filter `( $picture, $context, $attributes, $block_name )` | The picture of an item image or item cover, before its overlay and link: where media beside the image goes. An item without an image comes in empty and may leave with a picture |
+| `vpf_loop_item_picture` | filter `( $picture, $context, $attributes, $block_name, $img_attr )` | The picture of an item image or item cover, before its overlay and link: where media beside the image goes. An item without an image comes in empty and may leave with a picture, cropped by the `img` attributes of the block |
 | `vpf_loop_item_click_attributes` | filter `( $attributes, $action, $context )` | The link an item block renders for a click action an extension added; without `href` the item links to its own address |
 | `vpf_rest_loop_items_source_configs` | filter | Allow-list of source parameters the editor preview endpoint accepts |
 

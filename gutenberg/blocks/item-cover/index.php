@@ -146,6 +146,10 @@ class Visual_Portfolio_Block_Item_Cover {
 			$image = Visual_Portfolio_Images::get_attachment_image( $context['vp/itemNoImgId'], $size, false, $img_attr );
 		}
 
+		// See `vpf_loop_item_picture` in the item image block. The ratio of the
+		// cover is read off the first picture, so media added after it keeps the box.
+		$image = apply_filters( 'vpf_loop_item_picture', $image, $context, $attributes, 'visual-portfolio/item-cover', $img_attr );
+
 		// The assets walker only knows about galleries of the legacy block, so the
 		// lazy loading scripts of this one are requested here.
 		if ( $image && Visual_Portfolio_Settings::get_option( 'lazy_loading', 'vp_images' ) ) {
@@ -335,9 +339,7 @@ class Visual_Portfolio_Block_Item_Cover {
 			wp_enqueue_script_module( self::VIEW_MODULE );
 		}
 
-		// See `vpf_loop_item_picture` in the item image block. The ratio below is
-		// read off the first picture, so media added after it keeps the box.
-		$image = apply_filters( 'vpf_loop_item_picture', $this->get_image( $attributes, $context ), $context, $attributes, 'visual-portfolio/item-cover' );
+		$image = $this->get_image( $attributes, $context );
 
 		$aspect_ratio = trim( preg_replace( '#[^0-9./ ]#', '', (string) ( $attributes['aspectRatio'] ?? '' ) ) );
 
