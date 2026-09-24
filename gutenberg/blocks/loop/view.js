@@ -76,6 +76,8 @@ const loopUndoAddresses = new WeakMap();
 // the newest of them owns the loading state - the first one to settle would
 // otherwise clear the flag for both.
 const navigating = new WeakMap();
+// The navigation a loop was last asked for, kept after it ends.
+const latestNavigations = new WeakMap();
 
 // Per loop: the search waiting for the visitor to stop typing, what they typed
 // last with where the caret was, and the address the last finished search
@@ -554,8 +556,16 @@ function prefetchNextPage(loop) {
  */
 function prefetchLink(link) {
 	const href = getControlUrl(link);
+	const loop = link.closest(LOOP_SELECTOR);
 
-	if (!href || prefetchedLinks.has(href) || !canPrefetch(href)) {
+	// A link clicked before its delay ran out is on its way already.
+	if (
+		!href ||
+		!loop ||
+		navigating.has(loop) ||
+		prefetchedLinks.has(href) ||
+		!canPrefetch(href)
+	) {
 		return;
 	}
 
@@ -817,6 +827,7 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 
 	if (loop) {
 		navigating.set(loop, token);
+		latestNavigations.set(loop, token);
 	}
 
 	// Ends the loading state, and says whether this navigation was
@@ -842,9 +853,13 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 		yield Promise.race([
 			// A prefetch of this address still on its way is the request the
 			// router would make again. Once it failed, the router makes its own.
-			Promise.resolve(prefetchedLinks.get(href)).then(() =>
-				router.actions.navigate(href, { replace })
-			),
+			// The router takes the last navigation it is asked for, so one the
+			// visitor has since replaced asks for nothing.
+			Promise.resolve(prefetchedLinks.get(href)).then(() => {
+				if (!loop || latestNavigations.get(loop) === token) {
+					return router.actions.navigate(href, { replace });
+				}
+			}),
 			new Promise((resolve) => {
 				window.setTimeout(resolve, NAVIGATION_TIMEOUT);
 			}),
@@ -861,6 +876,11 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 
 	if (!release()) {
 		return false;
+	}
+
+	// The router keeps the page it rendered.
+	if (!prefetchedLinks.has(href)) {
+		prefetchedLinks.set(href, Promise.resolve());
 	}
 
 	const list = loop ? loop.querySelector(LIST_SELECTOR) : null;

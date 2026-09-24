@@ -46,7 +46,8 @@ class Visual_Portfolio_Gutenberg {
 			'visual-portfolio',
 			array(
 				// Read on `init`, after Pro's white label renamed the plugin.
-				'label' => visual_portfolio()->plugin_name,
+				// The name is escaped for HTML, the label is printed as text.
+				'label' => wp_specialchars_decode( visual_portfolio()->plugin_name, ENT_QUOTES ),
 			)
 		);
 

@@ -32,6 +32,23 @@ function getAlign(align) {
 	return ALIGNMENTS.includes(align) ? { align } : {};
 }
 
+/**
+ * Click action of the item image for a gallery's link setting.
+ *
+ * @param {string} linkTo - link setting of the gallery.
+ * @return {string} click action.
+ */
+function getGalleryClickAction(linkTo) {
+	if (!linkTo || 'none' === linkTo) {
+		return 'none';
+	}
+
+	return 'attachment' === linkTo ? 'url' : 'popup';
+}
+
+// Orders of Latest Posts a loop names otherwise.
+const LATEST_POSTS_ORDER_BY = { date: 'post_date' };
+
 export default {
 	from: [
 		{
@@ -49,6 +66,7 @@ export default {
 					randomOrder,
 					linkTo,
 					align,
+					caption: galleryCaption,
 				} = attributes;
 
 				// A gallery that crops its images shows them in a grid, at the
@@ -70,7 +88,9 @@ export default {
 							imgThumbnailUrl: image.url,
 							...(caption.trim() ? { title: caption } : {}),
 							...(image.alt ? { alt: image.alt } : {}),
-							...('custom' === image.linkDestination && image.href
+							...(['custom', 'attachment'].includes(
+								image.linkDestination
+							) && image.href
 								? { url: image.href }
 								: {}),
 						};
@@ -89,8 +109,9 @@ export default {
 												? aspectRatio
 												: '1',
 									}),
-							clickAction:
-								!linkTo || 'none' === linkTo ? 'none' : 'popup',
+							// A link to the attachment page follows the image's
+							// address, a link to the file opens the lightbox.
+							clickAction: getGalleryClickAction(linkTo),
 						},
 					],
 				];
@@ -99,7 +120,7 @@ export default {
 					items.push(['item-title', {}]);
 				}
 
-				return createBlock(
+				const loop = createBlock(
 					'visual-portfolio/loop',
 					{
 						...getAlign(align),
@@ -124,11 +145,25 @@ export default {
 						),
 					]
 				);
+				const caption = String(galleryCaption ?? '');
+
+				// A loop has no caption of its own, so the gallery's follows it.
+				return caption.trim()
+					? [
+							loop,
+							createBlock('core/paragraph', {
+								content: caption,
+								align: 'center',
+							}),
+						]
+					: loop;
 			},
 		},
 		{
 			type: 'block',
 			blocks: ['core/latest-posts'],
+			// A loop has no author filter, so it would show everyone's posts.
+			isMatch: ({ selectedAuthor }) => !selectedAuthor,
 			transform({
 				postsToShow = 5,
 				order = 'desc',
@@ -136,6 +171,7 @@ export default {
 				categories,
 				layout,
 				displayFeaturedImage,
+				featuredImageSizeSlug = 'thumbnail',
 				addLinkToFeaturedImage,
 				displayAuthor,
 				displayPostDate,
@@ -172,6 +208,7 @@ export default {
 					displayFeaturedImage && [
 						'item-image',
 						{
+							sizeSlug: featuredImageSizeSlug,
 							clickAction: addLinkToFeaturedImage
 								? 'url'
 								: 'none',
@@ -198,8 +235,7 @@ export default {
 						postsQuery: {
 							source: 'post',
 							order,
-							orderBy:
-								'title' === orderBy ? 'title' : 'post_date',
+							orderBy: LATEST_POSTS_ORDER_BY[orderBy] ?? orderBy,
 							taxonomies: terms,
 						},
 					},

@@ -116,14 +116,15 @@ class ClassLoopIntegrations extends WP_UnitTestCase {
 	public function test_pattern_category_follows_the_plugin_name() {
 		$name = visual_portfolio()->plugin_name;
 
-		visual_portfolio()->plugin_name = 'Acme Galleries';
+		// Stored escaped for HTML, as the plugin and the white label set it.
+		visual_portfolio()->plugin_name = esc_html( 'Acme & Galleries' );
 
 		try {
 			( new Visual_Portfolio_Gutenberg() )->register_block_patterns();
 
 			$category = WP_Block_Pattern_Categories_Registry::get_instance()->get_registered( 'visual-portfolio' );
 
-			$this->assertSame( 'Acme Galleries', $category['label'] );
+			$this->assertSame( 'Acme & Galleries', $category['label'] );
 		} finally {
 			visual_portfolio()->plugin_name = $name;
 

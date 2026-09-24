@@ -120,7 +120,11 @@ test.describe('Gallery Loop integrations', () => {
 
 		await editor.insertBlock({
 			name: 'core/gallery',
-			attributes: { columns: 2, linkTo: 'media' },
+			attributes: {
+				columns: 2,
+				linkTo: 'media',
+				caption: 'Gallery caption',
+			},
 			innerBlocks: images.slice(0, 2).map((image, index) => ({
 				name: 'core/image',
 				attributes: {
@@ -134,7 +138,12 @@ test.describe('Gallery Loop integrations', () => {
 
 		await transformToLoop(page, editor, 'Gallery');
 
-		const [loop] = await editor.getBlocks();
+		const [loop, caption] = await editor.getBlocks();
+
+		expect(caption).toMatchObject({
+			name: 'core/paragraph',
+			attributes: { content: 'Gallery caption' },
+		});
 
 		expect(loop.name).toBe('visual-portfolio/loop');
 		expect(loop.attributes.queryType).toBe('images');
@@ -219,6 +228,7 @@ test.describe('Gallery Loop integrations', () => {
 			'visual-portfolio/item-date',
 			'visual-portfolio/item-description',
 		]);
+		expect(template.innerBlocks[0].attributes.sizeSlug).toBe('thumbnail');
 		expect(template.innerBlocks[4].attributes).toMatchObject({
 			source: 'excerpt',
 			excerptLength: 20,
@@ -352,6 +362,55 @@ test.describe('Gallery Loop integrations', () => {
 
 		expect(requests()).toBe(1);
 		expect(await page.evaluate(() => window.__vpSameDocument)).toBe(true);
+	});
+
+	test('a later click wins over an earlier one still fetched ahead', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishPrefetchingLoop(
+			requestUtils,
+			page,
+			'Integrations - prefetch and click again',
+			'<!-- wp:visual-portfolio/loop-pagination --><!-- wp:visual-portfolio/loop-pagination-numbers /--><!-- /wp:visual-portfolio/loop-pagination -->'
+		);
+
+		// The second page answers late, after the third was rendered.
+		let secondPageDone;
+		const secondPageAnswered = new Promise((resolve) => {
+			secondPageDone = resolve;
+		});
+
+		await page.route(
+			(url) => '2' === url.searchParams.get('vp-1-page'),
+			async (route) => {
+				await new Promise((resolve) => setTimeout(resolve, 2000));
+				await route.fallback();
+				secondPageDone();
+			}
+		);
+
+		const numbers = page.locator(
+			`${LOOP} .vp-block-loop-pagination-numbers a`
+		);
+
+		await numbers.filter({ hasText: '2' }).click();
+		await numbers.filter({ hasText: '3' }).click();
+
+		await expect(page.locator(`${LOOP} ${ITEM} ${TITLE}`)).toHaveText([
+			'Prefetch E',
+			'Prefetch F',
+		]);
+
+		await secondPageAnswered;
+		// Room for a late navigation to land.
+		await page.waitForTimeout(500);
+
+		await expect(page.locator(`${LOOP} ${ITEM} ${TITLE}`)).toHaveText([
+			'Prefetch E',
+			'Prefetch F',
+		]);
+		expect(new URL(page.url()).searchParams.get('vp-1-page')).toBe('3');
 	});
 
 	test('the next page of a load more is fetched ahead and used', async ({
