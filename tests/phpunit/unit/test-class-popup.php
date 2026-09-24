@@ -227,6 +227,39 @@ class ClassPopup extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A page shown in the lightbox, Pro's Quick View, opens it too, and
+	 * without the lightbox a click lands on the page itself.
+	 *
+	 * @return void
+	 */
+	public function test_page_popup_opens_the_item_address() {
+		$filter = static function () {
+			return '<div class="vp-portfolio__item-popup" data-vp-popup-page="https://example.org/post/?vp_popup_iframe=vp_popup_iframe"></div>';
+		};
+
+		add_filter( 'vpf_popup_output', $filter );
+
+		$popup = Visual_Portfolio_Popup::get_item_popup(
+			$this->get_item( array( 'url' => 'https://example.org/post/' ) ),
+			$this->get_options()
+		);
+
+		$this->assertSame( 'https://example.org/post/', $popup['src'] );
+	}
+
+	/**
+	 * What extends the lightbox is told once that a loop opens it.
+	 *
+	 * @return void
+	 */
+	public function test_loop_popup_assets_are_announced_once() {
+		do_blocks( $this->get_loop_markup( 'popup' ) );
+		do_blocks( $this->get_loop_markup( 'popup' ) );
+
+		$this->assertSame( 1, did_action( 'vpf_loop_popup_enqueue' ) );
+	}
+
+	/**
 	 * Every click action renders the thing it names.
 	 *
 	 * @return void

@@ -103,6 +103,12 @@ class Visual_Portfolio_Popup {
 			$src = $processor->get_attribute( 'data-vp-popup-img' );
 		}
 
+		// A page shown in the lightbox, such as Pro's Quick View: without it,
+		// the page itself.
+		if ( ( ! is_string( $src ) || '' === $src ) && $processor->get_attribute( 'data-vp-popup-page' ) ) {
+			$src = $item['url'] ?? '';
+		}
+
 		if ( ! is_string( $src ) || '' === $src ) {
 			return array();
 		}
@@ -169,9 +175,26 @@ class Visual_Portfolio_Popup {
 	 * @return void
 	 */
 	public static function enqueue() {
+		static $done = false;
+
 		Visual_Portfolio_Assets::enqueue_popup_assets();
 
 		wp_enqueue_script( self::SCRIPT );
+
+		if ( $done ) {
+			return;
+		}
+
+		$done = true;
+
+		/**
+		 * Fires once on a page where a Gallery Loop opens the lightbox.
+		 *
+		 * The loop counterpart of `vpf_after_assets_enqueue` for the popup:
+		 * what extends the lightbox of a classic gallery loads its assets here
+		 * for a loop, and nothing else of the classic gallery comes with it.
+		 */
+		do_action( 'vpf_loop_popup_enqueue' );
 	}
 }
 new Visual_Portfolio_Popup();
