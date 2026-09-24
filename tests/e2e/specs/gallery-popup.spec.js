@@ -578,6 +578,17 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await expect(page.locator(FANCYBOX_INDEX)).toHaveText(
 			`${IMAGES_COUNT}`
 		);
+
+		// A step back through a history of the hash alone - what a deep link
+		// to each slide writes - leaves the page, appended items and all.
+		await page.keyboard.press('Escape');
+		await page.evaluate(() => {
+			window.history.pushState(null, '', '#&gid=a&pid=1');
+			window.history.back();
+		});
+		await expect.poll(() => new URL(page.url()).hash).toBe('');
+
+		await expect(page.locator(TRIGGER)).toHaveCount(IMAGES_COUNT);
 	});
 
 	test('the lightbox holds the items a region swap brought', async ({
