@@ -36,7 +36,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { memo, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _x, isRTL, sprintf } from '@wordpress/i18n';
 import {
 	alignNone,
 	justifyCenter,
@@ -261,7 +261,8 @@ function getCarouselInset(attributes) {
 function canRepeat(attributes) {
 	return (
 		effectRepeats(attributes.carouselEffect) &&
-		!attributes.carouselAutoWidth
+		!attributes.carouselAutoWidth &&
+		!isRTL()
 	);
 }
 
@@ -283,6 +284,13 @@ function getRepeatHelp(attributes) {
 	if (!effectRepeats(attributes.carouselEffect)) {
 		return __(
 			'This effect pins its slides in place, so the carousel cannot run round.',
+			'visual-portfolio'
+		);
+	}
+
+	if (isRTL()) {
+		return __(
+			'A right-to-left carousel cannot run round, so it stops at its ends.',
 			'visual-portfolio'
 		);
 	}

@@ -422,6 +422,35 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An RTL site's carousel is not run round: the carousel library carries
+	 * its loop in the scroll positions of LTR only. Nor are its last slides
+	 * loaded up front for a seam it will not have.
+	 *
+	 * @return void
+	 */
+	public function test_an_rtl_carousel_leaves_the_loop_out() {
+		global $wp_locale;
+
+		$direction                = $wp_locale->text_direction;
+		$wp_locale->text_direction = 'rtl';
+
+		try {
+			$output = $this->render_loop(
+				'<!-- wp:visual-portfolio/item-image /-->',
+				array(
+					'layoutType'     => 'carousel',
+					'carouselRepeat' => true,
+				)
+			);
+		} finally {
+			$wp_locale->text_direction = $direction;
+		}
+
+		$this->assertStringNotContainsString( 'data-vp-carousel-repeat', $output );
+		$this->assertStringNotContainsString( 'data-skip-lazy', $output );
+	}
+
+	/**
 	 * A carousel is drawn inside the one box of it that stays put, and the
 	 * controls are blocks beside that box rather than markup inside it.
 	 *

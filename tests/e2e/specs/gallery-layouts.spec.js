@@ -1251,6 +1251,59 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(current, { timeout: 10000 }).toBe(4);
 	});
 
+	test('an RTL carousel steps back from its end at any width', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.addInitScript(() => {
+			document.addEventListener('readystatechange', () => {
+				document.documentElement.dir = 'rtl';
+			});
+		});
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - RTL end',
+			blockId: 'e2e-rtl-end',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveClass(/vp-has-script/);
+
+		// Under RTL a slide's place is three rounded numbers, and at most
+		// widths the last step back fell a pixel short of the end, where the
+		// snap put the carousel back. Some width in this range did so. Each
+		// press waits out the one before, which an arrow counts on from for
+		// a while.
+		const stuck = [];
+
+		for (let width = 600; width <= 610; width++) {
+			await list.evaluate((node, frame) => {
+				node.parentElement.style.width = `${frame}px`;
+				node.scrollTo({ left: -node.scrollWidth, behavior: 'instant' });
+			}, width);
+			await page.waitForTimeout(800);
+
+			const end = await list.evaluate((node) => node.scrollLeft);
+
+			await page.locator(PREV_ARROW).click();
+			await page.waitForTimeout(250);
+
+			if (end === (await list.evaluate((node) => node.scrollLeft))) {
+				stuck.push(width);
+			}
+		}
+
+		expect(stuck).toEqual([]);
+	});
+
 	test('an RTL carousel keeps the thumbnail of its slide in the middle of the strip', async ({
 		page,
 		requestUtils,

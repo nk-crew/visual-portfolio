@@ -515,7 +515,9 @@ on a desktop and overflow the one column of a phone, so the module counts the
 slides against the columns, and counts again whenever the columns change,
 starting the carousel over as a loop or as a plain one. An RTL carousel runs as
 a plain one as well: the carousel library carries its loop in the scroll
-positions of LTR only.
+positions of LTR only. On an RTL site the server leaves the loop out and the
+control is greyed with the reason; a block made RTL on an LTR page is left out
+by the module.
 
 `peek` says whether the effect leaves an edge for a slide of the next one to
 show at, and is `true` unless the effect says otherwise. An effect that lays

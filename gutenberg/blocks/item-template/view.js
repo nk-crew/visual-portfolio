@@ -1134,7 +1134,13 @@ function getSlideTargets(list) {
 			? (list.clientWidth - item.offsetWidth) / 2
 			: padding;
 
-		return Math.max(0, Math.min(furthest, start - lead));
+		const place = Math.max(0, Math.min(furthest, start - lead));
+
+		// Three rounded numbers under RTL, one in LTR, so a place can fall up
+		// to a pixel and a half short of the end - and the snap put the list
+		// back at the end on every step towards the start. No step is two
+		// pixels long, so a place that close is the end.
+		return furthest - place < 2 ? furthest : place;
 	});
 }
 
