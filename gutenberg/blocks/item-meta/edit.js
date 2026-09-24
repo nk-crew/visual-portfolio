@@ -12,7 +12,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
@@ -21,7 +21,7 @@ import {
 /**
  * Internal dependencies
  */
-import { getMetaText, META_TYPES } from './meta-types';
+import { getMetaTypes } from './meta-types';
 
 export default function ItemMetaEdit({
 	attributes: { metaType, showIcon, showZero, prefix, suffix, isLink },
@@ -33,24 +33,38 @@ export default function ItemMetaEdit({
 	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 
-	const meta = META_TYPES[metaType] || META_TYPES.comments;
-	const value = context[meta.contextKey];
+	const metaTypes = getMetaTypes();
+	// Own names only: an attribute such as `constructor` is a string too.
+	const meta = Object.hasOwn(metaTypes, metaType)
+		? metaTypes[metaType]
+		: undefined;
+	const value = meta ? context[meta.contextKey] : undefined;
 
 	// An item without the value still needs something to lay out against, and
 	// the block would otherwise vanish from the item it was just dropped into.
 	const previewValue =
-		value === undefined || value === '' ? meta.sample : value;
+		value === undefined || value === '' ? meta?.sample : value;
 
-	const Icon = meta.icon;
-	const inner = (
+	const Icon = meta?.icon;
+	const inner = meta ? (
 		<>
 			{showIcon && <Icon aria-hidden="true" focusable="false" />}
 			<span>
 				{prefix}
-				{getMetaText(metaType, previewValue)}
+				{meta.getText(previewValue)}
 				{suffix}
 			</span>
 		</>
+	) : (
+		// A type this install lacks, which the page prints nothing for: still
+		// something to select, and not a value it does not show.
+		<span className="vp-item-meta-unavailable" style={{ opacity: 0.6 }}>
+			{sprintf(
+				/* translators: %s: name of a meta type this site does not offer. */
+				__('Unavailable meta: %s', 'visual-portfolio'),
+				metaType
+			)}
+		</span>
 	);
 
 	return (

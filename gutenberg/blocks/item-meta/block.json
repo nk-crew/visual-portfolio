@@ -16,8 +16,7 @@
 	"attributes": {
 		"metaType": {
 			"type": "string",
-			"default": "comments",
-			"enum": ["comments", "views", "reading-time"]
+			"default": "comments"
 		},
 		"showIcon": {
 			"type": "boolean",

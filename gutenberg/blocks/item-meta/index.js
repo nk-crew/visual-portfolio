@@ -11,11 +11,9 @@ import metadata from './block.json';
 import edit from './edit';
 import variations from './variations';
 
-/**
- * Register block
- */
-registerLoopBlock(metadata.name, {
-	...metadata,
+// Registered from the metadata, so the context keys the server adds for the
+// meta types of an extension reach the editor.
+registerLoopBlock(metadata, {
 	icon: {
 		foreground: '#2540CC',
 		src: <BlockIcon width="20" height="20" />,

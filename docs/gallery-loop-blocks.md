@@ -399,6 +399,7 @@ it reads — no hook involved:
 | `vpf_loop_tiles_presets` | filter `( $presets )` | Tiles notations offered in the editor |
 | `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers, `name => settings`. See below |
 | `vpf_item_cover_effects` | filter `( $effects )` | Effects the item cover offers, a list of names. The cover gets the class `vp-effect-{name}`, so an effect is a stylesheet and this name; a saved effect not in the list is drawn as `fade` |
+| `vpf_item_meta_types` | filter `( $types )` | Types the item meta block offers, `name => array( 'context', 'text', 'icon' )`: the context key the value comes in, `callable( $value, $attributes )` returning its unescaped text, and the path to an SVG file. See below |
 | `vpf_loop_popup_enqueue` | action | Fires once on a page where a loop opens the lightbox: where what extends the lightbox loads its assets |
 | `vpf_loop_item_picture` | filter `( $picture, $context, $attributes, $block_name, $img_attr )` | The picture of an item image or item cover, before its overlay and link: where media beside the image goes. An item without an image comes in empty and may leave with a picture, cropped by the `img` attributes of the block |
 | `vpf_loop_item_click_attributes` | filter `( $attributes, $action, $context )` | The link an item block renders for a click action an extension added; without `href` the item links to its own address |
@@ -487,6 +488,56 @@ a panel menu item marked "(Pro)" that shows one line and a link. An entry under
 that name replaces it. The Effect lists do the same by `value`, with a disabled
 option: `vpf.carouselEffects` for the item template and `vpf.itemCoverEffects`
 (`{ label, value }`) for the cover.
+
+### Item meta types
+
+The item meta block prints one value of an item, with its mark. Its types are
+comments, views and reading time, and `metaType` is a plain string, so a block
+saved with a type the install lacks keeps it and renders nothing. A type is a
+context key the item carries, registered on the server and in the editor:
+
+```php
+add_filter(
+	'vpf_item_meta_types',
+	function ( $types ) {
+		$types['acme-likes'] = array(
+			'context' => 'vp/itemLikesCount',
+			'text'    => function ( $value, $attributes ) {
+				return sprintf( '%d Likes', $value );
+			},
+			'icon'    => __DIR__ . '/likes.svg',
+		);
+
+		return $types;
+	}
+);
+```
+
+```js
+addFilter( 'vpf.itemMetaTypes', 'acme/likes', ( types ) => ( {
+	...types,
+	'acme-likes': {
+		icon: LikesIcon,
+		contextKey: 'vp/itemLikesCount',
+		sample: 12,
+		getText: ( value ) => `${ value } Likes`,
+	},
+} ) );
+
+registerBlockVariation( 'visual-portfolio/item-meta', {
+	name: 'acme-likes',
+	title: 'Gallery Item Likes',
+	attributes: { metaType: 'acme-likes' },
+	isActive: [ 'metaType' ],
+	scope: [ 'inserter', 'block', 'transform' ],
+} );
+```
+
+The value comes from `vpf_loop_item_context`. The server adds the context key
+of every type to the block's `usesContext`, which is how the editor hands it to
+the block, so the PHP filter has to be in place before the block registers,
+on `init` at priority 11. `sample` is what the editor shows for an item
+without the value.
 
 ### Carousel effects
 
@@ -629,8 +680,11 @@ Anything a source writes into legacy options and later needs for counting pages
 must also be registered through `vpf_allowed_max_pages_params`.
 
 Per-image fields in the gallery manager are added through the
-`VP.LoopImageSettings` slot. Settings of the Item Cover and Item Image blocks are
-added through the `vpf.itemCoverSettingsItems` and `vpf.itemImageSettingsItems`
+`VP.LoopImageSettings` slot. The formats its Format list offers come from the
+`vpf.loopImageFormats` filter (`{ label, value }`): the fields of a format are a
+fill that renders while `image.format` is that format, and a saved format the
+list lacks stays on the image. Settings of the Item Cover and Item Image blocks
+are added through the `vpf.itemCoverSettingsItems` and `vpf.itemImageSettingsItems`
 JavaScript filters, each of which is given an empty array
 and `{ attributes, setAttributes, clientId }` and returns `ToolsPanelItem`
 children — ordinary children of the block's Settings panel, registering with it

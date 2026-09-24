@@ -360,6 +360,100 @@ class ClassLoopItemMetaBlocks extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Render the item meta blocks over one post whose item carries the given
+	 * context values.
+	 *
+	 * @param string $item_blocks - serialized item meta blocks.
+	 * @param array  $values      - context keys and their values.
+	 *
+	 * @return string
+	 */
+	private function render_meta( $item_blocks, $values ) {
+		$set_values = function ( $context ) use ( $values ) {
+			return array_merge( $context, $values );
+		};
+
+		add_filter( 'vpf_loop_item_context', $set_values );
+
+		$output = $this->render_loop(
+			$this->posts_loop( array( self::factory()->post->create() ) ),
+			$item_blocks
+		);
+
+		remove_filter( 'vpf_loop_item_context', $set_values );
+
+		return $output;
+	}
+
+	/**
+	 * The three meta types of the free plugin read their values as before.
+	 *
+	 * @return void
+	 */
+	public function test_the_built_in_meta_types_render_their_values() {
+		$output = $this->render_meta(
+			'<!-- wp:visual-portfolio/item-meta /--><!-- wp:visual-portfolio/item-meta {"metaType":"views"} /--><!-- wp:visual-portfolio/item-meta {"metaType":"reading-time"} /-->',
+			array(
+				'vp/itemCommentsCount' => 2,
+				'vp/itemViewsCount'    => 1500,
+				'vp/itemReadingTime'   => 3,
+			)
+		);
+
+		$this->assertStringContainsString( '<span>2 Comments</span>', $output );
+		$this->assertStringContainsString( '<span>1,500 Views</span>', $output );
+		$this->assertStringContainsString( '<span>3 Mins Read</span>', $output );
+		$this->assertSame( 3, substr_count( $output, '<svg aria-hidden="true" focusable="false"' ) );
+	}
+
+	/**
+	 * A type added through `vpf_item_meta_types` reads its value from the
+	 * context key it names, with its own text and icon.
+	 *
+	 * @return void
+	 */
+	public function test_a_meta_type_added_through_the_filter_renders() {
+		$add_type = function ( $types ) {
+			$types['album-count'] = array(
+				'context' => 'vp/itemAlbumCount',
+				'text'    => function ( $value, $attributes ) {
+					return sprintf( '%d images in %s', $value, $attributes['metaType'] );
+				},
+				'icon'    => dirname( __DIR__, 3 ) . '/gutenberg/block-icons/item-meta.svg',
+			);
+
+			return $types;
+		};
+
+		add_filter( 'vpf_item_meta_types', $add_type );
+
+		$output = $this->render_meta(
+			'<!-- wp:visual-portfolio/item-meta {"metaType":"album-count"} /-->',
+			array( 'vp/itemAlbumCount' => 7 )
+		);
+
+		remove_filter( 'vpf_item_meta_types', $add_type );
+
+		$this->assertStringContainsString( '<span>7 images in album-count</span>', $output );
+		$this->assertStringContainsString( '<svg aria-hidden="true" focusable="false"', $output );
+	}
+
+	/**
+	 * A block saved with a type the install lacks renders nothing.
+	 *
+	 * @return void
+	 */
+	public function test_an_unknown_meta_type_renders_nothing() {
+		$output = $this->render_meta(
+			'<!-- wp:visual-portfolio/item-meta {"metaType":"e2e-missing-type"} /-->',
+			array( 'vp/itemE2eMissing' => 7 )
+		);
+
+		$this->assertStringContainsString( 'wp-block-visual-portfolio-item-template', $output );
+		$this->assertStringNotContainsString( 'wp-block-visual-portfolio-item-meta', $output );
+	}
+
+	/**
 	 * The autoplay delay is kept between two seconds and a minute.
 	 *
 	 * @return void

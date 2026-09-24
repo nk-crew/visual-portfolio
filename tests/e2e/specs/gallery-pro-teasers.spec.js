@@ -41,6 +41,8 @@ function getMarkup(images) {
 		'<!-- wp:visual-portfolio/item-cover {"effect":"caption-move"} -->',
 		'<!-- wp:visual-portfolio/item-title /-->',
 		'<!-- /wp:visual-portfolio/item-cover -->',
+		'<!-- wp:visual-portfolio/item-meta {"metaType":"album-count"} /-->',
+		'<!-- wp:visual-portfolio/item-meta {"metaType":"constructor"} /-->',
 		'<!-- /wp:visual-portfolio/item-template -->',
 		'<!-- wp:visual-portfolio/loop-pagination -->',
 		'<!-- wp:visual-portfolio/loop-pagination-trigger {"triggerType":"infinite","extensions":{"threshold":300}} /-->',
@@ -87,6 +89,88 @@ test.describe('Gallery Loop and Pro settings', () => {
 		expect(content).toContain('"effect":"caption-move"');
 		expect(content).toContain('"extensions":{"watermark":true}');
 		expect(content).toContain('"extensions":{"threshold":300}');
+		expect(content).toContain('"metaType":"album-count"');
+	});
+
+	test('a meta type this install lacks is shown as unavailable', async ({
+		page,
+		editor,
+	}) => {
+		test.skip(
+			await page.evaluate(() => window.VPGutenbergVariables.pro),
+			'Pro offers the type.'
+		);
+
+		await editor.setContent(getMarkup(images));
+
+		// A name every object inherits is no type either.
+		await expect(
+			editor.canvas
+				.getByText('Unavailable meta: constructor')
+				.filter({ visible: true })
+				.first()
+		).toBeVisible();
+
+		// Not as comments, which the page would not print either.
+		await expect(
+			editor.canvas
+				.getByText('Unavailable meta: album-count')
+				.filter({ visible: true })
+				.first()
+		).toBeVisible();
+		await expect(
+			editor.canvas.locator('.wp-block-visual-portfolio-item-meta', {
+				hasText: /Comment/,
+			})
+		).toHaveCount(0);
+	});
+
+	test('the gallery manager offers a format an extension adds', async ({
+		page,
+		editor,
+	}) => {
+		await editor.setContent(getMarkup(images));
+
+		const [loop] = await editor.getBlocks({ full: true });
+
+		await page.evaluate(() =>
+			window.wp.hooks.addFilter(
+				'vpf.loopImageFormats',
+				'e2e/gallery-format',
+				(options) => [
+					...options,
+					{ label: 'E2E format', value: 'e2e-format' },
+				]
+			)
+		);
+		await page.evaluate(
+			(id) =>
+				window.wp.data.dispatch('core/block-editor').selectBlock(id),
+			loop.clientId
+		);
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.locator('.vpf-gallery-manager .vpf-gallery-manager__preview')
+			.first()
+			.click();
+
+		const format = page
+			.getByRole('dialog', { name: 'Image Settings' })
+			.getByRole('combobox', { name: 'Format' });
+
+		await expect(format.locator('option[value="e2e-format"]')).toHaveText(
+			'E2E format'
+		);
+
+		await format.selectOption('e2e-format');
+
+		await expect
+			.poll(async () => {
+				const [block] = await editor.getBlocks();
+
+				return block.attributes.imagesQuery.images[0].format;
+			})
+			.toBe('e2e-format');
 	});
 
 	test('without Pro, a Pro setting says what it would do', async ({

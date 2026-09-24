@@ -10,8 +10,9 @@ import { ReactComponent as CommentsIcon } from '../../block-icons/item-meta-vari
 import { ReactComponent as ReadingTimeIcon } from '../../block-icons/item-meta-variation-reading-time.svg';
 import { ReactComponent as ViewsIcon } from '../../block-icons/item-meta-variation-views.svg';
 
-// The inserter mark of a variation. Kept apart from `META_TYPES[].icon`, which
-// is the mark the block itself prints - in the editor and on the front end.
+// The inserter mark of a variation. Kept apart from the `icon` of a meta type,
+// which is the mark the block itself prints - in the editor and on the front
+// end.
 const VARIATION_ICONS = {
 	comments: CommentsIcon,
 	views: ViewsIcon,

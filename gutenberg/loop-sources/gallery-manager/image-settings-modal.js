@@ -9,6 +9,7 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 
@@ -28,6 +29,19 @@ const FORMAT_OPTIONS = [
 	{ value: 'standard', label: __('Standard', 'visual-portfolio') },
 	{ value: 'video', label: __('Video', 'visual-portfolio') },
 ];
+
+/**
+ * The formats an image can be given.
+ *
+ * Pro adds its formats through this filter, and the fields of a format through
+ * the `VP.LoopImageSettings` slot. A saved format the list lacks stays on the
+ * image until another one is picked.
+ *
+ * @return {Array} select options.
+ */
+function getFormatOptions() {
+	return applyFilters('vpf.loopImageFormats', FORMAT_OPTIONS);
+}
 
 const STATE_OPTIONS = [
 	{ value: 'default', label: __('Default', 'visual-portfolio') },
@@ -304,7 +318,7 @@ export default function ImageSettingsModal({
 					<SelectControl
 						label={__('Format', 'visual-portfolio')}
 						value={image.format || 'standard'}
-						options={FORMAT_OPTIONS}
+						options={getFormatOptions()}
 						onChange={(format) => onChange({ format })}
 					/>
 
