@@ -85,6 +85,20 @@ class ClassPopup extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The options an images loop resolves its items with.
+	 *
+	 * @return array
+	 */
+	private function get_options() {
+		return Visual_Portfolio_Get::get_options(
+			array(
+				'content_source' => 'images',
+				'block_id'       => 'popup-test',
+			)
+		);
+	}
+
+	/**
 	 * An image item carries the `<template>` the classic lightbox reads, and
 	 * the full size image a click opens without it.
 	 *
@@ -92,7 +106,7 @@ class ClassPopup extends WP_UnitTestCase {
 	 */
 	public function test_image_item_carries_the_classic_template() {
 		$url   = wp_get_attachment_url( self::$attachment_id );
-		$popup = Visual_Portfolio_Popup::get_item_popup( $this->get_item(), Visual_Portfolio_Get::get_options( array() ) );
+		$popup = Visual_Portfolio_Popup::get_item_popup( $this->get_item(), $this->get_options() );
 
 		$this->assertSame( $url, $popup['src'] );
 		$this->assertStringContainsString( '<template class="vp-portfolio__item-popup"', $popup['markup'] );
@@ -110,7 +124,7 @@ class ClassPopup extends WP_UnitTestCase {
 	public function test_video_item_carries_the_video_url() {
 		$popup = Visual_Portfolio_Popup::get_item_popup(
 			$this->get_item( array( 'video' => 'https://youtu.be/aBcDeFgHiJk' ) ),
-			Visual_Portfolio_Get::get_options( array() )
+			$this->get_options()
 		);
 
 		$this->assertSame( 'https://youtu.be/aBcDeFgHiJk', $popup['src'] );
@@ -125,7 +139,7 @@ class ClassPopup extends WP_UnitTestCase {
 	public function test_item_without_a_popup_returns_nothing() {
 		$popup = Visual_Portfolio_Popup::get_item_popup(
 			$this->get_item( array( 'allow_popup' => false ) ),
-			Visual_Portfolio_Get::get_options( array() )
+			$this->get_options()
 		);
 
 		$this->assertSame( array(), $popup );
@@ -138,7 +152,7 @@ class ClassPopup extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_caption_follows_the_sources_of_the_loop() {
-		$options = Visual_Portfolio_Get::get_options( array() );
+		$options = $this->get_options();
 
 		$caption = Visual_Portfolio_Popup::get_item_popup(
 			$this->get_item(),
@@ -170,7 +184,7 @@ class ClassPopup extends WP_UnitTestCase {
 
 		add_filter( 'vpf_popup_output', $filter );
 
-		$popup = Visual_Portfolio_Popup::get_item_popup( $this->get_item(), Visual_Portfolio_Get::get_options( array() ) );
+		$popup = Visual_Portfolio_Popup::get_item_popup( $this->get_item(), $this->get_options() );
 
 		remove_filter( 'vpf_popup_output', $filter );
 
@@ -194,7 +208,7 @@ class ClassPopup extends WP_UnitTestCase {
 
 		$popup = Visual_Portfolio_Popup::get_item_popup(
 			$this->get_item( array( 'allow_popup' => false ) ),
-			Visual_Portfolio_Get::get_options( array() )
+			$this->get_options()
 		);
 
 		remove_filter( 'vpf_popup_output', $filter );

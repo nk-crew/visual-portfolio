@@ -82,6 +82,7 @@ function toQueryImages(items) {
  * @param {boolean} [options.title]     - add an item title that opens the lightbox too.
  * @param {Object}  [options.lightbox]  - caption sources of the loop.
  * @param {Array}   [options.controls]  - inner blocks of the pagination block.
+ * @param {Object}  [options.layout]    - attributes of the item template.
  * @return {string} serialized blocks.
  */
 function getLoopMarkup({
@@ -94,6 +95,7 @@ function getLoopMarkup({
 	title = false,
 	lightbox,
 	controls = [],
+	layout = { layoutType: 'grid', layoutColumns: 2 },
 }) {
 	const loop = {
 		block_id: blockId,
@@ -129,7 +131,7 @@ function getLoopMarkup({
 	return [
 		`<!-- wp:visual-portfolio/loop ${JSON.stringify(loop)} -->`,
 		'<div class="wp-block-visual-portfolio-loop vp-block-loop">',
-		'<!-- wp:visual-portfolio/item-template {"layoutType":"grid","layoutColumns":2} -->',
+		`<!-- wp:visual-portfolio/item-template ${JSON.stringify(layout)} -->`,
 		item,
 		'<!-- /wp:visual-portfolio/item-template -->',
 		pagination,
@@ -422,37 +424,58 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			.toBe(true);
 	});
 
-	test('a gallery inside the content of an item stays out of its lightbox', async ({
-		page,
-		requestUtils,
-	}) => {
-		await publishLoop(requestUtils, page, {
-			pageTitle: 'Popup - nested gallery',
-			blockId: 'e2e-popup-nested',
-			queryId: 1,
-			images,
-			clickAction: 'popup',
-		});
-
-		// What an item description showing a post's content brings with it:
-		// a classic gallery, whose items carry popup data of their own.
-		await page
-			.locator(ITEM)
-			.nth(1)
-			.evaluate((item) => {
-				item.insertAdjacentHTML(
-					'afterbegin',
-					'<div class="vp-portfolio__item-wrap"><template class="vp-portfolio__item-popup" data-vp-popup-img="https://example.org/nested.jpg"><h3 class="vp-portfolio__item-popup-title">Nested</h3></template></div>'
-				);
+	[
+		['a grid', { layoutType: 'grid', layoutColumns: 2 }],
+		[
+			'a carousel whose effect wraps the items',
+			{ layoutType: 'carousel', carouselEffect: 'slideshow' },
+		],
+	].forEach(([name, layout]) => {
+		test(`a gallery inside the content of an item stays out of its lightbox, in ${name}`, async ({
+			page,
+			requestUtils,
+		}) => {
+			await publishLoop(requestUtils, page, {
+				pageTitle: `Popup - nested gallery in ${name}`,
+				blockId: `e2e-popup-nested-${layout.layoutType}`,
+				queryId: 1,
+				images,
+				clickAction: 'popup',
+				layout,
 			});
 
-		await page.locator(TRIGGER).nth(1).click();
+			// What an item description showing a post's content brings with
+			// it: a classic gallery, whose items carry popup data of their
+			// own, ahead of the item's own.
+			await page
+				.locator(ITEM)
+				.nth(1)
+				.evaluate((item) => {
+					(
+						item.querySelector(
+							'.wp-block-visual-portfolio-item-template__card'
+						) || item
+					).insertAdjacentHTML(
+						'afterbegin',
+						'<div class="vp-portfolio__item-wrap"><template class="vp-portfolio__item-popup" data-vp-popup-img="https://example.org/nested.jpg"><h3 class="vp-portfolio__item-popup-title">Nested</h3></template></div>'
+					);
+				});
 
-		await expect(page.locator(FANCYBOX_COUNT)).toHaveText(
-			`${IMAGES_COUNT}`
-		);
-		await expect(page.locator(FANCYBOX_INDEX)).toHaveText('2');
-		await expect(page.locator(FANCYBOX_CAPTION)).toContainText('Image 2');
+			await page
+				.locator(ITEM)
+				.nth(1)
+				.locator(TRIGGER)
+				.first()
+				.dispatchEvent('click');
+
+			await expect(page.locator(FANCYBOX_COUNT)).toHaveText(
+				`${IMAGES_COUNT}`
+			);
+			await expect(page.locator(FANCYBOX_INDEX)).toHaveText('2');
+			await expect(page.locator(FANCYBOX_CAPTION)).toContainText(
+				'Image 2'
+			);
+		});
 	});
 
 	test('the cover opens the lightbox', async ({ page, requestUtils }) => {

@@ -1117,20 +1117,23 @@ class Visual_Portfolio_Block_Item_Template {
 
 			remove_filter( 'render_block_context', $filter_block_context, 1 );
 
-			// Last, so no `:first-child` rule of an item block meets it.
-			$item_content .= $popup['markup'] ?? '';
+			// A child of the item, where the lightbox looks first, and the last
+			// one, so no `:first-child` rule of an item block meets it.
+			$popup_markup = $popup['markup'] ?? '';
 
 			$content .= $effect
 				? sprintf(
 					// The place in the pile, for the effects that deal the
 					// items into one.
-					'<li class="wp-block-visual-portfolio-item-template__item" style="--vp-slide-index:%1$d"><div class="wp-block-visual-portfolio-item-template__slide"><div class="wp-block-visual-portfolio-item-template__card">%2$s</div></div></li>',
+					'<li class="wp-block-visual-portfolio-item-template__item" style="--vp-slide-index:%1$d"><div class="wp-block-visual-portfolio-item-template__slide"><div class="wp-block-visual-portfolio-item-template__card">%2$s</div></div>%3$s</li>',
 					$index - 1,
-					$item_content
+					$item_content,
+					$popup_markup
 				)
 				: sprintf(
-					'<li class="wp-block-visual-portfolio-item-template__item">%s</li>',
-					$item_content
+					'<li class="wp-block-visual-portfolio-item-template__item">%1$s%2$s</li>',
+					$item_content,
+					$popup_markup
 				);
 		}
 
