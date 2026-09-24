@@ -498,11 +498,23 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			cover: true,
 		});
 
+		// The gallery the lightbox names in its events is the loop, by the id
+		// an address can name it by again.
+		await page.evaluate(() => {
+			window.jQuery(document).on('initFancybox.vpf', (event, self) => {
+				window.vpOpenedFor = self.uid;
+			});
+		});
+
 		// The cover renders its trigger as the anchor that covers the whole
 		// item, which is the other of the two blocks that can open a popup.
 		await page.locator(TRIGGER).first().click();
 		await expect(page.locator(FANCYBOX)).toBeVisible();
 		await expect(page.locator(FANCYBOX_INDEX)).toHaveText('1');
+
+		expect(await page.evaluate(() => window.vpOpenedFor)).toBe(
+			'e2e-popup-cover'
+		);
 	});
 
 	test('a video item is played in a frame', async ({
