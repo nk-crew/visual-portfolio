@@ -445,8 +445,8 @@ class ClassLoopItemMetaBlocks extends WP_UnitTestCase {
 	 */
 	public function test_an_unknown_meta_type_renders_nothing() {
 		$output = $this->render_meta(
-			'<!-- wp:visual-portfolio/item-meta {"metaType":"album-count"} /-->',
-			array( 'vp/itemAlbumCount' => 7 )
+			'<!-- wp:visual-portfolio/item-meta {"metaType":"e2e-missing-type"} /-->',
+			array( 'vp/itemE2eMissing' => 7 )
 		);
 
 		$this->assertStringContainsString( 'wp-block-visual-portfolio-item-template', $output );
