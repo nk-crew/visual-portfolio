@@ -75,20 +75,17 @@ class Visual_Portfolio_Block_Item_Read_More {
 	 * @return string Empty when the click action has nothing to reach.
 	 */
 	private function get_click_wrapper( $label, $attributes, $context ) {
-		$action = $attributes['clickAction'] ?? 'url';
-
-		// An item the lightbox has nothing to show but that has an address of
-		// its own - an image with a link, a post without a picture - follows
-		// it, as the classic gallery does.
-		if ( 'popup' === $action && ! Visual_Portfolio_Popup::has_popup( $context ) ) {
-			$action = 'url';
-		}
+		list( $action, $extension ) = Visual_Portfolio_Popup::resolve_click_action( $attributes['clickAction'] ?? 'url', $context );
 
 		if ( 'none' === $action ) {
 			return '<span>' . $label . '</span>';
 		}
 
 		$label .= self::get_screen_reader_name( $context );
+
+		if ( $extension ) {
+			return sprintf( '<a%1$s>%2$s</a>', Visual_Portfolio_Popup::get_attributes_html( $extension ), $label );
+		}
 
 		if ( 'popup' === $action ) {
 			$trigger = Visual_Portfolio_Popup::get_trigger_attributes( $context );

@@ -269,6 +269,35 @@ class ClassPopup extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A click action an extension added renders the extension's link, and
+	 * without the extension it is a link to the item.
+	 *
+	 * @return void
+	 */
+	public function test_an_extension_renders_its_own_click_action() {
+		$plain = do_blocks( $this->get_loop_markup( 'quick-view', array( 'url' => 'https://example.org/item/' ) ) );
+
+		$this->assertStringContainsString( '<a href="https://example.org/item/"', $plain );
+
+		$filter = static function ( $attributes, $action, $context ) {
+			return 'quick-view' === $action
+				? array(
+					'href'              => $context['vp/itemUrl'],
+					'data-vp-quick-view' => '',
+				)
+				: $attributes;
+		};
+
+		add_filter( 'vpf_loop_item_click_attributes', $filter, 10, 3 );
+
+		$output = do_blocks( $this->get_loop_markup( 'quick-view', array( 'url' => 'https://example.org/item/' ) ) );
+
+		remove_filter( 'vpf_loop_item_click_attributes', $filter, 10 );
+
+		$this->assertStringContainsString( '<a href="https://example.org/item/" data-vp-quick-view=""', $output );
+	}
+
+	/**
 	 * Every click action renders the thing it names.
 	 *
 	 * @return void

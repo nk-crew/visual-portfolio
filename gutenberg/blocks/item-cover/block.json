@@ -89,7 +89,6 @@
 		"clickAction": {
 			"type": "string",
 			"default": "none",
-			"enum": ["none", "url", "popup"],
 			"role": "content"
 		},
 		"linkTarget": {

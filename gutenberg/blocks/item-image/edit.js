@@ -30,6 +30,7 @@ import { crop, fullscreen, link, linkOff } from '@wordpress/icons';
  */
 import { ProTeaserPanel } from '../../components/pro-teaser';
 import { ALLOWED_MEDIA_TYPES } from '../../loop-sources/gallery-manager/prepare-images';
+import { getClickActions } from '../../utils/click-actions';
 import { DimensionsTool } from '../../utils/dimensions-tools';
 import {
 	useImageSizeOnInsert,
@@ -60,12 +61,6 @@ const WATERMARK_TEASERS = [
 		),
 		campaign: 'teaser_watermark',
 	},
-];
-
-const CLICK_ACTION_OPTIONS = [
-	{ label: __('None', 'visual-portfolio'), value: 'none' },
-	{ label: __('Open the item', 'visual-portfolio'), value: 'url' },
-	{ label: __('Open the lightbox', 'visual-portfolio'), value: 'popup' },
 ];
 
 // What a click does is a link setting, and the toolbar is where core keeps the
@@ -263,19 +258,27 @@ export default function ItemImageEdit({
 					{!isCropping && (
 						<BlockControls group="block">
 							<ToolbarDropdownMenu
-								icon={CLICK_ACTION_ICONS[clickAction]}
+								icon={
+									getClickActions().find(
+										({ value }) => value === clickAction
+									)?.icon ||
+									CLICK_ACTION_ICONS[clickAction] ||
+									link
+								}
 								label={__('On click', 'visual-portfolio')}
-								controls={CLICK_ACTION_OPTIONS.map(
-									(option) => ({
-										title: option.label,
-										icon: CLICK_ACTION_ICONS[option.value],
-										isActive: option.value === clickAction,
-										onClick: () =>
-											setAttributes({
-												clickAction: option.value,
-											}),
-									})
-								)}
+								controls={getClickActions().map((option) => ({
+									title: option.label,
+									icon:
+										option.icon ||
+										CLICK_ACTION_ICONS[option.value] ||
+										link,
+									isActive: option.value === clickAction,
+									isDisabled: option.disabled,
+									onClick: () =>
+										setAttributes({
+											clickAction: option.value,
+										}),
+								}))}
 							/>
 							{/* Both tools wait, disabled rather than hidden so the
 							    toolbar keeps its shape and its focus, while the item
@@ -393,7 +396,7 @@ export default function ItemImageEdit({
 								<SelectControl
 									label={__('On click', 'visual-portfolio')}
 									value={clickAction}
-									options={CLICK_ACTION_OPTIONS}
+									options={getClickActions()}
 									onChange={(value) =>
 										setAttributes({ clickAction: value })
 									}

@@ -55,6 +55,10 @@ function getGallery(loop) {
 	return gallery;
 }
 
+// For what opens the lightbox of a loop on its own, such as Pro's Quick View:
+// the same stand-in, so the events name the same gallery.
+window.VPPopupAPI.getLoopGallery = getGallery;
+
 document.addEventListener('click', (event) => {
 	const { VPPopupAPI } = window;
 

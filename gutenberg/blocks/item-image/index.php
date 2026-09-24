@@ -105,13 +105,15 @@ class Visual_Portfolio_Block_Item_Image {
 	 * @return string
 	 */
 	private function get_click_wrapper( $image, $attributes, $context ) {
-		$action = $attributes['clickAction'] ?? 'none';
+		list( $action, $extension ) = Visual_Portfolio_Popup::resolve_click_action( $attributes['clickAction'] ?? 'none', $context );
 
-		// An item the lightbox has nothing to show but that has an address of
-		// its own - an image with a link, a post without a picture - follows
-		// it, as the classic gallery does.
-		if ( 'popup' === $action && ! Visual_Portfolio_Popup::has_popup( $context ) ) {
-			$action = 'url';
+		if ( $extension ) {
+			return sprintf(
+				'<a%1$s%2$s>%3$s</a>',
+				Visual_Portfolio_Popup::get_attributes_html( $extension ),
+				empty( $context['vp/itemAriaLabel'] ) ? '' : ' aria-label="' . esc_attr( $context['vp/itemAriaLabel'] ) . '"',
+				$image
+			);
 		}
 
 		if ( 'url' === $action && ! empty( $context['vp/itemUrl'] ) ) {
