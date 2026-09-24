@@ -408,6 +408,7 @@ it reads — no hook involved:
 | `vpf_loop_custom_output` | filter `( false\|string, $options, $block )` | Replace the whole item template output, before a single item is rendered. Content protection uses this |
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |
 | `vpf_loop_search` | filter `( false, $options )` | Whether an extension applies the visitor search of a loop. Until one returns true the search block renders nothing and the term reaches no query. See below |
+| `vpf_loop_prefetch` | filter `( false, $options )` | Whether a loop fetches pages before the visitor asks for them. See [Prefetch](#prefetch) |
 | `vpf_loop_tiles_presets` | filter `( $presets )` | Tiles notations offered in the editor |
 | `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers, `name => settings`. See below |
 | `vpf_item_cover_effects` | filter `( $effects )` | Effects the item cover offers, a list of names. The cover gets the class `vp-effect-{name}`, so an effect is a stylesheet and this name; a saved effect not in the list is drawn as `fade` |
@@ -760,7 +761,7 @@ without any change here.
 
 | Store | Module | What it does |
 |---|---|---|
-| `visual-portfolio/loop` | `build/gutenberg/blocks/loop/view.js` | Navigation of the whole family: `actions.navigate`, `actions.search`, `actions.loadMore`, `callbacks.initLayout` (masonry), `callbacks.observeInfinite`, `state.isLoading`, `state.ariaLiveMessage`, `state.isEnhanced` |
+| `visual-portfolio/loop` | `build/gutenberg/blocks/loop/view.js` | Navigation of the whole family: `actions.navigate`, `actions.search`, `actions.loadMore`, `callbacks.initLayout` (masonry), `callbacks.observeInfinite`, `callbacks.initPrefetch`, `state.isLoading`, `state.ariaLiveMessage`, `state.isEnhanced` |
 | `visual-portfolio/item-template` | `build/gutenberg/blocks/item-template/view.js` | Justified and carousel layouts, the carousel controls (`actions.carouselPrev`, `actions.carouselNext`, `actions.carouselGoTo`), native masonry detection |
 | `visual-portfolio/item-cover` | `build/gutenberg/blocks/item-cover/view.js` | The `fly` effect only |
 
@@ -906,10 +907,39 @@ page one for every page of a gallery. Add `vp_page`, `vp_filter`, `vp_sort` and
 `vp-*-page|filter|sort|search` to the list of parameters that form the cache key, and
 `vpf_random_seed` to the list that does not.
 
-**Pro's ajax cache module** is not wired into this family and will not be. It is
-built around the `vpf_ajax_call` POST of the legacy renderer; GET navigation is
-cached by the page cache itself, which is both simpler and more effective. The
-module continues to serve the legacy gallery.
+**Pro's ajax cache module** serves the legacy gallery. It is built around the
+`vpf_ajax_call` POST of the legacy renderer, and this family keeps none of it: GET
+navigation is cached by the page cache itself. What the module did for the
+visitor, fetching the next state before the click, this family does through
+`vpf_loop_prefetch`, which Pro turns on under the same Ajax Caching setting.
+
+### Prefetch
+
+A loop fetches pages before the visitor asks for them only where
+`vpf_loop_prefetch` returns true. It is off by default because every link a
+visitor points at without following costs the server a render. The filter gets
+the legacy options of the loop, and a true answer adds
+`data-wp-init---prefetch="callbacks.initPrefetch"` to the loop wrapper.
+
+```php
+add_filter( 'vpf_loop_prefetch', '__return_true' );
+```
+
+With it on:
+
+- A filter, sort or pagination link the visitor points at for 100 ms, or moves
+  the focus to, has its page fetched and handed to the router, so following it
+  swaps the loop without waiting for the server. A link whose address carries a
+  search is left alone: a search is whatever was typed, and its addresses do not
+  repeat.
+- The next page of a Load More or infinite trigger is fetched 600 ms after the
+  page has loaded, and again after every page appended or loop swapped. Load More
+  takes that page instead of fetching it. The loop keeps one such page, for the
+  address the trigger has now, and drops it once used or when the loop navigates.
+- Nothing is fetched ahead on Save-Data or on a 2G connection.
+
+A fetch ahead that fails changes nothing: the click fetches the page the way it
+would have without it.
 
 ## Images
 

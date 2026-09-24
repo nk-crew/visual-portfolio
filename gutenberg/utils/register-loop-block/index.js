@@ -2,6 +2,11 @@ import { registerBlockType } from '@wordpress/blocks';
 
 const { loop_blocks: loopBlocksSupported } = window.VPGutenbergVariables;
 
+// Fields of `block.json` the server translates. Settings override the
+// definition the server hands the editor, so these copied in from the file
+// would put the English text back over the translation.
+const TRANSLATED_FIELDS = ['title', 'description', 'keywords', 'styles'];
+
 /**
  * Register a block of the Gallery Loop family.
  *
@@ -22,5 +27,12 @@ export default function registerLoopBlock(nameOrMetadata, settings) {
 		return;
 	}
 
-	registerBlockType(nameOrMetadata, settings);
+	registerBlockType(
+		nameOrMetadata,
+		Object.fromEntries(
+			Object.entries(settings).filter(
+				([key]) => !TRANSLATED_FIELDS.includes(key)
+			)
+		)
+	);
 }
