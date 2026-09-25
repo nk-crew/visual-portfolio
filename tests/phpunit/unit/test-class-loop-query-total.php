@@ -126,6 +126,13 @@ class ClassLoopQueryTotal extends WP_UnitTestCase {
 		$_GET['vp-1-filter'] = 'category:red';
 
 		$this->assertStringContainsString( '>Displaying 3 of 3</div>', $this->render_loop( $block ) );
+
+		$this->tear_down_request();
+
+		// A page past the last names no range.
+		$_GET['vp-1-page'] = '9';
+
+		$this->assertStringNotContainsString( 'vp-block-loop-query-total', $this->render_loop( $block ) );
 	}
 
 	/**

@@ -391,6 +391,59 @@ test.describe('Gallery Loop integrations', () => {
 		});
 	});
 
+	test('a core query of picked posts keeps them, and one the loop cannot say is not offered', async ({
+		admin,
+		page,
+	}) => {
+		await admin.createNewPost({
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		// The transform asks the editor's post types, loaded on demand.
+		await page.evaluate(() =>
+			window.wp.data.resolveSelect('core').getPostTypes({ per_page: -1 })
+		);
+
+		const switchQuery = (query) =>
+			page.evaluate((attributes) => {
+				const block = window.wp.blocks.createBlock('core/query', {
+					query: attributes,
+				});
+				const switched = window.wp.blocks.switchToBlockType(
+					block,
+					'visual-portfolio/loop'
+				);
+
+				return switched ? switched[0].attributes.postsQuery : null;
+			}, query);
+
+		expect(
+			await switchQuery({
+				postType: 'post',
+				include: [12, 7],
+				orderBy: 'include',
+			})
+		).toMatchObject({ source: 'ids', ids: [12, 7], orderBy: 'post__in' });
+
+		// Two categories OR'd with a tag AND'd: a loop joins all its terms
+		// one way, so it cannot say this.
+		expect(
+			await switchQuery({
+				postType: 'post',
+				taxQuery: { include: { category: [1, 2], post_tag: [3] } },
+			})
+		).toBe(null);
+
+		expect(
+			await switchQuery({
+				postType: 'post',
+				taxQuery: { include: { category: [1], post_tag: [3] } },
+			})
+		).toMatchObject({ taxonomies: [1, 3], taxonomiesRelation: 'and' });
+	});
+
 	test('a core query loop becomes a loop of posts', async ({
 		admin,
 		editor,

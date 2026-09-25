@@ -273,6 +273,21 @@ function getTaxQuery(taxQuery) {
 }
 
 /**
+ * Whether the loop's single AND/OR can say what a core query's taxonomies say:
+ * terms of one taxonomy (OR), or one term in each of several (AND).
+ *
+ * @param {Object} taxQuery - `taxQuery` of the core query.
+ * @return {boolean} whether it can.
+ */
+function canJoinTaxQuery(taxQuery) {
+	const included = Object.values(getTaxQuery(taxQuery).include).filter(
+		(ids) => ids?.length
+	);
+
+	return 1 >= included.length || included.every((ids) => 1 === ids.length);
+}
+
+/**
  * The posts query of a loop for the query of a core Query Loop.
  *
  * @param {Object} query - `query` of the core block.
@@ -293,21 +308,25 @@ function getPostsQuery(query) {
 		.map((id) => parseInt(id, 10))
 		.filter((id) => id > 0);
 	const orderBy = query.orderBy || 'date';
+	// Posts picked one by one are a manual selection, in their own order
+	// when the query keeps it.
+	const ids = (query.include || []).filter((id) => id > 0);
 
 	return {
 		...defaults,
-		source: query.postType || 'post',
+		source: ids.length ? 'ids' : query.postType || 'post',
+		...(ids.length ? { ids } : {}),
 		order: query.order || 'desc',
-		orderBy: CORE_ORDER_BY[orderBy] ?? orderBy,
+		orderBy:
+			'include' === orderBy
+				? 'post__in'
+				: (CORE_ORDER_BY[orderBy] ?? orderBy),
 		offset: query.offset || 0,
 		taxonomies: included.flat(),
 		// Core joins the terms of one taxonomy by OR and the taxonomies by
-		// AND, and a loop joins all its terms one way. AND holds that only
-		// where every taxonomy names one term.
-		taxonomiesRelation:
-			1 < included.length && included.every((ids) => 1 === ids.length)
-				? 'and'
-				: 'or',
+		// AND; a loop joins all its terms one way, so the transform is offered
+		// only where one way says the same (see `canJoinTaxQuery()`).
+		taxonomiesRelation: 1 < included.length ? 'and' : 'or',
 		excludeTaxonomies: Object.values(exclude).flat(),
 		authors,
 		sticky: query.sticky || '',
@@ -529,7 +548,9 @@ export default {
 			blocks: ['core/query'],
 			// A current query lists whatever the page lists.
 			isMatch: ({ query }) =>
-				!!query?.inherit || isLoopPostType(query?.postType || 'post'),
+				!!query?.inherit ||
+				(isLoopPostType(query?.postType || 'post') &&
+					canJoinTaxQuery(query?.taxQuery)),
 			transform({ query = {}, align, className, anchor }, innerBlocks) {
 				return createBlock(
 					'visual-portfolio/loop',

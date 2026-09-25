@@ -66,15 +66,14 @@ class Visual_Portfolio_Block_Loop_Query_Total {
 		if ( 'range-display' === ( $attributes['displayType'] ?? '' ) ) {
 			$per_page = (int) ( $result['per_page'] ?? 0 );
 			$shown    = count( $result['items'] );
-			$start    = 0;
-			$end      = 0;
 
-			// A page past the end shows nothing, and says so as core does for
-			// a query that found nothing.
-			if ( $shown ) {
-				$start = $per_page > 0 ? ( (int) $result['start_page'] - 1 ) * $per_page + 1 : 1;
-				$end   = min( $total, $start + $shown - 1 );
+			// No range to name: an empty gallery, or a page past the last.
+			if ( ! $shown ) {
+				return '';
 			}
+
+			$start = $per_page > 0 ? ( (int) $result['start_page'] - 1 ) * $per_page + 1 : 1;
+			$end   = min( $total, $start + $shown - 1 );
 
 			/* translators: 1: number of the first item shown, 2: number of the last item shown, 3: number of items found. */
 			$range = __( 'Displaying %1$s – %2$s of %3$s', 'visual-portfolio' );
