@@ -972,18 +972,24 @@ class Visual_Portfolio_Get {
 					}
 				}
 
+				$image_id = intval( $img['id'] ?? 0 );
+
+				// An image outside the Media Library, inserted from a URL, has its
+				// address and nothing to look it up by.
+				$image_url = $image_id ? '' : (string) ( $img['imgUrl'] ?? '' );
+
 				$args = array_merge(
 					$each_item_args,
 					array(
 						'uid'            => isset( $img['uid'] ) && $img['uid'] ? $img['uid'] : '',
-						'url'            => isset( $img['url'] ) && $img['url'] ? $img['url'] : Visual_Portfolio_Images::wp_get_attachment_image_url( $img['id'], $img_size_popup ),
+						'url'            => isset( $img['url'] ) && $img['url'] ? $img['url'] : ( $image_id ? Visual_Portfolio_Images::wp_get_attachment_image_url( $image_id, $img_size_popup ) : $image_url ),
 						'title'          => isset( $img['title'] ) && $img['title'] ? $img['title'] : '',
 						'alt'            => isset( $img['alt'] ) ? $img['alt'] : '',
 						'content'        => isset( $img['description'] ) && $img['description'] ? $img['description'] : '',
 						'format'         => isset( $img['format'] ) && $img['format'] ? $img['format'] : 'standard',
 						'published_time' => isset( $img['published_time'] ) && $img['published_time'] ? $img['published_time'] : '',
 						'filter'         => implode( ',', $filter_values ),
-						'image_id'       => intval( $img['id'] ),
+						'image_id'       => $image_id,
 						'focal_point'    => isset( $img['focalPoint'] ) && $img['focalPoint'] ? $img['focalPoint'] : '',
 						'allow_popup'    => ! isset( $img['url'] ) || ! $img['url'],
 						'categories'     => $categories,
@@ -991,6 +997,12 @@ class Visual_Portfolio_Get {
 						'author_url'     => isset( $img['author'] ) && isset( $img['author_url'] ) && $img['author'] && $img['author_url'] ? $img['author_url'] : '',
 					)
 				);
+
+				if ( '' !== $image_url ) {
+					$args['image_url']    = $image_url;
+					$args['image_width']  = intval( $img['width'] ?? 0 );
+					$args['image_height'] = intval( $img['height'] ?? 0 );
+				}
 
 				// Excerpt.
 				if ( ! empty( $args['opts']['show_excerpt'] ) ) {
@@ -1487,7 +1499,8 @@ class Visual_Portfolio_Get {
 
 			if ( is_array( $items ) && ! empty( $items ) ) {
 				foreach ( $items as $item_args ) {
-					$slider_thumbnails[] = $item_args['image_id'];
+					// An image outside the Media Library is named by its address.
+					$slider_thumbnails[] = $item_args['image_id'] ? $item_args['image_id'] : ( $item_args['image_url'] ?? 0 );
 				}
 			}
 
@@ -1888,9 +1901,12 @@ class Visual_Portfolio_Get {
 			'none' !== $description_source ||
 			in_array( $order_by, array( 'image_title', 'image_caption', 'image_alt', 'image_description' ), true );
 
-		$images_ids = array();
-		foreach ( $images as $img ) {
-			$images_ids[] = (int) $img['id'];
+		// An image inserted from a URL has no attachment to read.
+		$images_ids = array_filter( array_map( 'intval', array_column( $images, 'id' ) ) );
+
+		// An empty `post__in` would find every attachment of the site.
+		if ( empty( $images_ids ) ) {
+			return $images;
 		}
 
 		// Find all used attachments.
@@ -1909,7 +1925,7 @@ class Visual_Portfolio_Get {
 
 		// prepare titles and descriptions.
 		foreach ( $images as $k => $img ) {
-			$attachment = $all_attachments[ (int) $img['id'] ] ?? false;
+			$attachment = $all_attachments[ (int) ( $img['id'] ?? 0 ) ] ?? false;
 
 			// Nothing to take the data from once the attachment is deleted.
 			if ( ! $attachment ) {
@@ -2018,7 +2034,7 @@ class Visual_Portfolio_Get {
 
 			// add unique IDs.
 			foreach ( $options['images'] as $k => $img ) {
-				$options['images'][ $k ]['uid'] = hash( 'crc32b', 'image-' . $k . $img['id'] );
+				$options['images'][ $k ]['uid'] = hash( 'crc32b', 'image-' . $k . ( $img['id'] ?? '' ) );
 			}
 
 			if ( $count < 0 ) {
@@ -3235,7 +3251,11 @@ class Visual_Portfolio_Get {
 			);
 		}
 
-		$args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, $image_attrs );
+		if ( empty( $args['image_id'] ) && ! empty( $args['image_url'] ) ) {
+			$args['image'] = Visual_Portfolio_Images::get_remote_image( $args['image_url'], $image_attrs, $args['image_width'], $args['image_height'] );
+		} else {
+			$args['image'] = Visual_Portfolio_Images::get_attachment_image( $args['image_id'], $args['img_size'], false, $image_attrs );
+		}
 
 		// prepare date.
 		if ( isset( $args['opts']['show_date'] ) ) {
@@ -3417,6 +3437,39 @@ class Visual_Portfolio_Get {
 	 * @return array|bool
 	 */
 	public static function get_popup_image( $img_id, $args ) {
+		// An image outside the Media Library comes in one size, and a size of 0
+		// is measured by the lightbox once the image loads.
+		if ( empty( $args['image_id'] ) && ! empty( $args['image_url'] ) ) {
+			$width  = (int) ( $args['image_width'] ?? 0 );
+			$height = (int) ( $args['image_height'] ?? 0 );
+
+			return apply_filters(
+				'vpf_popup_image_data',
+				array(
+					'id'               => 0,
+					'title'            => $args['title'],
+					'description'      => $args['content'],
+					'caption'          => '',
+					'alt'              => trim( (string) ( $args['alt'] ?? '' ) ),
+					'url'              => $args['image_url'],
+					'srcset'           => '',
+					'width'            => $width,
+					'height'           => $height,
+					'md_url'           => $args['image_url'],
+					'md_width'         => $width,
+					'md_height'        => $height,
+					'sm_url'           => $args['image_url'],
+					'sm_width'         => $width,
+					'sm_height'        => $height,
+					'item_title'       => $args['title'],
+					'item_description' => $args['content'],
+					'item_excerpt'     => self::get_item_excerpt( $args ),
+					'item_author'      => $args['author'],
+					'item_author_url'  => $args['author_url'],
+				)
+			);
+		}
+
 		$popup_image = false;
 		if ( $img_id ) {
 			$attachment = get_post( $args['image_id'] );
@@ -3498,7 +3551,7 @@ class Visual_Portfolio_Get {
 	public static function get_popup_video( $args ) {
 		return array(
 			'url'              => $args['format_video_url'],
-			'poster'           => wp_get_attachment_image_url( $args['image_id'], 'full' ),
+			'poster'           => empty( $args['image_id'] ) && ! empty( $args['image_url'] ) ? $args['image_url'] : wp_get_attachment_image_url( $args['image_id'], 'full' ),
 			'item_title'       => $args['title'] ?? null,
 			'item_description' => $args['content'] ?? null,
 			'item_excerpt'     => self::get_item_excerpt( $args ),

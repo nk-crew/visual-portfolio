@@ -458,6 +458,8 @@ class Visual_Portfolio_Security {
 							case 'id':
 							case 'custom_popup_image':
 							case 'hover_image':
+							case 'width':
+							case 'height':
 								$attribute[ $key ][ $attribute_key ] = self::sanitize_number( $media_attribute );
 								break;
 							case 'categories':

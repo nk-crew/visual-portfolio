@@ -6,6 +6,9 @@ import { __, sprintf } from '@wordpress/i18n';
 import { dragHandle, trash } from '@wordpress/icons';
 import classnames from 'classnames/dedupe';
 
+import { getImageKey } from './prepare-images';
+import PreviewMedia from './preview-media';
+
 /**
  * A single thumbnail of the gallery grid.
  *
@@ -30,7 +33,7 @@ function GalleryImage({ image, index, previewUrl, onEdit, onRemove }) {
 		transition,
 		isDragging,
 		isSorting,
-	} = useSortable({ id: image.id });
+	} = useSortable({ id: getImageKey(image) });
 
 	const label =
 		image.title ||
@@ -64,7 +67,7 @@ function GalleryImage({ image, index, previewUrl, onEdit, onRemove }) {
 				onClick={() => onEdit(index)}
 			>
 				{previewUrl ? (
-					<img src={previewUrl} alt="" loading="lazy" />
+					<PreviewMedia url={previewUrl} loading="lazy" />
 				) : (
 					<span className="vpf-gallery-manager__preview-empty" />
 				)}

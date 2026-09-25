@@ -139,6 +139,8 @@ class Visual_Portfolio_Block_Item_Cover {
 
 		if ( $img_id ) {
 			$image = Visual_Portfolio_Images::get_attachment_image( $img_id, $size, false, $img_attr );
+		} elseif ( ! empty( $context['vp/itemImgUrl'] ) ) {
+			$image = Visual_Portfolio_Images::get_remote_image( $context['vp/itemImgUrl'], $img_attr, $context['vp/itemImgWidth'] ?? 0, $context['vp/itemImgHeight'] ?? 0 );
 		}
 
 		// The global No Image fallback of the plugin settings.

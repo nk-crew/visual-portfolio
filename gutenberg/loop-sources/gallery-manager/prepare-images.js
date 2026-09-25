@@ -4,6 +4,19 @@ const { pro: isProPlugin } = window.VPGutenbergVariables;
 export const ALLOWED_MEDIA_TYPES = isProPlugin ? ['image', 'video'] : ['image'];
 
 /**
+ * What tells an image apart from the rest of the gallery.
+ *
+ * An image inserted from a URL has no attachment id, and is told apart by its
+ * address, as the classic gallery control does.
+ *
+ * @param {Object} image - gallery image.
+ * @return {number|string} key.
+ */
+export function getImageKey(image) {
+	return image.id || image.imgUrl;
+}
+
+/**
  * A text field of a media item, whichever shape the item came in.
  *
  * The media frame answers with plain strings; an upload answers with the REST
@@ -70,7 +83,8 @@ export function prepareImage(media) {
  * that was typed into them, new ones are appended, deselected ones are dropped.
  *
  * An item with no URL is an attachment that no longer exists; letting it fall
- * out here is what keeps a deleted image from lingering in the block.
+ * out here is what keeps a deleted image from lingering in the block. An image
+ * inserted from a URL is not in the library, so no selection drops it.
  *
  * @param {Array} selection - what the media frame returned.
  * @param {Array} images    - current gallery images.
@@ -80,10 +94,39 @@ export function mergeSelection(selection, images) {
 	const selected = (selection || []).filter((media) => media?.url);
 	const selectedIds = selected.map((media) => media.id);
 
-	const kept = images.filter((image) => selectedIds.includes(image.id));
+	const kept = images.filter(
+		(image) => !image.id || selectedIds.includes(image.id)
+	);
 	const added = selected
 		.filter((media) => !images.some((image) => image.id === media.id))
 		.map(prepareImage);
 
 	return [...kept, ...added];
+}
+
+/**
+ * An image inserted from a URL, as the gallery stores it.
+ *
+ * Nothing in the library answers with its size, so the size is read off the
+ * picture; one that does not load is stored without it, and measured by the
+ * page and the lightbox instead.
+ *
+ * @param {string} url - image URL.
+ * @return {Promise<Object>} gallery image.
+ */
+export function prepareUrlImage(url) {
+	const image = { imgUrl: url, imgThumbnailUrl: url };
+
+	return new Promise((resolve) => {
+		const picture = new window.Image();
+
+		picture.onload = () =>
+			resolve({
+				...image,
+				width: picture.naturalWidth,
+				height: picture.naturalHeight,
+			});
+		picture.onerror = () => resolve(image);
+		picture.src = url;
+	});
 }

@@ -15,7 +15,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
-import { getClickActions } from '../../utils/click-actions';
+import { followsLink, getClickActions } from '../../utils/click-actions';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
@@ -83,7 +83,7 @@ export default function ItemReadMoreEdit({
 								}
 							/>
 						</ToolsPanelItem>
-						{'url' === clickAction && (
+						{followsLink(clickAction) && (
 							<>
 								<ToolsPanelItem
 									label={__(

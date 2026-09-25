@@ -37,7 +37,8 @@
 	overflow: hidden;
 	border-radius: 5px;
 
-	img {
+	img,
+	video {
 		display: block;
 		width: 100%;
 		height: 100%;
@@ -113,8 +114,18 @@
 	cursor: grab;
 }
 
-.components-button.vpf-gallery-manager__add {
+// Side by side where the sidebar is wide enough for both labels, and one
+// above the other where it is not.
+.vpf-gallery-manager__actions {
+	display: flex;
+	flex-wrap: wrap;
 	grid-column: 1 / -1;
+	gap: 8px;
+}
+
+.components-button.vpf-gallery-manager__add {
+	flex: 1 1 auto;
+	white-space: nowrap;
 	justify-content: center;
 	height: 36px;
 	border: 1px solid var(--wp-components-color-foreground, #1e1e1e);

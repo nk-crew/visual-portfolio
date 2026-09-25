@@ -31,6 +31,12 @@ class Visual_Portfolio_Popup {
 	const DATA_ATTRIBUTE = 'data-vp-popup';
 
 	/**
+	 * Click action that follows the item's own link, and opens the lightbox for
+	 * an item without one.
+	 */
+	const URL_OR_POPUP = 'url-or-popup';
+
+	/**
 	 * Caption sources a loop can pick, the ones the classic gallery offers.
 	 */
 	const CAPTION_SOURCES = array( 'none', 'title', 'caption', 'alt', 'description', 'item_title', 'item_description', 'item_excerpt', 'item_author' );
@@ -154,6 +160,13 @@ class Visual_Portfolio_Popup {
 	 *               link and the action `extension` when there is one.
 	 */
 	public static function resolve_click_action( $action, $context ) {
+		// A post links to itself. An image of the Media source is given a popup
+		// only when it has no link of its own, so the fallback below sends one
+		// with a link to it.
+		if ( self::URL_OR_POPUP === $action ) {
+			$action = empty( $context['vp/itemPostId'] ) ? 'popup' : 'url';
+		}
+
 		if ( 'popup' === $action && ! self::has_popup( $context ) ) {
 			return array( 'url', array() );
 		}

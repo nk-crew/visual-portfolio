@@ -337,6 +337,26 @@ class ClassPopup extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Open its link, else in lightbox: an image with a link follows it, and
+	 * one without opens the lightbox.
+	 *
+	 * @return void
+	 */
+	public function test_url_or_popup_follows_a_link_and_opens_the_rest() {
+		$linked   = do_blocks( $this->get_loop_markup( 'url-or-popup', array( 'url' => 'https://example.org/elsewhere/' ) ) );
+		$unlinked = do_blocks( $this->get_loop_markup( 'url-or-popup' ) );
+
+		$this->assertStringContainsString( '<a href="https://example.org/elsewhere/" target="_self"', $linked );
+		$this->assertStringNotContainsString( 'data-vp-popup', $linked );
+
+		$this->assertStringContainsString(
+			'<a href="' . esc_url( wp_get_attachment_url( self::$attachment_id ) ) . '" data-vp-popup',
+			$unlinked
+		);
+		$this->assertStringContainsString( 'vp-portfolio__item-popup', $unlinked );
+	}
+
+	/**
 	 * A trigger loads the lightbox the classic gallery uses.
 	 *
 	 * @return void

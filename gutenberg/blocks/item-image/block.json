@@ -11,6 +11,8 @@
 		"vp/queryType",
 		"vp/itemImgId",
 		"vp/itemImgUrl",
+		"vp/itemImgWidth",
+		"vp/itemImgHeight",
 		"vp/itemImgAlt",
 		"vp/itemNoImgId",
 		"vp/itemImageSizes",

@@ -336,7 +336,7 @@ class Visual_Portfolio_Block_Item_Template {
 	 */
 	private static function opens_a_popup( $blocks ) {
 		foreach ( $blocks as $inner ) {
-			if ( isset( $inner['attrs']['clickAction'] ) && 'popup' === $inner['attrs']['clickAction'] ) {
+			if ( isset( $inner['attrs']['clickAction'] ) && in_array( $inner['attrs']['clickAction'], array( 'popup', Visual_Portfolio_Popup::URL_OR_POPUP ), true ) ) {
 				return true;
 			}
 
@@ -373,6 +373,11 @@ class Visual_Portfolio_Block_Item_Template {
 			// images by ids like `vpf_pro_social_instagram_123`. Never cast it.
 			'vp/itemImgId'         => $item['image_id'] ?? '',
 			'vp/itemImgUrl'        => self::get_item_image_url( $item ),
+
+			// Known only for an image inserted from a URL, which has no
+			// attachment to answer with its size.
+			'vp/itemImgWidth'      => $item['image_width'] ?? 0,
+			'vp/itemImgHeight'     => $item['image_height'] ?? 0,
 			'vp/itemImgAlt'        => $item['alt'] ?? '',
 			'vp/itemNoImgId'       => $item['no_image'] ?? '',
 			'vp/itemFocalPoint'    => $item['focal_point'] ?? '',
@@ -457,6 +462,8 @@ class Visual_Portfolio_Block_Item_Template {
 			'vp/itemPostId',
 			'vp/itemImgId',
 			'vp/itemImgUrl',
+			'vp/itemImgWidth',
+			'vp/itemImgHeight',
 			'vp/itemImgAlt',
 			'vp/itemNoImgId',
 			'vp/itemFocalPoint',
@@ -498,9 +505,14 @@ class Visual_Portfolio_Block_Item_Template {
 	private static function get_item_image_url( $item ) {
 		$image_id = $item['image_id'] ?? '';
 
-		// Remote images have no attachment to resolve - their URL arrives with
-		// `vpf_loop_item_context`.
-		if ( ! $image_id || ! is_numeric( $image_id ) ) {
+		// An image inserted from a URL carries its address.
+		if ( ! $image_id ) {
+			return (string) ( $item['image_url'] ?? '' );
+		}
+
+		// Remote images of the Pro sources have no attachment to resolve - their
+		// URL arrives with `vpf_loop_item_context`.
+		if ( ! is_numeric( $image_id ) ) {
 			return '';
 		}
 
