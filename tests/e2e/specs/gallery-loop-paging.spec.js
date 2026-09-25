@@ -535,6 +535,37 @@ test.describe('Gallery Loop paging', () => {
 		await expect(page.locator(TRIGGER)).toHaveCount(0);
 	});
 
+	test('a load more adds no copy of a lazy image that loads at once', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publish(
+			requestUtils,
+			page,
+			'Paging - no noscript copies',
+			getLoopMarkup({
+				blockId: 'e2e-paging-noscript',
+				images,
+				perPage: 4,
+				// One column, so the items past the first row load lazily.
+				layout: { layoutColumnsMode: 'manual', layoutColumnCount: 1 },
+				withImage: true,
+				pagination: [getBlock('loop-pagination-trigger')],
+			})
+		);
+
+		// The page as served holds no-JavaScript copies of its lazy images.
+		expect(await page.locator(`${LOOP} noscript`).count()).toBeGreaterThan(
+			0
+		);
+
+		await page.locator(TRIGGER).click();
+		await expect(page.locator(ITEM)).toHaveCount(8);
+
+		// Those of the page fetched are dropped, not parsed into images.
+		await expect(page.locator(`${LOOP} noscript img`)).toHaveCount(0);
+	});
+
 	test.describe('Back after a Load More', () => {
 		/**
 		 * Publish a loop of two to a page, with a filter above it and a Load
