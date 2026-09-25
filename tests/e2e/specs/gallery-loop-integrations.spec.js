@@ -177,6 +177,46 @@ test.describe('Gallery Loop integrations', () => {
 		]);
 	});
 
+	test('a gallery with an image from outside the library stays', async ({
+		admin,
+		editor,
+		page,
+	}) => {
+		await admin.createNewPost({
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: { id: images[0].id, url: images[0].url },
+				},
+				{
+					name: 'core/image',
+					attributes: { url: 'https://example.com/outside.jpg' },
+				},
+			],
+		});
+
+		// A transform that isMatch refuses gives nothing back.
+		expect(
+			await page.evaluate(() => {
+				const [gallery] = window.wp.data
+					.select('core/block-editor')
+					.getBlocks();
+
+				return window.wp.blocks.switchToBlockType(
+					gallery,
+					'visual-portfolio/loop'
+				);
+			})
+		).toBe(null);
+	});
+
 	test('core latest posts become a loop of posts', async ({
 		admin,
 		editor,
@@ -459,6 +499,46 @@ test.describe('Gallery Loop integrations', () => {
 		]);
 		expect(await page.evaluate(() => window.__vpSameDocument)).toBe(
 			undefined
+		);
+	});
+
+	test('a load more does not wait on a next page that hangs', async ({
+		page,
+		requestUtils,
+	}) => {
+		test.setTimeout(60000);
+
+		await publishPrefetchingLoop(
+			requestUtils,
+			page,
+			'Integrations - next page that hangs',
+			'<!-- wp:visual-portfolio/loop-pagination --><!-- wp:visual-portfolio/loop-pagination-trigger /--><!-- /wp:visual-portfolio/loop-pagination -->'
+		);
+
+		// Only the fetch ahead hangs, past the loop's ten seconds.
+		let hung = false;
+
+		await page.route(
+			(url) => '2' === url.searchParams.get('vp-1-page'),
+			async (route) => {
+				if (hung) {
+					await route.fallback();
+					return;
+				}
+
+				hung = true;
+				await new Promise((resolve) => setTimeout(resolve, 30000));
+				await route.fallback().catch(() => {});
+			}
+		);
+
+		await page.reload({ waitUntil: 'load' });
+		await expect.poll(() => hung).toBe(true);
+
+		await page.locator('.vp-block-loop-pagination-trigger').click();
+		await expect(page.locator(`${LOOP} ${ITEM} ${TITLE}`)).toHaveText(
+			['Prefetch A', 'Prefetch B', 'Prefetch C', 'Prefetch D'],
+			{ timeout: 20000 }
 		);
 	});
 

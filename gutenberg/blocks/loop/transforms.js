@@ -55,9 +55,10 @@ export default {
 			type: 'block',
 			blocks: ['core/gallery'],
 			// A gallery image without an attachment has nothing a loop can
-			// render.
+			// render, and leaving it out would lose it.
 			isMatch: (attributes, block) =>
-				(block?.innerBlocks || []).some((image) => image.attributes.id),
+				!!block?.innerBlocks?.length &&
+				block.innerBlocks.every((image) => image.attributes.id),
 			transform(attributes, innerBlocks) {
 				const {
 					columns,

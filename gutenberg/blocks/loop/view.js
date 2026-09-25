@@ -707,7 +707,20 @@ async function loadNextPage(trigger, context, byClick) {
 	nextPages.delete(loop);
 
 	try {
-		let html = ahead && ahead.href === href ? await ahead.html : null;
+		// A page fetched ahead that hangs is not waited for past the deadline
+		// a navigation has; the page is asked for again.
+		let html =
+			ahead && ahead.href === href
+				? await Promise.race([
+						ahead.html,
+						new Promise((resolve) => {
+							window.setTimeout(
+								() => resolve(null),
+								NAVIGATION_TIMEOUT
+							);
+						}),
+					])
+				: null;
 
 		// A navigation that started while the page fetched ahead was awaited.
 		controller.signal.throwIfAborted();
