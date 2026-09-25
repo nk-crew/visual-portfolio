@@ -2338,7 +2338,16 @@ class Visual_Portfolio_Get {
 						}
 					}
 
-					if ( ! empty( $options['posts_formats'] ) ) {
+					// Only where a queried post type has formats: a set that lost
+					// them keeps the saved choice without narrowing to nothing.
+					$format_types = 'post_types_set' === $options['posts_source'] ? (array) ( $options['post_types_set'] ?? array() ) : array( $options['posts_source'] );
+					$has_formats  = false;
+
+					foreach ( $format_types as $format_type ) {
+						$has_formats = $has_formats || post_type_supports( $format_type, 'post-formats' );
+					}
+
+					if ( $has_formats && ! empty( $options['posts_formats'] ) ) {
 						$formats       = array_intersect( (array) $options['posts_formats'], get_post_format_slugs() );
 						$formats_query = array( 'relation' => 'OR' );
 
@@ -2450,10 +2459,17 @@ class Visual_Portfolio_Get {
 
 					$not_id                     = (array) ( isset( $query_opts['post__not_in'] ) ? $query_opts['post__not_in'] : array() );
 					$query_opts['post__not_in'] = array_merge( $not_id, $used );
+				}
 
-					// Remove posts from post__in.
-					if ( isset( $query_opts['post__in'] ) ) {
-						$query_opts['post__in'] = array_diff( (array) $query_opts['post__in'], (array) $query_opts['post__not_in'] );
+				// WordPress reads `post__not_in` only without a `post__in`, so a
+				// list of posts, a manual selection or the sticky posts, drops
+				// the excluded ones itself. A list left empty stays empty rather
+				// than finding every post.
+				if ( isset( $query_opts['post__in'] ) ) {
+					$query_opts['post__in'] = array_values( array_diff( (array) $query_opts['post__in'], (array) ( $query_opts['post__not_in'] ?? array() ) ) );
+
+					if ( empty( $query_opts['post__in'] ) ) {
+						$query_opts['post__in'] = array( 0 );
 					}
 				}
 			}

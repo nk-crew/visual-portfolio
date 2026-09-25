@@ -350,6 +350,63 @@ class ClassLoopPostsQueryOptions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An excluded post stays out of the sticky posts, and a list the exclusions
+	 * empty finds nothing rather than every post.
+	 *
+	 * @return void
+	 */
+	public function test_sticky_only_keeps_its_exclusions() {
+		stick_post( self::$posts['Query Red'] );
+		stick_post( self::$posts['Query Blue'] );
+
+		$this->assertSame(
+			array( 'Query Blue' ),
+			$this->render_titles(
+				array(
+					'sticky'     => 'only',
+					'excludeIds' => array( self::$posts['Query Red'] ),
+				)
+			)
+		);
+		$this->assertSame(
+			array(),
+			$this->render_titles(
+				array(
+					'sticky'     => 'only',
+					'excludeIds' => array( self::$posts['Query Red'], self::$posts['Query Blue'] ),
+				)
+			)
+		);
+	}
+
+	/**
+	 * Formats narrow only post types that have them.
+	 *
+	 * @return void
+	 */
+	public function test_formats_leave_a_set_without_them_alone() {
+		$this->assertSame(
+			array( 'Query Red' ),
+			$this->render_titles(
+				array(
+					'source'       => 'post_types_set',
+					'postTypesSet' => array( 'post', 'page' ),
+					'formats'      => array( 'image' ),
+				)
+			)
+		);
+
+		// A post type that lost its formats keeps the saved choice harmless.
+		remove_post_type_support( 'post', 'post-formats' );
+
+		$titles = $this->render_titles( array( 'formats' => array( 'image' ) ) );
+
+		add_post_type_support( 'post', 'post-formats' );
+
+		$this->assertSame( array( 'Query Plain', 'Query Purple', 'Query Blue', 'Query Red' ), $titles );
+	}
+
+	/**
 	 * Only with nothing pinned finds nothing, rather than every post.
 	 *
 	 * @return void
