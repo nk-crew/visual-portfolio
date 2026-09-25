@@ -230,6 +230,23 @@ class ClassExternalImages extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An image from elsewhere past the first on the page is lazy, as WordPress
+	 * makes an attachment image, when the plugin's own lazy loading is off.
+	 *
+	 * @return void
+	 */
+	public function test_a_later_image_from_elsewhere_is_lazy() {
+		// WordPress keeps the first images of a page eager.
+		add_filter( 'wp_omit_loading_attr_threshold', '__return_zero' );
+
+		$image = Visual_Portfolio_Images::get_remote_image( self::URL, array( 'alt' => 'Late' ), 800, 600 );
+
+		remove_filter( 'wp_omit_loading_attr_threshold', '__return_zero' );
+
+		$this->assertStringContainsString( 'loading="lazy"', $image );
+	}
+
+	/**
 	 * The thumbnails of a classic slider show the image by its address.
 	 *
 	 * @return void
