@@ -8,7 +8,8 @@ controls around them.
 
 Every block of the family, apart from the children of the filter and the
 pagination, is marked **(Experimental)**. Every one is registered only on
-**WordPress 7.1 and newer**. The legacy `visual-portfolio/block`,
+**WordPress 7.1 and newer**. Below it a saved loop, and any block of the family
+saved outside one, prints nothing on the page. The legacy `visual-portfolio/block`,
 `visual-portfolio/saved`, the shortcodes and Saved Layouts are a separate world
 and are not affected by anything on this page.
 
@@ -290,6 +291,11 @@ select leads with a prompt. Without JavaScript a Filter or Sort button submits
 the select. With it, changing the select swaps the gallery and the focus stays
 on the select.
 
+Sort renders nothing on a Taxonomies loop, and Filter nothing on a Social one,
+since those sources have nothing to sort or filter by. The settings of the block
+say so in the editor. A Taxonomies or Social loop on a site without Pro shows
+its No Results.
+
 **Search.** The Gallery Search block is a search field for its loop. It searches
 as the visitor types, once they pause for half a second, and at once on Enter.
 The field keeps the focus, the caret and anything typed while the results load.
@@ -451,6 +457,7 @@ it reads — no hook involved:
 | `vpf_loop_custom_output` | filter `( false\|string, $options, $block )` | Replace the whole item template output, before a single item is rendered. Content protection uses this |
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |
 | `vpf_loop_search` | filter `( false, $options )` | Whether an extension applies the visitor search of a loop. Until one returns true the search block renders nothing and the term reaches no query. See below |
+| `vpf_loop_source_supports` | filter `( $supports )` | Which controls each source leaves out, `queryType => array( 'sort'\|'filter'\|'search' => bool )`. A control missing from the map is supported. The sort and filter blocks render nothing where it is false, the search block reads the loop's `content_source` instead, and the editor reads the same map for its note |
 | `vpf_loop_prefetch` | filter `( false, $options )` | Whether a loop fetches pages before the visitor asks for them. See [Prefetch](#prefetch) |
 | `vpf_loop_tiles_presets` | filter `( $presets )` | Tiles notations offered in the editor |
 | `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers, `name => settings`. See below |
@@ -484,6 +491,14 @@ is no key at all. It is never set for a loop without a query id, for social and
 taxonomy sources, or for the classic gallery. The filter block counts its terms
 over the searched items, and does not cache them while a search is active,
 since what visitors type has no end.
+
+**The active sort.** `Visual_Portfolio_Get::get_query_params()` reads the sort
+from the parameter of the gallery that asks, `vp-{queryId}-sort` for a loop and
+`vp_sort` for a classic gallery, and puts it on the options as
+`$options['active_sort']` before `vpf_extend_options_before_query_args` runs. A
+source that sorts in its own query reads it there rather than from the request.
+The value is the sort slug, run through `sanitize_text_field()`, and no sort is
+no key at all.
 
 The options of a loop's query carry `$options['is_loop'] = true`, so a query
 filter that should act on the classic gallery alone, such as one reading a

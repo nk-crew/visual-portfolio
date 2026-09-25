@@ -15,14 +15,11 @@ import { __ } from '@wordpress/i18n';
  */
 import { ProLine } from '../../components/pro-teaser';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
+import { loopSourceSupports } from '../../utils/loop-source-supports';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
-
-// Sources with no text of their items to match, where the page renders no
-// search either.
-const UNSEARCHABLE_SOURCES = ['social-stream', 'taxonomies'];
 
 export default function LoopSearchEdit({ attributes, setAttributes, context }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -31,8 +28,9 @@ export default function LoopSearchEdit({ attributes, setAttributes, context }) {
 
 	useLoopOrphanWarning('visual-portfolio/loop-search', context);
 
-	const isUnsearchable = UNSEARCHABLE_SOURCES.includes(
-		context?.['vp/queryType']
+	const isUnsearchable = !loopSourceSupports(
+		context?.['vp/queryType'],
+		'search'
 	);
 
 	let notice = null;

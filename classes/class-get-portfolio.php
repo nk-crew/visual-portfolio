@@ -147,7 +147,8 @@ class Visual_Portfolio_Get {
 	 * @return bool
 	 */
 	public static function supports_loop_search( $options, $query_id ) {
-		if ( null === self::sanitize_query_id( $query_id ) || in_array( $options['content_source'] ?? '', array( 'social-stream', 'taxonomies' ), true ) ) {
+		// `content_source` names a source the way `queryType` does, but for posts.
+		if ( null === self::sanitize_query_id( $query_id ) || ! self::loop_source_supports( $options['content_source'] ?? '', 'search' ) ) {
 			return false;
 		}
 
@@ -162,6 +163,53 @@ class Visual_Portfolio_Get {
 		 * @param array $options - options of the loop, in the legacy format.
 		 */
 		return (bool) apply_filters( 'vpf_loop_search', false, $options );
+	}
+
+	/**
+	 * Which controls of a Gallery Loop each content source leaves out.
+	 *
+	 * A source missing from the map, or a control missing from its entry,
+	 * supports the control. The editor reads the same map to say why a control
+	 * shows nothing on the page.
+	 *
+	 * @return array `queryType` => array( control => bool ).
+	 */
+	public static function get_loop_source_supports() {
+		/**
+		 * Filters the controls of a Gallery Loop each content source leaves out.
+		 *
+		 * The controls are `sort`, `filter` and `search`. A source that starts
+		 * to support one sets it to true.
+		 *
+		 * @param array $supports - `queryType` => array( control => bool ).
+		 */
+		return (array) apply_filters(
+			'vpf_loop_source_supports',
+			array(
+				'taxonomies'    => array(
+					'sort'   => false,
+					'search' => false,
+				),
+				'social-stream' => array(
+					'filter' => false,
+					'search' => false,
+				),
+			)
+		);
+	}
+
+	/**
+	 * Whether a content source of a Gallery Loop supports one of its controls.
+	 *
+	 * @param string $query_type - `queryType` of the loop.
+	 * @param string $control    - `sort`, `filter` or `search`.
+	 *
+	 * @return bool
+	 */
+	public static function loop_source_supports( $query_type, $control ) {
+		$supports = self::get_loop_source_supports();
+
+		return false !== ( $supports[ $query_type ][ $control ] ?? true );
 	}
 
 	/**
@@ -780,6 +828,10 @@ class Visual_Portfolio_Get {
 			$portfolio_query = $custom_query;
 			$found_pages     = (int) $portfolio_query->max_num_pages;
 			$max_pages       = $found_pages < $start_page ? $start_page : $found_pages;
+		} elseif ( ! empty( $options['is_loop'] ) && 'taxonomies' === $options['content_source'] ) {
+			// No extension answers for the source, and the query below would
+			// list Portfolio posts in its place. A loop shows its No Results.
+			$max_pages = $start_page;
 		} else {
 			// get Post List.
 			$portfolio_query = new WP_Query( $query_opts );
@@ -1692,6 +1744,11 @@ class Visual_Portfolio_Get {
 			return isset( $custom_query->max_num_pages ) ? max( 1, (int) $custom_query->max_num_pages ) : 1;
 		}
 
+		// Nothing answered for the source, see `resolve_query()`.
+		if ( 'taxonomies' === $content_source ) {
+			return 1;
+		}
+
 		// Everything left over is a `WP_Query`, which is what `resolve_query()`
 		// does with it too. A source that widens the query through
 		// `vpf_extend_query_args` rather than replacing the object used to fall
@@ -1928,6 +1985,15 @@ class Visual_Portfolio_Get {
 			$options['loop_search'] = $search;
 		}
 
+		// Read from the parameter of the gallery that asks, `vp_sort` for a
+		// classic one and `vp-{id}-sort` for a loop. Handed over for the
+		// sources that sort in their own query.
+		$active_sort = self::get_current_sort( $query_id );
+
+		if ( '' !== $active_sort ) {
+			$options['active_sort'] = $active_sort;
+		}
+
 		$options    = apply_filters( 'vpf_extend_options_before_query_args', $options, $layout_id );
 		$query_opts = array();
 		$is_images  = 'images' === $options['content_source'];
@@ -1935,7 +2001,6 @@ class Visual_Portfolio_Get {
 		// The state this query is narrowed by. A filter list asks for the
 		// unnarrowed query, so it never reads the active filter.
 		$active_filter = $for_filter ? false : self::get_filter_active_item( $query_opts, $query_id );
-		$active_sort   = self::get_current_sort( $query_id );
 
 		$paged = 0;
 		if ( isset( $options['pagination'] ) && $options['pagination'] ) {

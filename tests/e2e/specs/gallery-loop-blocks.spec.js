@@ -355,6 +355,66 @@ test.describe('Gallery Loop blocks', () => {
 			.poll(async () => getItemImageSize(await editor.getBlocks()))
 			.toBe('vp_lg');
 	});
+
+	test('a control the source leaves out says so in the inspector', async ({
+		admin,
+		editor,
+		page,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Loop - unsupported controls',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		const cases = [
+			{
+				queryType: 'taxonomies',
+				control: 'visual-portfolio/loop-sort',
+				note: 'Sorting is not available for this source, so the page shows no sort control.',
+			},
+			{
+				queryType: 'social-stream',
+				control: 'visual-portfolio/loop-filter',
+				note: 'Filtering is not available for this source, so the page shows no filter.',
+			},
+		];
+
+		for (const { queryType, control, note } of cases) {
+			await editor.insertBlock({
+				name: 'visual-portfolio/loop',
+				attributes: {
+					queryType,
+					baseQuery: { perPage: PER_PAGE, maxPages: 1 },
+				},
+				innerBlocks: [
+					{ name: control },
+					{
+						name: 'visual-portfolio/item-template',
+						innerBlocks: [{ name: 'visual-portfolio/item-title' }],
+					},
+				],
+			});
+
+			await editor.selectBlocks(
+				editor.canvas.locator(`[data-type="${control}"]`).last()
+			);
+			await editor.openDocumentSettingsSidebar();
+
+			await expect(page.getByText(note, { exact: true })).toBeVisible();
+		}
+
+		// A source that supports the control says nothing.
+		await editor.insertBlock(getLoopBlock(PAGED_PAGINATION));
+		await editor.selectBlocks(
+			editor.canvas
+				.locator('[data-type="visual-portfolio/loop-filter"]')
+				.last()
+		);
+
+		await expect(page.getByText(cases[1].note)).toBeHidden();
+	});
 });
 
 /**

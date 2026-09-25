@@ -193,6 +193,33 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 		}
 
 		/**
+		 * Print nothing for a block of the Gallery Loop family where the family
+		 * is not registered.
+		 *
+		 * WordPress prints the saved markup of a block it does not know, which
+		 * for a loop is its wrapper and the texts of its No Results and End of
+		 * List. Short-circuiting the loop skips its inner blocks as well.
+		 *
+		 * @param string|null $pre_render   - the output so far.
+		 * @param array       $parsed_block - the block being rendered.
+		 *
+		 * @return string|null
+		 */
+		public function skip_unsupported_loop_blocks( $pre_render, $parsed_block ) {
+			$name = $parsed_block['blockName'] ?? '';
+
+			if (
+				null !== $pre_render ||
+				( 0 !== strpos( $name, 'visual-portfolio/loop' ) && 0 !== strpos( $name, 'visual-portfolio/item-' ) ) ||
+				$this->supports_loop_blocks()
+			) {
+				return $pre_render;
+			}
+
+			return '';
+		}
+
+		/**
 		 * Init options
 		 */
 		public function init() {
@@ -210,6 +237,7 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			add_action( 'init', array( $this, 'earlier_init_hook' ), 5 );
 			add_action( 'init', array( $this, 'init_hook' ) );
 			add_action( 'init', array( $this, 'run_deferred_rewrite_rules' ), 20 );
+			add_filter( 'pre_render_block', array( $this, 'skip_unsupported_loop_blocks' ), 10, 2 );
 		}
 
 		/**

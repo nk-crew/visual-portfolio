@@ -18,6 +18,7 @@ import classnames from 'classnames/dedupe';
  * Internal dependencies
  */
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
+import { loopSourceSupports } from '../../utils/loop-source-supports';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
@@ -59,6 +60,10 @@ export default function LoopSortEdit({
 	useLoopOrphanWarning('visual-portfolio/loop-sort', context);
 
 	const shown = getShownOptions(options, labels);
+	const isUnsupported = !loopSourceSupports(
+		context?.['vp/queryType'],
+		'sort'
+	);
 
 	function toggleOption(value, isChecked) {
 		// An empty selection stands for all of them, so the first change has to
@@ -114,6 +119,14 @@ export default function LoopSortEdit({
 					}
 					dropdownMenuProps={dropdownMenuProps}
 				>
+					{isUnsupported && (
+						<p style={{ gridColumn: '1 / -1', margin: 0 }}>
+							{__(
+								'Sorting is not available for this source, so the page shows no sort control.',
+								'visual-portfolio'
+							)}
+						</p>
+					)}
 					<ToolsPanelItem
 						label={__('Display as dropdown', 'visual-portfolio')}
 						isShownByDefault

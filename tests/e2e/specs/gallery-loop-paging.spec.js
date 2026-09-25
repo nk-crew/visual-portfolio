@@ -1095,4 +1095,82 @@ test.describe('Gallery Loop paging', () => {
 
 		await expect.poll(getSearch).toBe('Pag');
 	});
+
+	test('a search erased before it lands leaves the page unsearched', async ({
+		page,
+		requestUtils,
+	}) => {
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: { title: 'Paging - erased search', status: 'publish' },
+		});
+
+		pageIds.push(created.id);
+
+		// The form the search block prints, as in the test above.
+		const form = [
+			'<form role="search" method="get" action="/" class="vp-block-loop-search" data-wp-interactive="visual-portfolio/loop" data-wp-on--submit="actions.search">',
+			`<input type="hidden" name="page_id" value="${created.id}">`,
+			'<label>Search <input type="search" class="vp-block-loop-search__input" name="vp-1-search" value="" data-wp-on--input="actions.search"></label>',
+			'</form>',
+		].join('');
+
+		await requestUtils.rest({
+			path: `/wp/v2/pages/${created.id}`,
+			method: 'POST',
+			data: {
+				content: getLoopMarkup({
+					blockId: 'e2e-paging-erased-search',
+					images,
+					perPage: 2,
+					before: [`<!-- wp:html -->${form}<!-- /wp:html -->`],
+				}),
+			},
+		});
+
+		await page.goto(created.link, { waitUntil: 'load' });
+
+		const input = page.locator('.vp-block-loop-search__input');
+		const isSearch = (url) => 'Pa' === getLoopParam(url, 'search');
+
+		let release;
+		const held = new Promise((resolve) => {
+			release = resolve;
+		});
+		const requested = page.waitForRequest(
+			(request) =>
+				'fetch' === request.resourceType() && isSearch(request.url())
+		);
+
+		await page.route(
+			(url) => isSearch(url.href),
+			async (route) => {
+				if ('fetch' === route.request().resourceType()) {
+					await held;
+				}
+
+				return route.fallback();
+			}
+		);
+
+		await input.fill('Pa');
+		await requested;
+
+		const landed = page.waitForResponse((response) =>
+			isSearch(response.url())
+		);
+
+		await input.fill('');
+
+		// Past the pause the store waits for before it searches.
+		await page.waitForTimeout(1000);
+
+		release();
+		await landed;
+
+		await expect(page.locator(LOOP)).not.toHaveClass(/\bvp-is-loading\b/);
+		expect(getLoopParam(page.url(), 'search')).toBe(null);
+		await expect(input).toHaveValue('');
+	});
 });
