@@ -3,7 +3,7 @@ import './live-reload-conditions';
 
 import { Spinner } from '@wordpress/components';
 import { dispatch, select, subscribe, withSelect } from '@wordpress/data';
-import { Component, createRef, Fragment } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import classnames from 'classnames/dedupe';
 import $ from 'jquery';
@@ -28,6 +28,40 @@ let uniqueIdCount = 1;
 // This is deliberately longer than the CSS transition in `style.scss`, so every step finishes
 // easing before the next one starts and the movement reads as continuous rather than stepped.
 const PREVIEW_RESIZE_INTERVAL = 400;
+
+/**
+ * Value the way PHP reads a form field: scalars as strings, `true` / `false` as
+ * `1` / `0`, and an empty object left out, since it has no field to post.
+ *
+ * @param {Mixed} val - attribute value.
+ *
+ * @return {Mixed} string, object of them, or undefined for an empty object.
+ */
+function toPostValue(val) {
+	if (typeof val === 'boolean') {
+		return val ? '1' : '0';
+	}
+
+	if (typeof val === 'number') {
+		return `${val}`;
+	}
+
+	if (typeof val === 'object' && val !== null) {
+		const result = {};
+
+		Object.keys(val).forEach((key) => {
+			const item = toPostValue(val[key]);
+
+			if (typeof item !== 'undefined') {
+				result[key] = item;
+			}
+		});
+
+		return Object.keys(result).length ? result : undefined;
+	}
+
+	return val || '';
+}
 
 function getUpdatedKeys(oldData, newData) {
 	const keys = uniq([...Object.keys(oldData), ...Object.keys(newData)]);
@@ -87,7 +121,6 @@ class IframePreview extends Component {
 			this.maybeResizePreviews
 		);
 		this.updateIframeHeight = this.updateIframeHeight.bind(this);
-		this.printInput = this.printInput.bind(this);
 
 		this.trackBlockPosition = this.trackBlockPosition.bind(this);
 	}
@@ -286,12 +319,6 @@ class IframePreview extends Component {
 			});
 
 			if (!data.reload) {
-				// Update AJAX dynamic data.
-				if (data.frameWindow && data.frameWindow.vp_preview_post_data) {
-					data.frameWindow.vp_preview_post_data[data.name] =
-						data.value;
-				}
-
 				// Insert dynamic CSS.
 				if (this.previewFrame && newAttributes.block_id) {
 					this.previewFrame.sendMessage({
@@ -416,44 +443,6 @@ class IframePreview extends Component {
 		});
 	}
 
-	/**
-	 * Prepare form input for POST variables.
-	 *
-	 * @param {string} name - option name.
-	 * @param {Mixed}  val  - option value.
-	 *
-	 * @return {JSX} - form control.
-	 */
-	printInput(name, val) {
-		const params = {
-			type: 'text',
-			name,
-			value: val,
-			readOnly: true,
-		};
-
-		if (typeof val === 'number') {
-			params.type = 'number';
-		} else if (typeof val === 'boolean') {
-			params.type = 'number';
-			params.value = val ? 1 : 0;
-		} else if (typeof val === 'object' && val !== null) {
-			return (
-				<>
-					{Object.keys(val).map((i) => (
-						<Fragment key={`${name}[${i}]`}>
-							{this.printInput(`${name}[${i}]`, val[i])}
-						</Fragment>
-					))}
-				</>
-			);
-		} else {
-			params.value = params.value || '';
-		}
-
-		return <input {...params} />;
-	}
-
 	render() {
 		const { postType, postId } = this.props;
 
@@ -467,7 +456,7 @@ class IframePreview extends Component {
 
 		// Convert attributes for form submission.
 		Object.keys(attributes).forEach((key) => {
-			formData[`vp_${key}`] = attributes[key];
+			formData[`vp_${key}`] = toPostValue(attributes[key]);
 		});
 
 		return (
@@ -540,11 +529,16 @@ class IframePreview extends Component {
 								readOnly
 							/>
 						) : (
-							Object.entries(formData).map(([key, value]) => (
-								<Fragment key={key}>
-									{this.printInput(key, value)}
-								</Fragment>
-							))
+							// One field for all attributes. A field per value
+							// runs past PHP's `max_input_vars` (1000 by default)
+							// on a gallery of a few hundred images, and hosts
+							// that cap the field count reject the request.
+							<input
+								type="hidden"
+								name="vp_preview_attributes"
+								value={JSON.stringify(formData)}
+								readOnly
+							/>
 						)}
 					</form>
 					<iframe
