@@ -189,6 +189,11 @@ test.describe('Gallery Loop integrations', () => {
 			className: 'is-e2e-gallery',
 			anchor: 'e2e-gallery',
 		});
+		// The loop turns off only its generated class; the one a user types
+		// is saved on the wrapper.
+		expect(await editor.getEditedPostContent()).toMatch(
+			/<div class="vp-block-loop is-e2e-gallery" id="e2e-gallery">/
+		);
 		expect(
 			loop.attributes.imagesQuery.images.map(({ id, title, alt }) => ({
 				id,
