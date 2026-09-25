@@ -1037,8 +1037,11 @@ function* searchLoop(loop, name, index, context) {
 		return;
 	}
 
+	// A cleared search is an entry of its own: replacing the search with the
+	// address it started from would leave Back two copies of that address.
 	const replace =
-		searchesInFlight.has(loop) || searchAddresses.get(loop) === here;
+		!!input.value.trim() &&
+		(searchesInFlight.has(loop) || searchAddresses.get(loop) === here);
 	const hadFocus = input === window.document.activeElement;
 
 	searchesInFlight.set(loop, href);
@@ -1186,7 +1189,9 @@ store('visual-portfolio/loop', {
 
 			event.preventDefault();
 
-			yield loadNextPage(ref, getLoopContext(), true);
+			// A click from a script, such as a lightbox asking for the slides
+			// of the next page, is not a visitor asking to leave for it.
+			yield loadNextPage(ref, getLoopContext(), event.isTrusted);
 
 			// A click on an infinite trigger lets it scroll on, and the page it
 			// loaded may leave the trigger in view, which the observer does not

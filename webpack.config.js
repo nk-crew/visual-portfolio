@@ -9,7 +9,6 @@ const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extract
 const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
-const RtlCssPlugin = require('rtlcss-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -641,9 +640,6 @@ const newConfig = {
 	},
 	plugins: [
 		...defaultConfig.plugins,
-		new RtlCssPlugin({
-			filename: '[name]-rtl.css',
-		}),
 		new FileManagerPlugin({
 			events: {
 				onEnd: {

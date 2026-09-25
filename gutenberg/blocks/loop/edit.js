@@ -772,15 +772,15 @@ export default function BlockEdit(props) {
 					clientId={clientId}
 				/>
 
+				<DisplayPanel
+					attributes={attributes}
+					setAttributes={setAttributes}
+				/>
+
 				<SourceFiltersPanel
 					attributes={attributes}
 					setAttributes={setAttributes}
 					clientId={clientId}
-				/>
-
-				<DisplayPanel
-					attributes={attributes}
-					setAttributes={setAttributes}
 				/>
 
 				<LightboxPanel

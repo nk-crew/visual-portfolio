@@ -107,6 +107,41 @@ test.describe('Gallery Loop integrations', () => {
 		).toEqual(['Galerie-Schleife', 'Galerie-Titel']);
 	});
 
+	test('the editor starts the settings of an extension as an object', async ({
+		admin,
+		page,
+	}) => {
+		await admin.createNewPost({
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		// Keyed by name, so a failure names the block.
+		const defaults = await page.evaluate(() =>
+			Object.fromEntries(
+				window.wp.blocks
+					.getBlockTypes()
+					.filter(
+						({ name, attributes }) =>
+							name.startsWith('visual-portfolio/') &&
+							attributes.extensions
+					)
+					.map(({ name, attributes }) => [
+						name,
+						Array.isArray(attributes.extensions.default)
+							? 'array'
+							: typeof attributes.extensions.default,
+					])
+			)
+		);
+
+		expect(defaults['visual-portfolio/item-template']).toBe('object');
+		expect(
+			Object.entries(defaults).filter(([, type]) => 'object' !== type)
+		).toEqual([]);
+	});
+
 	test('a core gallery becomes a loop of its images', async ({
 		admin,
 		editor,
@@ -124,6 +159,9 @@ test.describe('Gallery Loop integrations', () => {
 				columns: 2,
 				linkTo: 'media',
 				caption: 'Gallery caption',
+				className: 'is-e2e-gallery',
+				anchor: 'e2e-gallery',
+				style: { spacing: { blockGap: { top: '7px', left: '9px' } } },
 			},
 			innerBlocks: images.slice(0, 2).map((image, index) => ({
 				name: 'core/image',
@@ -146,7 +184,16 @@ test.describe('Gallery Loop integrations', () => {
 		});
 
 		expect(loop.name).toBe('visual-portfolio/loop');
-		expect(loop.attributes.queryType).toBe('images');
+		expect(loop.attributes).toMatchObject({
+			queryType: 'images',
+			className: 'is-e2e-gallery',
+			anchor: 'e2e-gallery',
+		});
+		// The loop turns off only its generated class; the one a user types
+		// is saved on the wrapper.
+		expect(await editor.getEditedPostContent()).toMatch(
+			/<div class="vp-block-loop is-e2e-gallery" id="e2e-gallery">/
+		);
 		expect(
 			loop.attributes.imagesQuery.images.map(({ id, title, alt }) => ({
 				id,
@@ -165,6 +212,7 @@ test.describe('Gallery Loop integrations', () => {
 			layoutType: 'grid',
 			layoutColumnsMode: 'manual',
 			layoutColumnCount: 2,
+			style: { spacing: { blockGap: { top: '7px', left: '9px' } } },
 		});
 		expect(
 			template.innerBlocks.map(({ name, attributes }) => [

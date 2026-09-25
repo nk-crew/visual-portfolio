@@ -1,6 +1,28 @@
 import { registerBlockType } from '@wordpress/blocks';
+import { addFilter } from '@wordpress/hooks';
 
 const { loop_blocks: loopBlocksSupported } = window.VPGutenbergVariables;
+
+// PHP decodes the `{}` default of `extensions` into an empty array, so a block
+// that keeps the definition the server hands the editor would start it as `[]`.
+addFilter(
+	'blocks.registerBlockType',
+	'visual-portfolio/loop-extensions-default',
+	(settings, name) =>
+		name.startsWith('visual-portfolio/') &&
+		Array.isArray(settings.attributes?.extensions?.default)
+			? {
+					...settings,
+					attributes: {
+						...settings.attributes,
+						extensions: {
+							...settings.attributes.extensions,
+							default: {},
+						},
+					},
+				}
+			: settings
+);
 
 // Fields of `block.json` the server translates. Settings override the
 // definition the server hands the editor, so these copied in from the file

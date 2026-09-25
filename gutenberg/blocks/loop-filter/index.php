@@ -68,15 +68,16 @@ class Visual_Portfolio_Block_Loop_Filter {
 			}
 
 			$template = $template ?? $item;
-			$key      = Visual_Portfolio_Filter_Terms::get_key( (int) ( $attributes['taxonomyId'] ?? 0 ), $attributes['filter'] );
+			$key      = Visual_Portfolio_Filter_Terms::get_key( self::get_translated_term_id( (int) ( $attributes['taxonomyId'] ?? 0 ) ), $attributes['filter'] );
 
 			if ( ! isset( $by_key[ $key ] ) || isset( $used[ $key ] ) ) {
 				continue;
 			}
 
-			$used[ $key ]           = true;
-			$item['attrs']['count'] = $by_key[ $key ]['count'];
-			$items[]                = $item;
+			$used[ $key ]                = true;
+			$item['attrs']['count']      = $by_key[ $key ]['count'];
+			$item['attrs']['taxonomyId'] = $by_key[ $key ]['id'];
+			$items[]                     = $item;
 		}
 
 		if ( $show_all && ! $all ) {
@@ -108,6 +109,31 @@ class Visual_Portfolio_Block_Loop_Filter {
 		}
 
 		return $items;
+	}
+
+	/**
+	 * The term a saved item points at, in the language of the page.
+	 *
+	 * A translated page keeps the term ids saved in the original, while its
+	 * gallery lists the terms of its own language.
+	 *
+	 * @param int $id - saved term id, 0 for an image category.
+	 *
+	 * @return int
+	 */
+	private static function get_translated_term_id( $id ) {
+		if ( ! $id || ! has_filter( 'wpml_object_id' ) ) {
+			return $id;
+		}
+
+		$term = get_term( $id );
+
+		if ( ! $term || is_wp_error( $term ) ) {
+			return $id;
+		}
+
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		return (int) apply_filters( 'wpml_object_id', $id, $term->taxonomy, true );
 	}
 
 	/**

@@ -998,4 +998,101 @@ test.describe('Gallery Loop paging', () => {
 			);
 		});
 	});
+
+	test('a Load More a script pressed stays on the page when its page fails', async ({
+		page,
+		requestUtils,
+	}) => {
+		const url = await publish(
+			requestUtils,
+			page,
+			'Paging - scripted load more fails',
+			getLoopMarkup({
+				blockId: 'e2e-paging-scripted',
+				images,
+				perPage: 2,
+				pagination: [getBlock('loop-pagination-trigger')],
+			})
+		);
+		const first = await getTitles(page);
+		const isSecondPage = (address) =>
+			'2' === getLoopParam(address.href, 'page');
+		const fail = (route) =>
+			'fetch' === route.request().resourceType()
+				? route.fulfill({ status: 500, body: '' })
+				: route.fallback();
+
+		await page.route(isSecondPage, fail);
+
+		const failed = page.waitForResponse(
+			(response) =>
+				500 === response.status() &&
+				'2' === getLoopParam(response.url(), 'page')
+		);
+
+		// The way the lightbox of Pro asks for the slides of the next page.
+		await page.locator(TRIGGER).evaluate((trigger) => trigger.click());
+		await failed;
+		await expect(page.locator(LOOP)).not.toHaveClass(/\bvp-is-loading\b/);
+
+		await page.unroute(isSecondPage, fail);
+
+		// Still the page it was, with a trigger that works.
+		await page.locator(TRIGGER).click();
+		await expect(page.locator(ITEM)).toHaveCount(4);
+		expect(page.url()).toBe(url);
+		expect((await getTitles(page)).slice(0, 2)).toEqual(first);
+	});
+
+	test('Back after a cleared search returns to the search', async ({
+		page,
+		requestUtils,
+	}) => {
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: { title: 'Paging - cleared search', status: 'publish' },
+		});
+
+		pageIds.push(created.id);
+
+		// Free prints no search field until an extension runs the search, so
+		// the page carries the form the block prints, which is all the store
+		// navigates by. The server ignores the term.
+		const form = [
+			'<form role="search" method="get" action="/" class="vp-block-loop-search" data-wp-interactive="visual-portfolio/loop" data-wp-on--submit="actions.search">',
+			`<input type="hidden" name="page_id" value="${created.id}">`,
+			'<label>Search <input type="search" class="vp-block-loop-search__input" name="vp-1-search" value="" data-wp-on--input="actions.search"></label>',
+			'</form>',
+		].join('');
+
+		await requestUtils.rest({
+			path: `/wp/v2/pages/${created.id}`,
+			method: 'POST',
+			data: {
+				content: getLoopMarkup({
+					blockId: 'e2e-paging-search',
+					images,
+					perPage: 2,
+					before: [`<!-- wp:html -->${form}<!-- /wp:html -->`],
+				}),
+			},
+		});
+
+		await page.goto(created.link, { waitUntil: 'load' });
+
+		const input = page.locator('.vp-block-loop-search__input');
+		const getSearch = () => getLoopParam(page.url(), 'search');
+
+		await input.fill('Pa');
+		await expect.poll(getSearch).toBe('Pa');
+		await input.fill('Pag');
+		await expect.poll(getSearch).toBe('Pag');
+		await input.fill('');
+		await expect.poll(getSearch).toBe(null);
+
+		await page.goBack();
+
+		await expect.poll(getSearch).toBe('Pag');
+	});
 });

@@ -68,7 +68,11 @@ export default {
 					linkTo,
 					align,
 					caption: galleryCaption,
+					className,
+					anchor,
+					style,
 				} = attributes;
+				const blockGap = style?.spacing?.blockGap;
 
 				// A gallery that crops its images shows them in a grid, at the
 				// ratio it sets or square. One that does not keeps each image's
@@ -125,6 +129,8 @@ export default {
 					'visual-portfolio/loop',
 					{
 						...getAlign(align),
+						...(className ? { className } : {}),
+						...(anchor ? { anchor } : {}),
 						queryType: 'images',
 						// A gallery shows every image it holds.
 						baseQuery: { perPage: PER_PAGE_ALL },
@@ -141,6 +147,9 @@ export default {
 								// than there are images.
 								layoutColumnCount:
 									columns ?? Math.min(3, images.length),
+								...(blockGap
+									? { style: { spacing: { blockGap } } }
+									: {}),
 							},
 							items
 						),
