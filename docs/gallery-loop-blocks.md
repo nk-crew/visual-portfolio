@@ -291,8 +291,9 @@ It carries a *Height* and an *Aspect ratio*, and two block styles: *Plain*, a
 ring around the current thumbnail, and *Dimmed*, where everything else steps
 back instead. A finger drags the strip because it is a scroll container; a
 mouse drags it because the strip is handed to the same library the carousel
-uses, which is already on the page. A gallery that appends items with **Load More** does not extend
-the strip — the module has no picture to add — so the two are not combined yet.
+uses, which is already on the page. **Load More** and infinite scroll extend the
+strip with the thumbnails the server rendered for the page they fetched, so every
+appended slide has its thumbnail.
 
 A control that is not wanted is deleted, or hidden the way any block is hidden
 — through the editor's own block visibility, which the control blocks leave

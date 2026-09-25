@@ -1251,6 +1251,75 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(current, { timeout: 10000 }).toBe(4);
 	});
 
+	test('a load more gives its slides their thumbnails', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - thumbnails and load more',
+			blockId: 'e2e-thumbnails-load-more',
+			images,
+			perPage: 3,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+			controls: ['loop-pagination-trigger'],
+			carousel: ['loop-carousel-thumbnails'],
+		});
+
+		const list = page.locator(LIST);
+		const items = page.locator(`${LIST} > ${ITEM}`);
+		const thumbs = page.locator('.vp-block-loop-carousel-thumb');
+		const current = () =>
+			thumbs.evaluateAll((nodes) =>
+				nodes.findIndex(
+					(thumb) => 'true' === thumb.getAttribute('aria-current')
+				)
+			);
+
+		await expect(thumbs).toHaveCount(3);
+		await expect(list).toHaveClass(/vp-has-script/);
+
+		await page.locator(LOAD_MORE).click();
+		await expect(items).toHaveCount(IMAGES_COUNT);
+		await expect(thumbs).toHaveCount(IMAGES_COUNT);
+
+		// Each names its own slide, with a picture of the size the server
+		// gives the first page's.
+		await expect(thumbs.nth(4)).toHaveAttribute('data-vp-slide', '4');
+		await expect(thumbs.nth(4)).toHaveAttribute('aria-label', /5/);
+		expect(
+			await thumbs.nth(4).locator(':scope > img').getAttribute('width')
+		).toBe(
+			await thumbs.nth(0).locator(':scope > img').getAttribute('width')
+		);
+
+		// A thumbnail that arrived takes the carousel to its slide, and is the
+		// one lit.
+		const slideInView = () =>
+			list.evaluate((node) => {
+				const frame = node.getBoundingClientRect();
+				const slide = node.children[4].getBoundingClientRect();
+
+				return (
+					slide.left >= frame.left - 1 &&
+					slide.right <= frame.right + 1
+				);
+			});
+
+		// The last page took the trigger and moved the focus to the first
+		// slide that arrived, so the carousel is taken back to its start.
+		await thumbs.nth(0).click();
+		await expect.poll(current, { timeout: 10000 }).toBe(0);
+		await expect.poll(slideInView, { timeout: 10000 }).toBe(false);
+
+		await thumbs.nth(4).click();
+		await expect.poll(current, { timeout: 10000 }).toBe(4);
+		await expect.poll(slideInView, { timeout: 10000 }).toBe(true);
+	});
+
 	test('an RTL carousel steps back from its end at any width', async ({
 		page,
 		requestUtils,

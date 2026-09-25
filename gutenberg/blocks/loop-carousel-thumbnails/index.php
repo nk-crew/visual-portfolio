@@ -134,6 +134,8 @@ class Visual_Portfolio_Block_Loop_Carousel_Thumbnails {
 				'thumbnails',
 				array(
 					'style'               => $styles,
+					// Load More renames the thumbnails of the page it appends.
+					'data-vp-thumb-label' => $label,
 					'data-wp-interactive' => Visual_Portfolio_Block_Item_Template::VIEW_MODULE_STORE,
 					'data-wp-on--click'   => 'actions.carouselGoTo',
 				)

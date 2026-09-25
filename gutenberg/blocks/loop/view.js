@@ -29,6 +29,8 @@ const END_SELECTOR = '.vp-block-loop-pagination-end';
 const MASONRY_CLASS = 'vp-layout-masonry';
 const SEARCH_INPUT_SELECTOR = '.vp-block-loop-search__input';
 const RANGE_SELECTOR = '.vp-block-loop-query-total[data-vp-range-text]';
+const THUMBS_SELECTOR = '.vp-block-loop-carousel-thumbnails';
+const THUMB_SELECTOR = '.vp-block-loop-carousel-thumb';
 
 // How long a search waits for the visitor to stop typing.
 const SEARCH_DELAY = 500;
@@ -706,6 +708,56 @@ function advanceRanges(loop, nextLoop) {
 }
 
 /**
+ * Give every Carousel Thumbnails strip of a loop the thumbnails of the page
+ * just loaded.
+ *
+ * The fetched page rendered a strip for its own items, with the pictures,
+ * sizes and loading attributes the server gives this one, so its buttons are
+ * moved over and only renamed: the slides they name follow the ones already
+ * here.
+ *
+ * @param {HTMLElement} loop     Loop wrapper.
+ * @param {HTMLElement} nextLoop Loop of the fetched page.
+ */
+function advanceThumbnails(loop, nextLoop) {
+	const own = (root) =>
+		Array.from(root.querySelectorAll(THUMBS_SELECTOR)).filter(
+			(strip) => strip.closest(LOOP_SELECTOR) === root
+		);
+	const nextStrips = own(nextLoop);
+
+	own(loop).forEach((strip, index) => {
+		const next = nextStrips[index];
+
+		if (!next) {
+			return;
+		}
+
+		const offset = strip.querySelectorAll(THUMB_SELECTOR).length;
+		const label = strip.dataset.vpThumbLabel || '';
+		const added = Array.from(next.querySelectorAll(THUMB_SELECTOR));
+
+		added.forEach((thumb, position) => {
+			const slide = offset + position;
+
+			thumb.dataset.vpSlide = String(slide);
+			thumb.setAttribute('aria-current', 'false');
+			thumb.setAttribute(
+				'aria-label',
+				label.replace('%d', String(slide + 1))
+			);
+			strip.appendChild(thumb);
+		});
+
+		registerUndo(loop, () => {
+			added.forEach((thumb) => {
+				thumb.remove();
+			});
+		});
+	});
+}
+
+/**
  * Append the next page of items to a loop.
  *
  * The router can only replace a region, never extend it, so this is the one
@@ -778,6 +830,13 @@ async function loadNextPage(trigger, context, byClick) {
 			html,
 			'text/html'
 		);
+
+		// A parser without scripts reads the no-JavaScript copy of a lazy
+		// image as a real one, which would load at once beside the lazy one.
+		parsed.querySelectorAll('noscript').forEach((node) => {
+			node.remove();
+		});
+
 		const nextLoop = parsed.querySelector(
 			`[data-wp-router-region="${region}"]`
 		);
@@ -807,6 +866,7 @@ async function loadNextPage(trigger, context, byClick) {
 
 		advanceTrigger(trigger, nextLoop, loop);
 		advanceRanges(loop, nextLoop);
+		advanceThumbnails(loop, nextLoop);
 		refreshLayout(list, added);
 		announceUpdate(context);
 
