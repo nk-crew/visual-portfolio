@@ -2464,8 +2464,9 @@ class Visual_Portfolio_Get {
 				// WordPress reads `post__not_in` only without a `post__in`, so a
 				// list of posts, a manual selection or the sticky posts, drops
 				// the excluded ones itself. A list left empty stays empty rather
-				// than finding every post.
-				if ( isset( $query_opts['post__in'] ) ) {
+				// than finding every post. An empty `post__in`, which the main
+				// query hands a current query, lists nothing to narrow.
+				if ( ! empty( $query_opts['post__in'] ) ) {
 					$query_opts['post__in'] = array_values( array_diff( (array) $query_opts['post__in'], (array) ( $query_opts['post__not_in'] ?? array() ) ) );
 
 					if ( empty( $query_opts['post__in'] ) ) {
