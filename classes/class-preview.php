@@ -336,12 +336,28 @@ class Visual_Portfolio_Preview {
 			)
 		);
 
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
+		$post_data = isset( $_POST ) ? $_POST : array();
+
+		// The block editor posts its attributes as one JSON field, since a field per
+		// value runs past `max_input_vars` on a gallery of a few hundred images.
+		// Unpacked here into the fields it replaces, so everything below reads the same.
+		if ( isset( $post_data['vp_preview_attributes'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized below with the rest of the post data.
+			$attributes = json_decode( wp_unslash( $post_data['vp_preview_attributes'] ), true );
+
+			unset( $post_data['vp_preview_attributes'] );
+
+			if ( is_array( $attributes ) ) {
+				$post_data = array_merge( $post_data, wp_slash( $attributes ) );
+			}
+		}
+
 		// Post data for script.
 		wp_localize_script(
 			'visual-portfolio-preview',
 			'vp_preview_post_data',
-            // phpcs:disable WordPress.Security.NonceVerification.Missing
-			isset( $_POST ) && ! empty( $_POST ) ? Visual_Portfolio_Security::sanitize_attributes( $_POST ) : array()
+			! empty( $post_data ) ? Visual_Portfolio_Security::sanitize_attributes( $post_data ) : array()
 		);
 
 		$class_name = 'vp-preview-wrapper';
@@ -355,8 +371,8 @@ class Visual_Portfolio_Preview {
 
 		// Prepare portfolio post options.
 		$options = array();
-		if ( isset( $_POST ) && ! empty( $_POST ) ) {
-			foreach ( $_POST as $name => $val ) {
+		if ( ! empty( $post_data ) ) {
+			foreach ( $post_data as $name => $val ) {
 				if ( strpos( $name, 'vp_' ) === 0 ) {
 					$options[ preg_replace( '/^vp_/', '', $name ) ] = $val;
 				}
