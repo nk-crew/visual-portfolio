@@ -126,7 +126,8 @@ export default function ItemImageEdit({
 		'vp/layoutColumns': layoutColumns,
 	} = context;
 
-	const blockProps = useBlockProps();
+	// The width is the figure's, as on the page: see `index.php`.
+	const blockProps = useBlockProps({ style: width ? { width } : undefined });
 	const blockEditingMode = useBlockEditingMode();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
@@ -204,7 +205,7 @@ export default function ItemImageEdit({
 	const imageStyles = {
 		aspectRatio: aspectRatio || undefined,
 		height: height || (width ? 'auto' : undefined),
-		width: width || (aspectRatio ? '100%' : undefined),
+		width: aspectRatio ? '100%' : undefined,
 		objectFit: aspectRatio || height ? scale : undefined,
 		objectPosition: itemFocalPoint
 			? `${itemFocalPoint.x * 100}% ${itemFocalPoint.y * 100}%`

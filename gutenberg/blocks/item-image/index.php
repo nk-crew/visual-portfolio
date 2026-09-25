@@ -39,8 +39,8 @@ class Visual_Portfolio_Block_Item_Image {
 	 * Inline styles of the image itself.
 	 *
 	 * Cropping happens on the `img`, not on the figure: the aspect ratio, or a
-	 * width and a height, are the box, and `object-fit` with the focal point
-	 * decide what of the image survives it.
+	 * height, are the box, and `object-fit` with the focal point decide what
+	 * of the image survives it. A width is the figure's, see `block_render()`.
 	 *
 	 * @param array $attributes  - block attributes.
 	 * @param mixed $focal_point - focal point of the item, `array( 'x', 'y' )` or empty.
@@ -72,10 +72,6 @@ class Visual_Portfolio_Block_Item_Image {
 			$styles[] = $height;
 		} elseif ( '' !== $width ) {
 			$styles[] = 'height:auto';
-		}
-
-		if ( '' !== $width ) {
-			$styles[] = $width;
 		}
 
 		$styles[] = 'object-fit:' . $scale;
@@ -229,7 +225,12 @@ class Visual_Portfolio_Block_Item_Image {
 			$image .= visual_portfolio_get_item_format_badge( $context['vp/itemFormat'] ?? '', $attributes['formatBadgePosition'] ?? '' );
 		}
 
-		return sprintf( '<figure %1$s>%2$s</figure>', get_block_wrapper_attributes(), $image );
+		// The width goes on the figure, the way core's Featured Image sets it,
+		// so the overlay, the badge and the wrappers of the picture are as wide
+		// as the picture rather than the column.
+		$width = empty( $attributes['width'] ) ? '' : safecss_filter_attr( 'width:' . $attributes['width'] );
+
+		return sprintf( '<figure %1$s>%2$s</figure>', get_block_wrapper_attributes( '' === $width ? array() : array( 'style' => $width ) ), $image );
 	}
 }
 new Visual_Portfolio_Block_Item_Image();

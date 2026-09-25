@@ -167,8 +167,8 @@ its own, in this order:
 |---|---|
 | Content Source | The source, and the way back to the chooser |
 | Settings | What the source cannot run without. These cannot be hidden |
-| Filters | What narrows the query. Starts empty, opened one option at a time |
 | Display | Items per page, offset, and a ceiling on the pages shown |
+| Filters | What narrows the query. Starts empty, opened one option at a time |
 | Lightbox | The title and description sources of the lightbox captions |
 
 A posts loop narrows by a keyword its text contains and by two exclusions that

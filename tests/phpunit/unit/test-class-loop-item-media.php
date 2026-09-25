@@ -152,6 +152,27 @@ class ClassLoopItemMedia extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A width is the figure's, so the overlay, the badge and the wrappers of
+	 * the picture are as wide as the picture. Without one the figure has no
+	 * width of its own.
+	 *
+	 * @return void
+	 */
+	public function test_a_width_sizes_the_figure_rather_than_the_image() {
+		$images = array(
+			array(
+				'id'    => self::$attachment_id,
+				'title' => 'One',
+			),
+		);
+
+		$narrow = $this->render_loop( $images, '<!-- wp:visual-portfolio/item-image {"width":"200px","dimRatio":50,"customOverlayColor":"#000000"} /-->' );
+
+		$this->assertMatchesRegularExpression( '#<figure [^>]*style="width:200px"[^>]*><img (?![^>]*width:200px)[^>]*><span [^>]*class="[^"]*wp-block-visual-portfolio-item-image__overlay#', $narrow );
+		$this->assertDoesNotMatchRegularExpression( '#<figure [^>]*style=#', $this->render_loop( $images, '<!-- wp:visual-portfolio/item-image {"dimRatio":50,"customOverlayColor":"#000000"} /-->' ) );
+	}
+
+	/**
 	 * A cover whose only picture came from a filter still loads its lazy
 	 * loading scripts.
 	 *

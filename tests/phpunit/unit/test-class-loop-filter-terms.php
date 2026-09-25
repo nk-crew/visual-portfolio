@@ -243,6 +243,31 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * On a translated page a saved item points at the term of the original
+	 * language, and keeps its label and place against the term WPML maps it
+	 * to. The filter stands in for WPML, mapping "Empty" to "Alpha".
+	 *
+	 * @return void
+	 */
+	public function test_a_saved_item_follows_its_term_into_the_page_language() {
+		$translate = static function ( $id, $type ) {
+			return 'category' === $type && self::$categories['empty'] === (int) $id ? self::$categories['alpha'] : $id;
+		};
+
+		add_filter( 'wpml_object_id', $translate, 10, 2 );
+
+		$items = $this->render_filter(
+			array( 'source' => 'post' ),
+			$this->saved_item( 'beta' ) . $this->saved_item( 'empty', array( 'text' => 'Translated alpha' ) )
+		);
+
+		remove_filter( 'wpml_object_id', $translate, 10 );
+
+		$this->assertSame( array( 'All', 'Beta (2)', 'Translated alpha (2)', 'Gamma (1)' ), $items );
+		$this->assertMatchesRegularExpression( '/<a [^>]*href="[^"]*category%3Aalpha[^"]*"[^>]*>\s*Translated alpha/', $this->last_html );
+	}
+
+	/**
 	 * Saved items keep their place and label, and one whose term has nothing
 	 * in the gallery is left out.
 	 *
