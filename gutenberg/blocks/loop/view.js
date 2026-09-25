@@ -70,6 +70,8 @@ const observedWidths = new WeakMap();
 const pendingRequests = new WeakMap();
 const loopUndos = new WeakMap();
 const loopUndoAddresses = new WeakMap();
+// Per infinite trigger, what makes its observer report where the trigger is now.
+const infiniteRearms = new WeakMap();
 
 // Loops whose region the router is replacing right now, each against the token
 // of the navigation doing it. Two clicks in a row are two navigations, and only
@@ -1185,6 +1187,11 @@ store('visual-portfolio/loop', {
 			event.preventDefault();
 
 			yield loadNextPage(ref, getLoopContext(), true);
+
+			// A click on an infinite trigger lets it scroll on, and the page it
+			// loaded may leave the trigger in view, which the observer does not
+			// report as a change.
+			infiniteRearms.get(ref)?.();
 		}),
 	},
 	callbacks: {
@@ -1299,7 +1306,23 @@ store('visual-portfolio/loop', {
 
 			ref.addEventListener('click', resume);
 
-			const observer = new window.IntersectionObserver(
+			let observer;
+
+			// Intersection is reported on change, and neither appending items
+			// nor refusing to fetch them moves a trigger that was already in
+			// view. Observing it again reports where it is now - without it a
+			// page turned down because the router was mid-swap would be the
+			// last one the loop ever loaded.
+			const rearm = () => {
+				if (ref.isConnected) {
+					observer.unobserve(ref);
+					observer.observe(ref);
+				}
+			};
+
+			infiniteRearms.set(ref, rearm);
+
+			observer = new window.IntersectionObserver(
 				(entries) => {
 					if (paused) {
 						return;
@@ -1322,16 +1345,7 @@ store('visual-portfolio/loop', {
 							}
 						}
 
-						// Intersection is reported on change, and neither
-						// appending items nor refusing to fetch them moves a
-						// trigger that was already in view. Observing it again
-						// reports where it is now - without it a page turned
-						// down because the router was mid-swap would be the
-						// last one the loop ever loaded.
-						if (ref.isConnected) {
-							observer.unobserve(ref);
-							observer.observe(ref);
-						}
+						rearm();
 					});
 				},
 				{ rootMargin: `${number('vpInfiniteThreshold', 300)}px` }
@@ -1341,6 +1355,7 @@ store('visual-portfolio/loop', {
 
 			return () => {
 				ref.removeEventListener('click', resume);
+				infiniteRearms.delete(ref);
 				observer.disconnect();
 			};
 		},

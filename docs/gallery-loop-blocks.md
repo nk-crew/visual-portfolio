@@ -6,7 +6,8 @@ a query, a `visual-portfolio/item-template` inside it lays the items out, and
 `loop-search`, `loop-pagination` and the `loop-carousel-*` blocks are the
 controls around them.
 
-Every block of the family is marked **(Experimental)** and registered only on
+Every block of the family, apart from the children of the filter and the
+pagination, is marked **(Experimental)**. Every one is registered only on
 **WordPress 7.1 and newer**. The legacy `visual-portfolio/block`,
 `visual-portfolio/saved`, the shortcodes and Saved Layouts are a separate world
 and are not affected by anything on this page.
@@ -19,6 +20,7 @@ and are not affected by anything on this page.
 - [Block Bindings](#block-bindings)
 - [Interactivity stores](#interactivity-stores)
 - [URL parameters and caching](#url-parameters-and-caching)
+- [Images](#images)
 - [Legacy hooks with no equivalent](#legacy-hooks-with-no-equivalent)
 
 ## For users
@@ -48,6 +50,12 @@ the inline cropper the block editor still ships for plugins, with the zoom, the
 aspect ratio and the rotation in the toolbar. Replace offers the media library
 and an upload. A posts loop shows neither: its image is the featured image of
 the post, and belongs to it.
+
+**Format badge.** The Item Image and Item Cover blocks can mark an item that is
+not a still picture. *Format badge* puts the video, audio or gallery icon of the
+classic gallery in a corner of the picture, and *Badge position* picks the
+corner. It is off by default, and a standard item gets no badge. The badge
+carries the name of the format for screen readers.
 
 **Layouts.** The item template offers grid, masonry, tiles, justified and
 carousel — a block variation each, the way the Group block offers Group, Row,
@@ -130,6 +138,28 @@ that says so when the query finds nothing. The wizard's Load More and infinite
 scroll add an **End of List** block, which is shown once the last page is on
 screen.
 
+**Transforms.** A core Gallery block and a core Latest Posts block turn into a
+loop from the block switcher. A gallery becomes an images loop that shows every
+image. It gets masonry when it keeps the proportions of its images and a grid
+otherwise, with the column count of the gallery. A link to the attachment page
+opens the item, and a link to the file opens the lightbox. The caption of the
+gallery follows the loop as a centred paragraph. The transform is offered only
+when every image has an attachment. Latest Posts becomes a posts loop with its
+count, order, categories and columns, and with item blocks in the order core
+prints them. It is not offered when Latest Posts filters by author, since the
+loop has no author filter.
+
+**Translations.** `wpml-config.xml` tells WPML which text the blocks store. The
+list covers the title, description, alt text, author and categories of each
+image of an images loop, the text of a filter item, the sort labels, the search
+placeholder and label, the pagination labels, the Read More text, the prefixes
+of the meta and author blocks, the suffix of the meta block, the separator of
+the categories block and the date format. The editor shows the block titles,
+descriptions, keywords and style names the server translated. Pattern titles
+stay in English, because `make-pot` reads pattern headers only from a
+`patterns/` folder at the plugin root. The pattern category takes the name of
+the plugin, which the white label of Pro may change.
+
 **Inspector.** The loop sorts its settings the way the core Query block sorts
 its own, in this order:
 
@@ -137,8 +167,9 @@ its own, in this order:
 |---|---|
 | Content Source | The source, and the way back to the chooser |
 | Settings | What the source cannot run without. These cannot be hidden |
-| Display | Items per page, offset, and a ceiling on the pages shown |
 | Filters | What narrows the query. Starts empty, opened one option at a time |
+| Display | Items per page, offset, and a ceiling on the pages shown |
+| Lightbox | The title and description sources of the lightbox captions |
 
 A posts loop narrows by a keyword its text contains and by two exclusions that
 do not overlap. Visual Portfolio Pro adds an Authors filter to the same panel,
@@ -152,12 +183,14 @@ be the same switch. The loop leaves that list out when *Exclude the current
 post* is off, which is why it never hides the post on its own. The legacy
 gallery has no such switch and keeps the behaviour it always had.
 
-The item template follows the same shape: Settings holds the layout type and the
-columns, and neither can be hidden; each layout adds a panel of its own.
+The item template follows the same shape. Its layout is a block variation,
+switched in the row of icons above the settings. Settings holds the columns, and
+the pattern when the layout is tiles, and neither can be hidden. Justified and
+carousel add a panel of their own.
 
-The layout, where the slides come to rest and the container width are switched
-in the block toolbar as well as in the sidebar, beside the editor's own view
-switchers. The typed width of a custom container stays in the sidebar.
+Where the slides come to rest and the container width are switched in the block
+toolbar alone, beside the editor's own view switchers. The typed width of a
+custom container is asked for in the same toolbar menu.
 
 **Carousel controls.** Everything a carousel is steered with is a block:
 *Carousel Previous Slide*, *Carousel Next Slide*, *Carousel Indicator* — drawn
@@ -294,12 +327,13 @@ visual-portfolio/loop                      query, block id, layout wrapper
     └── visual-portfolio/loop-pagination-end
 ```
 
-The five carousel controls declare the **loop** as their ancestor rather than
-the row, so the row is only the usual place to keep them: an arrow can sit in a
-heading beside the gallery, an indicator under it, thumbnails below both, and a
-gallery is free to draw two of either. They find their carousel through the loop
-they were dropped in — one item template to a loop — however deeply they were
-nested on the way.
+The five carousel controls name the loop, the item template and the navigation
+row as their `parent`. The row is only the usual place to keep them. An arrow
+can sit beside the gallery, an indicator under it and thumbnails below both, and
+a gallery may draw two of either. A `parent` admits direct children only, so a
+control never ends up in a Group inside the item template, where it would be
+rendered once per item. A control finds its carousel through the loop it sits
+in, and a loop holds one item template.
 
 The thumbnails are the exception to "no item block queries anything": the strip
 is a sibling of the item template and has no items to read, so it resolves the
@@ -353,7 +387,7 @@ from block context; none of them queries anything.
 | `vp/blockId` | string | Id of the loop, also its router region |
 | `vp/queryId` | number | Id the URL parameters are named after |
 | `vp/queryType` | string | Selected source (`posts`, `images`, or a registered one) |
-| `vp/baseQuery` | object | `perPage`, `maxPages` |
+| `vp/baseQuery` | object | `perPage`, `maxPages`, and `maxPagesLimit`, the ceiling on the pages shown |
 | `vp/postsQuery` / `vp/imagesQuery` | object | Settings of the built-in sources |
 | `vp/sourceQuery` | object | Settings of any other source |
 | `vp/lightbox` | object | Caption sources of the lightbox, `titleSource` and `descriptionSource` |
@@ -364,6 +398,15 @@ from block context; none of them queries anything.
 |---|---|---|
 | `vp/layoutType` | string | `grid`, `masonry`, `tiles`, `justified`, `carousel` |
 | `vp/layoutColumns` | number | Columns on the widest viewport |
+
+### From the filter and the pagination
+
+| Key | Type | Meaning |
+|---|---|---|
+| `vp/showCount` | boolean | The filter items print the count of their term |
+| `vp/displayAsDropdown` | boolean | The filter items render as options of a select |
+| `vp/showLabel` | boolean | Previous and Next print their label |
+| `vp/showArrow` | boolean | Previous and Next print their arrow |
 
 ### Per item
 
@@ -403,7 +446,7 @@ it reads — no hook involved:
 |---|---|---|
 | `vpf_before_loop_items` | action `( $options )` | Per-render setup |
 | `vpf_after_loop_items` | action `( $options )` | Per-render teardown |
-| `vpf_loop_items` | filter `( $result, $options )` | Post-process `{ items, max_pages, options }` |
+| `vpf_loop_items` | filter `( $result, $options )` | Post-process `{ items, max_pages, start_page, options }` |
 | `vpf_loop_item_context` | filter `( $context, $item, $options )` | Add context keys to one item |
 | `vpf_loop_custom_output` | filter `( false\|string, $options, $block )` | Replace the whole item template output, before a single item is rendered. Content protection uses this |
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |
@@ -416,7 +459,8 @@ it reads — no hook involved:
 | `vpf_loop_popup_enqueue` | action | Fires once on a page where a loop opens the lightbox: where what extends the lightbox loads its assets |
 | `vpf_loop_item_picture` | filter `( $picture, $context, $attributes, $block_name, $img_attr )` | The picture of an item image or item cover, before its overlay and link: where media beside the image goes. An item without an image comes in empty and may leave with a picture, cropped by the `img` attributes of the block |
 | `vpf_loop_item_click_attributes` | filter `( $attributes, $action, $context )` | The link an item block renders for a click action an extension added; without `href` the item links to its own address |
-| `vpf_rest_loop_items_source_configs` | filter | Allow-list of source parameters the editor preview endpoint accepts |
+| `vpf_rest_loop_items_source_configs` | filter `( $configs, $params )` | Allow-list of source parameters the editor preview endpoint accepts, keyed by content source |
+| `vpf_rest_filter_items_source_configs` | filter `( $configs, $params )` | The same allow-list for the endpoint that lists the terms of the filter block in the editor. It starts from the answer of `vpf_rest_loop_items_source_configs`, and a source missing from it gets the "All" item alone |
 
 ### The query
 
@@ -515,7 +559,12 @@ plugin adds a teaser for each Pro entry the list lacks, under the same `name`:
 a panel menu item marked "(Pro)" that shows one line and a link. An entry under
 that name replaces it. The Effect lists do the same by `value`, with a disabled
 option: `vpf.carouselEffects` for the item template and `vpf.itemCoverEffects`
-(`{ label, value }`) for the cover.
+(`{ label, value }`) for the cover. Three panels of Pro settings appear only
+without Pro, each a menu of teasers. The loop has a Protection panel for
+password, age gate and right-click protection. The item image has a Protection
+panel for the watermark. A trigger set to infinite scroll has an Infinite Scroll
+panel for loading on startup, pausing every few pages and the threshold
+distance.
 
 ### Item meta types
 
@@ -718,10 +767,11 @@ Per-image fields in the gallery manager are added through the
 fill that renders while `image.format` is that format, and a saved format the
 list lacks stays on the image. Settings of the Item Cover and Item Image blocks
 are added through the `vpf.itemCoverSettingsItems` and `vpf.itemImageSettingsItems`
-JavaScript filters, each of which is given an empty array
-and `{ attributes, setAttributes, clientId }` and returns `ToolsPanelItem`
-children — ordinary children of the block's Settings panel, registering with it
-the way the built-in ones do.
+JavaScript filters. Each is given an empty array and
+`{ attributes, setAttributes, clientId }`, and returns `{ name, Item }` entries.
+`Item` is a `ToolsPanelItem`, rendered with the same props as an ordinary child
+of the Settings panel of the block, so it registers with the panel the way the
+built-in ones do.
 
 The item template previews a screen through three JavaScript filters, each
 given `{ attributes, deviceType }`: `vpf.itemTemplateTiles` with the desktop
@@ -762,7 +812,7 @@ without any change here.
 | Store | Module | What it does |
 |---|---|---|
 | `visual-portfolio/loop` | `build/gutenberg/blocks/loop/view.js` | Navigation of the whole family: `actions.navigate`, `actions.search`, `actions.loadMore`, `callbacks.initLayout` (masonry), `callbacks.observeInfinite`, `callbacks.initPrefetch`, `state.isLoading`, `state.ariaLiveMessage`, `state.isEnhanced` |
-| `visual-portfolio/item-template` | `build/gutenberg/blocks/item-template/view.js` | Justified and carousel layouts, the carousel controls (`actions.carouselPrev`, `actions.carouselNext`, `actions.carouselGoTo`), native masonry detection |
+| `visual-portfolio/item-template` | `build/gutenberg/blocks/item-template/view.js` | Justified and carousel layouts, the carousel controls (`actions.carouselPrev`, `actions.carouselNext`, `actions.carouselGoTo`, `actions.carouselAutoplayToggle`), native masonry detection |
 | `visual-portfolio/item-cover` | `build/gutenberg/blocks/item-cover/view.js` | The `fly` effect only |
 
 Compose onto a namespace with another `store()` call, and **add** actions rather
@@ -774,9 +824,9 @@ load with a region swap, and hand the navigation back to the browser whenever
 they cannot. `state.isEnhanced` is how a server-rendered fallback control — the
 submit button of a filter or sort form — knows to take itself away.
 
-They are directives and actions and nothing else — between 0.4 and 4.4 KB each,
-with `@wordpress/interactivity` from the WordPress bundle as the only static
-dependency. Everything larger is fetched at the moment it is used and never
+They are directives and actions and nothing else. Each is between 0.7 and 8.4 KB
+after gzip, and `@wordpress/interactivity` from the WordPress bundle is the only
+static dependency. Everything larger is fetched at the moment it is used and never
 bundled: `@wordpress/interactivity-router` on the first region swap, the Blossom
 carousel from the address on the markup. A gallery that is a plain grid
 downloads neither.
@@ -797,7 +847,9 @@ items of the list, one slide per item, and a stand-in for the classic gallery
 instance per loop (`$item`, `uid`, `options`, `isPreview()`, `emitEvent()`), so
 the vendor events (`initFancybox.vpf`, `beforeInitPhotoSwipe.vpf` and the rest)
 fire on the loop element with the stand-in first, as they do for a classic
-gallery. The caption sources are the loop's `lightbox` attribute,
+gallery. The `uid` of the stand-in is the block id of the loop, so an address
+that names a gallery finds the same loop on the next visit. The caption sources
+are the loop's `lightbox` attribute,
 `titleSource` and `descriptionSource`, with the values of the classic Title and
 Description Source; defaults `item_title` and `item_excerpt`. An item the
 lightbox has nothing to show and that has an address of its own links to it.
@@ -805,7 +857,8 @@ lightbox has nothing to show and that has an address of its own links to it.
 The click actions of the item blocks are None, Open the item and Open in
 lightbox; an extension adds its own to the editor through the
 `vpf.itemClickActions` JavaScript filter (`{ label, value, icon }`) and renders
-them through `vpf_loop_item_click_attributes`. `VPPopupAPI.getLoopGallery( loop )`
+them through `vpf_loop_item_click_attributes`. Without Pro the list ends with a
+disabled "Quick View (Pro)". `VPPopupAPI.getLoopGallery( loop )`
 gives the stand-in of a loop to a script that opens the lightbox itself, so its
 events name the same gallery.
 
