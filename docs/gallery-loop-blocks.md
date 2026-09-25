@@ -143,9 +143,13 @@ screen.
 loop from the block switcher. A gallery becomes an images loop that shows every
 image. It gets masonry when it keeps the proportions of its images and a grid
 otherwise, with the column count of the gallery. A link to the attachment page
-opens the item, and a link to the file opens the lightbox. The caption of the
-gallery follows the loop as a centred paragraph. The transform is offered only
-when every image has an attachment. Latest Posts becomes a posts loop with its
+opens the item, and a link to the file opens the lightbox. A gallery where any
+image links to an address of its own gets *Open its link, else in lightbox*, so
+those links stay. The caption of the
+gallery follows the loop as a centred paragraph. An image from outside the
+Media Library is carried by its address; the width and height core stores on an
+image are the size it is shown at, so they are left behind. The transform is
+refused while an image is still uploading. Latest Posts becomes a posts loop with its
 count, order, categories, author and columns, and with item blocks in the order
 core prints them. Its sticky posts are set to *Ignore*, since Latest Posts lists
 by date alone.
@@ -432,7 +436,9 @@ from block context; none of them queries anything.
 
 ### Per item
 
-`vp/itemId`, `vp/itemPostId`, `vp/itemImgId`, `vp/itemImgUrl`, `vp/itemImgAlt`,
+`vp/itemId`, `vp/itemPostId`, `vp/itemImgId`, `vp/itemImgUrl`,
+`vp/itemImgWidth`, `vp/itemImgHeight` (the stored size of an image from outside
+the Media Library, 0 otherwise), `vp/itemImgAlt`,
 `vp/itemNoImgId`, `vp/itemFocalPoint`, `vp/itemUrl`, `vp/itemAriaLabel`,
 `vp/itemTitle`, `vp/itemContent`, `vp/itemExcerpt`, `vp/itemCategories`,
 `vp/itemFormat`, `vp/itemVideoUrl`, `vp/itemAuthor`, `vp/itemAuthorUrl`,
@@ -793,6 +799,18 @@ JavaScript filter (the registered sources, and `{ value }` with the loop's
 current one), so a post type that works with one source alone can offer only
 it. A source left out stays registered, and a loop saved with it keeps it.
 
+**Images from outside the Media Library.** The gallery manager adds one by its
+address, through Insert from URL beside Add media or in the empty gallery, and
+stores it without an `id`: `{ imgUrl, imgThumbnailUrl, width, height }`, the size
+read off the picture when it loads, plus the fields of any image. An address
+the gallery already holds is not added twice. The page renders it from the
+address through `Visual_Portfolio_Images::get_remote_image()`, in a loop and in
+a classic gallery alike, and the lightbox opens it in its one size; a size of 0
+is measured by Fancybox and PhotoSwipe. Upload to Media Library in its Image
+Settings asks the server to fetch the file (`POST /wp/v2/media` with `url`) and
+moves the entry to the new attachment, keeping everything typed into it. An
+entry whose attachment was deleted keeps its `id` and stays a No Image item.
+
 Per-image fields in the gallery manager are added through the
 `VP.LoopImageSettings` slot. The formats its Format list offers come from the
 `vpf.loopImageFormats` filter (`{ label, value }`): the fields of a format are a
@@ -886,8 +904,10 @@ are the loop's `lightbox` attribute,
 Description Source; defaults `item_title` and `item_excerpt`. An item the
 lightbox has nothing to show and that has an address of its own links to it.
 
-The click actions of the item blocks are None, Open the item and Open in
-lightbox; an extension adds its own to the editor through the
+The click actions of the item blocks are None, Open the item, Open in lightbox
+and Open its link, else in lightbox (`url-or-popup`): a post opens itself, an
+image with a link of its own follows it, and any other image opens the
+lightbox. An extension adds its own to the editor through the
 `vpf.itemClickActions` JavaScript filter (`{ label, value, icon }`) and renders
 them through `vpf_loop_item_click_attributes`. Without Pro the list ends with a
 disabled "Quick View (Pro)". `VPPopupAPI.getLoopGallery( loop )`

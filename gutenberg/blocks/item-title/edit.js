@@ -19,7 +19,7 @@ import {
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import { getClickActions } from '../../utils/click-actions';
+import { followsLink, getClickActions } from '../../utils/click-actions';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
@@ -103,7 +103,7 @@ export default function ItemTitleEdit({
 									}
 								/>
 							</ToolsPanelItem>
-							{'url' === clickAction && (
+							{followsLink(clickAction) && (
 								<>
 									<ToolsPanelItem
 										label={__(

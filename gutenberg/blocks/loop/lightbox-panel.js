@@ -6,6 +6,7 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { mayOpenLightbox } from '../../utils/click-actions';
 import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
 // The caption sources of the classic gallery's lightbox, and the defaults the
@@ -51,9 +52,8 @@ export default function LightboxPanel({ attributes, setAttributes, clientId }) {
 
 			return editor
 				.getClientIdsOfDescendants(clientId)
-				.some(
-					(id) =>
-						'popup' === editor.getBlockAttributes(id)?.clickAction
+				.some((id) =>
+					mayOpenLightbox(editor.getBlockAttributes(id)?.clickAction)
 				);
 		},
 		[clientId]

@@ -33,7 +33,7 @@ import classnames from 'classnames/dedupe';
  * Internal dependencies
  */
 import { getMissingTeasers } from '../../components/pro-teaser';
-import { getClickActions } from '../../utils/click-actions';
+import { followsLink, getClickActions } from '../../utils/click-actions';
 import { AspectRatioTool, ScaleTool } from '../../utils/dimensions-tools';
 import {
 	FORMAT_BADGE_DEFAULTS,
@@ -499,7 +499,7 @@ export default function ItemCoverEdit({
 									}
 								/>
 							</ToolsPanelItem>
-							{'url' === clickAction && (
+							{followsLink(clickAction) && (
 								<>
 									<ToolsPanelItem
 										label={__(

@@ -4,12 +4,40 @@ import { getProLabel } from '../components/pro-teaser';
 
 const { pro: isProPlugin } = window.VPGutenbergVariables;
 
+// The item's own link when it has one, the lightbox otherwise. See
+// `Visual_Portfolio_Popup::resolve_click_action()`.
+export const URL_OR_POPUP = 'url-or-popup';
+
 // What a click on an item block does, the choices the free plugin draws.
 const CLICK_ACTIONS = [
 	{ label: __('None', 'visual-portfolio'), value: 'none' },
 	{ label: __('Open the item', 'visual-portfolio'), value: 'url' },
 	{ label: __('Open in lightbox', 'visual-portfolio'), value: 'popup' },
+	{
+		label: __('Open its link, else in lightbox', 'visual-portfolio'),
+		value: URL_OR_POPUP,
+	},
 ];
+
+/**
+ * Whether a click action may follow a link, and so takes a target and a rel.
+ *
+ * @param {string} action - click action.
+ * @return {boolean} whether it may.
+ */
+export function followsLink(action) {
+	return 'url' === action || URL_OR_POPUP === action;
+}
+
+/**
+ * Whether a click action may open the lightbox.
+ *
+ * @param {string} action - click action.
+ * @return {boolean} whether it may.
+ */
+export function mayOpenLightbox(action) {
+	return 'popup' === action || URL_OR_POPUP === action;
+}
 
 // The choices Pro adds, for an install without them.
 const PRO_CLICK_ACTIONS = [

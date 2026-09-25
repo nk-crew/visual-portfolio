@@ -225,7 +225,59 @@ test.describe('Gallery Loop integrations', () => {
 		]);
 	});
 
-	test('a gallery with an image from outside the library stays', async ({
+	test('a gallery carries an image from outside the library by its address', async ({
+		admin,
+		editor,
+		page,
+	}) => {
+		const outside = 'https://example.com/outside.jpg';
+
+		await admin.createNewPost({
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'core/gallery',
+			attributes: { linkTo: 'media' },
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: { id: images[0].id, url: images[0].url },
+				},
+				{
+					name: 'core/image',
+					attributes: {
+						url: outside,
+						alt: 'Outside alt',
+						caption: 'Outside caption',
+						// The size it is shown at, not the size of the picture.
+						width: '120px',
+						height: '80px',
+					},
+				},
+			],
+		});
+
+		await transformToLoop(page, editor, 'Gallery');
+
+		const [loop] = await editor.getBlocks();
+		const [inLibrary, outsideImage] = loop.attributes.imagesQuery.images;
+
+		expect(inLibrary.id).toBe(images[0].id);
+		expect(outsideImage).toEqual({
+			imgUrl: outside,
+			imgThumbnailUrl: outside,
+			title: 'Outside caption',
+			alt: 'Outside alt',
+		});
+		expect(loop.innerBlocks[0].innerBlocks[0].attributes.clickAction).toBe(
+			'popup'
+		);
+	});
+
+	test('a gallery whose images link elsewhere keeps the links beside the lightbox', async ({
 		admin,
 		editor,
 		page,
@@ -238,31 +290,40 @@ test.describe('Gallery Loop integrations', () => {
 
 		await editor.insertBlock({
 			name: 'core/gallery',
+			attributes: { linkTo: 'none' },
 			innerBlocks: [
 				{
 					name: 'core/image',
-					attributes: { id: images[0].id, url: images[0].url },
+					attributes: {
+						id: images[0].id,
+						url: images[0].url,
+						linkDestination: 'custom',
+						href: 'https://example.com/elsewhere/',
+					},
 				},
 				{
 					name: 'core/image',
-					attributes: { url: 'https://example.com/outside.jpg' },
+					attributes: { id: images[1].id, url: images[1].url },
 				},
 			],
 		});
 
-		// A transform that isMatch refuses gives nothing back.
-		expect(
-			await page.evaluate(() => {
-				const [gallery] = window.wp.data
-					.select('core/block-editor')
-					.getBlocks();
+		await transformToLoop(page, editor, 'Gallery');
 
-				return window.wp.blocks.switchToBlockType(
-					gallery,
-					'visual-portfolio/loop'
-				);
-			})
-		).toBe(null);
+		const [loop] = await editor.getBlocks();
+
+		expect(
+			loop.attributes.imagesQuery.images.map(({ id, url }) => ({
+				id,
+				url,
+			}))
+		).toEqual([
+			{ id: images[0].id, url: 'https://example.com/elsewhere/' },
+			{ id: images[1].id, url: undefined },
+		]);
+		expect(loop.innerBlocks[0].innerBlocks[0].attributes.clickAction).toBe(
+			'url-or-popup'
+		);
 	});
 
 	test('core latest posts become a loop of posts', async ({

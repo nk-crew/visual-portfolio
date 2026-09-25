@@ -31,7 +31,7 @@ import { crop, fullscreen, link, linkOff } from '@wordpress/icons';
  */
 import { getMissingTeasers, ProTeaserPanel } from '../../components/pro-teaser';
 import { ALLOWED_MEDIA_TYPES } from '../../loop-sources/gallery-manager/prepare-images';
-import { getClickActions } from '../../utils/click-actions';
+import { followsLink, getClickActions } from '../../utils/click-actions';
 import { DimensionsTool } from '../../utils/dimensions-tools';
 import {
 	FORMAT_BADGE_DEFAULTS,
@@ -430,7 +430,7 @@ export default function ItemImageEdit({
 									}
 								/>
 							</ToolsPanelItem>
-							{'url' === clickAction && (
+							{followsLink(clickAction) && (
 								<>
 									<ToolsPanelItem
 										label={__(

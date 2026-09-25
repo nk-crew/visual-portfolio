@@ -1,3 +1,5 @@
+import apiFetch from '@wordpress/api-fetch';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	Button,
 	FormTokenField,
@@ -7,11 +9,12 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 import FocalPointControl from '../../components/focal-point-control';
 import CollapsibleSection from '../../components/gallery-control/collapsible-section';
@@ -21,7 +24,8 @@ import LoopImageSettingsSlot, {
 } from '../../components/loop-image-settings-slot';
 import MediaPreviewCard from '../../components/media-preview-card';
 import { ToggleGroupButtonsControl } from '../../components/toggle-group-control';
-import { prepareImage } from './prepare-images';
+import { getImageKey, prepareImage } from './prepare-images';
+import PreviewMedia from './preview-media';
 
 const { admin_url: adminUrl } = window.VPGutenbergVariables;
 
@@ -142,6 +146,92 @@ function AdditionalMediaInfo({ imageId }) {
 }
 
 /**
+ * Moves an image inserted from a URL into the Media Library.
+ *
+ * What only an attachment has, the sizes and srcset, the crop and the settings
+ * Pro reads off the attachment, comes with it. The server fetches the file, the
+ * way the core Image block's Upload to Media Library does, so the host of the
+ * image does not have to allow the editor to read it.
+ *
+ * @param {Object}   props          - component props.
+ * @param {Object}   props.image    - image being edited.
+ * @param {Function} props.onChange - merges the given values into the image.
+ * @return {Element|null} component.
+ */
+function UploadToLibrary({ image, onChange }) {
+	const [isUploading, setIsUploading] = useState(false);
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch(noticesStore);
+
+	// The editor hands the block editor its upload handler only for a user
+	// who may upload.
+	const canUpload = useSelect(
+		(select) => !!select(blockEditorStore).getSettings().mediaUpload,
+		[]
+	);
+
+	if (!canUpload) {
+		return null;
+	}
+
+	const upload = () => {
+		setIsUploading(true);
+
+		apiFetch({
+			path: '/wp/v2/media',
+			method: 'POST',
+			data: { url: image.imgUrl },
+		})
+			.then((attachment) => {
+				const { id, imgUrl, imgThumbnailUrl } = prepareImage({
+					...attachment,
+					url: attachment.source_url,
+				});
+
+				// Everything typed into the image stays; the size is the
+				// attachment's to answer now.
+				onChange({
+					id,
+					imgUrl,
+					imgThumbnailUrl,
+					width: undefined,
+					height: undefined,
+				});
+				createSuccessNotice(
+					__(
+						'Image uploaded to the Media Library.',
+						'visual-portfolio'
+					),
+					{ type: 'snackbar' }
+				);
+			})
+			.catch((error) => {
+				createErrorNotice(
+					error?.message ||
+						__(
+							'The image could not be uploaded.',
+							'visual-portfolio'
+						),
+					{ type: 'snackbar' }
+				);
+			})
+			.finally(() => setIsUploading(false));
+	};
+
+	return (
+		<Button
+			variant="secondary"
+			isBusy={isUploading}
+			disabled={isUploading}
+			accessibleWhenDisabled
+			onClick={upload}
+		>
+			{__('Upload to Media Library', 'visual-portfolio')}
+		</Button>
+	);
+}
+
+/**
  * Everything that can be set on a single image.
  *
  * @param {Object}   props                     - component props.
@@ -249,18 +339,24 @@ export default function ImageSettingsModal({
 							{previewUrl ? (
 								<MediaPreviewCard
 									onSelect={(media) =>
-										onChange(prepareImage(media))
+										// The size of an image from elsewhere
+										// does not describe the new one.
+										onChange({
+											width: undefined,
+											height: undefined,
+											...prepareImage(media),
+										})
 									}
 									allowedTypes={allowedTypes}
 									onRemove={onRemove}
 								>
-									<img src={previewUrl} alt="" />
+									<PreviewMedia url={previewUrl} />
 								</MediaPreviewCard>
 							) : null}
 
 							{/* Remounted per image, so it opens only for an off-centre point. */}
 							<FocalPointControl
-								key={image.id}
+								key={getImageKey(image)}
 								value={image.focalPoint}
 								onChange={(focalPoint) =>
 									onChange({ focalPoint })
@@ -269,7 +365,12 @@ export default function ImageSettingsModal({
 
 							{image.id ? (
 								<AdditionalMediaInfo imageId={image.id} />
-							) : null}
+							) : (
+								<UploadToLibrary
+									image={image}
+									onChange={onChange}
+								/>
+							)}
 						</>
 					)}
 				</div>

@@ -119,11 +119,16 @@ class Visual_Portfolio_Sitemap {
 		}
 
 		foreach ( $images as $image ) {
-			if ( ! is_array( $image ) || ! isset( $image['id'] ) ) {
+			if ( ! is_array( $image ) ) {
 				continue;
 			}
 
-			$image_id = $image['id'];
+			$image_id = (int) ( $image['id'] ?? 0 );
+
+			// An image inserted from a URL is listed by its address alone.
+			if ( ! $image_id && empty( $image['imgUrl'] ) ) {
+				continue;
+			}
 
 			$image_alt = '';
 
@@ -131,11 +136,11 @@ class Visual_Portfolio_Sitemap {
 				$image_alt = trim( (string) $image['alt'] );
 			} elseif ( isset( $image['description'] ) && '' !== trim( (string) $image['description'] ) ) {
 				$image_alt = trim( (string) $image['description'] );
-			} else {
+			} elseif ( $image_id ) {
 				$image_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true ) ?? '';
 			}
 
-			$image_title = $image['title'] ?? get_the_title( $image_id );
+			$image_title = $image['title'] ?? ( $image_id ? get_the_title( $image_id ) : '' );
 
 			$image_url = $image['imgUrl'] ?? wp_get_attachment_image_url( $image_id, 'full' );
 

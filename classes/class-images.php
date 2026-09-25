@@ -550,6 +550,53 @@ class Visual_Portfolio_Images {
 	}
 
 	/**
+	 * Image outside the Media Library, such as one inserted from a URL.
+	 *
+	 * Built the way `get_attachment_image()` builds an attachment's, lazy loading
+	 * included, from nothing but the address and the size stored with it.
+	 *
+	 * @param string       $url    image URL.
+	 * @param string|array $attr   image attributes.
+	 * @param int          $width  natural width, 0 when unknown.
+	 * @param int          $height natural height, 0 when unknown.
+	 *
+	 * @return string
+	 */
+	public static function get_remote_image( $url, $attr = '', $width = 0, $height = 0 ) {
+		$url = esc_url( $url );
+
+		if ( ! $url ) {
+			return '';
+		}
+
+		$attributes = array(
+			'src' => $url,
+			'alt' => '',
+		);
+
+		if ( (int) $width > 0 && (int) $height > 0 ) {
+			$attributes['width']  = (int) $width;
+			$attributes['height'] = (int) $height;
+		}
+
+		if ( is_array( $attr ) ) {
+			$attributes = array_merge( $attributes, $attr );
+		}
+
+		self::$image_processing = true;
+
+		$image = '<img ' . self::build_attributes_string( $attributes ) . ' />';
+
+		if ( self::$allow_vp_lazyload ) {
+			$image = self::add_image_placeholders( $image );
+		}
+
+		self::$image_processing = false;
+
+		return $image;
+	}
+
+	/**
 	 * Generation placeholder.
 	 *
 	 * @param int $width  Width of image.

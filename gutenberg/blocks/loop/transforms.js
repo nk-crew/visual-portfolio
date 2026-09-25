@@ -1,4 +1,7 @@
+import { isBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
+
+import { URL_OR_POPUP } from '../../utils/click-actions';
 
 const PER_PAGE_ALL = -1;
 
@@ -36,9 +39,18 @@ function getAlign(align) {
  * Click action of the item image for a gallery's link setting.
  *
  * @param {string} linkTo - link setting of the gallery.
+ * @param {Array}  images - attributes of the gallery's images.
  * @return {string} click action.
  */
-function getGalleryClickAction(linkTo) {
+function getGalleryClickAction(linkTo, images) {
+	// An image may link somewhere of its own whatever the gallery says, and
+	// only this action keeps those links beside a lightbox for the rest.
+	if (
+		images.some((image) => 'custom' === image.linkDestination && image.href)
+	) {
+		return URL_OR_POPUP;
+	}
+
 	if (!linkTo || 'none' === linkTo) {
 		return 'none';
 	}
@@ -54,11 +66,14 @@ export default {
 		{
 			type: 'block',
 			blocks: ['core/gallery'],
-			// A gallery image without an attachment has nothing a loop can
-			// render, and leaving it out would lose it.
+			// An image from outside the library is kept by its address; one
+			// still uploading has nothing yet a loop could keep.
 			isMatch: (attributes, block) =>
 				!!block?.innerBlocks?.length &&
-				block.innerBlocks.every((image) => image.attributes.id),
+				block.innerBlocks.every(
+					({ attributes: image }) =>
+						image.url && (image.id || !isBlobURL(image.url))
+				),
 			transform(attributes, innerBlocks) {
 				const {
 					columns,
@@ -81,25 +96,25 @@ export default {
 					false === imageCrop &&
 					(!aspectRatio || 'auto' === aspectRatio);
 
-				const images = innerBlocks
-					.filter((image) => image.attributes.id)
-					.map(({ attributes: image }) => {
-						// A caption is rich text, whose string form is its HTML.
-						const caption = String(image.caption ?? '');
+				// The `width` and `height` of an image are the size it is shown
+				// at, not the size of the picture, so they are left behind.
+				const images = innerBlocks.map(({ attributes: image }) => {
+					// A caption is rich text, whose string form is its HTML.
+					const caption = String(image.caption ?? '');
 
-						return {
-							id: image.id,
-							imgUrl: image.url,
-							imgThumbnailUrl: image.url,
-							...(caption.trim() ? { title: caption } : {}),
-							...(image.alt ? { alt: image.alt } : {}),
-							...(['custom', 'attachment'].includes(
-								image.linkDestination
-							) && image.href
-								? { url: image.href }
-								: {}),
-						};
-					});
+					return {
+						...(image.id ? { id: image.id } : {}),
+						imgUrl: image.url,
+						imgThumbnailUrl: image.url,
+						...(caption.trim() ? { title: caption } : {}),
+						...(image.alt ? { alt: image.alt } : {}),
+						...(['custom', 'attachment'].includes(
+							image.linkDestination
+						) && image.href
+							? { url: image.href }
+							: {}),
+					};
+				});
 
 				const items = [
 					[
@@ -116,7 +131,12 @@ export default {
 									}),
 							// A link to the attachment page follows the image's
 							// address, a link to the file opens the lightbox.
-							clickAction: getGalleryClickAction(linkTo),
+							clickAction: getGalleryClickAction(
+								linkTo,
+								innerBlocks.map(
+									({ attributes: image }) => image
+								)
+							),
 						},
 					],
 				];

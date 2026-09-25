@@ -31,7 +31,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 							// Show Image.
 							visual_portfolio()->include_template(
 								'items-list/item-parts/image',
-								array( 'image' => Visual_Portfolio_Images::get_attachment_image( $image_id, $img_size ) )
+								array(
+									'image' => is_numeric( $image_id )
+										? Visual_Portfolio_Images::get_attachment_image( $image_id, $img_size )
+										: Visual_Portfolio_Images::get_remote_image( $image_id ),
+								)
 							);
 							?>
 						</div>
