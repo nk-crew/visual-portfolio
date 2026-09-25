@@ -45,7 +45,9 @@ class Visual_Portfolio_Gutenberg {
 		register_block_pattern_category(
 			'visual-portfolio',
 			array(
-				'label' => __( 'Visual Portfolio', 'visual-portfolio' ),
+				// Read on `init`, after Pro's white label renamed the plugin.
+				// The name is escaped for HTML, the label is printed as text.
+				'label' => wp_specialchars_decode( visual_portfolio()->plugin_name, ENT_QUOTES ),
 			)
 		);
 
@@ -360,6 +362,7 @@ class Visual_Portfolio_Gutenberg {
 			'build/gutenberg/index',
 			$gutenberg_script_dependencies
 		);
+		wp_set_script_translations( 'visual-portfolio-gutenberg', 'visual-portfolio', visual_portfolio()->plugin_path . 'languages' );
 
 		// Asking for the sort options fires `vpf_loop_sort_options`, and the
 		// block that reads them ships with the Gallery Loop family.
@@ -396,6 +399,7 @@ class Visual_Portfolio_Gutenberg {
 			'visual-portfolio-gutenberg-custom-post-meta',
 			'build/gutenberg/custom-post-meta'
 		);
+		wp_set_script_translations( 'visual-portfolio-gutenberg-custom-post-meta', 'visual-portfolio', visual_portfolio()->plugin_path . 'languages' );
 
 		wp_localize_script(
 			'visual-portfolio-gutenberg-custom-post-meta',

@@ -100,6 +100,13 @@ class Visual_Portfolio_Block_Loop {
 		$processor->set_attribute( 'data-wp-context', wp_json_encode( array( 'loopId' => $block_id ) ) );
 		$processor->set_attribute( 'data-wp-class--vp-is-loading', 'state.isLoading' );
 
+		// Fetching ahead costs the server a render for every link a visitor
+		// only points at, so it stays off until the site asks for it. Checked
+		// first, the options are built only for a site that listens.
+		if ( has_filter( 'vpf_loop_prefetch' ) && apply_filters( 'vpf_loop_prefetch', false, self::get_options( self::get_context_from_attributes( $block['attrs'] ) ) ) ) {
+			$processor->set_attribute( 'data-wp-init---prefetch', 'callbacks.initPrefetch' );
+		}
+
 		return $processor->get_updated_html();
 	}
 

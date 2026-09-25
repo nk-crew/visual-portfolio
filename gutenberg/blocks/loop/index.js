@@ -3,6 +3,7 @@ import registerLoopBlock from '../../utils/register-loop-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
+import transforms from './transforms';
 
 const { name } = metadata;
 
@@ -14,6 +15,7 @@ const settings = {
 	},
 	edit,
 	save,
+	transforms,
 };
 
 registerLoopBlock(name, settings);

@@ -53,6 +53,16 @@ const NAVIGATION_TIMEOUT = 10000;
 // Listened for by the item template module, which owns justified and carousel.
 const RELAYOUT_EVENT = 'vp-relayout';
 
+// Prefetching runs on a loop the server gave `callbacks.initPrefetch`. The
+// delays are the classic gallery's: a pointer that only crosses a link asks for
+// nothing, and the next page waits for the page itself to settle.
+const NAVIGATE_LINK_SELECTOR = 'a[data-wp-on--click="actions.navigate"]';
+const HOVER_DELAY = 100;
+const NEXT_PAGE_DELAY = 600;
+
+// A search is whatever the visitor typed, so its addresses never repeat.
+const SEARCH_PARAM = /^vp(-\d+-|_)search$/;
+
 const masonryLayouts = new WeakMap();
 const autoColumns = new WeakMap();
 const resizeObservers = new WeakMap();
@@ -66,6 +76,8 @@ const loopUndoAddresses = new WeakMap();
 // the newest of them owns the loading state - the first one to settle would
 // otherwise clear the flag for both.
 const navigating = new WeakMap();
+// The navigation a loop was last asked for, kept after it ends.
+const latestNavigations = new WeakMap();
 
 // Per loop: the search waiting for the visitor to stop typing, what they typed
 // last with where the caret was, and the address the last finished search
@@ -74,6 +86,15 @@ const searchTimers = new WeakMap();
 const searchesInFlight = new WeakMap();
 const typedSearches = new WeakMap();
 const searchAddresses = new WeakMap();
+
+// Loops that prefetch; per loop, the timer of its next page, and that page
+// fetched ahead of a Load More as `{ href, html }`, where `html` settles to null
+// if the fetch failed. Beside them, the fetches of link targets on their way to
+// the router or already handed to it, by address.
+const prefetchingLoops = new WeakSet();
+const nextPageTimers = new WeakMap();
+const nextPages = new WeakMap();
+const prefetchedLinks = new Map();
 
 /**
  * Context of the loop the current element belongs to.
@@ -438,9 +459,129 @@ window.addEventListener('popstate', () => {
 	window.document.querySelectorAll(LOOP_SELECTOR).forEach((loop) => {
 		if (loopUndoAddresses.get(loop) !== getPageAddress()) {
 			undoManualEdits(loop);
+			nextPages.delete(loop);
 		}
 	});
 });
+
+/**
+ * Whether an address may be fetched before the visitor asks for it.
+ *
+ * @param {string} href Address.
+ *
+ * @return {boolean} False on Save-Data and 2G, as the classic gallery, and for a search.
+ */
+function canPrefetch(href) {
+	const { connection } = window.navigator;
+
+	if (
+		connection &&
+		(connection.saveData || (connection.effectiveType || '').includes('2g'))
+	) {
+		return false;
+	}
+
+	return !Array.from(new window.URL(href).searchParams.keys()).some((name) =>
+		SEARCH_PARAM.test(name)
+	);
+}
+
+/**
+ * Fetch the HTML of a page.
+ *
+ * @param {string}      href   Address.
+ * @param {AbortSignal} signal Signal that cancels the request.
+ *
+ * @return {Promise<string>} HTML.
+ */
+async function fetchPageHtml(href, signal) {
+	const response = await window.fetch(href, { signal });
+
+	if (!response.ok) {
+		throw new Error(response.statusText);
+	}
+
+	return response.text();
+}
+
+/**
+ * Fetch the page a Load More or infinite trigger of a loop leads to, a moment
+ * from now, for `loadNextPage()` to take instead of fetching it.
+ *
+ * @param {HTMLElement} loop Loop wrapper.
+ */
+function prefetchNextPage(loop) {
+	if (!prefetchingLoops.has(loop)) {
+		return;
+	}
+
+	window.clearTimeout(nextPageTimers.get(loop));
+	nextPageTimers.set(
+		loop,
+		window.setTimeout(() => {
+			nextPageTimers.delete(loop);
+
+			const trigger = Array.from(
+				loop.querySelectorAll(TRIGGER_SELECTOR)
+			).find((element) => element.closest(LOOP_SELECTOR) === loop);
+			const href = trigger ? getControlUrl(trigger) : '';
+
+			// A page already on its way, either one.
+			if (
+				!href ||
+				href === nextPages.get(loop)?.href ||
+				pendingRequests.has(loop) ||
+				navigating.has(loop) ||
+				!canPrefetch(href)
+			) {
+				return;
+			}
+
+			nextPages.set(loop, {
+				href,
+				html: fetchPageHtml(href).catch(() => null),
+			});
+		}, NEXT_PAGE_DELAY)
+	);
+}
+
+/**
+ * Hand the router the page a navigate link leads to, so that following the
+ * link swaps the loop without waiting for the server.
+ *
+ * Fetched here rather than by the router's own prefetch, which keeps a failed
+ * fetch for the address and would turn the click into a full page load.
+ *
+ * @param {HTMLElement} link Link.
+ */
+function prefetchLink(link) {
+	const href = getControlUrl(link);
+	const loop = link.closest(LOOP_SELECTOR);
+
+	// A link clicked before its delay ran out is on its way already.
+	if (
+		!href ||
+		!loop ||
+		navigating.has(loop) ||
+		prefetchedLinks.has(href) ||
+		!canPrefetch(href)
+	) {
+		return;
+	}
+
+	prefetchedLinks.set(
+		href,
+		fetchPageHtml(href)
+			.then(async (html) => {
+				const router = await import('@wordpress/interactivity-router');
+
+				await router.actions.prefetch(href, { html });
+			})
+			.catch(() => {
+				prefetchedLinks.delete(href);
+			})
+	);
+}
 
 /**
  * Move the items of a fetched list into the rendered one.
@@ -559,16 +700,35 @@ async function loadNextPage(trigger, context, byClick) {
 	pendingRequests.set(loop, controller);
 	context.isLoading = true;
 
-	try {
-		const response = await window.fetch(href, {
-			signal: controller.signal,
-		});
+	// Taken whether or not it is the page asked for: the trigger has moved on
+	// from any other.
+	const ahead = nextPages.get(loop);
 
-		if (!response.ok) {
-			throw new Error(response.statusText);
+	nextPages.delete(loop);
+
+	try {
+		// A page fetched ahead that hangs is not waited for past the deadline
+		// a navigation has; the page is asked for again.
+		let html =
+			ahead && ahead.href === href
+				? await Promise.race([
+						ahead.html,
+						new Promise((resolve) => {
+							window.setTimeout(
+								() => resolve(null),
+								NAVIGATION_TIMEOUT
+							);
+						}),
+					])
+				: null;
+
+		// A navigation that started while the page fetched ahead was awaited.
+		controller.signal.throwIfAborted();
+
+		if (null === html) {
+			html = await fetchPageHtml(href, controller.signal);
 		}
 
-		const html = await response.text();
 		const parsed = new window.DOMParser().parseFromString(
 			html,
 			'text/html'
@@ -609,6 +769,8 @@ async function loadNextPage(trigger, context, byClick) {
 		if (hadFocus && !trigger.isConnected && added.length) {
 			focusIn(added[0]);
 		}
+
+		prefetchNextPage(loop);
 
 		return APPENDED;
 	} catch (error) {
@@ -664,6 +826,7 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 		// rollback that already ran.
 		pendingRequests.get(loop)?.abort();
 		pendingRequests.delete(loop);
+		nextPages.delete(loop);
 
 		undoManualEdits(loop);
 	}
@@ -677,6 +840,7 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 
 	if (loop) {
 		navigating.set(loop, token);
+		latestNavigations.set(loop, token);
 	}
 
 	// Ends the loading state, and says whether this navigation was
@@ -699,12 +863,36 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 	try {
 		const router = yield import('@wordpress/interactivity-router');
 
-		yield Promise.race([
-			router.actions.navigate(href, { replace }),
+		let asked = false;
+
+		const timedOut = yield Promise.race([
+			// A prefetch of this address still on its way is the request the
+			// router would make again. Once it failed, the router makes its own.
+			// The router takes the last navigation it is asked for, so one the
+			// visitor has since replaced asks for nothing.
+			Promise.resolve(prefetchedLinks.get(href)).then(async () => {
+				if (!loop || latestNavigations.get(loop) === token) {
+					asked = true;
+					await router.actions.navigate(href, { replace });
+				}
+
+				return false;
+			}),
 			new Promise((resolve) => {
-				window.setTimeout(resolve, NAVIGATION_TIMEOUT);
+				window.setTimeout(() => resolve(true), NAVIGATION_TIMEOUT);
 			}),
 		]);
+
+		// A page fetched ahead that has not come by the deadline is given up,
+		// and the address loads in full, as when the router's own fetch hangs.
+		if (timedOut && !asked) {
+			// A newer navigation keeps the loop.
+			if (loop && latestNavigations.get(loop) === token) {
+				latestNavigations.set(loop, {});
+			}
+
+			throw new Error('Timeout');
+		}
 	} catch {
 		// Only the navigation still wanted may fall back to a full load: an
 		// older one would take the visitor off the control they used since.
@@ -719,10 +907,19 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 		return false;
 	}
 
+	// The router keeps the page it rendered.
+	if (!prefetchedLinks.has(href)) {
+		prefetchedLinks.set(href, Promise.resolve());
+	}
+
 	const list = loop ? loop.querySelector(LIST_SELECTOR) : null;
 
 	if (list) {
 		refreshLayout(list);
+	}
+
+	if (loop) {
+		prefetchNextPage(loop);
 	}
 
 	return true;
@@ -1009,6 +1206,64 @@ store('visual-portfolio/loop', {
 			initMasonry(ref);
 
 			return () => destroyMasonry(ref);
+		},
+
+		/**
+		 * Fetch pages before the visitor asks for them: the target of a navigate
+		 * link they point at or move the focus to, and the next page of a Load
+		 * More or infinite trigger.
+		 *
+		 * Listened for on the loop, in the capture phase, since neither event
+		 * bubbles, and the router renders the links anew on every swap.
+		 *
+		 * @return {Function} Teardown.
+		 */
+		initPrefetch() {
+			const { ref: loop } = getElement();
+			let timer;
+
+			const isLink = (element) => element.matches(NAVIGATE_LINK_SELECTOR);
+			const onEnter = ({ target }) => {
+				if (isLink(target)) {
+					window.clearTimeout(timer);
+					timer = window.setTimeout(
+						() => prefetchLink(target),
+						HOVER_DELAY
+					);
+				}
+			};
+			const onLeave = ({ target }) => {
+				if (isLink(target)) {
+					window.clearTimeout(timer);
+				}
+			};
+			const onFocus = ({ target }) => {
+				if (isLink(target)) {
+					prefetchLink(target);
+				}
+			};
+			const onLoad = () => prefetchNextPage(loop);
+
+			prefetchingLoops.add(loop);
+			loop.addEventListener('pointerenter', onEnter, true);
+			loop.addEventListener('pointerleave', onLeave, true);
+			loop.addEventListener('focus', onFocus, true);
+
+			if ('complete' === window.document.readyState) {
+				onLoad();
+			} else {
+				window.addEventListener('load', onLoad, { once: true });
+			}
+
+			return () => {
+				prefetchingLoops.delete(loop);
+				window.clearTimeout(timer);
+				window.clearTimeout(nextPageTimers.get(loop));
+				loop.removeEventListener('pointerenter', onEnter, true);
+				loop.removeEventListener('pointerleave', onLeave, true);
+				loop.removeEventListener('focus', onFocus, true);
+				window.removeEventListener('load', onLoad);
+			};
 		},
 
 		/**

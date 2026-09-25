@@ -23,6 +23,57 @@
 			<key name="pagination_load_more_text_loading" />
 			<key name="pagination_load_more_text_end_list" />
 		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/loop" translate="1">
+			<key name="imagesQuery">
+				<key name="images">
+					<key name="*">
+						<key name="title" />
+						<key name="description" />
+						<key name="alt" />
+						<key name="author" />
+						<key name="categories" />
+					</key>
+				</key>
+			</key>
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/loop-filter-item" translate="1">
+			<key name="text" />
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/loop-sort" translate="1">
+			<key name="labels">
+				<key name="*" />
+			</key>
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/loop-search" translate="1">
+			<key name="placeholder" />
+			<key name="label" />
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/loop-pagination-next" translate="1">
+			<key name="label" />
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/loop-pagination-previous" translate="1">
+			<key name="label" />
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/loop-pagination-trigger" translate="1">
+			<key name="label" />
+			<key name="loadingLabel" />
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/item-read-more" translate="1">
+			<key name="text" />
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/item-meta" translate="1">
+			<key name="prefix" />
+			<key name="suffix" />
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/item-author" translate="1">
+			<key name="prefix" />
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/item-categories" translate="1">
+			<key name="separator" />
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/item-date" translate="1">
+			<key name="format" />
+		</gutenberg-block>
 	</gutenberg-blocks>
 
 	<custom-types>
