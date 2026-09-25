@@ -2312,6 +2312,103 @@ class Visual_Portfolio_Get {
 					if ( isset( $options['posts_offset'] ) && $options['posts_offset'] ) {
 						$query_opts['offset'] = $options['posts_offset'] + ( $paged - 1 ) * $count;
 					}
+
+					// Excluded terms and formats, joined to the taxonomies above
+					// by AND, the way the core Query block joins them.
+					$narrow_tax_query = array();
+
+					if ( ! empty( $options['posts_excluded_taxonomies'] ) ) {
+						$excluded = array();
+
+						foreach ( (array) $options['posts_excluded_taxonomies'] as $term_id ) {
+							$term = get_term( (int) $term_id );
+
+							if ( $term instanceof WP_Term ) {
+								$excluded[ $term->taxonomy ][] = $term->term_id;
+							}
+						}
+
+						foreach ( $excluded as $taxonomy_name => $term_ids ) {
+							$narrow_tax_query[] = array(
+								'taxonomy' => $taxonomy_name,
+								'field'    => 'term_id',
+								'terms'    => $term_ids,
+								'operator' => 'NOT IN',
+							);
+						}
+					}
+
+					if ( ! empty( $options['posts_formats'] ) ) {
+						$formats       = array_intersect( (array) $options['posts_formats'], get_post_format_slugs() );
+						$formats_query = array( 'relation' => 'OR' );
+
+						// `standard` is stored as no format at all.
+						if ( in_array( 'standard', $formats, true ) ) {
+							$formats_query[] = array(
+								'taxonomy' => 'post_format',
+								'operator' => 'NOT EXISTS',
+							);
+						}
+
+						$formats = array_diff( $formats, array( 'standard' ) );
+
+						if ( ! empty( $formats ) ) {
+							$formats_query[] = array(
+								'taxonomy' => 'post_format',
+								'field'    => 'slug',
+								'terms'    => array_values(
+									array_map(
+										function ( $format ) {
+											return 'post-format-' . $format;
+										},
+										$formats
+									)
+								),
+							);
+						}
+
+						if ( 1 < count( $formats_query ) ) {
+							$narrow_tax_query[] = $formats_query;
+						}
+					}
+
+					if ( ! empty( $narrow_tax_query ) ) {
+                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+						$query_opts['tax_query'] = array_merge(
+							array( 'relation' => 'AND' ),
+							isset( $query_opts['tax_query'] ) ? array( $query_opts['tax_query'] ) : array(),
+							$narrow_tax_query
+						);
+					}
+
+					// WordPress pins only posts, so the other post types have
+					// no sticky choice. Include, the default, is no key.
+					if ( 'post' === $options['posts_source'] && ! empty( $options['posts_sticky'] ) ) {
+						$sticky = array_map( 'absint', (array) get_option( 'sticky_posts' ) );
+
+						switch ( $options['posts_sticky'] ) {
+							case 'ignore':
+								$query_opts['ignore_sticky_posts'] = true;
+								break;
+
+							case 'exclude':
+								$query_opts['post__not_in'] = array_merge( (array) ( $query_opts['post__not_in'] ?? array() ), $sticky );
+								break;
+
+							case 'only':
+								// An empty `post__in` finds every post.
+								$query_opts['post__in']            = empty( $sticky ) ? array( 0 ) : $sticky;
+								$query_opts['ignore_sticky_posts'] = true;
+								break;
+						}
+					}
+				}
+
+				// Every posts source, as Pro applied it before the setting came
+				// here: a classic gallery may narrow a manual selection or a
+				// custom query by author. The loop offers it where core does.
+				if ( ! empty( $options['posts_authors'] ) ) {
+					$query_opts['author__in'] = array_map( 'intval', (array) $options['posts_authors'] );
 				}
 
 				// Narrow the query the way the Filters panel asks.

@@ -216,6 +216,10 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 					'posts_avoid_duplicate_posts',
 					'posts_exclude_current',
 					'posts_keyword',
+					'posts_sticky',
+					'posts_authors',
+					'posts_formats',
+					'posts_excluded_taxonomies',
 					'posts_custom_query',
 				),
 				'images' => array(

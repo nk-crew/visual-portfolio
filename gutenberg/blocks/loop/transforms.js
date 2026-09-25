@@ -172,13 +172,12 @@ export default {
 		{
 			type: 'block',
 			blocks: ['core/latest-posts'],
-			// A loop has no author filter, so it would show everyone's posts.
-			isMatch: ({ selectedAuthor }) => !selectedAuthor,
 			transform({
 				postsToShow = 5,
 				order = 'desc',
 				orderBy = 'date',
 				categories,
+				selectedAuthor,
 				layout,
 				displayFeaturedImage,
 				featuredImageSizeSlug = 'thumbnail',
@@ -247,6 +246,11 @@ export default {
 							order,
 							orderBy: LATEST_POSTS_ORDER_BY[orderBy] ?? orderBy,
 							taxonomies: terms,
+							...(selectedAuthor
+								? { authors: [selectedAuthor] }
+								: {}),
+							// Latest Posts lists by date alone.
+							sticky: 'ignore',
 						},
 					},
 					[
