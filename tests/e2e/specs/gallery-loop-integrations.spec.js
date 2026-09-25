@@ -25,11 +25,14 @@ const IMAGES_COUNT = 6;
  */
 async function transformToLoop(page, editor, from) {
 	await editor.showBlockToolbar();
+
+	// From the keyboard: on a wide block the toolbar can sit under the
+	// admin menu, which takes a pointer click.
 	await page
 		.getByRole('toolbar', { name: 'Block tools' })
 		.getByRole('button', { name: from, exact: true })
-		.click();
-	await page.getByRole('menuitem', { name: LOOP_TITLE }).click();
+		.press('Enter');
+	await page.getByRole('menuitem', { name: LOOP_TITLE }).press('Enter');
 }
 
 test.describe('Gallery Loop integrations', () => {
