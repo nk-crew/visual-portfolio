@@ -886,7 +886,8 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 		// A page fetched ahead that has not come by the deadline is given up,
 		// and the address loads in full, as when the router's own fetch hangs.
 		if (timedOut && !asked) {
-			if (loop) {
+			// A newer navigation keeps the loop.
+			if (loop && latestNavigations.get(loop) === token) {
 				latestNavigations.set(loop, {});
 			}
 
