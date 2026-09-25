@@ -1029,19 +1029,25 @@ function* searchLoop(loop, name, index, context) {
 	const href = getSearchUrl(input);
 
 	// Already there, or already on the way: an Enter right after a pause
-	// would push the same address twice.
+	// would push the same address twice. The address the visitor stands on is
+	// still asked for while another search is on the way, or that one lands
+	// over a field that no longer holds it.
 	// Without the hash, which a search address never carries.
 	const here = window.location.href.split('#')[0];
+	const inFlight = searchesInFlight.get(loop);
 
-	if (href === here || href === searchesInFlight.get(loop)) {
+	if (href === inFlight || (href === here && !inFlight)) {
 		return;
 	}
 
 	// A cleared search is an entry of its own: replacing the search with the
 	// address it started from would leave Back two copies of that address.
+	// Asking for the address the visitor stands on is the reverse: a new entry
+	// would be the second copy.
 	const replace =
-		!!input.value.trim() &&
-		(searchesInFlight.has(loop) || searchAddresses.get(loop) === here);
+		href === here ||
+		(!!input.value.trim() &&
+			(!!inFlight || searchAddresses.get(loop) === here));
 	const hadFocus = input === window.document.activeElement;
 
 	searchesInFlight.set(loop, href);

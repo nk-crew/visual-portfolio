@@ -80,6 +80,10 @@ class Visual_Portfolio_Block_Loop_Sort {
 	 * @return string
 	 */
 	public function block_render( $attributes, $content, $block ) {
+		if ( ! Visual_Portfolio_Get::loop_source_supports( $block->context['vp/queryType'] ?? '', 'sort' ) ) {
+			return '';
+		}
+
 		$loop_options = Visual_Portfolio_Gutenberg::transform_context_to_attributes( $block->context );
 		$available    = Visual_Portfolio_Get::get_loop_sort_options( $loop_options );
 		$shown        = self::get_shown_options( $attributes, $available );

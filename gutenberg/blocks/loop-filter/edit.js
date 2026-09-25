@@ -23,6 +23,7 @@ import classnames from 'classnames/dedupe';
  * Internal dependencies
  */
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
+import { loopSourceSupports } from '../../utils/loop-source-supports';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
@@ -453,6 +454,14 @@ export default function BlockEdit({
 					}
 					dropdownMenuProps={dropdownMenuProps}
 				>
+					{!loopSourceSupports(queryType, 'filter') && (
+						<p style={{ gridColumn: '1 / -1', margin: 0 }}>
+							{__(
+								'Filtering is not available for this source, so the page shows no filter.',
+								'visual-portfolio'
+							)}
+						</p>
+					)}
 					<ToolsPanelItem
 						label={__('Display as dropdown', 'visual-portfolio')}
 						isShownByDefault

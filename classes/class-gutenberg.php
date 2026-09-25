@@ -384,6 +384,7 @@ class Visual_Portfolio_Gutenberg {
 				'pro'                      => visual_portfolio()->is_pro(),
 				'loop_blocks'              => $loop_blocks,
 				'loop_sort_options'        => $loop_blocks ? self::get_loop_sort_options() : array(),
+				'loop_source_supports'     => $loop_blocks ? Visual_Portfolio_Get::get_loop_source_supports() : array(),
 				'site_rtl'                 => $loop_blocks && self::is_site_rtl(),
 				'admin_url'                => get_admin_url(),
 				'attributes'               => $attributes,
