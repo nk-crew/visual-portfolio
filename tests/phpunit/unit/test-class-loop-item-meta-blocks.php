@@ -360,6 +360,82 @@ class ClassLoopItemMetaBlocks extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The date can be the last modified one, and an item without one shows the
+	 * date it has.
+	 *
+	 * @return void
+	 */
+	public function test_the_date_can_be_the_modified_date() {
+		global $wpdb;
+
+		$post = self::factory()->post->create( array( 'post_date' => '2024-03-05 10:00:00' ) );
+
+		$wpdb->update(
+			$wpdb->posts,
+			array(
+				'post_modified'     => '2025-06-07 10:00:00',
+				'post_modified_gmt' => '2025-06-07 10:00:00',
+			),
+			array( 'ID' => $post )
+		);
+		clean_post_cache( $post );
+
+		$modified = $this->render_loop(
+			$this->posts_loop( array( $post ) ),
+			'<!-- wp:visual-portfolio/item-date {"format":"Y/m/d","displayType":"modified"} /-->'
+		);
+
+		$this->reset_loop_state();
+
+		$published = $this->render_loop(
+			$this->posts_loop( array( $post ) ),
+			'<!-- wp:visual-portfolio/item-date {"format":"Y/m/d"} /-->'
+		);
+
+		$this->reset_loop_state();
+
+		$image = $this->render_loop(
+			$this->images_loop(),
+			'<!-- wp:visual-portfolio/item-date {"format":"Y","displayType":"modified"} /-->'
+		);
+
+		$this->assertStringContainsString( '>2025/06/07</time>', $modified );
+		$this->assertStringContainsString( '>2024/03/05</time>', $published );
+		$this->assertStringContainsString( '>' . gmdate( 'Y' ) . '</time>', $image );
+	}
+
+	/**
+	 * The categories block can show one taxonomy, any the post has, linked to
+	 * the loop's filter.
+	 *
+	 * @return void
+	 */
+	public function test_the_categories_can_show_one_taxonomy() {
+		$post = self::factory()->post->create();
+
+		wp_set_post_categories( $post, array( self::factory()->category->create( array( 'name' => 'Alpha' ) ) ) );
+		wp_set_post_tags( $post, array( 'Blue' ) );
+
+		$tags = $this->render_loop(
+			$this->posts_loop( array( $post ) ),
+			'<!-- wp:visual-portfolio/item-categories {"taxonomy":"post_tag"} /-->'
+		);
+
+		$this->reset_loop_state();
+
+		$all = $this->render_loop(
+			$this->posts_loop( array( $post ) ),
+			'<!-- wp:visual-portfolio/item-categories /-->'
+		);
+
+		$this->assertStringContainsString( '>Blue</a>', $tags );
+		$this->assertStringContainsString( 'vp-1-filter=post_tag%3Ablue', $tags );
+		$this->assertStringNotContainsString( 'Alpha', $tags );
+		$this->assertStringContainsString( '>Alpha</a>', $all );
+		$this->assertStringNotContainsString( 'Blue', $all );
+	}
+
+	/**
 	 * Render the item meta blocks over one post whose item carries the given
 	 * context values.
 	 *

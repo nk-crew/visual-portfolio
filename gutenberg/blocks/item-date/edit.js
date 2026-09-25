@@ -24,10 +24,11 @@ import {
 } from '../../utils/tools-panel';
 
 export default function ItemDateEdit({
-	attributes: { format, isLink },
+	attributes: { format, displayType, isLink },
 	setAttributes,
 	context: {
 		'vp/itemPublishedTime': itemPublishedTime,
+		'vp/itemModifiedTime': itemModifiedTime,
 		'vp/itemUrl': itemUrl,
 	},
 }) {
@@ -37,8 +38,10 @@ export default function ItemDateEdit({
 	const blockEditingMode = useBlockEditingMode();
 
 	const siteFormat = getDateSettings().formats.date;
+	const isModified = 'modified' === displayType;
 	// Sources without a publish date still need something to lay out against.
-	const date = itemPublishedTime || new Date();
+	const date =
+		(isModified && itemModifiedTime) || itemPublishedTime || new Date();
 
 	const dateElement = (
 		<time dateTime={dateI18n('c', date)}>
@@ -59,6 +62,7 @@ export default function ItemDateEdit({
 							setAttributes(
 								getResetAllValues(filters, {
 									format: undefined,
+									displayType: 'date',
 									isLink: false,
 								})
 							)
@@ -77,6 +81,35 @@ export default function ItemDateEdit({
 								defaultFormat={siteFormat}
 								onChange={(nextFormat) =>
 									setAttributes({ format: nextFormat })
+								}
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							label={__(
+								'Display last modified date',
+								'visual-portfolio'
+							)}
+							hasValue={() => isModified}
+							onDeselect={() =>
+								setAttributes({ displayType: 'date' })
+							}
+						>
+							<ToggleControl
+								label={__(
+									'Display last modified date',
+									'visual-portfolio'
+								)}
+								help={__(
+									'An item never edited after it was published, and an image, shows its publish date.',
+									'visual-portfolio'
+								)}
+								checked={isModified}
+								onChange={() =>
+									setAttributes({
+										displayType: isModified
+											? 'date'
+											: 'modified',
+									})
 								}
 							/>
 						</ToolsPanelItem>

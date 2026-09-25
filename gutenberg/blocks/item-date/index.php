@@ -47,6 +47,12 @@ class Visual_Portfolio_Block_Item_Date {
 	public function block_render( $attributes, $content, $block ) {
 		$published_time = isset( $block->context['vp/itemPublishedTime'] ) ? $block->context['vp/itemPublishedTime'] : '';
 
+		// An item never edited after publishing, and an image or a social item,
+		// which have no such date, show the date they have.
+		if ( 'modified' === ( $attributes['displayType'] ?? '' ) && ! empty( $block->context['vp/itemModifiedTime'] ) ) {
+			$published_time = $block->context['vp/itemModifiedTime'];
+		}
+
 		if ( ! $published_time ) {
 			return '';
 		}

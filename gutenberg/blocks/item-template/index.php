@@ -393,6 +393,7 @@ class Visual_Portfolio_Block_Item_Template {
 			'vp/itemAuthorUrl'     => $item['author_url'] ?? '',
 			'vp/itemAuthorAvatar'  => $item['author_avatar'] ?? '',
 			'vp/itemPublishedTime' => $item['published_time'] ?? '',
+			'vp/itemModifiedTime'  => $item['modified_time'] ?? '',
 			'vp/itemCommentsCount' => $item['comments_count'] ?? '',
 			'vp/itemCommentsUrl'   => $item['comments_url'] ?? '',
 			'vp/itemViewsCount'    => $item['views_count'] ?? '',
@@ -479,6 +480,7 @@ class Visual_Portfolio_Block_Item_Template {
 			'vp/itemAuthorUrl',
 			'vp/itemAuthorAvatar',
 			'vp/itemPublishedTime',
+			'vp/itemModifiedTime',
 			'vp/itemCommentsCount',
 			'vp/itemCommentsUrl',
 			'vp/itemViewsCount',
@@ -1124,8 +1126,9 @@ class Visual_Portfolio_Block_Item_Template {
 			add_filter( 'render_block_context', $filter_block_context, 1 );
 
 			// `dynamic` off renders the inner blocks only, without calling this
-			// callback again and without a wrapper of their own.
-			$item_content = ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
+			// callback again and without a wrapper of their own. The loop's
+			// context goes along, as it does in the editor.
+			$item_content = ( new WP_Block( $block_instance, $block->context ) )->render( array( 'dynamic' => false ) );
 
 			remove_filter( 'render_block_context', $filter_block_context, 1 );
 

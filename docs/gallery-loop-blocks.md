@@ -3,8 +3,8 @@
 The block-native gallery of Visual Portfolio: a `visual-portfolio/loop` block holds
 a query, a `visual-portfolio/item-template` inside it lays the items out, and
 `item-*` blocks inside that draw one item. `loop-filter`, `loop-sort`,
-`loop-search`, `loop-pagination` and the `loop-carousel-*` blocks are the
-controls around them.
+`loop-search`, `loop-query-total`, `loop-pagination` and the `loop-carousel-*`
+blocks are the controls around them.
 
 Every block of the family, apart from the children of the filter and the
 pagination, is marked **(Experimental)**. Every one is registered only on
@@ -153,6 +153,25 @@ refused while an image is still uploading. Latest Posts becomes a posts loop wit
 count, order, categories, author and columns, and with item blocks in the order
 core prints them. Its sticky posts are set to *Ignore*, since Latest Posts lists
 by date alone.
+
+A core Query Loop becomes a posts loop too. *Inherit query from template* becomes
+the Current Query source. Otherwise the loop takes the post type, the items per
+page, the page limit, the offset, the order, the authors, sticky posts, the
+included and excluded terms, the formats, the keyword and the excluded posts. The
+terms of one taxonomy are joined by OR and the taxonomies by AND in core, while a
+loop joins all its terms one way: AND where every taxonomy names one term, OR
+otherwise. A query without a count of its own keeps the loop's default, since the
+loop cannot follow the Reading settings. The Post Template becomes the item
+template, a grid with its column count or a single column for a list. Inside it,
+Featured Image, Title, Excerpt, Date, Terms, Author, Author Name, Read More,
+Comments Count and Time to Read become the item block of the same job, with their link, size,
+ratio, heading level, excerpt length, date format and taxonomy. Pagination, Query
+Total and No Results become the loop's own, with what they hold. Any other block
+that reads the post, such as Content, Author Biography, Comments and Avatar, is
+left out, since a loop item has nothing to give it. Groups,
+paragraphs and other blocks stay where they were. The transform is not offered
+for a post type a loop cannot list, such as attachments or a type that is not
+public. Parents, the tag name and the query namespace have no counterpart.
 
 **Translations.** `wpml-config.xml` tells WPML which text the blocks store. The
 list covers the title, description, alt text, author and categories of each
@@ -316,6 +335,21 @@ since those sources have nothing to sort or filter by. The settings of the block
 say so in the editor. A Taxonomies or Social loop on a site without Pro shows
 its No Results.
 
+**Query Total.** The Gallery Query Total block says how many items the loop
+found, as *12 items*, or which of them are on screen, as *Displaying 1 – 6 of
+12*. It counts the loop's own query with the filter, the sort and the search the
+visitor chose, and is swapped with the loop. Load More stretches the range over
+the items it adds. It reads the count the query already made, so it costs no
+query of its own. A source that does not report how many items it has, which is
+the case of the social sources of Pro for now, shows no count.
+
+**Item date and categories.** The Item Date block can show the date an item was
+last modified, as the core Post Date block does. An item never edited after it
+was published, and an image, shows its publish date. The Item Categories block
+lists the terms of every taxonomy the filter uses by default, and can show a
+single taxonomy of the loop's post types instead, tags included. Each term still
+links to the loop filtered by it.
+
 **Search.** The Gallery Search block is a search field for its loop. It searches
 as the visitor types, once they pause for half a second, and at once on Enter.
 The field keeps the focus, the caret and anything typed while the results load.
@@ -339,6 +373,7 @@ visual-portfolio/loop                      query, block id, layout wrapper
 │   └── visual-portfolio/loop-filter-item
 ├── visual-portfolio/loop-sort             a GET form around a <select>, or links
 ├── visual-portfolio/loop-search           a GET form around a search input, Pro applies the term
+├── visual-portfolio/loop-query-total      the count or the range of the items found
 ├── visual-portfolio/item-template         runs the query, renders <ul><li>
 │   ├── visual-portfolio/item-image
 │   ├── visual-portfolio/item-cover        image with blocks on top of it
@@ -418,6 +453,8 @@ from block context; none of them queries anything.
 | `vp/sourceQuery` | object | Settings of any other source |
 | `vp/lightbox` | object | Caption sources of the lightbox, `titleSource` and `descriptionSource` |
 
+A block inside an item receives these as well, on the page as in the editor.
+
 ### From the item template
 
 | Key | Type | Meaning |
@@ -442,7 +479,8 @@ the Media Library, 0 otherwise), `vp/itemImgAlt`,
 `vp/itemNoImgId`, `vp/itemFocalPoint`, `vp/itemUrl`, `vp/itemAriaLabel`,
 `vp/itemTitle`, `vp/itemContent`, `vp/itemExcerpt`, `vp/itemCategories`,
 `vp/itemFormat`, `vp/itemVideoUrl`, `vp/itemAuthor`, `vp/itemAuthorUrl`,
-`vp/itemAuthorAvatar`, `vp/itemPublishedTime`, `vp/itemCommentsCount`,
+`vp/itemAuthorAvatar`, `vp/itemPublishedTime`, `vp/itemModifiedTime` (set only
+when a post was edited after it was published), `vp/itemCommentsCount`,
 `vp/itemCommentsUrl`, `vp/itemViewsCount`, `vp/itemReadingTime`,
 `vp/itemPopupData`.
 
@@ -474,7 +512,7 @@ it reads — no hook involved:
 |---|---|---|
 | `vpf_before_loop_items` | action `( $options )` | Per-render setup |
 | `vpf_after_loop_items` | action `( $options )` | Per-render teardown |
-| `vpf_loop_items` | filter `( $result, $options )` | Post-process `{ items, max_pages, start_page, options }` |
+| `vpf_loop_items` | filter `( $result, $options )` | Post-process `{ items, max_pages, found_items, per_page, start_page, options }`. `found_items` is the count over all pages, or null where the source does not say, and Query Total prints nothing then. A source that knows its count sets it here |
 | `vpf_loop_item_context` | filter `( $context, $item, $options )` | Add context keys to one item |
 | `vpf_loop_custom_output` | filter `( false\|string, $options, $block )` | Replace the whole item template output, before a single item is rendered. Content protection uses this |
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |

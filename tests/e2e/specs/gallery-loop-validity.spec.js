@@ -43,6 +43,7 @@ const ALL_BLOCKS_LOOPS = [
 			{ name: 'visual-portfolio/loop-filter' },
 			{ name: 'visual-portfolio/loop-sort' },
 			{ name: 'visual-portfolio/loop-search' },
+			{ name: 'visual-portfolio/loop-query-total' },
 			{
 				name: 'visual-portfolio/item-template',
 				attributes: { layoutType: 'grid' },
