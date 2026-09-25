@@ -283,6 +283,7 @@ test.describe('Gallery Loop integrations', () => {
 				layout: { type: 'grid', columnCount: 2 },
 				order: 'asc',
 				orderBy: 'title',
+				selectedAuthor: 1,
 				displayFeaturedImage: true,
 				displayAuthor: true,
 				displayPostDate: true,
@@ -299,7 +300,13 @@ test.describe('Gallery Loop integrations', () => {
 		expect(loop.attributes).toMatchObject({
 			queryType: 'posts',
 			baseQuery: { perPage: 4 },
-			postsQuery: { source: 'post', order: 'asc', orderBy: 'title' },
+			postsQuery: {
+				source: 'post',
+				order: 'asc',
+				orderBy: 'title',
+				authors: [1],
+				sticky: 'ignore',
+			},
 		});
 
 		const [template] = loop.innerBlocks;

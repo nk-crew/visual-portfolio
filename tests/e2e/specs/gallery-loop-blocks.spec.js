@@ -415,6 +415,73 @@ test.describe('Gallery Loop blocks', () => {
 
 		await expect(page.getByText(cases[1].note)).toBeHidden();
 	});
+
+	test('the Filters panel offers authors, formats and sticky posts', async ({
+		admin,
+		editor,
+		page,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Loop - core filters',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock(getLoopBlock(PAGED_PAGINATION));
+		await editor.selectBlocks(
+			editor.canvas.locator('[data-type="visual-portfolio/loop"]')
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const filters = page.locator('.components-tools-panel', {
+			has: page.getByRole('heading', { name: 'Filters' }),
+		});
+		// The panel menu names an item it would show as `Show {label}`.
+		const menuItem = (label) =>
+			page.getByRole('menuitemcheckbox', {
+				name: `Show ${label}`,
+				exact: true,
+			});
+
+		await filters.getByRole('button', { name: /options/i }).click();
+
+		for (const name of ['Authors', 'Formats', 'Sticky posts']) {
+			await expect(menuItem(name)).toBeVisible();
+		}
+
+		await menuItem('Sticky posts').click();
+		await page.keyboard.press('Escape');
+		await filters
+			.getByRole('combobox', { name: 'Sticky posts' })
+			.selectOption('exclude');
+
+		const [loop] = await editor.getBlocks();
+
+		expect(loop.attributes.postsQuery.sticky).toBe('exclude');
+
+		// Pages are never sticky and take no format.
+		await page
+			.locator('.components-tools-panel', {
+				has: page.getByRole('heading', { name: 'Settings' }),
+			})
+			.getByRole('combobox', { name: 'Source' })
+			.selectOption('page');
+
+		await expect(
+			filters.getByRole('combobox', { name: 'Sticky posts' })
+		).toHaveCount(0);
+
+		await filters.getByRole('button', { name: /options/i }).click();
+
+		await expect(menuItem('Authors')).toBeVisible();
+		await expect(menuItem('Formats')).toHaveCount(0);
+		await expect(menuItem('Sticky posts')).toHaveCount(0);
+
+		const [pageLoop] = await editor.getBlocks();
+
+		expect(pageLoop.attributes.postsQuery.sticky).toBe('');
+	});
 });
 
 /**

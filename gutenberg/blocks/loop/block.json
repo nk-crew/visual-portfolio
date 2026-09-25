@@ -49,6 +49,10 @@
 				"avoidDuplicates": false,
 				"excludeCurrent": false,
 				"keyword": "",
+				"sticky": "",
+				"authors": [],
+				"formats": [],
+				"excludeTaxonomies": [],
 				"customQuery": ""
 			}
 		},

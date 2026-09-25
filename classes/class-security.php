@@ -642,16 +642,20 @@ class Visual_Portfolio_Security {
 		 * A source or a module that gives the loop a setting the legacy
 		 * gallery has no control for registers it here, or `get_options()`
 		 * drops it before the query is built. The value is the type its
-		 * sanitizer takes: `ids`, `text`, `boolean` or `number`.
+		 * sanitizer takes: `ids`, `slugs`, `text`, `boolean` or `number`.
 		 *
 		 * @param array $options Option name to sanitizer type.
 		 */
 		return apply_filters(
 			'vpf_loop_only_options',
 			array(
-				'posts_keyword'         => 'text',
-				'posts_exclude_current' => 'boolean',
-				'max_pages'             => 'number',
+				'posts_keyword'             => 'text',
+				'posts_exclude_current'     => 'boolean',
+				'posts_sticky'              => 'text',
+				'posts_authors'             => 'ids',
+				'posts_formats'             => 'slugs',
+				'posts_excluded_taxonomies' => 'ids',
+				'max_pages'                 => 'number',
 			)
 		);
 	}
@@ -668,6 +672,8 @@ class Visual_Portfolio_Security {
 		switch ( $type ) {
 			case 'ids':
 				return array_values( array_filter( array_map( 'absint', (array) $value ) ) );
+			case 'slugs':
+				return array_values( array_filter( array_map( 'sanitize_key', (array) $value ) ) );
 			case 'text':
 				return is_scalar( $value ) ? sanitize_text_field( wp_unslash( (string) $value ) ) : '';
 			case 'boolean':
@@ -709,6 +715,10 @@ class Visual_Portfolio_Security {
 			'posts_custom_query'          => array( 'string', '' ),
 			'posts_exclude_current'       => array( 'boolean', false ),
 			'posts_keyword'               => array( 'string', '' ),
+			'posts_sticky'                => array( 'string', '' ),
+			'posts_authors'               => array( 'array', array() ),
+			'posts_formats'               => array( 'array', array() ),
+			'posts_excluded_taxonomies'   => array( 'array', array() ),
 			'posts_excluded_ids'          => array( 'array', array() ),
 			'posts_ids'                   => array( 'array', array() ),
 			'posts_offset'                => 'number',

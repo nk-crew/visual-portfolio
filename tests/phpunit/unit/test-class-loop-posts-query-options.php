@@ -29,12 +29,22 @@ class ClassLoopPostsQueryOptions extends WP_UnitTestCase {
 	private static $terms = array();
 
 	/**
+	 * Author of Query Blue and Query Purple.
+	 *
+	 * @var int
+	 */
+	private static $author = 0;
+
+	/**
 	 * Four posts a day apart: one in Red, one in Blue, one in both and one in
-	 * neither.
+	 * neither. Blue and Purple have their own author, Red is an image and Blue
+	 * a video, the other two are standard.
 	 *
 	 * @return void
 	 */
 	public static function wpSetUpBeforeClass() {
+		self::$author = self::factory()->user->create( array( 'role' => 'author' ) );
+
 		self::$terms = array(
 			'Red'  => self::factory()->category->create( array( 'name' => 'Red' ) ),
 			'Blue' => self::factory()->category->create( array( 'name' => 'Blue' ) ),
@@ -54,9 +64,13 @@ class ClassLoopPostsQueryOptions extends WP_UnitTestCase {
 					'post_title'    => $title,
 					'post_date'     => sprintf( '2026-01-0%d 10:00:00', $day++ ),
 					'post_category' => $categories,
+					'post_author'   => in_array( $title, array( 'Query Blue', 'Query Purple' ), true ) ? self::$author : 1,
 				)
 			);
 		}
+
+		set_post_format( self::$posts['Query Red'], 'image' );
+		set_post_format( self::$posts['Query Blue'], 'video' );
 	}
 
 	/**
@@ -192,5 +206,231 @@ class ClassLoopPostsQueryOptions extends WP_UnitTestCase {
 	 */
 	public function test_offset() {
 		$this->assertSame( array( 'Query Blue', 'Query Red' ), $this->render_titles( array( 'offset' => 2 ) ) );
+	}
+
+	/**
+	 * Authors keep only the posts they wrote.
+	 *
+	 * @return void
+	 */
+	public function test_authors() {
+		$this->assertSame( array( 'Query Purple', 'Query Blue' ), $this->render_titles( array( 'authors' => array( self::$author ) ) ) );
+	}
+
+	/**
+	 * Authors narrow the current query too.
+	 *
+	 * @return void
+	 */
+	public function test_authors_narrow_the_current_query() {
+		$this->go_to( get_category_link( self::$terms['Red'] ) );
+
+		$titles = $this->render_titles(
+			array(
+				'source'  => 'current_query',
+				'authors' => array( self::$author ),
+			)
+		);
+
+		$this->assertSame( array( 'Query Purple' ), $titles );
+	}
+
+	/**
+	 * Authors narrow a manual selection too, as the Pro setting did for a
+	 * classic gallery before the setting came to the free plugin.
+	 *
+	 * @return void
+	 */
+	public function test_authors_narrow_a_manual_selection() {
+		$titles = $this->render_titles(
+			array(
+				'source'  => 'ids',
+				'ids'     => array_values( self::$posts ),
+				'authors' => array( self::$author ),
+			)
+		);
+
+		sort( $titles );
+
+		$this->assertSame( array( 'Query Blue', 'Query Purple' ), $titles );
+	}
+
+	/**
+	 * Standard is the absence of a format, and formats join by OR.
+	 *
+	 * @return void
+	 */
+	public function test_formats() {
+		$this->assertSame( array( 'Query Plain', 'Query Purple', 'Query Red' ), $this->render_titles( array( 'formats' => array( 'standard', 'image' ) ) ) );
+	}
+
+	/**
+	 * Formats and taxonomies both have to match.
+	 *
+	 * @return void
+	 */
+	public function test_formats_and_taxonomies() {
+		$titles = $this->render_titles(
+			array(
+				'taxonomies' => array( self::$terms['Blue'] ),
+				'formats'    => array( 'standard' ),
+			)
+		);
+
+		$this->assertSame( array( 'Query Purple' ), $titles );
+	}
+
+	/**
+	 * An excluded term leaves out every post in it.
+	 *
+	 * @return void
+	 */
+	public function test_excluded_terms() {
+		$this->assertSame( array( 'Query Plain', 'Query Blue' ), $this->render_titles( array( 'excludeTaxonomies' => array( self::$terms['Red'] ) ) ) );
+	}
+
+	/**
+	 * An excluded term wins over an included one.
+	 *
+	 * @return void
+	 */
+	public function test_excluded_terms_and_taxonomies() {
+		$titles = $this->render_titles(
+			array(
+				'taxonomies'        => array( self::$terms['Blue'] ),
+				'excludeTaxonomies' => array( self::$terms['Red'] ),
+			)
+		);
+
+		$this->assertSame( array( 'Query Blue' ), $titles );
+	}
+
+	/**
+	 * Include, the default, puts a sticky post first on the first page.
+	 *
+	 * @return void
+	 */
+	public function test_sticky_include() {
+		stick_post( self::$posts['Query Red'] );
+
+		$this->assertSame( array( 'Query Red', 'Query Plain', 'Query Purple', 'Query Blue' ), $this->render_titles( array( 'sticky' => '' ) ) );
+	}
+
+	/**
+	 * Ignore keeps a sticky post where its date puts it.
+	 *
+	 * @return void
+	 */
+	public function test_sticky_ignore() {
+		stick_post( self::$posts['Query Red'] );
+
+		$this->assertSame( array( 'Query Plain', 'Query Purple', 'Query Blue', 'Query Red' ), $this->render_titles( array( 'sticky' => 'ignore' ) ) );
+	}
+
+	/**
+	 * Exclude leaves the sticky posts out.
+	 *
+	 * @return void
+	 */
+	public function test_sticky_exclude() {
+		stick_post( self::$posts['Query Red'] );
+
+		$this->assertSame( array( 'Query Plain', 'Query Purple', 'Query Blue' ), $this->render_titles( array( 'sticky' => 'exclude' ) ) );
+	}
+
+	/**
+	 * Only keeps the sticky posts alone.
+	 *
+	 * @return void
+	 */
+	public function test_sticky_only() {
+		stick_post( self::$posts['Query Red'] );
+
+		$this->assertSame( array( 'Query Red' ), $this->render_titles( array( 'sticky' => 'only' ) ) );
+	}
+
+	/**
+	 * An excluded post stays out of the sticky posts, and a list the exclusions
+	 * empty finds nothing rather than every post.
+	 *
+	 * @return void
+	 */
+	public function test_sticky_only_keeps_its_exclusions() {
+		stick_post( self::$posts['Query Red'] );
+		stick_post( self::$posts['Query Blue'] );
+
+		$this->assertSame(
+			array( 'Query Blue' ),
+			$this->render_titles(
+				array(
+					'sticky'     => 'only',
+					'excludeIds' => array( self::$posts['Query Red'] ),
+				)
+			)
+		);
+		$this->assertSame(
+			array(),
+			$this->render_titles(
+				array(
+					'sticky'     => 'only',
+					'excludeIds' => array( self::$posts['Query Red'], self::$posts['Query Blue'] ),
+				)
+			)
+		);
+	}
+
+	/**
+	 * Formats narrow only post types that have them.
+	 *
+	 * @return void
+	 */
+	public function test_formats_leave_a_set_without_them_alone() {
+		$this->assertSame(
+			array( 'Query Red' ),
+			$this->render_titles(
+				array(
+					'source'       => 'post_types_set',
+					'postTypesSet' => array( 'post', 'page' ),
+					'formats'      => array( 'image' ),
+				)
+			)
+		);
+
+		// A post type that lost its formats keeps the saved choice harmless.
+		remove_post_type_support( 'post', 'post-formats' );
+
+		$titles = $this->render_titles( array( 'formats' => array( 'image' ) ) );
+
+		add_post_type_support( 'post', 'post-formats' );
+
+		$this->assertSame( array( 'Query Plain', 'Query Purple', 'Query Blue', 'Query Red' ), $titles );
+	}
+
+	/**
+	 * Only with nothing pinned finds nothing, rather than every post.
+	 *
+	 * @return void
+	 */
+	public function test_sticky_only_without_sticky_posts() {
+		$this->assertSame( array(), $this->render_titles( array( 'sticky' => 'only' ) ) );
+	}
+
+	/**
+	 * Only posts can be sticky, so another source ignores the choice.
+	 *
+	 * @return void
+	 */
+	public function test_sticky_is_for_the_posts_source_alone() {
+		stick_post( self::$posts['Query Red'] );
+
+		$titles = $this->render_titles(
+			array(
+				'source'       => 'post_types_set',
+				'postTypesSet' => array( 'post' ),
+				'sticky'       => 'exclude',
+			)
+		);
+
+		$this->assertContains( 'Query Red', $titles );
 	}
 }

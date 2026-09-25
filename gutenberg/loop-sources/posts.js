@@ -26,15 +26,6 @@ import useEntitySearch from './use-entity-search';
 // where Pro draws them.
 const PRO_FILTERS = [
 	{
-		name: 'authors',
-		label: __('Authors', 'visual-portfolio'),
-		line: __(
-			'Only posts written by the authors you list.',
-			'visual-portfolio'
-		),
-		campaign: 'teaser_filter_authors',
-	},
-	{
 		name: 'date',
 		label: __('Date', 'visual-portfolio'),
 		line: __(
@@ -56,16 +47,28 @@ const PRO_FILTERS = [
 		shows: (attributes) =>
 			'current_query' !== attributes.postsQuery?.source,
 	},
-	{
-		name: 'sticky',
-		label: __('Sticky posts', 'visual-portfolio'),
-		line: __(
-			'Include, ignore, leave out or show only the sticky posts.',
-			'visual-portfolio'
-		),
-		campaign: 'teaser_filter_sticky',
-		shows: (attributes) => 'post' === attributes.postsQuery?.source,
-	},
+];
+
+// The choices of the core Query block, under the values it stores them as.
+const STICKY_OPTIONS = [
+	{ value: '', label: __('Include', 'visual-portfolio') },
+	{ value: 'ignore', label: __('Ignore', 'visual-portfolio') },
+	{ value: 'exclude', label: __('Exclude', 'visual-portfolio') },
+	{ value: 'only', label: __('Only', 'visual-portfolio') },
+];
+
+// The formats WordPress knows, as the core Query block lists them.
+const POST_FORMATS = [
+	{ value: 'aside', label: __('Aside', 'visual-portfolio') },
+	{ value: 'audio', label: __('Audio', 'visual-portfolio') },
+	{ value: 'chat', label: __('Chat', 'visual-portfolio') },
+	{ value: 'gallery', label: __('Gallery', 'visual-portfolio') },
+	{ value: 'image', label: __('Image', 'visual-portfolio') },
+	{ value: 'link', label: __('Link', 'visual-portfolio') },
+	{ value: 'quote', label: __('Quote', 'visual-portfolio') },
+	{ value: 'standard', label: __('Standard', 'visual-portfolio') },
+	{ value: 'status', label: __('Status', 'visual-portfolio') },
+	{ value: 'video', label: __('Video', 'visual-portfolio') },
 ];
 
 // Sources that describe how to build the query rather than which post type to
@@ -105,6 +108,10 @@ const DEFAULTS = {
 	avoidDuplicates: false,
 	excludeCurrent: false,
 	keyword: '',
+	sticky: '',
+	authors: [],
+	formats: [],
+	excludeTaxonomies: [],
 	customQuery: '',
 };
 
@@ -114,7 +121,8 @@ const DEFAULTS = {
  * Mirrors the legacy control: everything public, minus attachments, which the
  * images source covers.
  *
- * @return {Array} `{ slug, label }` pairs.
+ * @return {Array} `{ slug, label, formats }`, where `formats` says whether the
+ *                 post type supports post formats.
  */
 function usePostTypes() {
 	const postTypes = useSelect((select) => {
@@ -127,12 +135,96 @@ function usePostTypes() {
 				.filter(
 					({ viewable, slug }) => viewable && 'attachment' !== slug
 				)
-				.map(({ slug, labels, name }) => ({
+				.map(({ slug, labels, name, supports }) => ({
 					slug,
 					label: labels?.singular_name || name || slug,
+					formats: !!supports?.['post-formats'],
 				})),
 		[postTypes]
 	);
+}
+
+/**
+ * Formats the loop can filter by: the ones the theme declares, and none
+ * unless it declares one beside `standard`, which is how the core Query block
+ * decides to offer the filter at all.
+ *
+ * @param {string} source       - selected source.
+ * @param {Array}  postTypesSet - post types of a set.
+ * @param {Array}  postTypes    - from `usePostTypes()`.
+ * @return {Array} `{ value, label }` pairs, empty where the filter is not offered.
+ */
+function usePostFormats(source, postTypesSet, postTypes) {
+	const themeFormats = useSelect(
+		(select) => select(coreStore).getThemeSupports()?.formats,
+		[]
+	);
+
+	const slugs = SOURCE_POST_TYPES_SET === source ? postTypesSet : [source];
+	const supported = postTypes.some(
+		({ slug, formats }) => formats && slugs.includes(slug)
+	);
+
+	if (
+		!supported ||
+		!Array.isArray(themeFormats) ||
+		!themeFormats.some((format) => 'standard' !== format)
+	) {
+		return [];
+	}
+
+	return POST_FORMATS.filter(({ value }) => themeFormats.includes(value));
+}
+
+/**
+ * Authors of the site, as a token field needs them.
+ *
+ * The whole list is fetched rather than searched: a token field has to render a
+ * label for every id the block was saved with, and a search only knows what was
+ * typed into it.
+ *
+ * @param {Array} selected - author ids the block carries.
+ * @return {{tokens: Array, suggestions: Array, toIds: Function}} token helpers.
+ */
+function useAuthors(selected) {
+	const authors = useSelect(
+		(select) =>
+			select(coreStore).getUsers({
+				who: 'authors',
+				per_page: -1,
+				_fields: 'id,name',
+				context: 'view',
+			}),
+		[]
+	);
+
+	const list = authors || [];
+	const counts = {};
+
+	list.forEach(({ name }) => {
+		counts[name] = (counts[name] || 0) + 1;
+	});
+
+	// Two people may share a display name, and a token has to name one of them.
+	const label = ({ id, name }) =>
+		1 < counts[name] ? `${name} (#${id})` : name;
+
+	return {
+		tokens: selected.map((id) => {
+			const author = list.find((item) => item.id === parseInt(id, 10));
+
+			return author ? label(author) : String(id);
+		}),
+		suggestions: list.map(label),
+		toIds: (tokens) =>
+			tokens
+				.map((token) => {
+					const author = list.find((item) => label(item) === token);
+
+					return author ? author.id : parseInt(token, 10);
+				})
+				.filter((id) => !Number.isNaN(id)),
+	};
 }
 
 /**
@@ -154,6 +246,7 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 		ids = DEFAULTS.ids,
 		excludeIds = DEFAULTS.excludeIds,
 		taxonomies = DEFAULTS.taxonomies,
+		excludeTaxonomies = DEFAULTS.excludeTaxonomies,
 		taxonomiesRelation = DEFAULTS.taxonomiesRelation,
 		order = DEFAULTS.order,
 		orderBy = DEFAULTS.orderBy,
@@ -181,6 +274,10 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 		selected: excludeIds,
 	});
 	const termSearch = useEntitySearch({ type: 'term', selected: taxonomies });
+	const excludeTermSearch = useEntitySearch({
+		type: 'term',
+		selected: excludeTaxonomies,
+	});
 	const update = (values) =>
 		setAttributes({ postsQuery: { ...postsQuery, ...values } });
 
@@ -205,6 +302,7 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 						ids: DEFAULTS.ids,
 						excludeIds: DEFAULTS.excludeIds,
 						taxonomies: DEFAULTS.taxonomies,
+						excludeTaxonomies: DEFAULTS.excludeTaxonomies,
 						taxonomiesRelation: DEFAULTS.taxonomiesRelation,
 						order: DEFAULTS.order,
 						orderBy: DEFAULTS.orderBy,
@@ -245,7 +343,23 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 							label: __('Current Query', 'visual-portfolio'),
 						},
 					]}
-					onChange={(value) => update({ source: value })}
+					onChange={(value) =>
+						update({
+							source: value,
+							// As the core Query block does when its post type
+							// changes: only posts are sticky, and a post type
+							// without formats would match none of them.
+							...('post' !== value
+								? { sticky: DEFAULTS.sticky }
+								: {}),
+							...(postTypes.some(
+								({ slug, formats }) =>
+									slug === value && !formats
+							)
+								? { formats: DEFAULTS.formats }
+								: {}),
+						})
+					}
 				/>
 			</ToolsPanelItem>
 
@@ -379,6 +493,38 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 						/>
 					</ToolsPanelItem>
 
+					<ToolsPanelItem
+						label={__('Excluded Taxonomies', 'visual-portfolio')}
+						hasValue={() => 0 < excludeTaxonomies.length}
+						onDeselect={() =>
+							update({
+								excludeTaxonomies: DEFAULTS.excludeTaxonomies,
+							})
+						}
+						panelId={clientId}
+					>
+						<FormTokenField
+							label={__(
+								'Excluded Taxonomies',
+								'visual-portfolio'
+							)}
+							help={__(
+								'Leave out the items in any of these, whatever the taxonomies above let in.',
+								'visual-portfolio'
+							)}
+							value={excludeTermSearch.tokens}
+							suggestions={excludeTermSearch.suggestions}
+							onInputChange={excludeTermSearch.search}
+							onChange={(tokens) =>
+								update({
+									excludeTaxonomies:
+										excludeTermSearch.toIds(tokens),
+								})
+							}
+							__experimentalShowHowTo={false}
+						/>
+					</ToolsPanelItem>
+
 					{taxonomies.length > 1 ? (
 						<ToolsPanelItem
 							label={__(
@@ -487,15 +633,21 @@ function PostsFiltersPanel(props) {
 	const { postsQuery } = attributes;
 	const {
 		source = DEFAULTS.source,
+		postTypesSet = DEFAULTS.postTypesSet,
 		avoidDuplicates = DEFAULTS.avoidDuplicates,
 		excludeCurrent = DEFAULTS.excludeCurrent,
 		keyword = DEFAULTS.keyword,
+		sticky = DEFAULTS.sticky,
+		authors = DEFAULTS.authors,
+		formats = DEFAULTS.formats,
 	} = postsQuery || {};
 
 	const update = (values) =>
 		setAttributes({ postsQuery: { ...postsQuery, ...values } });
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const authorSearch = useAuthors(authors);
+	const postFormats = usePostFormats(source, postTypesSet, usePostTypes());
 
 	// A hand-written query is already narrowed, and a manual selection is a
 	// list rather than a query.
@@ -505,7 +657,7 @@ function PostsFiltersPanel(props) {
 
 	// Anything else this install can narrow a posts query by. A `ToolsPanelItem`
 	// returned here is an ordinary child of the panel below, so it registers
-	// with the panel the way the built-in ones do. Pro adds the Authors filter
+	// with the panel the way the built-in ones do. Pro adds the Date filter
 	// through this; its `resetAllFilter` is what "Reset all" writes back for it,
 	// in the same `postsQuery` the built-in filters live in.
 	const extraItems = applyFilters('vpf.loopPostsFilterItems', [], props);
@@ -521,6 +673,9 @@ function PostsFiltersPanel(props) {
 				update(
 					getResetAllValues(filters, {
 						keyword: DEFAULTS.keyword,
+						authors: DEFAULTS.authors,
+						formats: DEFAULTS.formats,
+						sticky: DEFAULTS.sticky,
 						avoidDuplicates: DEFAULTS.avoidDuplicates,
 						excludeCurrent: DEFAULTS.excludeCurrent,
 					})
@@ -530,6 +685,26 @@ function PostsFiltersPanel(props) {
 			{extraItems.map(({ name, Item }) => (
 				<Item key={name} {...props} />
 			))}
+
+			<ToolsPanelItem
+				label={__('Authors', 'visual-portfolio')}
+				hasValue={() => 0 < authors.length}
+				onDeselect={() => update({ authors: DEFAULTS.authors })}
+			>
+				<FormTokenField
+					label={__('Authors', 'visual-portfolio')}
+					help={__(
+						'Only posts written by the authors you list.',
+						'visual-portfolio'
+					)}
+					value={authorSearch.tokens}
+					suggestions={authorSearch.suggestions}
+					onChange={(tokens) =>
+						update({ authors: authorSearch.toIds(tokens) })
+					}
+					__experimentalShowHowTo={false}
+				/>
+			</ToolsPanelItem>
 
 			<ToolsPanelItem
 				label={__('Keyword', 'visual-portfolio')}
@@ -546,6 +721,57 @@ function PostsFiltersPanel(props) {
 					onChange={(value) => update({ keyword: value })}
 				/>
 			</ToolsPanelItem>
+
+			{/* The current query is the page's own, so it is narrowed by
+				    author and keyword alone, as it was before. */}
+			{SOURCE_CURRENT_QUERY !== source && postFormats.length ? (
+				<ToolsPanelItem
+					label={__('Formats', 'visual-portfolio')}
+					hasValue={() => 0 < formats.length}
+					onDeselect={() => update({ formats: DEFAULTS.formats })}
+				>
+					<FormTokenField
+						label={__('Formats', 'visual-portfolio')}
+						value={postFormats
+							.filter(({ value }) => formats.includes(value))
+							.map(({ label }) => label)}
+						suggestions={postFormats
+							.filter(({ value }) => !formats.includes(value))
+							.map(({ label }) => label)}
+						onChange={(tokens) =>
+							update({
+								formats: postFormats
+									.filter(({ label }) =>
+										tokens.includes(label)
+									)
+									.map(({ value }) => value),
+							})
+						}
+						__experimentalExpandOnFocus
+						__experimentalShowHowTo={false}
+					/>
+				</ToolsPanelItem>
+			) : null}
+
+			{/* WordPress pins only posts. */}
+			{'post' === source ? (
+				<ToolsPanelItem
+					label={__('Sticky posts', 'visual-portfolio')}
+					hasValue={() => !!sticky}
+					onDeselect={() => update({ sticky: DEFAULTS.sticky })}
+				>
+					<SelectControl
+						label={__('Sticky posts', 'visual-portfolio')}
+						help={__(
+							'Sticky posts always appear first, regardless of their publish date.',
+							'visual-portfolio'
+						)}
+						value={sticky}
+						options={STICKY_OPTIONS}
+						onChange={(value) => update({ sticky: value })}
+					/>
+				</ToolsPanelItem>
+			) : null}
 
 			{/* One item, because both answer the same question - what
 				    this gallery must not repeat - and a reader looking for

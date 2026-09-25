@@ -146,9 +146,9 @@ otherwise, with the column count of the gallery. A link to the attachment page
 opens the item, and a link to the file opens the lightbox. The caption of the
 gallery follows the loop as a centred paragraph. The transform is offered only
 when every image has an attachment. Latest Posts becomes a posts loop with its
-count, order, categories and columns, and with item blocks in the order core
-prints them. It is not offered when Latest Posts filters by author, since the
-loop has no author filter.
+count, order, categories, author and columns, and with item blocks in the order
+core prints them. Its sticky posts are set to *Ignore*, since Latest Posts lists
+by date alone.
 
 **Translations.** `wpml-config.xml` tells WPML which text the blocks store. The
 list covers the title, description, alt text, author and categories of each
@@ -172,12 +172,28 @@ its own, in this order:
 | Filters | What narrows the query. Starts empty, opened one option at a time |
 | Lightbox | The title and description sources of the lightbox captions |
 
-A posts loop narrows by a keyword its text contains and by two exclusions that
-do not overlap. Visual Portfolio Pro adds an Authors filter to the same panel,
-through the `vpf.loopPostsFilterItems` JavaScript filter. *Avoid duplicates* hides what the page has
-already shown — another gallery, or the list of a listing page. *Exclude the
-current post* hides the post being viewed, and nothing else. Either, both or
-neither can be on.
+A posts loop narrows by authors, a keyword its text contains, formats, sticky
+posts and two exclusions that do not overlap. Visual Portfolio Pro adds a Date
+filter to the same panel, through the `vpf.loopPostsFilterItems` JavaScript
+filter. Settings holds *Excluded Taxonomies* beside *Taxonomies*. The four
+settings the core Query block has as well are stored the way it stores them,
+and are applied where it applies them:
+
+| `postsQuery` key | Legacy option | Applies to |
+|---|---|---|
+| `authors` (user ids) | `posts_authors` | A post type, a post types set and the current query |
+| `formats` (`standard`, `image`, …) | `posts_formats` | A post type and a post types set. `standard` is a post with no format, and formats join by OR |
+| `excludeTaxonomies` (term ids) | `posts_excluded_taxonomies` | A post type and a post types set. Joined to `taxonomies` and `formats` by AND |
+| `sticky` (`''`, `ignore`, `exclude`, `only`) | `posts_sticky` | The Posts source alone. `''` includes sticky posts first on the first page, as WordPress does |
+
+Formats is offered where the core Query block offers it: for a post type that
+supports post formats, while the theme declares one beside `standard`. Sticky
+posts is offered for the Posts source only, and leaving that source clears it.
+None of these reaches a manual selection or a custom query.
+
+*Avoid duplicates* hides what the page has already shown — another gallery, or
+the list of a listing page. *Exclude the current post* hides the post being
+viewed, and nothing else. Either, both or neither can be on.
 
 On a single post the page's own list is that post, so the two would otherwise
 be the same switch. The loop leaves that list out when *Exclude the current
@@ -546,8 +562,9 @@ Three of them need a word for sources that are neither posts nor images:
   );
   ```
 
-  Entries are `option => type`, where the type is `ids`, `text`, `boolean` or
-  `number` and names the sanitizer the value passes through on the way in.
+  Entries are `option => type`, where the type is `ids`, `slugs`, `text`,
+  `boolean` or `number` and names the sanitizer the value passes through on the
+  way in.
 
 ### Settings of an extension
 
