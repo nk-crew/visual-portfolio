@@ -225,6 +225,7 @@ class ClassLoopSources extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'vp-block-loop-filter', $this->render_control( 'loop-filter', 'images' ) );
 		$this->assertSame( '', $this->render_control( 'loop-sort', 'taxonomies' ) );
 		$this->assertSame( '', $this->render_control( 'loop-filter', 'social-stream' ) );
+		$this->assertSame( '', $this->render_control( 'loop-filter', 'taxonomies' ) );
 
 		add_filter(
 			'vpf_loop_source_supports',

@@ -188,6 +188,7 @@ class Visual_Portfolio_Get {
 			array(
 				'taxonomies'    => array(
 					'sort'   => false,
+					'filter' => false,
 					'search' => false,
 				),
 				'social-stream' => array(
