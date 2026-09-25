@@ -34,6 +34,16 @@ class ClassLoopPatternsRender extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public static function wpSetUpBeforeClass() {
+		// The plugin registers them on `init` only while its setting says so,
+		// which a fresh test database may not have saved.
+		if ( ! post_type_exists( 'portfolio' ) ) {
+			register_post_type( 'portfolio', array( 'public' => true ) );
+		}
+
+		if ( ! taxonomy_exists( 'portfolio_category' ) ) {
+			register_taxonomy( 'portfolio_category', 'portfolio', array( 'public' => true ) );
+		}
+
 		$term = self::factory()->term->create(
 			array(
 				'taxonomy' => 'portfolio_category',
