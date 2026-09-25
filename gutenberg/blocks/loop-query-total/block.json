@@ -1,48 +1,40 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "visual-portfolio/item-categories",
-	"title": "Gallery Item Categories (Experimental)",
+	"name": "visual-portfolio/loop-query-total",
+	"title": "Gallery Query Total (Experimental)",
 	"category": "media",
-	"description": "Displays the categories of a gallery item. Block is experimental and will change in future releases. Please use with caution.",
-	"ancestor": ["visual-portfolio/item-template"],
+	"description": "Displays how many items the gallery found, or which of them are on screen. Block is experimental and will change in future releases. Please use with caution.",
+	"ancestor": ["visual-portfolio/loop"],
 	"textdomain": "visual-portfolio",
 	"usesContext": [
-		"vp/itemCategories",
-		"vp/itemPostId",
 		"vp/queryId",
 		"vp/queryType",
-		"vp/postsQuery"
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery",
+		"vp/sourceQuery",
+		"vp/blockId"
 	],
 	"attributes": {
-		"taxonomy": {
+		"displayType": {
 			"type": "string",
-			"default": ""
-		},
-		"separator": {
-			"type": "string",
-			"default": ", ",
-			"role": "content"
-		},
-		"limit": {
-			"type": "number",
-			"default": 0
+			"enum": ["total-results", "range-display"],
+			"default": "total-results"
 		},
 		"extensions": {
 			"type": "object",
 			"default": {}
 		}
 	},
-	"example": {
-		"viewportWidth": 350
-	},
 	"supports": {
 		"html": false,
 		"reusable": false,
+		"anchor": true,
+		"align": ["wide", "full"],
 		"color": {
 			"text": true,
 			"gradients": true,
-			"link": true,
 			"__experimentalDefaultControls": {
 				"text": true,
 				"background": true
@@ -53,12 +45,11 @@
 			"lineHeight": true,
 			"textAlign": true,
 			"__experimentalFontFamily": true,
-			"__experimentalTextDecoration": true,
-			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
-			"__experimentalWritingMode": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -67,6 +58,5 @@
 			"margin": true,
 			"padding": true
 		}
-	},
-	"style": "visual-portfolio-block-item-categories"
+	}
 }

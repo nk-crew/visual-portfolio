@@ -583,6 +583,12 @@ class Visual_Portfolio_Images {
 			$attributes = array_merge( $attributes, $attr );
 		}
 
+		// What WordPress gives an attachment image: lazy past the first images
+		// of the page, counted with them.
+		if ( ! isset( $attributes['loading'] ) && function_exists( 'wp_get_loading_optimization_attributes' ) ) {
+			$attributes = array_merge( wp_get_loading_optimization_attributes( 'img', $attributes, 'wp_get_attachment_image' ), $attributes );
+		}
+
 		self::$image_processing = true;
 
 		$image = '<img ' . self::build_attributes_string( $attributes ) . ' />';

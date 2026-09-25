@@ -299,6 +299,70 @@ test.describe('Gallery Loop blocks', () => {
 		await expect(items.nth(PER_PAGE * (expectedPages - 1))).toBeFocused();
 	});
 
+	test('query total follows Load More and a filter', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Loop - query total',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		const loop = getLoopBlock([
+			{ name: 'visual-portfolio/loop-pagination-trigger' },
+		]);
+
+		loop.innerBlocks.splice(
+			1,
+			0,
+			{ name: 'visual-portfolio/loop-query-total' },
+			{
+				name: 'visual-portfolio/loop-query-total',
+				attributes: { displayType: 'range-display' },
+			}
+		);
+
+		await editor.insertBlock(loop);
+		await editor.publishPost();
+
+		const total = await getPublishedPostCount(requestUtils);
+		const [nature] = await requestUtils.rest({
+			path: '/wp/v2/categories',
+			params: { slug: 'loop-nature' },
+		});
+
+		const frontend = await openPublishedPage(page);
+		const totals = frontend.locator('.vp-block-loop-query-total');
+
+		await expect(totals).toHaveText([
+			`${total} items`,
+			`Displaying 1 – ${PER_PAGE} of ${total}`,
+		]);
+
+		await frontend.locator('.vp-block-loop-pagination-trigger').click();
+
+		await expect(totals).toHaveText([
+			`${total} items`,
+			`Displaying 1 – ${2 * PER_PAGE} of ${total}`,
+		]);
+
+		await frontend
+			.locator('a.vp-block-loop-filter-item', { hasText: 'Loop Nature' })
+			.click();
+
+		await expect(totals).toHaveText(
+			[
+				`${nature.count} items`,
+				`Displaying 1 – ${Math.min(PER_PAGE, nature.count)} of ${nature.count}`,
+			],
+			{ timeout: 15000 }
+		);
+	});
+
 	test('page count follows the content without re-saving the page', async ({
 		page,
 		admin,

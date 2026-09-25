@@ -4,13 +4,22 @@
 	"name": "visual-portfolio/item-date",
 	"title": "Gallery Item Date (Experimental)",
 	"category": "media",
-	"description": "Displays the publish date of a gallery item. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Displays the publish or last modified date of a gallery item. Block is experimental and will change in future releases. Please use with caution.",
 	"ancestor": ["visual-portfolio/item-template"],
 	"textdomain": "visual-portfolio",
-	"usesContext": ["vp/itemPublishedTime", "vp/itemUrl"],
+	"usesContext": [
+		"vp/itemPublishedTime",
+		"vp/itemModifiedTime",
+		"vp/itemUrl"
+	],
 	"attributes": {
 		"format": {
 			"type": "string"
+		},
+		"displayType": {
+			"type": "string",
+			"enum": ["date", "modified"],
+			"default": "date"
 		},
 		"isLink": {
 			"type": "boolean",

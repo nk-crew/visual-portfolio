@@ -786,6 +786,9 @@ class Visual_Portfolio_Get {
 	 *     @type array       $query_opts      Query options.
 	 *     @type object|null $portfolio_query Query object, null for images and social sources.
 	 *     @type int         $max_pages       Total pages count.
+	 *     @type int         $found_pages     Pages the query really found.
+	 *     @type int|null    $found_items     Items the query matched on all pages, null where the source does not say.
+	 *     @type int         $per_page        Items per page, zero or less for all of them.
 	 *     @type int         $start_page      Currently requested page.
 	 *     @type string|bool $next_page_url   URL of the next page, false when there is none.
 	 * }
@@ -817,6 +820,11 @@ class Visual_Portfolio_Get {
 		// the numbered pagination are built from the answer.
 		$found_pages = 0;
 
+		// How many items the query matched over all its pages, or null where
+		// the source does not say.
+		$found_items = null;
+		$per_page    = (int) ( $query_opts['posts_per_page'] ?? ( $options['items_count'] ?? 0 ) );
+
 		if ( $is_images || $is_social ) {
 			if ( isset( $query_opts['max_num_pages'] ) ) {
 				$found_pages = (int) $query_opts['max_num_pages'];
@@ -824,21 +832,31 @@ class Visual_Portfolio_Get {
 			} else {
 				$max_pages = $start_page;
 			}
+
+			if ( isset( $query_opts['found_posts'] ) ) {
+				$found_items = (int) $query_opts['found_posts'];
+			}
 		} elseif ( $custom_query ) {
 			// Use custom query object provided by extensions.
 			$portfolio_query = $custom_query;
 			$found_pages     = (int) $portfolio_query->max_num_pages;
 			$max_pages       = $found_pages < $start_page ? $start_page : $found_pages;
+
+			if ( isset( $portfolio_query->found_posts ) ) {
+				$found_items = (int) $portfolio_query->found_posts;
+			}
 		} elseif ( ! empty( $options['is_loop'] ) && 'taxonomies' === $options['content_source'] ) {
 			// No extension answers for the source, and the query below would
 			// list Portfolio posts in its place. A loop shows its No Results.
-			$max_pages = $start_page;
+			$max_pages   = $start_page;
+			$found_items = 0;
 		} else {
 			// get Post List.
 			$portfolio_query = new WP_Query( $query_opts );
 
 			$found_pages = (int) $portfolio_query->max_num_pages;
 			$max_pages   = $found_pages < $start_page ? $start_page : $found_pages;
+			$found_items = (int) $portfolio_query->found_posts;
 
 			// `max_num_pages` counts every post the query matched, and an
 			// offset is not part of that count, so a gallery that skips the
@@ -860,6 +878,7 @@ class Visual_Portfolio_Get {
 				$reachable   = (int) ceil( max( 0, (int) $portfolio_query->found_posts - $offset ) / $per_page );
 				$found_pages = min( $found_pages, $reachable );
 				$max_pages   = max( $start_page, min( $max_pages, $reachable ) );
+				$found_items = max( 0, $found_items - $offset );
 			}
 		}
 
@@ -870,6 +889,10 @@ class Visual_Portfolio_Get {
 		if ( $max_pages_limit ) {
 			$max_pages   = min( $max_pages, $max_pages_limit );
 			$found_pages = min( $found_pages, $max_pages_limit );
+
+			if ( null !== $found_items && $per_page > 0 ) {
+				$found_items = min( $found_items, $max_pages_limit * $per_page );
+			}
 		}
 
 		$next_page_url = ( ! $max_pages || $max_pages >= $start_page + 1 ) ? self::get_pagenum_link(
@@ -884,6 +907,8 @@ class Visual_Portfolio_Get {
 			'portfolio_query' => $portfolio_query,
 			'max_pages'       => $max_pages,
 			'found_pages'     => $found_pages,
+			'found_items'     => $found_items,
+			'per_page'        => $per_page,
 			'start_page'      => $start_page,
 			'next_page_url'   => $next_page_url,
 		);
@@ -1078,6 +1103,9 @@ class Visual_Portfolio_Get {
 						'content'        => get_the_content(),
 						'format'         => get_post_format() ? get_post_format() : 'standard',
 						'published_time' => get_the_date( 'Y-m-d H:i:s', $the_post ),
+						// Only an edit after publishing counts, as the core Post
+						// Date block counts it.
+						'modified_time'  => get_the_modified_date( 'U', $the_post ) > get_the_date( 'U', $the_post ) ? get_the_modified_date( 'Y-m-d H:i:s', $the_post ) : '',
 						'filter'         => implode( ',', $filter_values ),
 						'image_id'       => 'attachment' === $post_type ? get_the_ID() : get_post_thumbnail_id( get_the_ID() ),
 						'focal_point'    => Visual_Portfolio_Custom_Post_Meta::get_featured_image_focal_point( get_the_ID() ),
@@ -1162,6 +1190,7 @@ class Visual_Portfolio_Get {
 			'format'            => '',
 			'published'         => '',
 			'published_time'    => '',
+			'modified_time'     => '',
 			'categories'        => array(),
 			'filter'            => '',
 			'video'             => '',
@@ -1295,7 +1324,7 @@ class Visual_Portfolio_Get {
 		/**
 		 * Filters the resolved loop items.
 		 *
-		 * @param array $result  items, max_pages, start_page and options.
+		 * @param array $result  items, max_pages, found_items, per_page, start_page and options.
 		 * @param array $options portfolio options.
 		 */
 		// The count the query really found, not the one floored to the page that
@@ -1305,10 +1334,12 @@ class Visual_Portfolio_Get {
 		$result = apply_filters(
 			'vpf_loop_items',
 			array(
-				'items'      => $items,
-				'max_pages'  => max( 1, (int) $query['found_pages'] ),
-				'start_page' => $query['start_page'],
-				'options'    => $options,
+				'items'       => $items,
+				'max_pages'   => max( 1, (int) $query['found_pages'] ),
+				'found_items' => $query['found_items'],
+				'per_page'    => $query['per_page'],
+				'start_page'  => $query['start_page'],
+				'options'     => $options,
 			),
 			$options
 		);
@@ -2154,6 +2185,9 @@ class Visual_Portfolio_Get {
 			} else {
 				$query_opts['max_num_pages'] = 0;
 			}
+
+			// Named as `WP_Query` names it, for the count a loop shows.
+			$query_opts['found_posts'] = count( $images );
 
 			$start_from_item = ( $paged - 1 ) * $count;
 			$end_on_item     = $start_from_item + $count;

@@ -28,6 +28,7 @@ const TRIGGER_SELECTOR = '.vp-block-loop-pagination-trigger';
 const END_SELECTOR = '.vp-block-loop-pagination-end';
 const MASONRY_CLASS = 'vp-layout-masonry';
 const SEARCH_INPUT_SELECTOR = '.vp-block-loop-search__input';
+const RANGE_SELECTOR = '.vp-block-loop-query-total[data-vp-range-text]';
 
 // How long a search waits for the visitor to stop typing.
 const SEARCH_DELAY = 500;
@@ -663,6 +664,48 @@ function advanceTrigger(trigger, nextLoop, loop) {
 }
 
 /**
+ * Stretch the range of every Query Total of a loop over the page just loaded.
+ *
+ * The range starts where this page started and ends where the fetched one
+ * ends. Only the text node is written, the one Preact renders the block with,
+ * so the router finds its own node when it swaps the region.
+ *
+ * @param {HTMLElement} loop     Loop wrapper.
+ * @param {HTMLElement} nextLoop Loop of the fetched page.
+ */
+function advanceRanges(loop, nextLoop) {
+	const own = (root) =>
+		Array.from(root.querySelectorAll(RANGE_SELECTOR)).filter(
+			(total) => total.closest(LOOP_SELECTOR) === root
+		);
+	const nextTotals = own(nextLoop);
+
+	own(loop).forEach((total, index) => {
+		const next = nextTotals[index];
+		const text = total.firstChild;
+
+		if (!next || !text || window.Node.TEXT_NODE !== text.nodeType) {
+			return;
+		}
+
+		const values = [
+			total.dataset.vpRangeStart,
+			next.dataset.vpRangeEnd,
+			next.dataset.vpRangeTotal,
+		];
+		const previous = text.nodeValue;
+
+		text.nodeValue = total.dataset.vpRangeText.replace(
+			/%(\d)\$s/g,
+			(match, position) => values[position - 1] ?? match
+		);
+		registerUndo(loop, () => {
+			text.nodeValue = previous;
+		});
+	});
+}
+
+/**
  * Append the next page of items to a loop.
  *
  * The router can only replace a region, never extend it, so this is the one
@@ -763,6 +806,7 @@ async function loadNextPage(trigger, context, byClick) {
 			byClick && trigger.contains(window.document.activeElement);
 
 		advanceTrigger(trigger, nextLoop, loop);
+		advanceRanges(loop, nextLoop);
 		refreshLayout(list, added);
 		announceUpdate(context);
 

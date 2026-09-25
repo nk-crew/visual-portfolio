@@ -25,11 +25,14 @@ const IMAGES_COUNT = 6;
  */
 async function transformToLoop(page, editor, from) {
 	await editor.showBlockToolbar();
+
+	// From the keyboard: on a wide block the toolbar can sit under the
+	// admin menu, which takes a pointer click.
 	await page
 		.getByRole('toolbar', { name: 'Block tools' })
 		.getByRole('button', { name: from, exact: true })
-		.click();
-	await page.getByRole('menuitem', { name: LOOP_TITLE }).click();
+		.press('Enter');
+	await page.getByRole('menuitem', { name: LOOP_TITLE }).press('Enter');
 }
 
 test.describe('Gallery Loop integrations', () => {
@@ -389,6 +392,188 @@ test.describe('Gallery Loop integrations', () => {
 			source: 'excerpt',
 			excerptLength: 20,
 		});
+	});
+
+	test('a core query of picked posts keeps them, and one the loop cannot say is not offered', async ({
+		admin,
+		page,
+	}) => {
+		await admin.createNewPost({
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		// The transform asks the editor's post types, loaded on demand.
+		await page.evaluate(() =>
+			window.wp.data.resolveSelect('core').getPostTypes({ per_page: -1 })
+		);
+
+		const switchQuery = (query) =>
+			page.evaluate((attributes) => {
+				const block = window.wp.blocks.createBlock('core/query', {
+					query: attributes,
+				});
+				const switched = window.wp.blocks.switchToBlockType(
+					block,
+					'visual-portfolio/loop'
+				);
+
+				return switched ? switched[0].attributes.postsQuery : null;
+			}, query);
+
+		expect(
+			await switchQuery({
+				postType: 'post',
+				include: [12, 7],
+				orderBy: 'include',
+			})
+		).toMatchObject({ source: 'ids', ids: [12, 7], orderBy: 'post__in' });
+
+		// Two categories OR'd with a tag AND'd: a loop joins all its terms
+		// one way, so it cannot say this.
+		expect(
+			await switchQuery({
+				postType: 'post',
+				taxQuery: { include: { category: [1, 2], post_tag: [3] } },
+			})
+		).toBe(null);
+
+		expect(
+			await switchQuery({
+				postType: 'post',
+				taxQuery: { include: { category: [1], post_tag: [3] } },
+			})
+		).toMatchObject({ taxonomies: [1, 3], taxonomiesRelation: 'and' });
+	});
+
+	test('a core query loop becomes a loop of posts', async ({
+		admin,
+		editor,
+		page,
+	}) => {
+		await admin.createNewPost({
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'core/query',
+			attributes: {
+				queryId: 5,
+				query: {
+					perPage: 4,
+					pages: 0,
+					offset: 1,
+					postType: 'post',
+					order: 'asc',
+					orderBy: 'title',
+					author: '1',
+					search: 'blog',
+					exclude: [],
+					sticky: 'exclude',
+					inherit: false,
+					taxQuery: { include: { category: [1] } },
+					format: [],
+				},
+			},
+			innerBlocks: [
+				{
+					name: 'core/post-template',
+					attributes: { layout: { type: 'grid', columnCount: 3 } },
+					innerBlocks: [
+						{
+							name: 'core/post-featured-image',
+							attributes: {
+								isLink: true,
+								aspectRatio: '4/3',
+								sizeSlug: 'medium',
+							},
+						},
+						{
+							name: 'core/post-title',
+							attributes: { level: 4, isLink: true },
+						},
+						{ name: 'core/post-date' },
+						{
+							name: 'core/post-excerpt',
+							attributes: { excerptLength: 20 },
+						},
+						{ name: 'core/post-time-to-read' },
+						// No counterpart in a loop.
+						{ name: 'core/post-content' },
+					],
+				},
+				{
+					name: 'core/query-pagination',
+					innerBlocks: [
+						{ name: 'core/query-pagination-previous' },
+						{ name: 'core/query-pagination-numbers' },
+						{ name: 'core/query-pagination-next' },
+					],
+				},
+			],
+		});
+
+		await transformToLoop(page, editor, 'Query Loop');
+
+		const [loop] = await editor.getBlocks();
+
+		expect(loop.name).toBe('visual-portfolio/loop');
+		expect(loop.attributes).toMatchObject({
+			queryType: 'posts',
+			baseQuery: { perPage: 4, maxPagesLimit: 0 },
+			postsQuery: {
+				source: 'post',
+				order: 'asc',
+				orderBy: 'title',
+				offset: 1,
+				authors: [1],
+				sticky: 'exclude',
+				keyword: 'blog',
+				taxonomies: [1],
+			},
+		});
+
+		const [template, pagination] = loop.innerBlocks;
+
+		expect(template.name).toBe('visual-portfolio/item-template');
+		expect(template.attributes).toMatchObject({
+			layoutType: 'grid',
+			layoutColumnsMode: 'manual',
+			layoutColumnCount: 3,
+		});
+		expect(template.innerBlocks.map(({ name }) => name)).toEqual([
+			'visual-portfolio/item-image',
+			'visual-portfolio/item-title',
+			'visual-portfolio/item-date',
+			'visual-portfolio/item-description',
+			'visual-portfolio/item-meta',
+		]);
+		expect(template.innerBlocks[4].attributes.metaType).toBe(
+			'reading-time'
+		);
+		expect(template.innerBlocks[0].attributes).toMatchObject({
+			clickAction: 'url',
+			aspectRatio: '4/3',
+			sizeSlug: 'medium',
+		});
+		expect(template.innerBlocks[1].attributes).toMatchObject({
+			clickAction: 'url',
+			level: 4,
+		});
+		expect(template.innerBlocks[3].attributes).toMatchObject({
+			source: 'excerpt',
+			excerptLength: 20,
+		});
+
+		expect(pagination.name).toBe('visual-portfolio/loop-pagination');
+		expect(pagination.innerBlocks.map(({ name }) => name)).toEqual([
+			'visual-portfolio/loop-pagination-previous',
+			'visual-portfolio/loop-pagination-numbers',
+			'visual-portfolio/loop-pagination-next',
+		]);
 	});
 
 	/**
