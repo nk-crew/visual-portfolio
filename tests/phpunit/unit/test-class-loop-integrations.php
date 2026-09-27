@@ -1,8 +1,8 @@
 <?php
 /**
  * Tests for what the Gallery Loop family hands to the outside: the texts WPML
- * translates, the pattern category a white label renames, the translations of
- * the editor scripts, and the prefetch switch.
+ * translates, the pattern category a white label renames, and the translations
+ * of the editor scripts.
  *
  * @package Visual Portfolio
  */
@@ -29,10 +29,6 @@ class ClassLoopIntegrations extends WP_UnitTestCase {
 		parent::set_up();
 
 		$this->skip_without_loop_blocks();
-
-		// Pro turns prefetching on; these tests say for themselves whether
-		// anything does.
-		remove_all_filters( 'vpf_loop_prefetch' );
 
 		$this->scripts = $GLOBALS['wp_scripts'] ?? null;
 	}
@@ -152,58 +148,5 @@ class ClassLoopIntegrations extends WP_UnitTestCase {
 			$this->assertSame( 'visual-portfolio', $script->textdomain, $handle );
 			$this->assertSame( visual_portfolio()->plugin_path . 'languages', $script->translations_path, $handle );
 		}
-	}
-
-	/**
-	 * Render a loop that has an id, so the store is attached to it.
-	 *
-	 * @return string
-	 */
-	private function render_loop() {
-		return do_blocks(
-			sprintf(
-				'<!-- wp:visual-portfolio/loop %s --><div class="wp-block-visual-portfolio-loop vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->',
-				wp_json_encode(
-					array(
-						'block_id'  => 'prefetch-test',
-						'queryId'   => 1,
-						'queryType' => 'images',
-					)
-				)
-			)
-		);
-	}
-
-	/**
-	 * A loop prefetches only where the site says so, and the site is asked with
-	 * the options of that loop.
-	 *
-	 * @return void
-	 */
-	public function test_prefetch_is_on_only_when_the_filter_says_so() {
-		$html = $this->render_loop();
-
-		$this->assertStringContainsString( 'data-wp-router-region="vp-loop-prefetch-test"', $html );
-		$this->assertStringNotContainsString( 'initPrefetch', $html );
-
-		$handed = null;
-
-		add_filter(
-			'vpf_loop_prefetch',
-			function ( $prefetch, $options ) use ( &$handed ) {
-				$handed = $options;
-
-				return $prefetch;
-			},
-			10,
-			2
-		);
-
-		$this->assertStringNotContainsString( 'initPrefetch', $this->render_loop() );
-		$this->assertSame( 'images', $handed['content_source'] );
-
-		add_filter( 'vpf_loop_prefetch', '__return_true', 20 );
-
-		$this->assertStringContainsString( 'data-wp-init---prefetch="callbacks.initPrefetch"', $this->render_loop() );
 	}
 }

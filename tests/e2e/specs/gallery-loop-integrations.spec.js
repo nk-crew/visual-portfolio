@@ -1,7 +1,7 @@
 /**
  * Gallery Loop: what it takes from and gives to the rest of the editor and the
  * page - the block names the server translated, the core blocks it replaces,
- * and the pages it fetches before the visitor asks for them.
+ * and the events a script answers the loads of a loop through.
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
@@ -576,29 +576,93 @@ test.describe('Gallery Loop integrations', () => {
 		]);
 	});
 
+	const NUMBERS =
+		'<!-- wp:visual-portfolio/loop-pagination --><!-- wp:visual-portfolio/loop-pagination-numbers /--><!-- /wp:visual-portfolio/loop-pagination -->';
+	const TRIGGER =
+		'<!-- wp:visual-portfolio/loop-pagination --><!-- wp:visual-portfolio/loop-pagination-trigger /--><!-- /wp:visual-portfolio/loop-pagination -->';
+
 	/**
-	 * Publish a page holding one loop of the images, with prefetching turned
-	 * on, and open it.
+	 * Answer every `vp-loop-request` on the page the way `mode` says, and keep
+	 * every `vp-loop-loaded` in `window.__vpLoaded`.
 	 *
-	 * The switch is a PHP filter and this environment loads no plugin that
-	 * flips it, so the page is served with the attribute the filter adds to the
-	 * loop wrapper - on every request, the router's included.
+	 * Runs in the page before its scripts, so it cannot see anything of the
+	 * spec. An answered page has its item titles changed from `Item` to
+	 * `Answered`, which tells it apart from one the loop loaded itself.
+	 *
+	 * @param {string} mode - `answer`, `late` (the second page answers after
+	 *                      2 s), `hang`, `reject` or `null`.
+	 */
+	function respond(mode) {
+		window.__vpLoaded = [];
+
+		window.document.addEventListener('vp-loop-loaded', ({ detail }) => {
+			window.__vpLoaded.push({
+				purpose: detail.purpose,
+				page: new window.URL(detail.href).searchParams.get('vp-1-page'),
+			});
+		});
+
+		window.document.addEventListener('vp-loop-request', ({ detail }) => {
+			const answered = () =>
+				window
+					.fetch(detail.href)
+					.then((response) => response.text())
+					.then((html) =>
+						html.replace(/Item ([A-F])/g, 'Answered $1')
+					);
+
+			if ('hang' === mode) {
+				detail.respondWith(new Promise(() => {}));
+			} else if ('reject' === mode) {
+				detail.respondWith(Promise.reject(new Error('No page')));
+			} else if ('null' === mode) {
+				detail.respondWith(null);
+			} else if (
+				'late' === mode &&
+				'2' ===
+					new window.URL(detail.href).searchParams.get('vp-1-page')
+			) {
+				detail.respondWith(
+					new Promise((resolve) => {
+						window.setTimeout(resolve, 2000);
+					})
+						.then(answered)
+						.finally(() => {
+							window.__vpLateDone = true;
+						})
+				);
+			} else {
+				detail.respondWith(answered());
+			}
+		});
+	}
+
+	/**
+	 * Publish a page holding one loop of the images, answer its loads the way
+	 * `mode` says, and open it.
 	 *
 	 * @param {Object} requestUtils - REST utils.
 	 * @param {Object} page         - Playwright page.
 	 * @param {string} title        - page title.
 	 * @param {string} controls     - serialized control blocks after the items.
+	 * @param {string} mode         - how `respond()` answers.
 	 */
-	async function publishPrefetchingLoop(requestUtils, page, title, controls) {
+	async function publishAnsweredLoop(
+		requestUtils,
+		page,
+		title,
+		controls,
+		mode
+	) {
 		const loop = {
-			block_id: 'e2e-prefetch',
+			block_id: 'e2e-events',
 			queryId: 1,
 			queryType: 'images',
 			baseQuery: { perPage: PER_PAGE, maxPages: 0 },
 			imagesQuery: {
 				images: images.map(({ id }, index) => ({
 					id,
-					title: `Prefetch ${String.fromCharCode(65 + index)}`,
+					title: `Item ${String.fromCharCode(65 + index)}`,
 				})),
 				orderBy: 'default',
 			},
@@ -625,22 +689,7 @@ test.describe('Gallery Loop integrations', () => {
 
 		pageIds.push(created.id);
 
-		const { pathname } = new URL(created.link);
-		const region = 'data-wp-router-region="vp-loop-e2e-prefetch"';
-
-		await page.route(
-			(url) => url.pathname === pathname,
-			async (route) => {
-				const response = await route.fetch();
-				const body = (await response.text()).replace(
-					region,
-					`${region} data-wp-init---prefetch="callbacks.initPrefetch"`
-				);
-
-				await route.fulfill({ response, body });
-			}
-		);
-
+		await page.addInitScript(respond, mode);
 		await page.goto(created.link, { waitUntil: 'load' });
 
 		// A full page load would take the mark with it.
@@ -649,86 +698,45 @@ test.describe('Gallery Loop integrations', () => {
 		});
 	}
 
-	/**
-	 * Count the requests the page makes for a page of the loop.
-	 *
-	 * @param {Object} page   - Playwright page.
-	 * @param {string} number - page number.
-	 * @return {Function} Current count.
-	 */
-	function countRequests(page, number) {
-		let count = 0;
-
-		page.on('request', (request) => {
-			if (
-				number === new URL(request.url()).searchParams.get('vp-1-page')
-			) {
-				count += 1;
-			}
-		});
-
-		return () => count;
-	}
-
-	test('a pagination link pointed at is fetched once, before the click', async ({
+	test('a navigation takes the page a script answered with', async ({
 		page,
 		requestUtils,
 	}) => {
-		const requests = countRequests(page, '2');
-
-		await publishPrefetchingLoop(
+		await publishAnsweredLoop(
 			requestUtils,
 			page,
-			'Integrations - prefetch a link',
-			'<!-- wp:visual-portfolio/loop-pagination --><!-- wp:visual-portfolio/loop-pagination-numbers /--><!-- /wp:visual-portfolio/loop-pagination -->'
+			'Integrations - answered navigation',
+			NUMBERS,
+			'answer'
 		);
 
-		const link = page.locator(
-			`${LOOP} .vp-block-loop-pagination-numbers a`,
-			{
+		await page
+			.locator(`${LOOP} .vp-block-loop-pagination-numbers a`, {
 				hasText: '2',
-			}
-		);
-
-		expect(requests()).toBe(0);
-
-		await link.hover();
-		await expect.poll(requests).toBe(1);
-
-		await link.click();
+			})
+			.click();
 		await expect(page.locator(`${LOOP} ${ITEM} ${TITLE}`)).toHaveText([
-			'Prefetch C',
-			'Prefetch D',
+			'Answered C',
+			'Answered D',
 		]);
 
-		expect(requests()).toBe(1);
+		expect(new URL(page.url()).searchParams.get('vp-1-page')).toBe('2');
 		expect(await page.evaluate(() => window.__vpSameDocument)).toBe(true);
+		await expect
+			.poll(() => page.evaluate(() => window.__vpLoaded))
+			.toEqual([{ purpose: 'navigate', page: '2' }]);
 	});
 
-	test('a later click wins over an earlier one still fetched ahead', async ({
+	test('a later click wins over an earlier answer still on its way', async ({
 		page,
 		requestUtils,
 	}) => {
-		await publishPrefetchingLoop(
+		await publishAnsweredLoop(
 			requestUtils,
 			page,
-			'Integrations - prefetch and click again',
-			'<!-- wp:visual-portfolio/loop-pagination --><!-- wp:visual-portfolio/loop-pagination-numbers /--><!-- /wp:visual-portfolio/loop-pagination -->'
-		);
-
-		// The second page answers late, after the third was rendered.
-		let secondPageDone;
-		const secondPageAnswered = new Promise((resolve) => {
-			secondPageDone = resolve;
-		});
-
-		await page.route(
-			(url) => '2' === url.searchParams.get('vp-1-page'),
-			async (route) => {
-				await new Promise((resolve) => setTimeout(resolve, 2000));
-				await route.fallback();
-				secondPageDone();
-			}
+			'Integrations - answered late',
+			NUMBERS,
+			'late'
 		);
 
 		const numbers = page.locator(
@@ -739,138 +747,126 @@ test.describe('Gallery Loop integrations', () => {
 		await numbers.filter({ hasText: '3' }).click();
 
 		await expect(page.locator(`${LOOP} ${ITEM} ${TITLE}`)).toHaveText([
-			'Prefetch E',
-			'Prefetch F',
+			'Answered E',
+			'Answered F',
 		]);
 
-		await secondPageAnswered;
+		await expect
+			.poll(() => page.evaluate(() => window.__vpLateDone))
+			.toBe(true);
 		// Room for a late navigation to land.
 		await page.waitForTimeout(500);
 
 		await expect(page.locator(`${LOOP} ${ITEM} ${TITLE}`)).toHaveText([
-			'Prefetch E',
-			'Prefetch F',
+			'Answered E',
+			'Answered F',
 		]);
 		expect(new URL(page.url()).searchParams.get('vp-1-page')).toBe('3');
 	});
 
-	test('a page fetched ahead that never comes loads in full', async ({
+	test('an answer that never comes loads the address in full', async ({
 		page,
 		requestUtils,
 	}) => {
 		test.setTimeout(60000);
 
-		await publishPrefetchingLoop(
+		await publishAnsweredLoop(
 			requestUtils,
 			page,
-			'Integrations - prefetch that hangs',
-			'<!-- wp:visual-portfolio/loop-pagination --><!-- wp:visual-portfolio/loop-pagination-numbers /--><!-- /wp:visual-portfolio/loop-pagination -->'
+			'Integrations - answer that hangs',
+			NUMBERS,
+			'hang'
 		);
 
-		// Only the fetch ahead hangs, past the loop's ten seconds.
-		let hung = false;
-
-		await page.route(
-			(url) => '2' === url.searchParams.get('vp-1-page'),
-			async (route) => {
-				if (hung) {
-					await route.fallback();
-					return;
-				}
-
-				hung = true;
-				await new Promise((resolve) => setTimeout(resolve, 15000));
-				await route.fallback().catch(() => {});
-			}
-		);
-
-		const link = page.locator(
-			`${LOOP} .vp-block-loop-pagination-numbers a`,
-			{ hasText: '2' }
-		);
-
-		await link.hover();
-		await expect.poll(() => hung).toBe(true);
-		await link.click();
+		await page
+			.locator(`${LOOP} .vp-block-loop-pagination-numbers a`, {
+				hasText: '2',
+			})
+			.click();
 
 		await page.waitForURL(/vp-1-page=2/, { timeout: 20000 });
 		await expect(page.locator(`${LOOP} ${ITEM} ${TITLE}`)).toHaveText([
-			'Prefetch C',
-			'Prefetch D',
+			'Item C',
+			'Item D',
 		]);
 		expect(await page.evaluate(() => window.__vpSameDocument)).toBe(
 			undefined
 		);
 	});
 
-	test('a load more does not wait on a next page that hangs', async ({
+	for (const mode of ['reject', 'null']) {
+		test(`a navigation answered with ${mode} loads the page itself`, async ({
+			page,
+			requestUtils,
+		}) => {
+			await publishAnsweredLoop(
+				requestUtils,
+				page,
+				`Integrations - answered with ${mode}`,
+				NUMBERS,
+				mode
+			);
+
+			await page
+				.locator(`${LOOP} .vp-block-loop-pagination-numbers a`, {
+					hasText: '2',
+				})
+				.click();
+			await expect(page.locator(`${LOOP} ${ITEM} ${TITLE}`)).toHaveText([
+				'Item C',
+				'Item D',
+			]);
+
+			expect(await page.evaluate(() => window.__vpSameDocument)).toBe(
+				true
+			);
+		});
+	}
+
+	test('a load more does not wait on an answer that hangs', async ({
 		page,
 		requestUtils,
 	}) => {
 		test.setTimeout(60000);
 
-		await publishPrefetchingLoop(
+		await publishAnsweredLoop(
 			requestUtils,
 			page,
-			'Integrations - next page that hangs',
-			'<!-- wp:visual-portfolio/loop-pagination --><!-- wp:visual-portfolio/loop-pagination-trigger /--><!-- /wp:visual-portfolio/loop-pagination -->'
+			'Integrations - load more answer that hangs',
+			TRIGGER,
+			'hang'
 		);
-
-		// Only the fetch ahead hangs, past the loop's ten seconds.
-		let hung = false;
-
-		await page.route(
-			(url) => '2' === url.searchParams.get('vp-1-page'),
-			async (route) => {
-				if (hung) {
-					await route.fallback();
-					return;
-				}
-
-				hung = true;
-				await new Promise((resolve) => setTimeout(resolve, 30000));
-				await route.fallback().catch(() => {});
-			}
-		);
-
-		await page.reload({ waitUntil: 'load' });
-		await expect.poll(() => hung).toBe(true);
 
 		await page.locator('.vp-block-loop-pagination-trigger').click();
 		await expect(page.locator(`${LOOP} ${ITEM} ${TITLE}`)).toHaveText(
-			['Prefetch A', 'Prefetch B', 'Prefetch C', 'Prefetch D'],
+			['Item A', 'Item B', 'Item C', 'Item D'],
 			{ timeout: 20000 }
 		);
+		expect(await page.evaluate(() => window.__vpSameDocument)).toBe(true);
 	});
 
-	test('the next page of a load more is fetched ahead and used', async ({
+	test('a load more takes the page a script answered with', async ({
 		page,
 		requestUtils,
 	}) => {
-		const secondPage = countRequests(page, '2');
-		const thirdPage = countRequests(page, '3');
-
-		await publishPrefetchingLoop(
+		await publishAnsweredLoop(
 			requestUtils,
 			page,
-			'Integrations - prefetch the next page',
-			'<!-- wp:visual-portfolio/loop-pagination --><!-- wp:visual-portfolio/loop-pagination-trigger /--><!-- /wp:visual-portfolio/loop-pagination -->'
+			'Integrations - answered load more',
+			TRIGGER,
+			'answer'
 		);
-
-		await expect.poll(secondPage).toBe(1);
 
 		await page.locator('.vp-block-loop-pagination-trigger').click();
 		await expect(page.locator(`${LOOP} ${ITEM} ${TITLE}`)).toHaveText([
-			'Prefetch A',
-			'Prefetch B',
-			'Prefetch C',
-			'Prefetch D',
+			'Item A',
+			'Item B',
+			'Answered C',
+			'Answered D',
 		]);
 
-		expect(secondPage()).toBe(1);
-
-		// And the page after it, once the items are in.
-		await expect.poll(thirdPage).toBe(1);
-		expect(await page.evaluate(() => window.__vpSameDocument)).toBe(true);
+		await expect
+			.poll(() => page.evaluate(() => window.__vpLoaded))
+			.toEqual([{ purpose: 'append', page: '2' }]);
 	});
 });

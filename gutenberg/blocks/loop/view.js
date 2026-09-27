@@ -60,15 +60,12 @@ const RELAYOUT_EVENT = 'vp-relayout';
 // that cancels it keeps the trigger a Load More until it is asked again.
 const INFINITE_LOAD_EVENT = 'vp-infinite-load';
 
-// Prefetching runs on a loop the server gave `callbacks.initPrefetch`. The
-// delays are the classic gallery's: a pointer that only crosses a link asks for
-// nothing, and the next page waits for the page itself to settle.
-const NAVIGATE_LINK_SELECTOR = 'a[data-wp-on--click="actions.navigate"]';
-const HOVER_DELAY = 100;
-const NEXT_PAGE_DELAY = 600;
+// Sent on a loop right before it loads an address, so that an extension holding
+// the page already can answer with it; see `requestPage()`.
+const REQUEST_EVENT = 'vp-loop-request';
 
-// A search is whatever the visitor typed, so its addresses never repeat.
-const SEARCH_PARAM = /^vp(-\d+-|_)search$/;
+// Sent on a loop once it shows what it loaded.
+const LOADED_EVENT = 'vp-loop-loaded';
 
 const masonryLayouts = new WeakMap();
 const autoColumns = new WeakMap();
@@ -85,7 +82,8 @@ const infiniteRearms = new WeakMap();
 // the newest of them owns the loading state - the first one to settle would
 // otherwise clear the flag for both.
 const navigating = new WeakMap();
-// The navigation a loop was last asked for, kept after it ends.
+// The navigation a loop was last asked for, kept after it ends, so that an
+// answer to an older one arriving late asks the router for nothing.
 const latestNavigations = new WeakMap();
 
 // Per loop: the search waiting for the visitor to stop typing, what they typed
@@ -95,15 +93,6 @@ const searchTimers = new WeakMap();
 const searchesInFlight = new WeakMap();
 const typedSearches = new WeakMap();
 const searchAddresses = new WeakMap();
-
-// Loops that prefetch; per loop, the timer of its next page, and that page
-// fetched ahead of a Load More as `{ href, html }`, where `html` settles to null
-// if the fetch failed. Beside them, the fetches of link targets on their way to
-// the router or already handed to it, by address.
-const prefetchingLoops = new WeakSet();
-const nextPageTimers = new WeakMap();
-const nextPages = new WeakMap();
-const prefetchedLinks = new Map();
 
 /**
  * Context of the loop the current element belongs to.
@@ -468,32 +457,9 @@ window.addEventListener('popstate', () => {
 	window.document.querySelectorAll(LOOP_SELECTOR).forEach((loop) => {
 		if (loopUndoAddresses.get(loop) !== getPageAddress()) {
 			undoManualEdits(loop);
-			nextPages.delete(loop);
 		}
 	});
 });
-
-/**
- * Whether an address may be fetched before the visitor asks for it.
- *
- * @param {string} href Address.
- *
- * @return {boolean} False on Save-Data and 2G, as the classic gallery, and for a search.
- */
-function canPrefetch(href) {
-	const { connection } = window.navigator;
-
-	if (
-		connection &&
-		(connection.saveData || (connection.effectiveType || '').includes('2g'))
-	) {
-		return false;
-	}
-
-	return !Array.from(new window.URL(href).searchParams.keys()).some((name) =>
-		SEARCH_PARAM.test(name)
-	);
-}
 
 /**
  * Fetch the HTML of a page.
@@ -514,81 +480,57 @@ async function fetchPageHtml(href, signal) {
 }
 
 /**
- * Fetch the page a Load More or infinite trigger of a loop leads to, a moment
- * from now, for `loadNextPage()` to take instead of fetching it.
+ * Ask the extensions on the page for an address before the loop loads it.
  *
- * @param {HTMLElement} loop Loop wrapper.
+ * A listener that holds the page already - Pro fetches ahead what a visitor
+ * points at - calls `respondWith()` with it, synchronously, and the first call
+ * wins. Whatever it gives settles to the page HTML, or to null when it is no
+ * page, fails, or nobody answered, and the loop then loads the address itself.
+ *
+ * @param {HTMLElement} loop    Loop wrapper.
+ * @param {string}      href    Absolute address.
+ * @param {string}      purpose `navigate` for a swap of the loop, `append` for
+ *                              a page added under it.
+ *
+ * @return {Promise<?string>|null} The answer, or null when nobody answered.
  */
-function prefetchNextPage(loop) {
-	if (!prefetchingLoops.has(loop)) {
-		return;
-	}
+function requestPage(loop, href, purpose) {
+	let answer = null;
 
-	window.clearTimeout(nextPageTimers.get(loop));
-	nextPageTimers.set(
-		loop,
-		window.setTimeout(() => {
-			nextPageTimers.delete(loop);
-
-			const trigger = Array.from(
-				loop.querySelectorAll(TRIGGER_SELECTOR)
-			).find((element) => element.closest(LOOP_SELECTOR) === loop);
-			const href = trigger ? getControlUrl(trigger) : '';
-
-			// A page already on its way, either one.
-			if (
-				!href ||
-				href === nextPages.get(loop)?.href ||
-				pendingRequests.has(loop) ||
-				navigating.has(loop) ||
-				!canPrefetch(href)
-			) {
-				return;
-			}
-
-			nextPages.set(loop, {
+	loop.dispatchEvent(
+		new window.CustomEvent(REQUEST_EVENT, {
+			bubbles: true,
+			detail: {
 				href,
-				html: fetchPageHtml(href).catch(() => null),
-			});
-		}, NEXT_PAGE_DELAY)
+				purpose,
+				respondWith(page) {
+					if (!answer) {
+						answer = Promise.resolve(page).then(
+							(html) => ('string' === typeof html ? html : null),
+							() => null
+						);
+					}
+				},
+			},
+		})
 	);
+
+	return answer;
 }
 
 /**
- * Hand the router the page a navigate link leads to, so that following the
- * link swaps the loop without waiting for the server.
+ * Tell the extensions on the page that a loop shows what it loaded.
  *
- * Fetched here rather than by the router's own prefetch, which keeps a failed
- * fetch for the address and would turn the click into a full page load.
- *
- * @param {HTMLElement} link Link.
+ * @param {HTMLElement} loop    Loop wrapper.
+ * @param {string}      href    Absolute address the loop loaded.
+ * @param {string}      purpose `navigate` or `append`, as it was asked for.
  */
-function prefetchLink(link) {
-	const href = getControlUrl(link);
-	const loop = link.closest(LOOP_SELECTOR);
-
-	// A link clicked before its delay ran out is on its way already.
-	if (
-		!href ||
-		!loop ||
-		navigating.has(loop) ||
-		prefetchedLinks.has(href) ||
-		!canPrefetch(href)
-	) {
-		return;
-	}
-
-	prefetchedLinks.set(
-		href,
-		fetchPageHtml(href)
-			.then(async (html) => {
-				const router = await import('@wordpress/interactivity-router');
-
-				await router.actions.prefetch(href, { html });
-			})
-			.catch(() => {
-				prefetchedLinks.delete(href);
-			})
+function announceLoaded(loop, href, purpose) {
+	loop.dispatchEvent(
+		new window.CustomEvent(LOADED_EVENT, {
+			bubbles: true,
+			detail: { href, purpose },
+		})
 	);
 }
 
@@ -801,29 +743,24 @@ async function loadNextPage(trigger, context, byClick) {
 	pendingRequests.set(loop, controller);
 	context.isLoading = true;
 
-	// Taken whether or not it is the page asked for: the trigger has moved on
-	// from any other.
-	const ahead = nextPages.get(loop);
-
-	nextPages.delete(loop);
+	const answer = requestPage(loop, href, 'append');
 
 	try {
-		// A page fetched ahead that hangs is not waited for past the deadline
-		// a navigation has; the page is asked for again.
-		let html =
-			ahead && ahead.href === href
-				? await Promise.race([
-						ahead.html,
-						new Promise((resolve) => {
-							window.setTimeout(
-								() => resolve(null),
-								NAVIGATION_TIMEOUT
-							);
-						}),
-					])
-				: null;
+		// An answer that hangs is not waited for past the deadline a
+		// navigation has; the page is asked for again.
+		let html = answer
+			? await Promise.race([
+					answer,
+					new Promise((resolve) => {
+						window.setTimeout(
+							() => resolve(null),
+							NAVIGATION_TIMEOUT
+						);
+					}),
+				])
+			: null;
 
-		// A navigation that started while the page fetched ahead was awaited.
+		// A navigation that started while the answer was awaited.
 		controller.signal.throwIfAborted();
 
 		if (null === html) {
@@ -880,7 +817,7 @@ async function loadNextPage(trigger, context, byClick) {
 			focusIn(added[0]);
 		}
 
-		prefetchNextPage(loop);
+		announceLoaded(loop, href, 'append');
 
 		return APPENDED;
 	} catch (error) {
@@ -936,7 +873,6 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 		// rollback that already ran.
 		pendingRequests.get(loop)?.abort();
 		pendingRequests.delete(loop);
-		nextPages.delete(loop);
 
 		undoManualEdits(loop);
 	}
@@ -975,15 +911,20 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 
 		let asked = false;
 
+		const answer = loop ? requestPage(loop, href, 'navigate') : null;
+
 		const timedOut = yield Promise.race([
-			// A prefetch of this address still on its way is the request the
-			// router would make again. Once it failed, the router makes its own.
-			// The router takes the last navigation it is asked for, so one the
-			// visitor has since replaced asks for nothing.
-			Promise.resolve(prefetchedLinks.get(href)).then(async () => {
+			// A page an extension answered with is the request the router would
+			// make again. Without one, the router makes its own. The router
+			// takes the last navigation it is asked for, so one the visitor has
+			// since replaced asks for nothing.
+			Promise.resolve(answer).then(async (html) => {
 				if (!loop || latestNavigations.get(loop) === token) {
 					asked = true;
-					await router.actions.navigate(href, { replace });
+					await router.actions.navigate(
+						href,
+						html ? { replace, html } : { replace }
+					);
 				}
 
 				return false;
@@ -993,8 +934,8 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 			}),
 		]);
 
-		// A page fetched ahead that has not come by the deadline is given up,
-		// and the address loads in full, as when the router's own fetch hangs.
+		// An answer that has not come by the deadline is given up, and the
+		// address loads in full, as when the router's own fetch hangs.
 		if (timedOut && !asked) {
 			// A newer navigation keeps the loop.
 			if (loop && latestNavigations.get(loop) === token) {
@@ -1017,11 +958,6 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 		return false;
 	}
 
-	// The router keeps the page it rendered.
-	if (!prefetchedLinks.has(href)) {
-		prefetchedLinks.set(href, Promise.resolve());
-	}
-
 	const list = loop ? loop.querySelector(LIST_SELECTOR) : null;
 
 	if (list) {
@@ -1029,7 +965,7 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 	}
 
 	if (loop) {
-		prefetchNextPage(loop);
+		announceLoaded(loop, href, 'navigate');
 	}
 
 	return true;
@@ -1331,64 +1267,6 @@ store('visual-portfolio/loop', {
 			initMasonry(ref);
 
 			return () => destroyMasonry(ref);
-		},
-
-		/**
-		 * Fetch pages before the visitor asks for them: the target of a navigate
-		 * link they point at or move the focus to, and the next page of a Load
-		 * More or infinite trigger.
-		 *
-		 * Listened for on the loop, in the capture phase, since neither event
-		 * bubbles, and the router renders the links anew on every swap.
-		 *
-		 * @return {Function} Teardown.
-		 */
-		initPrefetch() {
-			const { ref: loop } = getElement();
-			let timer;
-
-			const isLink = (element) => element.matches(NAVIGATE_LINK_SELECTOR);
-			const onEnter = ({ target }) => {
-				if (isLink(target)) {
-					window.clearTimeout(timer);
-					timer = window.setTimeout(
-						() => prefetchLink(target),
-						HOVER_DELAY
-					);
-				}
-			};
-			const onLeave = ({ target }) => {
-				if (isLink(target)) {
-					window.clearTimeout(timer);
-				}
-			};
-			const onFocus = ({ target }) => {
-				if (isLink(target)) {
-					prefetchLink(target);
-				}
-			};
-			const onLoad = () => prefetchNextPage(loop);
-
-			prefetchingLoops.add(loop);
-			loop.addEventListener('pointerenter', onEnter, true);
-			loop.addEventListener('pointerleave', onLeave, true);
-			loop.addEventListener('focus', onFocus, true);
-
-			if ('complete' === window.document.readyState) {
-				onLoad();
-			} else {
-				window.addEventListener('load', onLoad, { once: true });
-			}
-
-			return () => {
-				prefetchingLoops.delete(loop);
-				window.clearTimeout(timer);
-				window.clearTimeout(nextPageTimers.get(loop));
-				loop.removeEventListener('pointerenter', onEnter, true);
-				loop.removeEventListener('pointerleave', onLeave, true);
-				loop.removeEventListener('focus', onFocus, true);
-				window.removeEventListener('load', onLoad);
-			};
 		},
 
 		/**
