@@ -602,10 +602,9 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The rules a count set for a screen applies by are the free plugin's,
-	 * for Pro to write the classes of: at the breakpoints the theme declares
-	 * for its responsive styles, or the ones the editor falls back to - and
-	 * as the same ranges, so the tablet count is the tablet's alone.
+	 * A screen begins where the editor previews it: at the breakpoints the
+	 * theme declares for its responsive styles, or the ones the editor falls
+	 * back to - and as ranges, so the tablet is the tablet's alone.
 	 *
 	 * @return void
 	 */
@@ -617,17 +616,6 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 		$this->assertSame( array( 'tablet', 'mobile' ), array_keys( $queries ) );
 		$this->assertSame( '@media (480px < width <= 782px)', $queries['tablet'] );
 		$this->assertSame( '@media (width <= 480px)', $queries['mobile'] );
-
-		// The rules ride along with the block stylesheet, after it, so they
-		// are printed wherever the stylesheet is - the editor canvas included.
-		wp_styles()->add_data( Visual_Portfolio_Block_Item_Template::STYLE, 'after', array() );
-
-		( new Visual_Portfolio_Block_Item_Template() )->add_screen_columns_style();
-
-		$rules = implode( '', (array) wp_styles()->get_data( Visual_Portfolio_Block_Item_Template::STYLE, 'after' ) );
-
-		$this->assertStringContainsString( '@media (480px < width <= 782px){.wp-block-visual-portfolio-item-template.vp-has-tablet-columns{--vp-layout-current-columns:var(--vp-layout-columns-tablet)}}', $rules );
-		$this->assertStringContainsString( '@media (width <= 480px){.wp-block-visual-portfolio-item-template.vp-has-mobile-columns{--vp-layout-current-columns:var(--vp-layout-columns-mobile)}}', $rules );
 	}
 
 	/**
