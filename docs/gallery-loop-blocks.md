@@ -789,29 +789,14 @@ leaves is nothing.
 
 ### Carousel marquee
 
-Autoplay has two modes. Slide by slide holds each slide for the delay. A marquee
-moves the carousel on without stopping, and is Pro's: the free editor offers it
-as a disabled "Marquee (Pro)" option of the *Mode* select, and nothing the free
-plugin renders turns it on. Choosing it keeps `extensions.marquee` on the item
-template, an object whose settings belong to the extension, turns *Repeat* on,
-and puts `vpf.itemTemplateMarqueeControls` (`null`, `{ attributes,
-setAttributes }`) where the delay was.
-
-The view module runs a marquee for a list that carries, with autoplay:
-
-| Attribute | Value |
-|---|---|
-| `data-vp-carousel-marquee` | speed, in pixels per second |
-| `data-vp-carousel-marquee-direction` | `backward` runs it the other way |
-| `data-vp-carousel-marquee-hover` | the share of the speed kept under the pointer, from `0`, a stop, to `1` |
-
-Only a carousel that repeats runs one; any other steps by its delay, and a
-visitor who asked for less motion gets a still carousel either way. A marquee
-pauses where autoplay pauses, lets go of the carousel to an arrow, a dot, a drag
-or a scroll, and takes it up again once it has come to rest. The scroll holds
-whole pixels and is kept a margin in from the ends of a loop, so the module
-moves the slides by the rest through `--vp-carousel-marquee-shift` on the list,
-which translates every item.
+Autoplay has two modes. Slide by slide holds each slide for the delay. A
+marquee moves the carousel on without stopping, and is Pro's: the free editor
+offers it as a disabled "Marquee (Pro)" option of the *Mode* select, and the
+free plugin has no code that runs one. Choosing it keeps `extensions.marquee`
+on the item template, an object whose settings belong to the extension, turns
+*Repeat* on, and puts `vpf.itemTemplateMarqueeControls` (`null`, `{ attributes,
+setAttributes }`) where the delay was. The page runs it through the autoplay
+events below.
 
 ### Sitemap
 
@@ -989,6 +974,8 @@ template:
 |---|---|
 | `vp-carousel-go-to` | `detail.index` — scroll to that slide |
 | `vp-carousel-autoplay` | `detail.playing` — `false` holds autoplay, `true` releases it |
+| `vp-carousel-place` | `detail.position` — a place on the loop of a repeating carousel, scrolled to at once and kept off the seam the way a step is; written back as the scroll it came to rest at |
+| `vp-carousel-autoplay-take` | the autoplay stops moving the carousel and hands each frame to the script that took it |
 
 And announces itself on the same element, bubbling, so that a script outside
 the module can run beside a carousel for as long as it runs:
@@ -997,6 +984,16 @@ the module can run beside a carousel for as long as it runs:
 |---|---|
 | `vp-carousel-start` | the module has started the carousel, once per start — a Load More starts it again |
 | `vp-carousel-stop` | the module is about to let go of it |
+| `vp-carousel-travel-start` | the module has started drawing a step of a repeating carousel, snapping held off (not bubbling) |
+| `vp-carousel-travel-end` | the step has arrived or was stopped, and the snap is back (not bubbling) |
+| `vp-carousel-autoplay-frame` | a frame of a taken autoplay: `detail.elapsed` in milliseconds, `detail.held` (the visitor's stop, a script's hold, off the screen, the keyboard), `detail.pointer` and `detail.keyboard` (not bubbling) |
+
+A script that takes the autoplay moves the carousel itself and keeps the rest:
+the pauses, the play and pause button, and a visitor who asked for less
+motion, for whom no frame ever comes. It takes it again on every
+`vp-carousel-start`, since a Load More starts a new autoplay. Snapping is
+switched by the list's `--snap-type` custom property, which the carousel
+library reads; a step saves it and puts it back when it arrives.
 
 Holding autoplay is not the same as stopping it: the pause a pointer or a focus
 already applies keeps working underneath, and releasing the hold does not

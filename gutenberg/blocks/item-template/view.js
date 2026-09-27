@@ -254,8 +254,19 @@ const RELAYOUT_EVENT = 'vp-relayout';
 //                                          it. A hold, not a play button: the
 //                                          pointer of the visitor still pauses
 //                                          a released carousel.
+// `vp-carousel-place`     `detail.position` a place on the clock of a
+//                                          repeating carousel, scrolled to at
+//                                          once - kept off the seam the way
+//                                          a step is. Written back as the
+//                                          scroll it came to rest at.
+// `vp-carousel-autoplay-take`              the autoplay stops moving the
+//                                          carousel itself and hands each
+//                                          frame it would have run to the
+//                                          script that took it.
 const GO_TO_EVENT = 'vp-carousel-go-to';
 const AUTOPLAY_EVENT = 'vp-carousel-autoplay';
+const PLACE_EVENT = 'vp-carousel-place';
+const AUTOPLAY_TAKE_EVENT = 'vp-carousel-autoplay-take';
 
 // Dispatched on the list, and bubbling, once the module runs a carousel and
 // again just before it lets go of one - so that a script that is not a module
@@ -266,6 +277,23 @@ const AUTOPLAY_EVENT = 'vp-carousel-autoplay';
 // `vp-carousel-stop`   it is about to be torn down.
 const START_EVENT = 'vp-carousel-start';
 const STOP_EVENT = 'vp-carousel-stop';
+
+// Dispatched on the list, so that a script moving the carousel as well keeps
+// out of the way of the module.
+//
+// `vp-carousel-travel-start`  the module has started drawing a step of a
+//                             repeating carousel, with snapping held off.
+// `vp-carousel-travel-end`    it has arrived, or was stopped, and the snap is
+//                             back to what it was.
+// `vp-carousel-autoplay-frame` a frame of a taken autoplay: `detail.elapsed`
+//                             in milliseconds, `detail.held` - stopped by the
+//                             visitor, held by a script, off the screen or
+//                             under the keyboard - `detail.pointer` when the
+//                             pointer rests on the carousel, and
+//                             `detail.keyboard` when the keyboard has it.
+const TRAVEL_START_EVENT = 'vp-carousel-travel-start';
+const TRAVEL_END_EVENT = 'vp-carousel-travel-end';
+const AUTOPLAY_FRAME_EVENT = 'vp-carousel-autoplay-frame';
 
 // Dispatched on the list by a press on an arrow or a dot. Autoplay starts
 // its wait over on it: a visitor who has just chosen a slide is owed a whole
@@ -357,17 +385,6 @@ const MODIFIER_KEYS = new Set([
 
 // How long a step of a repeating carousel takes, drawn by the module.
 const TRAVEL_DURATION = 450;
-
-// How long a marquee takes to reach a new speed, in milliseconds, and how
-// long a carousel something else moved has to lie still before the marquee
-// takes it up again.
-const MARQUEE_EASE = 300;
-const MARQUEE_SETTLE = 400;
-
-// How far a marquee has moved past where the scroll could go - the part of a
-// pixel it holds none of, and the margin it keeps at the seam of the loop.
-// The stylesheet translates the slides by it.
-const MARQUEE_SHIFT_PROPERTY = '--vp-carousel-marquee-shift';
 
 // The shortest and the longest a move that carries on from a drag takes. Its
 // length is otherwise the speed it was let go at, which for a slow drag over
@@ -684,6 +701,7 @@ function travelRepeating(list, from, to, period, speed = 0) {
 		}
 
 		remeasureLoop(list);
+		list.dispatchEvent(new window.CustomEvent(TRAVEL_END_EVENT));
 	};
 
 	// A carousel that was thrown is already going, and a move that eased in
@@ -751,6 +769,7 @@ function travelRepeating(list, from, to, period, speed = 0) {
 	// for. Blossom stops throwing a carousel the moment anything else scrolls
 	// it, and a travel that waited for its frame let a throw it was taking
 	// over from move the carousel once more first.
+	list.dispatchEvent(new window.CustomEvent(TRAVEL_START_EVENT));
 	place(from);
 
 	raf = window.requestAnimationFrame(frame);
@@ -2508,252 +2527,6 @@ function initScrub(list) {
 }
 
 /**
- * How a carousel asked to run as a marquee.
- *
- * Only a carousel that repeats can: a marquee never reaches an end, and one
- * that could not run round - too few slides, a right to left page - falls
- * back to the steps of its delay.
- *
- * @param {HTMLElement} list Item template list.
- *
- * @return {Object|null} `speed` in pixels of scroll per millisecond, negative
- *                       backwards, and `hover`, the share of it kept under
- *                       the pointer. Null for a carousel that steps.
- */
-function getMarquee(list) {
-	const speed = parseFloat(list.dataset.vpCarouselMarquee);
-	const hover = parseFloat(list.dataset.vpCarouselMarqueeHover);
-
-	if (!(speed > 0) || !isRepeating(list)) {
-		return null;
-	}
-
-	return {
-		speed:
-			(speed / 1000) *
-			('backward' === list.dataset.vpCarouselMarqueeDirection ? -1 : 1),
-		hover: Number.isFinite(hover) ? Math.max(0, Math.min(1, hover)) : 0,
-	};
-}
-
-/**
- * Move a repeating carousel on at a steady speed.
- *
- * The scroll holds whole pixels only, so a slow marquee moved by it alone
- * stood still on most frames and jumped on the rest. The whole pixels go to
- * the scroll and what is left of one to a translation of the slides, which
- * the stylesheet reads from the list.
- *
- * The marquee lets go of the carousel to anything else that moves it - a
- * step the module is drawing, a drag, a swipe, the wheel, the keyboard - and
- * takes it up again from wherever it came to rest.
- *
- * @param {HTMLElement} list    Item template list.
- * @param {Object}      marquee What `getMarquee` read.
- *
- * @return {Object} `drift( elapsed, wanted, now )` to call every frame, with
- *                  the share of the speed the carousel should be moving at,
- *                  `rest( now )` for a frame the keyboard has it, and
- *                  `stop()`.
- */
-function initMarquee(list, marquee) {
-	// Where the marquee put the carousel, between whole pixels. Null while
-	// something else has it.
-	let place = null;
-	// The share of the speed it is moving at, eased towards the one asked
-	// for, so a pointer that rests on it slows it rather than stopping it
-	// dead.
-	let rate = 0;
-	// A mouse button held on the list, and a finger on it: the browser takes
-	// the pointer of a finger away the moment it starts to pan, and a finger
-	// that stopped mid-pan was moved on under.
-	let pressed = false;
-	let touching = false;
-	// A key pressed on the list, focused by a click as often as by the Tab
-	// key - and a click leaves no focus the keyboard's for the autoplay to
-	// hold on.
-	let keyboard = false;
-	let lastPosition = getScrollPosition(list);
-	let lastMove = 0;
-	// The snap the carousel has when the marquee is not moving it. Blossom
-	// writes its own when it loads, after the marquee has started.
-	let snap = list.style.getPropertyValue(SNAP_TYPE_PROPERTY);
-
-	const setSnap = (value) => {
-		if (value) {
-			list.style.setProperty(SNAP_TYPE_PROPERTY, value);
-		} else {
-			list.style.removeProperty(SNAP_TYPE_PROPERTY);
-		}
-	};
-
-	const setShift = (value) => {
-		list.style.setProperty(MARQUEE_SHIFT_PROPERTY, `${value}px`);
-	};
-
-	const letGo = (now) => {
-		place = null;
-		rate = 0;
-		lastMove = now;
-		setShift(0);
-	};
-
-	// The main button only, and never past a menu: the menu a right click
-	// or a Ctrl click opens on a Mac swallows the release, and the marquee
-	// stood still until the next click.
-	const onDown = (event) => {
-		pressed = 0 === event.button;
-	};
-	const onUp = () => {
-		pressed = false;
-	};
-	// The fingers on this list, not on the page: a finger lifted elsewhere
-	// with another still down held every marquee on it.
-	const onTouch = (event) => {
-		touching = Array.from(event.touches).some((touch) =>
-			list.contains(touch.target)
-		);
-	};
-
-	const drift = (elapsed, wanted, now) => {
-		if (keyboard) {
-			rest(now);
-
-			return;
-		}
-
-		// A marquee rests nowhere, and a snap pulled it back to the slide it
-		// was leaving on every frame. Written every frame, since Blossom
-		// writes its own.
-		const current = list.style.getPropertyValue(SNAP_TYPE_PROPERTY);
-
-		if ('none' !== current) {
-			snap = current;
-			list.style.setProperty(SNAP_TYPE_PROPERTY, 'none');
-		}
-
-		// Held and at a stop, there is nothing to move - and nothing to
-		// measure until it runs again, when a move made meanwhile is found.
-		if (!wanted && !rate) {
-			return;
-		}
-
-		const position = getScrollPosition(list);
-		const { period } = getRepeatGeometry(list);
-		// Moved by something other than the marquee since the last frame: the
-		// marquee reads back the very pixel it scrolled to. A turn of the loop
-		// is the same picture, so only a move off it counts.
-		const off = onTheClock(position - lastPosition, period);
-		const moved = off > 0.5 && off < period - 0.5;
-
-		lastPosition = position;
-
-		if (moved) {
-			lastMove = now;
-		}
-
-		if (
-			!period ||
-			pressed ||
-			touching ||
-			travels.has(list) ||
-			(moved && null !== place)
-		) {
-			letGo(now);
-
-			return;
-		}
-
-		if (null === place) {
-			// Taken up again once the carousel has come to rest.
-			if (now - lastMove < MARQUEE_SETTLE) {
-				return;
-			}
-
-			place = position;
-		}
-
-		// At an even rate, so that a stop is a stop and not a crawl.
-		const change = elapsed / MARQUEE_EASE;
-
-		rate += Math.max(-change, Math.min(change, wanted - rate));
-		place = onTheClock(place + marquee.speed * rate * elapsed, period);
-
-		placeRepeating(list, Math.floor(place), period);
-		lastPosition = getScrollPosition(list);
-
-		// What the scroll could not take. The part of a pixel, and near the
-		// seam more: the scroll is kept a margin in from either end of its
-		// range and put at the margin when asked for a place inside it, which
-		// on its own jumped the marquee over the seam and held it there.
-		const short = onTheClock(place - lastPosition + period / 2, period);
-
-		setShift(short - period / 2);
-	};
-
-	// The keyboard has the carousel: it is given its snap back, so an arrow
-	// key moves it a slide, and the marquee takes it up again when the focus
-	// leaves.
-	const rest = (now) => {
-		if (null !== place || rate) {
-			letGo(now);
-		}
-
-		// Not under a step the module is drawing, which holds the snap off
-		// until it arrives and gives it back itself.
-		if (
-			!travels.has(list) &&
-			'none' === list.style.getPropertyValue(SNAP_TYPE_PROPERTY)
-		) {
-			setSnap(snap);
-		}
-
-		lastPosition = getScrollPosition(list);
-	};
-
-	// The snap is given back before the key scrolls, so the key moves a slide.
-	const onKey = (event) => {
-		if (!MODIFIER_KEYS.has(event.key)) {
-			keyboard = true;
-			rest(event.timeStamp);
-		}
-	};
-	// Out of the list altogether: a key on a link inside a slide bubbles up
-	// here, and the link's own blur does not.
-	const onFocusOut = (event) => {
-		if (!list.contains(event.relatedTarget)) {
-			keyboard = false;
-		}
-	};
-
-	list.addEventListener('pointerdown', onDown);
-	window.addEventListener('pointerup', onUp);
-	window.addEventListener('pointercancel', onUp);
-	window.addEventListener('contextmenu', onUp);
-	list.addEventListener('touchstart', onTouch, { passive: true });
-	window.addEventListener('touchend', onTouch, { passive: true });
-	window.addEventListener('touchcancel', onTouch, { passive: true });
-	list.addEventListener('keydown', onKey);
-	list.addEventListener('focusout', onFocusOut);
-
-	const stop = () => {
-		list.removeEventListener('pointerdown', onDown);
-		window.removeEventListener('pointerup', onUp);
-		window.removeEventListener('pointercancel', onUp);
-		window.removeEventListener('contextmenu', onUp);
-		list.removeEventListener('touchstart', onTouch);
-		window.removeEventListener('touchend', onTouch);
-		window.removeEventListener('touchcancel', onTouch);
-		list.removeEventListener('keydown', onKey);
-		list.removeEventListener('focusout', onFocusOut);
-		list.style.removeProperty(MARQUEE_SHIFT_PROPERTY);
-		setSnap(snap);
-	};
-
-	return { drift, rest, stop };
-}
-
-/**
  * Run a carousel on its own.
  *
  * The delay is drawn onto the indicator as it runs down, so the dot doubles as
@@ -2815,10 +2588,9 @@ function initAutoplay(list) {
 	// showing a different one.
 	let seen = -1;
 
-	// A marquee is the same clock run without a wait: it moves every frame the
-	// clock is not held.
-	const marquee = getMarquee(list);
-	const drifting = marquee ? initMarquee(list, marquee) : null;
+	// Taken by a script that moves the carousel itself. The pauses stay the
+	// autoplay's, and so does the play and pause button.
+	let taken = false;
 
 	const setProgress = (value) => {
 		root.style.setProperty(
@@ -2848,32 +2620,35 @@ function initAutoplay(list) {
 			});
 		});
 
-		const holding = focusIn.size || held || offscreen || stopped.has(list);
-
-		// Under the pointer a marquee keeps the share of its speed it was
-		// given, and slows to it. A frame that comes long after the last one -
-		// a tab brought back - moves it no further than a frame's worth.
-		if (drifting && focusIn.size) {
-			drifting.rest(now);
-
-			return;
-		}
-
-		if (drifting) {
-			let wanted = pointerOn.size ? marquee.hover : 1;
-
-			if (holding) {
-				wanted = 0;
-			}
-
-			drifting.drift(Math.min(step, 100), wanted, now);
+		if (taken) {
+			list.dispatchEvent(
+				new window.CustomEvent(AUTOPLAY_FRAME_EVENT, {
+					detail: {
+						elapsed: step,
+						held: !!(
+							focusIn.size ||
+							held ||
+							offscreen ||
+							stopped.has(list)
+						),
+						pointer: pointerOn.size > 0,
+						keyboard: focusIn.size > 0,
+					},
+				})
+			);
 
 			return;
 		}
 
 		// A held clock reads nothing: the slide it will count for is read on
 		// the first frame it runs again.
-		if (pointerOn.size || holding) {
+		if (
+			pointerOn.size ||
+			focusIn.size ||
+			held ||
+			offscreen ||
+			stopped.has(list)
+		) {
 			return;
 		}
 
@@ -2978,7 +2753,13 @@ function initAutoplay(list) {
 		box.addEventListener('focusout', onFocusOut);
 	});
 	list.addEventListener(AUTOPLAY_EVENT, hold);
+	const take = () => {
+		taken = true;
+		setProgress(0);
+	};
+
 	list.addEventListener(STEP_EVENT, restart);
+	list.addEventListener(AUTOPLAY_TAKE_EVENT, take);
 	syncAutoplay(list, root);
 
 	raf = window.requestAnimationFrame((now) => {
@@ -2998,8 +2779,8 @@ function initAutoplay(list) {
 		});
 		list.removeEventListener(AUTOPLAY_EVENT, hold);
 		list.removeEventListener(STEP_EVENT, restart);
+		list.removeEventListener(AUTOPLAY_TAKE_EVENT, take);
 		root.style.removeProperty('--vp-carousel-autoplay-progress');
-		drifting?.stop();
 	};
 }
 
@@ -3068,6 +2849,16 @@ function wakeControls(list, hasAutoplay) {
 function initCarousel(list, restore) {
 	const onScroll = () => syncNav(list);
 	const onGoTo = (event) => goToSlide(list, event.detail?.index);
+	const onPlace = (event) => {
+		const { period } = getRepeatGeometry(list);
+
+		if (!isRepeating(list) || !period || !event.detail) {
+			return;
+		}
+
+		placeRepeating(list, event.detail.position, period);
+		event.detail.position = getScrollPosition(list);
+	};
 
 	// Drag is the one thing the browser does not do for a scroll container, and
 	// it is the one thing Blossom adds - so it is loaded where a pointer can
@@ -3140,6 +2931,7 @@ function initCarousel(list, restore) {
 
 	list.addEventListener('scroll', onScroll, { passive: true });
 	list.addEventListener(GO_TO_EVENT, onGoTo);
+	list.addEventListener(PLACE_EVENT, onPlace);
 
 	const stopObserving = observeItems(list, () => {
 		syncSnapGroups(list);
@@ -3271,6 +3063,7 @@ function initCarousel(list, restore) {
 		sleepControls();
 		list.removeEventListener('scroll', onScroll);
 		list.removeEventListener(GO_TO_EVENT, onGoTo);
+		list.removeEventListener(PLACE_EVENT, onPlace);
 		list.removeEventListener('mousedown', onMouseDown);
 		list.removeEventListener('keydown', onKeyDown);
 		list.removeEventListener('blur', unmarkFocus);
