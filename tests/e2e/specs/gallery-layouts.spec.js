@@ -950,6 +950,55 @@ test.describe('Gallery Item Template layouts', () => {
 		}
 	});
 
+	test('the arrow keys step a repeating carousel one slide across its seam', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel repeat keyboard',
+			blockId: 'e2e-carousel-repeat-keyboard',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 4,
+				carouselRepeat: true,
+			},
+			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveAttribute('has-repeat', 'true', {
+			timeout: 15000,
+		});
+		await expect
+			.poll(() => getRestingSlide(list), { timeout: 10000 })
+			.toBe(0);
+
+		// The browser's own arrow scroll stopped at the end of the range the
+		// library keeps the loop in: the last slide was never reached. Each
+		// press waits for the last to come to rest, which is when the
+		// browser's scroll would have taken it.
+		await list.focus();
+
+		const press = async (key, expected) => {
+			await page.keyboard.press(key);
+			await expect
+				.poll(() => getRestingSlide(list), { timeout: 10000 })
+				.toBe(expected);
+			await settle(list);
+		};
+
+		for (const expected of [1, 2, 3, 4, 5, 0, 1]) {
+			await press('ArrowRight', expected);
+		}
+
+		for (const expected of [0, 5, 4]) {
+			await press('ArrowLeft', expected);
+		}
+	});
+
 	test('a repeating carousel steps its frames round the loop', async ({
 		page,
 		requestUtils,
