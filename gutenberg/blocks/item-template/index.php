@@ -49,10 +49,6 @@ class Visual_Portfolio_Block_Item_Template {
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_block' ), 11 );
 
-		// styles. On the page and in the editor canvas alike: the action runs
-		// for both, and the rules ride along with the block stylesheet.
-		add_action( 'enqueue_block_assets', array( $this, 'add_screen_columns_style' ) );
-
 		// editor. Late, so that the editor bundle it attaches to is registered.
 		add_action( 'enqueue_block_assets', array( $this, 'enqueue_tiles_presets' ), 20 );
 	}
@@ -90,48 +86,6 @@ class Visual_Portfolio_Block_Item_Template {
 		}
 
 		return $screens;
-	}
-
-	/**
-	 * The rules a count set for a screen is applied by.
-	 *
-	 * Attached to the block stylesheet rather than written into it: a
-	 * stylesheet cannot read the breakpoints of a theme, and these have to.
-	 * Printed after the stylesheet, at the same weight as the ladder the
-	 * stylesheet walks, so a count set outright wins over a stepped one.
-	 *
-	 * Nothing in the free plugin writes the classes these rules answer to.
-	 * They are the half of the contract Pro's responsive layout relies on:
-	 * it prints `vp-has-{screen}-columns` and `--vp-layout-columns-{screen}`
-	 * on a list, and the count applies at the breakpoints the editor
-	 * previews the screen at.
-	 *
-	 * @return void
-	 */
-	public function add_screen_columns_style() {
-		static $done = false;
-
-		if ( $done ) {
-			return;
-		}
-
-		$done = true;
-
-		$rules = '';
-
-		// The queries are built by the editor out of breakpoints it has
-		// checked are plain lengths, and the screen names are this class's own.
-		foreach ( self::get_screen_queries() as $screen => $query ) {
-			$rules .= sprintf(
-				'%1$s{.wp-block-visual-portfolio-item-template.vp-has-%2$s-columns{--vp-layout-current-columns:var(--vp-layout-columns-%2$s)}}',
-				$query,
-				$screen
-			);
-		}
-
-		if ( $rules ) {
-			wp_add_inline_style( self::STYLE, $rules );
-		}
 	}
 
 	/**

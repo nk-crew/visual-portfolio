@@ -2,7 +2,6 @@ import {
 	getContext,
 	getElement,
 	store,
-	withScope,
 	withSyncEvent,
 } from '@wordpress/interactivity';
 
@@ -17,7 +16,8 @@ import { syncColumns } from '../item-template/auto-columns';
  * loop still navigates by full page loads. It only replaces the load with a
  * region swap, and hands the navigation back to the browser whenever it cannot.
  *
- * Pro composes onto the same namespace with another `store()` call.
+ * Pro composes onto the same namespace with another `store()` call, and adds
+ * `actions.search` there. Free never defines it, so the two cannot collide.
  */
 
 const LOOP_SELECTOR = '.vp-block-loop';
@@ -27,13 +27,9 @@ const PAGINATION_SELECTOR = '.vp-block-loop-pagination';
 const TRIGGER_SELECTOR = '.vp-block-loop-pagination-trigger';
 const END_SELECTOR = '.vp-block-loop-pagination-end';
 const MASONRY_CLASS = 'vp-layout-masonry';
-const SEARCH_INPUT_SELECTOR = '.vp-block-loop-search__input';
 const RANGE_SELECTOR = '.vp-block-loop-query-total[data-vp-range-text]';
 const THUMBS_SELECTOR = '.vp-block-loop-carousel-thumbnails';
 const THUMB_SELECTOR = '.vp-block-loop-carousel-thumb';
-
-// How long a search waits for the visitor to stop typing.
-const SEARCH_DELAY = 500;
 
 // Written on the list once Masonry is positioning the items, and read by the
 // stylesheet: until then the browser packs them into columns on its own. Not
@@ -56,15 +52,16 @@ const NAVIGATION_TIMEOUT = 10000;
 // Listened for by the item template module, which owns justified and carousel.
 const RELAYOUT_EVENT = 'vp-relayout';
 
-// Prefetching runs on a loop the server gave `callbacks.initPrefetch`. The
-// delays are the classic gallery's: a pointer that only crosses a link asks for
-// nothing, and the next page waits for the page itself to settle.
-const NAVIGATE_LINK_SELECTOR = 'a[data-wp-on--click="actions.navigate"]';
-const HOVER_DELAY = 100;
-const NEXT_PAGE_DELAY = 600;
+// Sent by an infinite trigger before a load it starts by itself; an extension
+// that cancels it keeps the trigger a Load More until it is asked again.
+const INFINITE_LOAD_EVENT = 'vp-infinite-load';
 
-// A search is whatever the visitor typed, so its addresses never repeat.
-const SEARCH_PARAM = /^vp(-\d+-|_)search$/;
+// Sent on a loop right before it loads an address, so that an extension holding
+// the page already can answer with it; see `requestPage()`.
+const REQUEST_EVENT = 'vp-loop-request';
+
+// Sent on a loop once it shows what it loaded.
+const LOADED_EVENT = 'vp-loop-loaded';
 
 const masonryLayouts = new WeakMap();
 const autoColumns = new WeakMap();
@@ -81,25 +78,9 @@ const infiniteRearms = new WeakMap();
 // the newest of them owns the loading state - the first one to settle would
 // otherwise clear the flag for both.
 const navigating = new WeakMap();
-// The navigation a loop was last asked for, kept after it ends.
+// The navigation a loop was last asked for, kept after it ends, so that an
+// answer to an older one arriving late asks the router for nothing.
 const latestNavigations = new WeakMap();
-
-// Per loop: the search waiting for the visitor to stop typing, what they typed
-// last with where the caret was, and the address the last finished search
-// wrote.
-const searchTimers = new WeakMap();
-const searchesInFlight = new WeakMap();
-const typedSearches = new WeakMap();
-const searchAddresses = new WeakMap();
-
-// Loops that prefetch; per loop, the timer of its next page, and that page
-// fetched ahead of a Load More as `{ href, html }`, where `html` settles to null
-// if the fetch failed. Beside them, the fetches of link targets on their way to
-// the router or already handed to it, by address.
-const prefetchingLoops = new WeakSet();
-const nextPageTimers = new WeakMap();
-const nextPages = new WeakMap();
-const prefetchedLinks = new Map();
 
 /**
  * Context of the loop the current element belongs to.
@@ -464,32 +445,9 @@ window.addEventListener('popstate', () => {
 	window.document.querySelectorAll(LOOP_SELECTOR).forEach((loop) => {
 		if (loopUndoAddresses.get(loop) !== getPageAddress()) {
 			undoManualEdits(loop);
-			nextPages.delete(loop);
 		}
 	});
 });
-
-/**
- * Whether an address may be fetched before the visitor asks for it.
- *
- * @param {string} href Address.
- *
- * @return {boolean} False on Save-Data and 2G, as the classic gallery, and for a search.
- */
-function canPrefetch(href) {
-	const { connection } = window.navigator;
-
-	if (
-		connection &&
-		(connection.saveData || (connection.effectiveType || '').includes('2g'))
-	) {
-		return false;
-	}
-
-	return !Array.from(new window.URL(href).searchParams.keys()).some((name) =>
-		SEARCH_PARAM.test(name)
-	);
-}
 
 /**
  * Fetch the HTML of a page.
@@ -510,81 +468,57 @@ async function fetchPageHtml(href, signal) {
 }
 
 /**
- * Fetch the page a Load More or infinite trigger of a loop leads to, a moment
- * from now, for `loadNextPage()` to take instead of fetching it.
+ * Ask the extensions on the page for an address before the loop loads it.
  *
- * @param {HTMLElement} loop Loop wrapper.
+ * A listener that holds the page already - Pro fetches ahead what a visitor
+ * points at - calls `respondWith()` with it, synchronously, and the first call
+ * wins. Whatever it gives settles to the page HTML, or to null when it is no
+ * page, fails, or nobody answered, and the loop then loads the address itself.
+ *
+ * @param {HTMLElement} loop    Loop wrapper.
+ * @param {string}      href    Absolute address.
+ * @param {string}      purpose `navigate` for a swap of the loop, `append` for
+ *                              a page added under it.
+ *
+ * @return {Promise<?string>|null} The answer, or null when nobody answered.
  */
-function prefetchNextPage(loop) {
-	if (!prefetchingLoops.has(loop)) {
-		return;
-	}
+function requestPage(loop, href, purpose) {
+	let answer = null;
 
-	window.clearTimeout(nextPageTimers.get(loop));
-	nextPageTimers.set(
-		loop,
-		window.setTimeout(() => {
-			nextPageTimers.delete(loop);
-
-			const trigger = Array.from(
-				loop.querySelectorAll(TRIGGER_SELECTOR)
-			).find((element) => element.closest(LOOP_SELECTOR) === loop);
-			const href = trigger ? getControlUrl(trigger) : '';
-
-			// A page already on its way, either one.
-			if (
-				!href ||
-				href === nextPages.get(loop)?.href ||
-				pendingRequests.has(loop) ||
-				navigating.has(loop) ||
-				!canPrefetch(href)
-			) {
-				return;
-			}
-
-			nextPages.set(loop, {
+	loop.dispatchEvent(
+		new window.CustomEvent(REQUEST_EVENT, {
+			bubbles: true,
+			detail: {
 				href,
-				html: fetchPageHtml(href).catch(() => null),
-			});
-		}, NEXT_PAGE_DELAY)
+				purpose,
+				respondWith(page) {
+					if (!answer) {
+						answer = Promise.resolve(page).then(
+							(html) => ('string' === typeof html ? html : null),
+							() => null
+						);
+					}
+				},
+			},
+		})
 	);
+
+	return answer;
 }
 
 /**
- * Hand the router the page a navigate link leads to, so that following the
- * link swaps the loop without waiting for the server.
+ * Tell the extensions on the page that a loop shows what it loaded.
  *
- * Fetched here rather than by the router's own prefetch, which keeps a failed
- * fetch for the address and would turn the click into a full page load.
- *
- * @param {HTMLElement} link Link.
+ * @param {HTMLElement} loop    Loop wrapper.
+ * @param {string}      href    Absolute address the loop loaded.
+ * @param {string}      purpose `navigate` or `append`, as it was asked for.
  */
-function prefetchLink(link) {
-	const href = getControlUrl(link);
-	const loop = link.closest(LOOP_SELECTOR);
-
-	// A link clicked before its delay ran out is on its way already.
-	if (
-		!href ||
-		!loop ||
-		navigating.has(loop) ||
-		prefetchedLinks.has(href) ||
-		!canPrefetch(href)
-	) {
-		return;
-	}
-
-	prefetchedLinks.set(
-		href,
-		fetchPageHtml(href)
-			.then(async (html) => {
-				const router = await import('@wordpress/interactivity-router');
-
-				await router.actions.prefetch(href, { html });
-			})
-			.catch(() => {
-				prefetchedLinks.delete(href);
-			})
+function announceLoaded(loop, href, purpose) {
+	loop.dispatchEvent(
+		new window.CustomEvent(LOADED_EVENT, {
+			bubbles: true,
+			detail: { href, purpose },
+		})
 	);
 }
 
@@ -797,29 +731,24 @@ async function loadNextPage(trigger, context, byClick) {
 	pendingRequests.set(loop, controller);
 	context.isLoading = true;
 
-	// Taken whether or not it is the page asked for: the trigger has moved on
-	// from any other.
-	const ahead = nextPages.get(loop);
-
-	nextPages.delete(loop);
+	const answer = requestPage(loop, href, 'append');
 
 	try {
-		// A page fetched ahead that hangs is not waited for past the deadline
-		// a navigation has; the page is asked for again.
-		let html =
-			ahead && ahead.href === href
-				? await Promise.race([
-						ahead.html,
-						new Promise((resolve) => {
-							window.setTimeout(
-								() => resolve(null),
-								NAVIGATION_TIMEOUT
-							);
-						}),
-					])
-				: null;
+		// An answer that hangs is not waited for past the deadline a
+		// navigation has; the page is asked for again.
+		let html = answer
+			? await Promise.race([
+					answer,
+					new Promise((resolve) => {
+						window.setTimeout(
+							() => resolve(null),
+							NAVIGATION_TIMEOUT
+						);
+					}),
+				])
+			: null;
 
-		// A navigation that started while the page fetched ahead was awaited.
+		// A navigation that started while the answer was awaited.
 		controller.signal.throwIfAborted();
 
 		if (null === html) {
@@ -876,7 +805,7 @@ async function loadNextPage(trigger, context, byClick) {
 			focusIn(added[0]);
 		}
 
-		prefetchNextPage(loop);
+		announceLoaded(loop, href, 'append');
 
 		return APPENDED;
 	} catch (error) {
@@ -921,18 +850,17 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 	// node while everything inside it is replaced.
 	const loop = ref.closest(LOOP_SELECTOR);
 
-	if (loop) {
-		// A search still waiting for a pause in the typing would follow this
-		// navigation from the page it replaces.
-		window.clearTimeout(searchTimers.get(loop));
-		searchTimers.delete(loop);
+	// Sent first, so that whatever would follow this navigation from the page
+	// it replaces, such as a search waiting for a pause in the typing, stops
+	// before anything else happens.
+	const answer = loop ? requestPage(loop, href, 'navigate') : null;
 
+	if (loop) {
 		// A Load More still in flight would append its page under the
 		// one the router is about to render, and register undos for a
 		// rollback that already ran.
 		pendingRequests.get(loop)?.abort();
 		pendingRequests.delete(loop);
-		nextPages.delete(loop);
 
 		undoManualEdits(loop);
 	}
@@ -972,14 +900,17 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 		let asked = false;
 
 		const timedOut = yield Promise.race([
-			// A prefetch of this address still on its way is the request the
-			// router would make again. Once it failed, the router makes its own.
-			// The router takes the last navigation it is asked for, so one the
-			// visitor has since replaced asks for nothing.
-			Promise.resolve(prefetchedLinks.get(href)).then(async () => {
+			// A page an extension answered with is the request the router would
+			// make again. Without one, the router makes its own. The router
+			// takes the last navigation it is asked for, so one the visitor has
+			// since replaced asks for nothing.
+			Promise.resolve(answer).then(async (html) => {
 				if (!loop || latestNavigations.get(loop) === token) {
 					asked = true;
-					await router.actions.navigate(href, { replace });
+					await router.actions.navigate(
+						href,
+						html ? { replace, html } : { replace }
+					);
 				}
 
 				return false;
@@ -989,8 +920,8 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 			}),
 		]);
 
-		// A page fetched ahead that has not come by the deadline is given up,
-		// and the address loads in full, as when the router's own fetch hangs.
+		// An answer that has not come by the deadline is given up, and the
+		// address loads in full, as when the router's own fetch hangs.
 		if (timedOut && !asked) {
 			// A newer navigation keeps the loop.
 			if (loop && latestNavigations.get(loop) === token) {
@@ -1013,11 +944,6 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 		return false;
 	}
 
-	// The router keeps the page it rendered.
-	if (!prefetchedLinks.has(href)) {
-		prefetchedLinks.set(href, Promise.resolve());
-	}
-
 	const list = loop ? loop.querySelector(LIST_SELECTOR) : null;
 
 	if (list) {
@@ -1025,147 +951,10 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 	}
 
 	if (loop) {
-		prefetchNextPage(loop);
+		announceLoaded(loop, href, 'navigate');
 	}
 
 	return true;
-}
-
-/**
- * The address a search form leads to, the one it submits to without
- * JavaScript. An empty search is the default state, left out of the address.
- *
- * @param {HTMLInputElement} input Search input.
- *
- * @return {string} Address.
- */
-function getSearchUrl(input) {
-	// Not `form.action`, which a preserved parameter named `action` shadows.
-	const url = new window.URL(
-		input.form.getAttribute('action'),
-		window.location.href
-	);
-	const params = new window.URLSearchParams(new window.FormData(input.form));
-
-	if (!input.value.trim()) {
-		params.delete(input.name);
-	}
-
-	url.search = params.toString();
-
-	return url.href;
-}
-
-/**
- * Put back what the visitor was typing, when a swap took it away.
- *
- * The router renders the input again with the term the server read, which is
- * behind whatever was typed while the page was on its way, and a node it
- * rendered anew takes the focus with it.
- *
- * @param {HTMLElement} loop     Loop wrapper.
- * @param {string}      name     Name of the search input.
- * @param {boolean}     hadFocus Whether the input held the focus before the swap.
- */
-function getSearchInput(loop, name, index) {
-	return loop.querySelectorAll(`${SEARCH_INPUT_SELECTOR}[name="${name}"]`)[
-		index
-	];
-}
-
-function restoreSearch(loop, name, index, hadFocus) {
-	const typed = typedSearches.get(loop);
-	const input = getSearchInput(loop, name, index);
-
-	// What was typed belongs to the field it was typed in.
-	if (!typed || !input || typed.name !== name || typed.index !== index) {
-		return;
-	}
-
-	let moved = false;
-
-	if (input.value !== typed.value) {
-		input.value = typed.value;
-		moved = true;
-	}
-
-	const active = window.document.activeElement;
-
-	// Only a focus the swap dropped, not one the visitor took elsewhere.
-	if (
-		hadFocus &&
-		input !== active &&
-		(!active || window.document.body === active)
-	) {
-		input.focus();
-		moved = true;
-	}
-
-	if (moved && input === window.document.activeElement) {
-		input.setSelectionRange(typed.start, typed.end);
-	}
-}
-
-/**
- * Swap a loop for the search in its input.
- *
- * A search adds a history entry, and every search right after it replaces
- * that entry, so Back leaves the search rather than stepping through it a few
- * letters at a time.
- *
- * @param {HTMLElement} loop    Loop wrapper.
- * @param {string}      name    Name of the search input.
- * @param {Object}      context Loop context.
- *
- * @return {Generator} Done.
- */
-function* searchLoop(loop, name, index, context) {
-	searchTimers.delete(loop);
-
-	// Asked for again: a swap since the visitor typed may have rendered it
-	// anew. By its place, since a loop may hold two of them.
-	const input = getSearchInput(loop, name, index);
-
-	if (!input || !input.form) {
-		return;
-	}
-
-	const href = getSearchUrl(input);
-
-	// Already there, or already on the way: an Enter right after a pause
-	// would push the same address twice. The address the visitor stands on is
-	// still asked for while another search is on the way, or that one lands
-	// over a field that no longer holds it.
-	// Without the hash, which a search address never carries.
-	const here = window.location.href.split('#')[0];
-	const inFlight = searchesInFlight.get(loop);
-
-	if (href === inFlight || (href === here && !inFlight)) {
-		return;
-	}
-
-	// A cleared search is an entry of its own: replacing the search with the
-	// address it started from would leave Back two copies of that address.
-	// Asking for the address the visitor stands on is the reverse: a new entry
-	// would be the second copy.
-	const replace =
-		href === here ||
-		(!!input.value.trim() &&
-			(!!inFlight || searchAddresses.get(loop) === here));
-	const hadFocus = input === window.document.activeElement;
-
-	searchesInFlight.set(loop, href);
-
-	const done = yield* swapLoop(input, href, context, { replace });
-
-	if (searchesInFlight.get(loop) === href) {
-		searchesInFlight.delete(loop);
-	}
-
-	if (done) {
-		searchAddresses.set(loop, href);
-		restoreSearch(loop, name, index, hadFocus);
-	}
 }
 
 store('visual-portfolio/loop', {
@@ -1227,63 +1016,43 @@ store('visual-portfolio/loop', {
 		}),
 
 		/**
-		 * Search the loop for what the visitor typed.
+		 * Swap a loop for its state at another address, for a script that
+		 * leads the loop somewhere no control of its own links to.
 		 *
-		 * Typing waits for a pause, Enter searches at once. The input lives in
-		 * the region it swaps, so the focus, the caret and anything typed while
-		 * the page was on its way are put back afterwards.
+		 * Called from an action or a callback of any store, or from a function
+		 * wrapped in `withScope()`, so that the loop context is the one of the
+		 * element. Leaves the focus where it is.
 		 *
-		 * @param {Event} event Input or submit event.
+		 * @param {string}      href            Address, absolute or relative to
+		 *                                      the page.
+		 * @param {Object}      options         Options.
+		 * @param {boolean}     options.replace Whether the address replaces the
+		 *                                      current history entry.
+		 * @param {HTMLElement} options.ref     Element inside the loop, the
+		 *                                      current element when left out.
+		 *
+		 * @return {Generator} Whether the swap was the loop's latest and is
+		 *                     done.
 		 */
-		search: withSyncEvent(function* (event) {
-			const { ref } = getElement();
-			const loop = ref.closest(LOOP_SELECTOR);
-			const input = ref
-				.closest('form')
-				?.querySelector(SEARCH_INPUT_SELECTOR);
-
-			// An input method is still composing the text.
-			if (!loop || !input || event.isComposing) {
-				return;
+		navigateTo: function* (href, { replace = false, ref } = {}) {
+			// Bound as a directive, it would be handed an event.
+			if ('string' !== typeof href || !href) {
+				return false;
 			}
 
-			const isSubmit = 'submit' === event.type;
+			const element = ref || getElement()?.ref;
 
-			if (isSubmit) {
-				event.preventDefault();
+			if (!element) {
+				return false;
 			}
 
-			window.clearTimeout(searchTimers.get(loop));
-			searchTimers.delete(loop);
-			const { name } = input;
-			const index = Array.from(
-				loop.querySelectorAll(
-					`${SEARCH_INPUT_SELECTOR}[name="${name}"]`
-				)
-			).indexOf(input);
-
-			typedSearches.set(loop, {
-				name,
-				index,
-				value: input.value,
-				start: input.selectionStart,
-				end: input.selectionEnd,
-			});
-			const context = getLoopContext();
-			const run = function* () {
-				yield* searchLoop(loop, name, index, context);
-			};
-
-			if (isSubmit) {
-				yield* run();
-				return;
-			}
-
-			searchTimers.set(
-				loop,
-				window.setTimeout(withScope(run), SEARCH_DELAY)
+			return yield* swapLoop(
+				element,
+				new window.URL(href, window.location.href).href,
+				getLoopContext(),
+				{ replace }
 			);
-		}),
+		},
 
 		/**
 		 * Append the next page of items.
@@ -1303,9 +1072,8 @@ store('visual-portfolio/loop', {
 			// of the next page, is not a visitor asking to leave for it.
 			yield loadNextPage(ref, getLoopContext(), event.isTrusted);
 
-			// A click on an infinite trigger lets it scroll on, and the page it
-			// loaded may leave the trigger in view, which the observer does not
-			// report as a change.
+			// The page a click on an infinite trigger loaded may leave the
+			// trigger in view, which the observer does not report as a change.
 			infiniteRearms.get(ref)?.();
 		}),
 	},
@@ -1331,64 +1099,6 @@ store('visual-portfolio/loop', {
 		},
 
 		/**
-		 * Fetch pages before the visitor asks for them: the target of a navigate
-		 * link they point at or move the focus to, and the next page of a Load
-		 * More or infinite trigger.
-		 *
-		 * Listened for on the loop, in the capture phase, since neither event
-		 * bubbles, and the router renders the links anew on every swap.
-		 *
-		 * @return {Function} Teardown.
-		 */
-		initPrefetch() {
-			const { ref: loop } = getElement();
-			let timer;
-
-			const isLink = (element) => element.matches(NAVIGATE_LINK_SELECTOR);
-			const onEnter = ({ target }) => {
-				if (isLink(target)) {
-					window.clearTimeout(timer);
-					timer = window.setTimeout(
-						() => prefetchLink(target),
-						HOVER_DELAY
-					);
-				}
-			};
-			const onLeave = ({ target }) => {
-				if (isLink(target)) {
-					window.clearTimeout(timer);
-				}
-			};
-			const onFocus = ({ target }) => {
-				if (isLink(target)) {
-					prefetchLink(target);
-				}
-			};
-			const onLoad = () => prefetchNextPage(loop);
-
-			prefetchingLoops.add(loop);
-			loop.addEventListener('pointerenter', onEnter, true);
-			loop.addEventListener('pointerleave', onLeave, true);
-			loop.addEventListener('focus', onFocus, true);
-
-			if ('complete' === window.document.readyState) {
-				onLoad();
-			} else {
-				window.addEventListener('load', onLoad, { once: true });
-			}
-
-			return () => {
-				prefetchingLoops.delete(loop);
-				window.clearTimeout(timer);
-				window.clearTimeout(nextPageTimers.get(loop));
-				loop.removeEventListener('pointerenter', onEnter, true);
-				loop.removeEventListener('pointerleave', onLeave, true);
-				loop.removeEventListener('focus', onFocus, true);
-				window.removeEventListener('load', onLoad);
-			};
-		},
-
-		/**
 		 * Load the next page as the trigger comes into view.
 		 *
 		 * @return {Function} Teardown.
@@ -1399,27 +1109,9 @@ store('visual-portfolio/loop', {
 			// taken while there still is one.
 			const context = getLoopContext();
 
-			// How far ahead of the viewport a page is fetched, and how often
-			// the visitor is asked before it is. Written onto the trigger by
-			// whoever renders it; absent, the loop scrolls on by itself from
-			// the first screen, 300px early.
-			const number = (name, fallback) => {
-				const value = parseInt(ref.dataset[name], 10);
-
-				return Number.isNaN(value) ? fallback : value;
-			};
-
-			const everyPages = Math.max(0, number('vpInfiniteEveryPage', 0));
-			let loaded = 0;
-			let paused = 'true' === ref.dataset.vpInfiniteStartupLoadMore;
-
-			// The trigger is a Load More button as well as a sentinel: a click
-			// on it lets the scrolling resume.
-			const resume = () => {
-				paused = false;
-			};
-
-			ref.addEventListener('click', resume);
+			// How far ahead of the viewport a page is fetched, written onto the
+			// trigger by whoever renders it; absent, 300px early.
+			const threshold = parseInt(ref.dataset.vpInfiniteThreshold, 10);
 
 			let observer;
 
@@ -1439,37 +1131,37 @@ store('visual-portfolio/loop', {
 
 			observer = new window.IntersectionObserver(
 				(entries) => {
-					if (paused) {
-						return;
-					}
-
 					if (!entries.some((entry) => entry.isIntersecting)) {
 						return;
 					}
 
+					if (
+						!ref.dispatchEvent(
+							new window.CustomEvent(INFINITE_LOAD_EVENT, {
+								bubbles: true,
+								cancelable: true,
+							})
+						)
+					) {
+						return;
+					}
+
 					loadNextPage(ref, context, false).then((result) => {
-						if (STOP === result) {
-							return;
+						if (STOP !== result) {
+							rearm();
 						}
-
-						if (APPENDED === result) {
-							loaded += 1;
-
-							if (everyPages && 0 === loaded % everyPages) {
-								paused = true;
-							}
-						}
-
-						rearm();
 					});
 				},
-				{ rootMargin: `${number('vpInfiniteThreshold', 300)}px` }
+				{
+					rootMargin: `${
+						Number.isNaN(threshold) ? 300 : threshold
+					}px`,
+				}
 			);
 
 			observer.observe(ref);
 
 			return () => {
-				ref.removeEventListener('click', resume);
 				infiniteRearms.delete(ref);
 				observer.disconnect();
 			};

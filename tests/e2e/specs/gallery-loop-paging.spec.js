@@ -409,85 +409,55 @@ test.describe('Gallery Loop paging', () => {
 			await expect(page.locator(TRIGGER)).toHaveCount(0);
 		});
 
-		test('stops after every so many pages until the trigger is clicked', async ({
+		test('an extension can hold an automatic load', async ({
 			page,
 			requestUtils,
 		}) => {
-			await setInfiniteData(page, {
-				'data-vp-infinite-every-page': 2,
-				'data-vp-infinite-threshold': 0,
+			await page.addInitScript(() => {
+				window.__hold = true;
+				window.__infiniteLoads = 0;
+
+				document.addEventListener('vp-infinite-load', (event) => {
+					window.__infiniteLoads += 1;
+
+					if (window.__hold) {
+						event.preventDefault();
+					}
+				});
 			});
 			await publish(
 				requestUtils,
 				page,
-				'Paging - infinite every page',
-				SPACER +
-					getInfiniteLoop('e2e-paging-infinite-every', [INFINITE])
+				'Paging - infinite held',
+				getInfiniteLoop('e2e-paging-infinite-held', [INFINITE])
 			);
 
 			const items = page.locator(ITEM);
+			const loads = () => page.evaluate(() => window.__infiniteLoads);
 
-			await expect
-				.poll(
-					async () => {
-						await scrollToTrigger(page);
-
-						return items.count();
-					},
-					{ timeout: 20000 }
-				)
-				.toBe(6);
-
-			// Two pages loaded by scrolling, and the third is left to the
-			// visitor however long they keep the trigger in view.
-			for (let i = 0; i < 4; i++) {
-				await scrollToTrigger(page);
-				await page.waitForTimeout(500);
-			}
-
-			await expect(items).toHaveCount(6);
-
-			// The page the click asked for, and the ones the scrolling that
-			// resumed may already have added under it.
-			await page.locator(TRIGGER).click();
-			await expect.poll(() => items.count()).toBeGreaterThanOrEqual(8);
-
-			// The click let the scrolling go on.
-			await expect
-				.poll(
-					async () => {
-						await scrollToTrigger(page);
-
-						return items.count();
-					},
-					{ timeout: 20000 }
-				)
-				.toBe(IMAGES_COUNT);
-		});
-
-		test('started as a Load More, waits for the first click', async ({
-			page,
-			requestUtils,
-		}) => {
-			await setInfiniteData(page, {
-				'data-vp-infinite-startup-load-more': 'true',
-			});
-			await publish(
-				requestUtils,
-				page,
-				'Paging - infinite from a click',
-				getInfiniteLoop('e2e-paging-infinite-startup', [INFINITE])
-			);
-
-			const items = page.locator(ITEM);
-
+			// In view, the trigger asks, is told no, and loads nothing.
 			await scrollToTrigger(page);
 			await expect(page.locator(TRIGGER)).toBeInViewport();
+			await expect.poll(loads).toBeGreaterThanOrEqual(1);
 			await page.waitForTimeout(1500);
 			await expect(items).toHaveCount(2);
 
+			// A click loads its page without asking; the rearm after it asks
+			// again, and the hold turns that down too.
+			const before = await loads();
+
 			await page.locator(TRIGGER).click();
-			await expect.poll(() => items.count()).toBeGreaterThanOrEqual(4);
+			await expect(items).toHaveCount(4);
+			await expect.poll(loads).toBeGreaterThan(before);
+			await page.waitForTimeout(1500);
+			await expect(items).toHaveCount(4);
+
+			// Released, the rearm after the next click is let through and the
+			// trigger scrolls on.
+			await page.evaluate(() => {
+				window.__hold = false;
+			});
+			await page.locator(TRIGGER).click();
 
 			await expect
 				.poll(
@@ -499,6 +469,59 @@ test.describe('Gallery Loop paging', () => {
 					{ timeout: 30000 }
 				)
 				.toBe(IMAGES_COUNT);
+		});
+
+		test('a click alone sends no load event', async ({
+			page,
+			requestUtils,
+		}) => {
+			await page.addInitScript(() => {
+				window.__infiniteLoads = 0;
+
+				document.addEventListener('vp-infinite-load', () => {
+					window.__infiniteLoads += 1;
+				});
+			});
+			await publish(
+				requestUtils,
+				page,
+				'Paging - infinite click only',
+				SPACER +
+					getInfiniteLoop('e2e-paging-infinite-click', [INFINITE])
+			);
+
+			const items = page.locator(ITEM);
+
+			// Far below the fold: a scripted click loads a page, and the
+			// trigger it leaves out of view is never asked about.
+			await page.locator(TRIGGER).evaluate((trigger) => trigger.click());
+			await expect(items).toHaveCount(4);
+			await page.waitForTimeout(1000);
+
+			expect(await page.evaluate(() => window.__infiniteLoads)).toBe(0);
+		});
+
+		test('the threshold attribute sets how far ahead it looks', async ({
+			page,
+			requestUtils,
+		}) => {
+			await setInfiniteData(page, {
+				'data-vp-infinite-threshold': 4000,
+			});
+			await publish(
+				requestUtils,
+				page,
+				'Paging - infinite threshold',
+				SPACER +
+					getInfiniteLoop('e2e-paging-infinite-threshold', [INFINITE])
+			);
+
+			// The trigger sits 3000px down, inside the 4000px it looks ahead,
+			// so pages load without a scroll.
+			await expect
+				.poll(() => page.locator(ITEM).count(), { timeout: 20000 })
+				.toBeGreaterThan(2);
+			expect(await page.evaluate(() => window.scrollY)).toBe(0);
 		});
 	});
 
@@ -1073,135 +1096,5 @@ test.describe('Gallery Loop paging', () => {
 		await expect(page.locator(ITEM)).toHaveCount(4);
 		expect(page.url()).toBe(url);
 		expect((await getTitles(page)).slice(0, 2)).toEqual(first);
-	});
-
-	test('Back after a cleared search returns to the search', async ({
-		page,
-		requestUtils,
-	}) => {
-		const created = await requestUtils.rest({
-			path: '/wp/v2/pages',
-			method: 'POST',
-			data: { title: 'Paging - cleared search', status: 'publish' },
-		});
-
-		pageIds.push(created.id);
-
-		// Free prints no search field until an extension runs the search, so
-		// the page carries the form the block prints, which is all the store
-		// navigates by. The server ignores the term.
-		const form = [
-			'<form role="search" method="get" action="/" class="vp-block-loop-search" data-wp-interactive="visual-portfolio/loop" data-wp-on--submit="actions.search">',
-			`<input type="hidden" name="page_id" value="${created.id}">`,
-			'<label>Search <input type="search" class="vp-block-loop-search__input" name="vp-1-search" value="" data-wp-on--input="actions.search"></label>',
-			'</form>',
-		].join('');
-
-		await requestUtils.rest({
-			path: `/wp/v2/pages/${created.id}`,
-			method: 'POST',
-			data: {
-				content: getLoopMarkup({
-					blockId: 'e2e-paging-search',
-					images,
-					perPage: 2,
-					before: [`<!-- wp:html -->${form}<!-- /wp:html -->`],
-				}),
-			},
-		});
-
-		await page.goto(created.link, { waitUntil: 'load' });
-
-		const input = page.locator('.vp-block-loop-search__input');
-		const getSearch = () => getLoopParam(page.url(), 'search');
-
-		await input.fill('Pa');
-		await expect.poll(getSearch).toBe('Pa');
-		await input.fill('Pag');
-		await expect.poll(getSearch).toBe('Pag');
-		await input.fill('');
-		await expect.poll(getSearch).toBe(null);
-
-		await page.goBack();
-
-		await expect.poll(getSearch).toBe('Pag');
-	});
-
-	test('a search erased before it lands leaves the page unsearched', async ({
-		page,
-		requestUtils,
-	}) => {
-		const created = await requestUtils.rest({
-			path: '/wp/v2/pages',
-			method: 'POST',
-			data: { title: 'Paging - erased search', status: 'publish' },
-		});
-
-		pageIds.push(created.id);
-
-		// The form the search block prints, as in the test above.
-		const form = [
-			'<form role="search" method="get" action="/" class="vp-block-loop-search" data-wp-interactive="visual-portfolio/loop" data-wp-on--submit="actions.search">',
-			`<input type="hidden" name="page_id" value="${created.id}">`,
-			'<label>Search <input type="search" class="vp-block-loop-search__input" name="vp-1-search" value="" data-wp-on--input="actions.search"></label>',
-			'</form>',
-		].join('');
-
-		await requestUtils.rest({
-			path: `/wp/v2/pages/${created.id}`,
-			method: 'POST',
-			data: {
-				content: getLoopMarkup({
-					blockId: 'e2e-paging-erased-search',
-					images,
-					perPage: 2,
-					before: [`<!-- wp:html -->${form}<!-- /wp:html -->`],
-				}),
-			},
-		});
-
-		await page.goto(created.link, { waitUntil: 'load' });
-
-		const input = page.locator('.vp-block-loop-search__input');
-		const isSearch = (url) => 'Pa' === getLoopParam(url, 'search');
-
-		let release;
-		const held = new Promise((resolve) => {
-			release = resolve;
-		});
-		const requested = page.waitForRequest(
-			(request) =>
-				'fetch' === request.resourceType() && isSearch(request.url())
-		);
-
-		await page.route(
-			(url) => isSearch(url.href),
-			async (route) => {
-				if ('fetch' === route.request().resourceType()) {
-					await held;
-				}
-
-				return route.fallback();
-			}
-		);
-
-		await input.fill('Pa');
-		await requested;
-
-		const landed = page.waitForResponse((response) =>
-			isSearch(response.url())
-		);
-
-		await input.fill('');
-
-		// Past the pause the store waits for before it searches.
-		await page.waitForTimeout(1000);
-
-		release();
-		await landed;
-
-		await expect(page.locator(LOOP)).not.toHaveClass(/\bvp-is-loading\b/);
-		expect(getLoopParam(page.url(), 'search')).toBe(null);
-		await expect(input).toHaveValue('');
 	});
 });
