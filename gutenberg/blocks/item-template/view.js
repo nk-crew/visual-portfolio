@@ -2998,6 +2998,30 @@ function initCarousel(list, restore) {
 		list.addEventListener('blur', unmarkFocus);
 	}
 
+	// The browser's own arrow-key scroll stops at the end of the range Blossom
+	// keeps a repeating carousel in, so it never reaches the seam. The arrows
+	// step the way the buttons do instead. A loop never runs right to left.
+	const onArrowKey = (event) => {
+		const direction = { ArrowLeft: -1, ArrowRight: 1 }[event.key];
+
+		if (
+			!direction ||
+			event.defaultPrevented ||
+			event.altKey ||
+			event.ctrlKey ||
+			event.metaKey
+		) {
+			return;
+		}
+
+		event.preventDefault();
+		slide(list, direction);
+	};
+
+	if (repeats) {
+		list.addEventListener('keydown', onArrowKey);
+	}
+
 	// A drag of a repeating carousel takes over from a step the module is
 	// still drawing, and is landed on a slide by the module as well.
 	const stopLanding = repeats ? landDrags(list) : noop;
@@ -3070,6 +3094,7 @@ function initCarousel(list, restore) {
 		list.removeEventListener(PLACE_EVENT, onPlace);
 		list.removeEventListener('mousedown', onMouseDown);
 		list.removeEventListener('keydown', onKeyDown);
+		list.removeEventListener('keydown', onArrowKey);
 		list.removeEventListener('blur', unmarkFocus);
 		unmarkFocus();
 		stopShifting();
