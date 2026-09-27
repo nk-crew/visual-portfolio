@@ -2718,8 +2718,12 @@ function initMarquee(list, marquee) {
 			rest(event.timeStamp);
 		}
 	};
-	const onBlur = () => {
-		keyboard = false;
+	// Out of the list altogether: a key on a link inside a slide bubbles up
+	// here, and the link's own blur does not.
+	const onFocusOut = (event) => {
+		if (!list.contains(event.relatedTarget)) {
+			keyboard = false;
+		}
 	};
 
 	list.addEventListener('pointerdown', onDown);
@@ -2730,7 +2734,7 @@ function initMarquee(list, marquee) {
 	window.addEventListener('touchend', onTouch, { passive: true });
 	window.addEventListener('touchcancel', onTouch, { passive: true });
 	list.addEventListener('keydown', onKey);
-	list.addEventListener('blur', onBlur);
+	list.addEventListener('focusout', onFocusOut);
 
 	const stop = () => {
 		list.removeEventListener('pointerdown', onDown);
@@ -2741,7 +2745,7 @@ function initMarquee(list, marquee) {
 		window.removeEventListener('touchend', onTouch);
 		window.removeEventListener('touchcancel', onTouch);
 		list.removeEventListener('keydown', onKey);
-		list.removeEventListener('blur', onBlur);
+		list.removeEventListener('focusout', onFocusOut);
 		list.style.removeProperty(MARQUEE_SHIFT_PROPERTY);
 		setSnap(snap);
 	};
