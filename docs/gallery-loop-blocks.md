@@ -965,6 +965,20 @@ disabled "Quick View (Pro)". `VPPopupAPI.getLoopGallery( loop )`
 gives the stand-in of a loop to a script that opens the lightbox itself, so its
 events name the same gallery.
 
+### Infinite scroll
+
+An infinite trigger loads the next page once it comes within 300px of the
+viewport. `data-vp-infinite-threshold` on the trigger, in whole pixels, sets
+that distance instead; whoever renders the trigger writes it.
+
+Before every load it starts by itself, the trigger dispatches
+`vp-infinite-load`: bubbling, cancelable, with no detail. A script that calls
+`preventDefault()` holds that one load, and the trigger stays a Load More
+button. The event is sent again when the trigger comes back into view and
+after a load a click started, so a script that keeps the load held cancels it
+each time. A click on the trigger never sends it. A page that failed to load
+is asked for again, so the same address can come up twice.
+
 ### Carousel events
 
 The carousel takes commands as DOM events on the list element of an item

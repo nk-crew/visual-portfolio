@@ -56,6 +56,10 @@ const NAVIGATION_TIMEOUT = 10000;
 // Listened for by the item template module, which owns justified and carousel.
 const RELAYOUT_EVENT = 'vp-relayout';
 
+// Sent by an infinite trigger before a load it starts by itself; an extension
+// that cancels it keeps the trigger a Load More until it is asked again.
+const INFINITE_LOAD_EVENT = 'vp-infinite-load';
+
 // Prefetching runs on a loop the server gave `callbacks.initPrefetch`. The
 // delays are the classic gallery's: a pointer that only crosses a link asks for
 // nothing, and the next page waits for the page itself to settle.
@@ -1303,9 +1307,8 @@ store('visual-portfolio/loop', {
 			// of the next page, is not a visitor asking to leave for it.
 			yield loadNextPage(ref, getLoopContext(), event.isTrusted);
 
-			// A click on an infinite trigger lets it scroll on, and the page it
-			// loaded may leave the trigger in view, which the observer does not
-			// report as a change.
+			// The page a click on an infinite trigger loaded may leave the
+			// trigger in view, which the observer does not report as a change.
 			infiniteRearms.get(ref)?.();
 		}),
 	},
@@ -1399,27 +1402,9 @@ store('visual-portfolio/loop', {
 			// taken while there still is one.
 			const context = getLoopContext();
 
-			// How far ahead of the viewport a page is fetched, and how often
-			// the visitor is asked before it is. Written onto the trigger by
-			// whoever renders it; absent, the loop scrolls on by itself from
-			// the first screen, 300px early.
-			const number = (name, fallback) => {
-				const value = parseInt(ref.dataset[name], 10);
-
-				return Number.isNaN(value) ? fallback : value;
-			};
-
-			const everyPages = Math.max(0, number('vpInfiniteEveryPage', 0));
-			let loaded = 0;
-			let paused = 'true' === ref.dataset.vpInfiniteStartupLoadMore;
-
-			// The trigger is a Load More button as well as a sentinel: a click
-			// on it lets the scrolling resume.
-			const resume = () => {
-				paused = false;
-			};
-
-			ref.addEventListener('click', resume);
+			// How far ahead of the viewport a page is fetched, written onto the
+			// trigger by whoever renders it; absent, 300px early.
+			const threshold = parseInt(ref.dataset.vpInfiniteThreshold, 10);
 
 			let observer;
 
@@ -1439,37 +1424,37 @@ store('visual-portfolio/loop', {
 
 			observer = new window.IntersectionObserver(
 				(entries) => {
-					if (paused) {
-						return;
-					}
-
 					if (!entries.some((entry) => entry.isIntersecting)) {
 						return;
 					}
 
+					if (
+						!ref.dispatchEvent(
+							new window.CustomEvent(INFINITE_LOAD_EVENT, {
+								bubbles: true,
+								cancelable: true,
+							})
+						)
+					) {
+						return;
+					}
+
 					loadNextPage(ref, context, false).then((result) => {
-						if (STOP === result) {
-							return;
+						if (STOP !== result) {
+							rearm();
 						}
-
-						if (APPENDED === result) {
-							loaded += 1;
-
-							if (everyPages && 0 === loaded % everyPages) {
-								paused = true;
-							}
-						}
-
-						rearm();
 					});
 				},
-				{ rootMargin: `${number('vpInfiniteThreshold', 300)}px` }
+				{
+					rootMargin: `${
+						Number.isNaN(threshold) ? 300 : threshold
+					}px`,
+				}
 			);
 
 			observer.observe(ref);
 
 			return () => {
-				ref.removeEventListener('click', resume);
 				infiniteRearms.delete(ref);
 				observer.disconnect();
 			};

@@ -409,85 +409,55 @@ test.describe('Gallery Loop paging', () => {
 			await expect(page.locator(TRIGGER)).toHaveCount(0);
 		});
 
-		test('stops after every so many pages until the trigger is clicked', async ({
+		test('an extension can hold an automatic load', async ({
 			page,
 			requestUtils,
 		}) => {
-			await setInfiniteData(page, {
-				'data-vp-infinite-every-page': 2,
-				'data-vp-infinite-threshold': 0,
+			await page.addInitScript(() => {
+				window.__hold = true;
+				window.__infiniteLoads = 0;
+
+				document.addEventListener('vp-infinite-load', (event) => {
+					window.__infiniteLoads += 1;
+
+					if (window.__hold) {
+						event.preventDefault();
+					}
+				});
 			});
 			await publish(
 				requestUtils,
 				page,
-				'Paging - infinite every page',
-				SPACER +
-					getInfiniteLoop('e2e-paging-infinite-every', [INFINITE])
+				'Paging - infinite held',
+				getInfiniteLoop('e2e-paging-infinite-held', [INFINITE])
 			);
 
 			const items = page.locator(ITEM);
+			const loads = () => page.evaluate(() => window.__infiniteLoads);
 
-			await expect
-				.poll(
-					async () => {
-						await scrollToTrigger(page);
-
-						return items.count();
-					},
-					{ timeout: 20000 }
-				)
-				.toBe(6);
-
-			// Two pages loaded by scrolling, and the third is left to the
-			// visitor however long they keep the trigger in view.
-			for (let i = 0; i < 4; i++) {
-				await scrollToTrigger(page);
-				await page.waitForTimeout(500);
-			}
-
-			await expect(items).toHaveCount(6);
-
-			// The page the click asked for, and the ones the scrolling that
-			// resumed may already have added under it.
-			await page.locator(TRIGGER).click();
-			await expect.poll(() => items.count()).toBeGreaterThanOrEqual(8);
-
-			// The click let the scrolling go on.
-			await expect
-				.poll(
-					async () => {
-						await scrollToTrigger(page);
-
-						return items.count();
-					},
-					{ timeout: 20000 }
-				)
-				.toBe(IMAGES_COUNT);
-		});
-
-		test('started as a Load More, waits for the first click', async ({
-			page,
-			requestUtils,
-		}) => {
-			await setInfiniteData(page, {
-				'data-vp-infinite-startup-load-more': 'true',
-			});
-			await publish(
-				requestUtils,
-				page,
-				'Paging - infinite from a click',
-				getInfiniteLoop('e2e-paging-infinite-startup', [INFINITE])
-			);
-
-			const items = page.locator(ITEM);
-
+			// In view, the trigger asks, is told no, and loads nothing.
 			await scrollToTrigger(page);
 			await expect(page.locator(TRIGGER)).toBeInViewport();
+			await expect.poll(loads).toBeGreaterThanOrEqual(1);
 			await page.waitForTimeout(1500);
 			await expect(items).toHaveCount(2);
 
+			// A click loads its page without asking; the rearm after it asks
+			// again, and the hold turns that down too.
+			const before = await loads();
+
 			await page.locator(TRIGGER).click();
-			await expect.poll(() => items.count()).toBeGreaterThanOrEqual(4);
+			await expect(items).toHaveCount(4);
+			await expect.poll(loads).toBeGreaterThan(before);
+			await page.waitForTimeout(1500);
+			await expect(items).toHaveCount(4);
+
+			// Released, the rearm after the next click is let through and the
+			// trigger scrolls on.
+			await page.evaluate(() => {
+				window.__hold = false;
+			});
+			await page.locator(TRIGGER).click();
 
 			await expect
 				.poll(
@@ -499,6 +469,59 @@ test.describe('Gallery Loop paging', () => {
 					{ timeout: 30000 }
 				)
 				.toBe(IMAGES_COUNT);
+		});
+
+		test('a click alone sends no load event', async ({
+			page,
+			requestUtils,
+		}) => {
+			await page.addInitScript(() => {
+				window.__infiniteLoads = 0;
+
+				document.addEventListener('vp-infinite-load', () => {
+					window.__infiniteLoads += 1;
+				});
+			});
+			await publish(
+				requestUtils,
+				page,
+				'Paging - infinite click only',
+				SPACER +
+					getInfiniteLoop('e2e-paging-infinite-click', [INFINITE])
+			);
+
+			const items = page.locator(ITEM);
+
+			// Far below the fold: a scripted click loads a page, and the
+			// trigger it leaves out of view is never asked about.
+			await page.locator(TRIGGER).evaluate((trigger) => trigger.click());
+			await expect(items).toHaveCount(4);
+			await page.waitForTimeout(1000);
+
+			expect(await page.evaluate(() => window.__infiniteLoads)).toBe(0);
+		});
+
+		test('the threshold attribute sets how far ahead it looks', async ({
+			page,
+			requestUtils,
+		}) => {
+			await setInfiniteData(page, {
+				'data-vp-infinite-threshold': 4000,
+			});
+			await publish(
+				requestUtils,
+				page,
+				'Paging - infinite threshold',
+				SPACER +
+					getInfiniteLoop('e2e-paging-infinite-threshold', [INFINITE])
+			);
+
+			// The trigger sits 3000px down, inside the 4000px it looks ahead,
+			// so pages load without a scroll.
+			await expect
+				.poll(() => page.locator(ITEM).count(), { timeout: 20000 })
+				.toBeGreaterThan(2);
+			expect(await page.evaluate(() => window.scrollY)).toBe(0);
 		});
 	});
 
