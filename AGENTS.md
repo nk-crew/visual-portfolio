@@ -27,20 +27,10 @@ WordPress plugin: portfolio / gallery layouts and Gutenberg integration. PHP bac
 
 ## Free and Pro
 
-This plugin has a paid extension, Visual Portfolio Pro, which carries it as a submodule. A
-Pro feature's code lives in Pro, however much easier it would be to write here. For a Pro
-feature this plugin gets only:
-
-- code free users run too;
-- use of an extension point it already has: a `vpf_` filter, a JS filter, a documented DOM
-  event, the `extensions` block attribute;
-- the editor side of a Pro setting that sits in a free panel: the teaser, the option, and the
-  slot Pro fills.
-
-"Reuse before writing" above holds inside this plugin. Pro reuses this plugin through its
-extension points, not by moving its code here. A new filter or event is a public API, and
-adding one is the user's decision. So is anything else a Pro feature seems to need from here.
-Stop and bring the user the options before building it.
+Visual Portfolio Pro extends this plugin. A Pro feature's code lives in Pro, even when writing
+it here would be easier. This plugin gets only code free users run too, the extension points
+Pro hooks into, and the editor teaser or setting slot. Anything more, a new filter or event
+included, is the user's call: ask before building it.
 
 ## Commands
 
