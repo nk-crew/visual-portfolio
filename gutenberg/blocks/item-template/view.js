@@ -2852,7 +2852,11 @@ function initCarousel(list, restore) {
 	const onPlace = (event) => {
 		const { period } = getRepeatGeometry(list);
 
-		if (!isRepeating(list) || !period || !event.detail) {
+		if (
+			!isRepeating(list) ||
+			!period ||
+			!Number.isFinite(event.detail?.position)
+		) {
 			return;
 		}
 
