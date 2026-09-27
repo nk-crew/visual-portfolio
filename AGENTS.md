@@ -25,6 +25,15 @@ WordPress plugin: portfolio / gallery layouts and Gutenberg integration. PHP bac
 - `build/` is generated — edit sources, never the bundles.
 - Do not run packaging/release commands (`build:prod`, `zip`, `bump:*`) unless the user asks.
 
+## Free and Pro
+
+This plugin has a paid extension, Visual Portfolio Pro, which carries it as a submodule. A
+Pro feature's code lives in Pro. For a Pro feature this plugin gets only a generic extension
+point Pro hooks into (a `vpf_` filter, a JS filter, a documented DOM event, the `extensions`
+block attribute) and an editor teaser. Code that does nothing without Pro does not belong
+here, however much easier it would be to write here. When a Pro feature seems to need more,
+stop and bring the user the options: where code ships is their decision.
+
 ## Commands
 
 | Task | Command |
