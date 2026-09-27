@@ -2569,9 +2569,10 @@ function initMarquee(list, marquee) {
 	// that stopped mid-pan was moved on under.
 	let pressed = false;
 	let touching = false;
-	// A sideways wheel or trackpad scroll, which moves the list a pixel at a
-	// time when it is slow - no more than the marquee itself does in a frame.
-	let nudged = false;
+	// A key pressed on the list, focused by a click as often as by the Tab
+	// key - and a click leaves no focus the keyboard's for the autoplay to
+	// hold on.
+	let keyboard = false;
 	let lastPosition = getScrollPosition(list);
 	let lastMove = 0;
 	// The snap the carousel has when the marquee is not moving it. Blossom
@@ -2597,32 +2598,30 @@ function initMarquee(list, marquee) {
 		setShift(0);
 	};
 
-	// The main button only: the menu a right click opens on a Mac swallows
-	// the release, and the marquee stood still until the next click.
+	// The main button only, and never past a menu: the menu a right click
+	// or a Ctrl click opens on a Mac swallows the release, and the marquee
+	// stood still until the next click.
 	const onDown = (event) => {
 		pressed = 0 === event.button;
 	};
 	const onUp = () => {
 		pressed = false;
 	};
+	// The fingers on this list, not on the page: a finger lifted elsewhere
+	// with another still down held every marquee on it.
 	const onTouch = (event) => {
-		touching = event.touches.length > 0;
+		touching = Array.from(event.touches).some((touch) =>
+			list.contains(touch.target)
+		);
 	};
-	const onWheel = (event) => {
-		if (event.deltaX) {
-			nudged = true;
-		}
-	};
-
-	list.addEventListener('pointerdown', onDown);
-	window.addEventListener('pointerup', onUp);
-	window.addEventListener('pointercancel', onUp);
-	list.addEventListener('touchstart', onTouch, { passive: true });
-	window.addEventListener('touchend', onTouch, { passive: true });
-	window.addEventListener('touchcancel', onTouch, { passive: true });
-	list.addEventListener('wheel', onWheel, { passive: true });
 
 	const drift = (elapsed, wanted, now) => {
+		if (keyboard) {
+			rest(now);
+
+			return;
+		}
+
 		// A marquee rests nowhere, and a snap pulled it back to the slide it
 		// was leaving on every frame. Written every frame, since Blossom
 		// writes its own.
@@ -2635,7 +2634,7 @@ function initMarquee(list, marquee) {
 
 		// Held and at a stop, there is nothing to move - and nothing to
 		// measure until it runs again, when a move made meanwhile is found.
-		if (!wanted && !rate && !nudged) {
+		if (!wanted && !rate) {
 			return;
 		}
 
@@ -2645,10 +2644,9 @@ function initMarquee(list, marquee) {
 		// marquee reads back the very pixel it scrolled to. A turn of the loop
 		// is the same picture, so only a move off it counts.
 		const off = onTheClock(position - lastPosition, period);
-		const moved = nudged || (off > 0.5 && off < period - 0.5);
+		const moved = off > 0.5 && off < period - 0.5;
 
 		lastPosition = position;
-		nudged = false;
 
 		if (moved) {
 			lastMove = now;
@@ -2701,21 +2699,49 @@ function initMarquee(list, marquee) {
 			letGo(now);
 		}
 
-		if ('none' === list.style.getPropertyValue(SNAP_TYPE_PROPERTY)) {
+		// Not under a step the module is drawing, which holds the snap off
+		// until it arrives and gives it back itself.
+		if (
+			!travels.has(list) &&
+			'none' === list.style.getPropertyValue(SNAP_TYPE_PROPERTY)
+		) {
 			setSnap(snap);
 		}
 
 		lastPosition = getScrollPosition(list);
 	};
 
+	// The snap is given back before the key scrolls, so the key moves a slide.
+	const onKey = (event) => {
+		if (!MODIFIER_KEYS.has(event.key)) {
+			keyboard = true;
+			rest(event.timeStamp);
+		}
+	};
+	const onBlur = () => {
+		keyboard = false;
+	};
+
+	list.addEventListener('pointerdown', onDown);
+	window.addEventListener('pointerup', onUp);
+	window.addEventListener('pointercancel', onUp);
+	window.addEventListener('contextmenu', onUp);
+	list.addEventListener('touchstart', onTouch, { passive: true });
+	window.addEventListener('touchend', onTouch, { passive: true });
+	window.addEventListener('touchcancel', onTouch, { passive: true });
+	list.addEventListener('keydown', onKey);
+	list.addEventListener('blur', onBlur);
+
 	const stop = () => {
 		list.removeEventListener('pointerdown', onDown);
 		window.removeEventListener('pointerup', onUp);
 		window.removeEventListener('pointercancel', onUp);
+		window.removeEventListener('contextmenu', onUp);
 		list.removeEventListener('touchstart', onTouch);
 		window.removeEventListener('touchend', onTouch);
 		window.removeEventListener('touchcancel', onTouch);
-		list.removeEventListener('wheel', onWheel);
+		list.removeEventListener('keydown', onKey);
+		list.removeEventListener('blur', onBlur);
 		list.style.removeProperty(MARQUEE_SHIFT_PROPERTY);
 		setSnap(snap);
 	};
