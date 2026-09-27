@@ -358,6 +358,17 @@ const MODIFIER_KEYS = new Set([
 // How long a step of a repeating carousel takes, drawn by the module.
 const TRAVEL_DURATION = 450;
 
+// How long a marquee takes to reach a new speed, in milliseconds, and how
+// long a carousel something else moved has to lie still before the marquee
+// takes it up again.
+const MARQUEE_EASE = 300;
+const MARQUEE_SETTLE = 400;
+
+// How far a marquee has moved past where the scroll could go - the part of a
+// pixel it holds none of, and the margin it keeps at the seam of the loop.
+// The stylesheet translates the slides by it.
+const MARQUEE_SHIFT_PROPERTY = '--vp-carousel-marquee-shift';
+
 // The shortest and the longest a move that carries on from a drag takes. Its
 // length is otherwise the speed it was let go at, which for a slow drag over
 // the last of a slide is a glide of several seconds, and for a hard flick
@@ -2497,6 +2508,165 @@ function initScrub(list) {
 }
 
 /**
+ * How a carousel asked to run as a marquee.
+ *
+ * Only a carousel that repeats can: a marquee never reaches an end, and one
+ * that could not run round - too few slides, a right to left page - falls
+ * back to the steps of its delay.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {Object|null} `speed` in pixels of scroll per millisecond, negative
+ *                       backwards, and `hover`, the share of it kept under
+ *                       the pointer. Null for a carousel that steps.
+ */
+function getMarquee(list) {
+	const speed = parseFloat(list.dataset.vpCarouselMarquee);
+	const hover = parseFloat(list.dataset.vpCarouselMarqueeHover);
+
+	if (!(speed > 0) || !isRepeating(list)) {
+		return null;
+	}
+
+	return {
+		speed:
+			(speed / 1000) *
+			('backward' === list.dataset.vpCarouselMarqueeDirection ? -1 : 1),
+		hover: Number.isFinite(hover) ? Math.max(0, Math.min(1, hover)) : 0,
+	};
+}
+
+/**
+ * Move a repeating carousel on at a steady speed.
+ *
+ * The scroll holds whole pixels only, so a slow marquee moved by it alone
+ * stood still on most frames and jumped on the rest. The whole pixels go to
+ * the scroll and what is left of one to a translation of the slides, which
+ * the stylesheet reads from the list.
+ *
+ * The marquee lets go of the carousel to anything else that moves it - a
+ * step the module is drawing, a drag, a swipe, the wheel, the keyboard - and
+ * takes it up again from wherever it came to rest.
+ *
+ * @param {HTMLElement} list    Item template list.
+ * @param {Object}      marquee What `getMarquee` read.
+ *
+ * @return {Object} `drift( elapsed, wanted, now )` to call every frame, with
+ *                  the share of the speed the carousel should be moving at,
+ *                  and `stop()`.
+ */
+function initMarquee(list, marquee) {
+	// Where the marquee put the carousel, between whole pixels. Null while
+	// something else has it.
+	let place = null;
+	// The share of the speed it is moving at, eased towards the one asked
+	// for, so a pointer that rests on it slows it rather than stopping it
+	// dead.
+	let rate = 0;
+	let pressed = false;
+	let lastPosition = getScrollPosition(list);
+	let lastMove = 0;
+
+	const snap = list.style.getPropertyValue(SNAP_TYPE_PROPERTY);
+
+	const setShift = (value) => {
+		list.style.setProperty(MARQUEE_SHIFT_PROPERTY, `${value}px`);
+	};
+
+	const letGo = (now) => {
+		place = null;
+		rate = 0;
+		lastMove = now;
+		setShift(0);
+	};
+
+	const onDown = () => {
+		pressed = true;
+	};
+	const onUp = () => {
+		pressed = false;
+	};
+
+	list.addEventListener('pointerdown', onDown);
+	window.addEventListener('pointerup', onUp);
+	window.addEventListener('pointercancel', onUp);
+
+	const drift = (elapsed, wanted, now) => {
+		// A marquee rests nowhere, and a snap pulled it back to the slide it
+		// was leaving on every frame. Written every frame: Blossom writes its
+		// own snap type when it loads, after the marquee has started.
+		if ('none' !== list.style.getPropertyValue(SNAP_TYPE_PROPERTY)) {
+			list.style.setProperty(SNAP_TYPE_PROPERTY, 'none');
+		}
+
+		const position = getScrollPosition(list);
+		const { period } = getRepeatGeometry(list);
+		// Moved by something other than the marquee since the last frame. A
+		// turn of the loop is the same picture, so only a move off it counts.
+		const off = onTheClock(position - lastPosition, period);
+		const moved = off > 1 && off < period - 1;
+
+		lastPosition = position;
+
+		if (moved) {
+			lastMove = now;
+		}
+
+		if (
+			!period ||
+			pressed ||
+			travels.has(list) ||
+			(moved && null !== place)
+		) {
+			letGo(now);
+
+			return;
+		}
+
+		if (null === place) {
+			// Taken up again once the carousel has come to rest.
+			if (now - lastMove < MARQUEE_SETTLE) {
+				return;
+			}
+
+			place = position;
+		}
+
+		// At an even rate, so that a stop is a stop and not a crawl.
+		const change = elapsed / MARQUEE_EASE;
+
+		rate += Math.max(-change, Math.min(change, wanted - rate));
+		place = onTheClock(place + marquee.speed * rate * elapsed, period);
+
+		placeRepeating(list, Math.floor(place), period);
+		lastPosition = getScrollPosition(list);
+
+		// What the scroll could not take. The part of a pixel, and near the
+		// seam more: the scroll is kept a margin in from either end of its
+		// range and put at the margin when asked for a place inside it, which
+		// on its own jumped the marquee over the seam and held it there.
+		const short = onTheClock(place - lastPosition + period / 2, period);
+
+		setShift(short - period / 2);
+	};
+
+	const stop = () => {
+		list.removeEventListener('pointerdown', onDown);
+		window.removeEventListener('pointerup', onUp);
+		window.removeEventListener('pointercancel', onUp);
+		list.style.removeProperty(MARQUEE_SHIFT_PROPERTY);
+
+		if (snap) {
+			list.style.setProperty(SNAP_TYPE_PROPERTY, snap);
+		} else {
+			list.style.removeProperty(SNAP_TYPE_PROPERTY);
+		}
+	};
+
+	return { drift, stop };
+}
+
+/**
  * Run a carousel on its own.
  *
  * The delay is drawn onto the indicator as it runs down, so the dot doubles as
@@ -2558,6 +2728,11 @@ function initAutoplay(list) {
 	// showing a different one.
 	let seen = -1;
 
+	// A marquee is the same clock run without a wait: it moves every frame the
+	// clock is not held.
+	const marquee = getMarquee(list);
+	const drifting = marquee ? initMarquee(list, marquee) : null;
+
 	const setProgress = (value) => {
 		root.style.setProperty(
 			'--vp-carousel-autoplay-progress',
@@ -2586,15 +2761,26 @@ function initAutoplay(list) {
 			});
 		});
 
+		const holding = focusIn.size || held || offscreen || stopped.has(list);
+
+		// Under the pointer a marquee keeps the share of its speed it was
+		// given, and slows to it. A frame that comes long after the last one -
+		// a tab brought back - moves it no further than a frame's worth.
+		if (drifting) {
+			let wanted = pointerOn.size ? marquee.hover : 1;
+
+			if (holding) {
+				wanted = 0;
+			}
+
+			drifting.drift(Math.min(step, 100), wanted, now);
+
+			return;
+		}
+
 		// A held clock reads nothing: the slide it will count for is read on
 		// the first frame it runs again.
-		if (
-			pointerOn.size ||
-			focusIn.size ||
-			held ||
-			offscreen ||
-			stopped.has(list)
-		) {
+		if (pointerOn.size || holding) {
 			return;
 		}
 
@@ -2720,6 +2906,7 @@ function initAutoplay(list) {
 		list.removeEventListener(AUTOPLAY_EVENT, hold);
 		list.removeEventListener(STEP_EVENT, restart);
 		root.style.removeProperty('--vp-carousel-autoplay-progress');
+		drifting?.stop();
 	};
 }
 

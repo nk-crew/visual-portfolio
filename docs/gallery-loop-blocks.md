@@ -311,10 +311,11 @@ editor uses for the width of any block — *None* is the content width, then
 *Wide width*, *Full width* and *Custom*, whose width is typed in the menu.
 
 The carousel panel of the item template carries the rest: *Effect*, *Autoplay*
-and its delay, *Repeat*, *Peek*, *Slides per step* (zero
-moves a whole screen at a time, and a swipe comes to rest on the same frames an
-arrow does), *Slide height* and *Blocks fill the slide*,
-*Fade the edges*, *Slide width from content* and *Free scrolling*.
+with its mode (slide by slide, or a marquee with Pro) and its delay, *Repeat*,
+*Peek*, *Slides per step* (zero moves a whole screen at a time, and a swipe
+comes to rest on the same frames an arrow does), *Slide height* and *Blocks
+fill the slide*, *Fade the edges*, *Slide width from content* and *Free
+scrolling*.
 
 **Controls.** Filter, sort and pagination are server-rendered links and forms.
 With JavaScript they swap the gallery in place; without it they work as ordinary
@@ -785,6 +786,32 @@ The frame around the list is an inline-size query container, so a width is
 stated in `cqw` rather than in a percentage of the list — a carousel that
 repeats is padded by half its width at each end, and a percentage of what that
 leaves is nothing.
+
+### Carousel marquee
+
+Autoplay has two modes. Slide by slide holds each slide for the delay. A marquee
+moves the carousel on without stopping, and is Pro's: the free editor offers it
+as a disabled "Marquee (Pro)" option of the *Mode* select, and nothing the free
+plugin renders turns it on. Choosing it keeps `extensions.marquee` on the item
+template, an object whose settings belong to the extension, turns *Repeat* on,
+and puts `vpf.itemTemplateMarqueeControls` (`null`, `{ attributes,
+setAttributes }`) where the delay was.
+
+The view module runs a marquee for a list that carries, with autoplay:
+
+| Attribute | Value |
+|---|---|
+| `data-vp-carousel-marquee` | speed, in pixels per second |
+| `data-vp-carousel-marquee-direction` | `backward` runs it the other way |
+| `data-vp-carousel-marquee-hover` | the share of the speed kept under the pointer, from `0`, a stop, to `1` |
+
+Only a carousel that repeats runs one; any other steps by its delay, and a
+visitor who asked for less motion gets a still carousel either way. A marquee
+pauses where autoplay pauses, lets go of the carousel to an arrow, a dot, a drag
+or a scroll, and takes it up again once it has come to rest. The scroll holds
+whole pixels and is kept a margin in from the ends of a loop, so the module
+moves the slides by the rest through `--vp-carousel-marquee-shift` on the list,
+which translates every item.
 
 ### Sitemap
 

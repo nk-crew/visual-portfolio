@@ -491,6 +491,13 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			scroll-behavior: auto;
 		}
 
+		// A marquee moves the scroll as far as the scroll goes - whole pixels,
+		// and short of the seam of the loop - and the slides by the rest. See
+		// `initMarquee` in the view module.
+		&[data-vp-carousel-marquee] > .wp-block-visual-portfolio-item-template__item {
+			transform: translateX(calc(-1 * var(--vp-carousel-marquee-shift, 0px)));
+		}
+
 		// The edges dissolve rather than cut, so a half slide reads as more
 		// carousel rather than as a mistake. Three layers: a ramp at each edge
 		// and the solid middle between them, which is what lets one side be

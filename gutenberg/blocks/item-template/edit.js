@@ -49,7 +49,7 @@ import ProNote from '../../components/pro-note';
 /**
  * Internal dependencies
  */
-import { ProLine } from '../../components/pro-teaser';
+import { getProLabel, ProLine } from '../../components/pro-teaser';
 import getBlockGapValue from '../../utils/block-gap';
 import { CONTROL_BLOCKS } from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
@@ -303,6 +303,38 @@ function getRepeatHelp(attributes) {
 
 	return __(
 		'The carousel runs on without an end, in both directions.',
+		'visual-portfolio'
+	);
+}
+
+/**
+ * What the autoplay mode does, or why it cannot be a marquee.
+ *
+ * @param {boolean} repeatable - whether the carousel can run round.
+ *
+ * @return {string|Element} Help of the mode control.
+ */
+function getAutoplayModeHelp(repeatable) {
+	if (!isProPlugin) {
+		return (
+			<ProLine campaign="teaser_carousel_marquee">
+				{__(
+					'A marquee moves the carousel on without stopping, at a steady speed.',
+					'visual-portfolio'
+				)}
+			</ProLine>
+		);
+	}
+
+	if (!repeatable) {
+		return __(
+			'A marquee runs round, and this carousel cannot, so it moves slide by slide.',
+			'visual-portfolio'
+		);
+	}
+
+	return __(
+		'Slide by slide holds each slide for the delay. A marquee moves on without stopping, and the arrows, dots and dragging still work.',
 		'visual-portfolio'
 	);
 }
@@ -880,6 +912,14 @@ export default function BlockEdit({
 	// greyed, the way the container control is.
 	const repeatable = canRepeat(attributes);
 
+	// A marquee is Pro's. The choice of it lives here, beside the delay it
+	// replaces, and Pro draws its settings under it. The page runs one only
+	// where the carousel can run round, and steps by the delay elsewhere - so
+	// does the editor.
+	const { marquee, ...extensionsWithoutMarquee } =
+		attributes.extensions || {};
+	const runsMarquee = !!marquee && repeatable && isProPlugin;
+
 	// An effect that lays the slides out itself leaves no edge for the next
 	// one to show at, so its peek is greyed the same way, and not drawn.
 	const peekable = effectPeeks(carouselEffect);
@@ -1380,6 +1420,7 @@ export default function BlockEdit({
 						carouselRepeat: false,
 						carouselAutoplay: false,
 						carouselAutoplayDelay: 5,
+						extensions: extensionsWithoutMarquee,
 						carouselPeek: 0,
 						carouselEdgeFade: false,
 						carouselSlideHeight: '',
@@ -1432,6 +1473,7 @@ export default function BlockEdit({
 					setAttributes({
 						carouselAutoplay: false,
 						carouselAutoplayDelay: 5,
+						extensions: extensionsWithoutMarquee,
 					})
 				}
 			>
@@ -1444,10 +1486,65 @@ export default function BlockEdit({
 						)}
 						checked={carouselAutoplay}
 						onChange={(value) =>
-							setAttributes({ carouselAutoplay: value })
+							setAttributes({
+								carouselAutoplay: value,
+								...(value
+									? {}
+									: { extensions: extensionsWithoutMarquee }),
+							})
 						}
 					/>
 					{carouselAutoplay && (
+						<SelectControl
+							label={__('Mode', 'visual-portfolio')}
+							help={getAutoplayModeHelp(repeatable)}
+							value={marquee ? 'marquee' : 'step'}
+							options={[
+								{
+									label: __(
+										'Slide by slide',
+										'visual-portfolio'
+									),
+									value: 'step',
+								},
+								{
+									label: isProPlugin
+										? __('Marquee', 'visual-portfolio')
+										: getProLabel(
+												__(
+													'Marquee',
+													'visual-portfolio'
+												)
+											),
+									value: 'marquee',
+									disabled: !isProPlugin || !repeatable,
+								},
+							]}
+							onChange={(value) =>
+								setAttributes(
+									'marquee' === value
+										? {
+												extensions: {
+													...extensionsWithoutMarquee,
+													marquee: {},
+												},
+												carouselRepeat: true,
+											}
+										: {
+												extensions:
+													extensionsWithoutMarquee,
+											}
+								)
+							}
+						/>
+					)}
+					{carouselAutoplay &&
+						runsMarquee &&
+						applyFilters('vpf.itemTemplateMarqueeControls', null, {
+							attributes,
+							setAttributes,
+						})}
+					{carouselAutoplay && !runsMarquee && (
 						<RangeControl
 							label={__('Delay, seconds', 'visual-portfolio')}
 							help={__(
@@ -1478,9 +1575,16 @@ export default function BlockEdit({
 				    effect. */}
 				<ToggleControl
 					label={__('Repeat', 'visual-portfolio')}
-					help={getRepeatHelp(attributes)}
-					checked={carouselRepeat && repeatable}
-					disabled={!repeatable}
+					help={
+						runsMarquee
+							? __(
+									'A marquee runs round, so the carousel repeats.',
+									'visual-portfolio'
+								)
+							: getRepeatHelp(attributes)
+					}
+					checked={(carouselRepeat || runsMarquee) && repeatable}
+					disabled={!repeatable || runsMarquee}
 					onChange={(value) =>
 						setAttributes({ carouselRepeat: value })
 					}
