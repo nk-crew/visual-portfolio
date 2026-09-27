@@ -2553,7 +2553,8 @@ function getMarquee(list) {
  *
  * @return {Object} `drift( elapsed, wanted, now )` to call every frame, with
  *                  the share of the speed the carousel should be moving at,
- *                  and `stop()`.
+ *                  `rest( now )` for a frame the keyboard has it, and
+ *                  `stop()`.
  */
 function initMarquee(list, marquee) {
 	// Where the marquee put the carousel, between whole pixels. Null while
@@ -2563,11 +2564,27 @@ function initMarquee(list, marquee) {
 	// for, so a pointer that rests on it slows it rather than stopping it
 	// dead.
 	let rate = 0;
+	// A mouse button held on the list, and a finger on it: the browser takes
+	// the pointer of a finger away the moment it starts to pan, and a finger
+	// that stopped mid-pan was moved on under.
 	let pressed = false;
+	let touching = false;
+	// A sideways wheel or trackpad scroll, which moves the list a pixel at a
+	// time when it is slow - no more than the marquee itself does in a frame.
+	let nudged = false;
 	let lastPosition = getScrollPosition(list);
 	let lastMove = 0;
+	// The snap the carousel has when the marquee is not moving it. Blossom
+	// writes its own when it loads, after the marquee has started.
+	let snap = list.style.getPropertyValue(SNAP_TYPE_PROPERTY);
 
-	const snap = list.style.getPropertyValue(SNAP_TYPE_PROPERTY);
+	const setSnap = (value) => {
+		if (value) {
+			list.style.setProperty(SNAP_TYPE_PROPERTY, value);
+		} else {
+			list.style.removeProperty(SNAP_TYPE_PROPERTY);
+		}
+	};
 
 	const setShift = (value) => {
 		list.style.setProperty(MARQUEE_SHIFT_PROPERTY, `${value}px`);
@@ -2580,33 +2597,58 @@ function initMarquee(list, marquee) {
 		setShift(0);
 	};
 
-	const onDown = () => {
-		pressed = true;
+	// The main button only: the menu a right click opens on a Mac swallows
+	// the release, and the marquee stood still until the next click.
+	const onDown = (event) => {
+		pressed = 0 === event.button;
 	};
 	const onUp = () => {
 		pressed = false;
+	};
+	const onTouch = (event) => {
+		touching = event.touches.length > 0;
+	};
+	const onWheel = (event) => {
+		if (event.deltaX) {
+			nudged = true;
+		}
 	};
 
 	list.addEventListener('pointerdown', onDown);
 	window.addEventListener('pointerup', onUp);
 	window.addEventListener('pointercancel', onUp);
+	list.addEventListener('touchstart', onTouch, { passive: true });
+	window.addEventListener('touchend', onTouch, { passive: true });
+	window.addEventListener('touchcancel', onTouch, { passive: true });
+	list.addEventListener('wheel', onWheel, { passive: true });
 
 	const drift = (elapsed, wanted, now) => {
 		// A marquee rests nowhere, and a snap pulled it back to the slide it
-		// was leaving on every frame. Written every frame: Blossom writes its
-		// own snap type when it loads, after the marquee has started.
-		if ('none' !== list.style.getPropertyValue(SNAP_TYPE_PROPERTY)) {
+		// was leaving on every frame. Written every frame, since Blossom
+		// writes its own.
+		const current = list.style.getPropertyValue(SNAP_TYPE_PROPERTY);
+
+		if ('none' !== current) {
+			snap = current;
 			list.style.setProperty(SNAP_TYPE_PROPERTY, 'none');
+		}
+
+		// Held and at a stop, there is nothing to move - and nothing to
+		// measure until it runs again, when a move made meanwhile is found.
+		if (!wanted && !rate && !nudged) {
+			return;
 		}
 
 		const position = getScrollPosition(list);
 		const { period } = getRepeatGeometry(list);
-		// Moved by something other than the marquee since the last frame. A
-		// turn of the loop is the same picture, so only a move off it counts.
+		// Moved by something other than the marquee since the last frame: the
+		// marquee reads back the very pixel it scrolled to. A turn of the loop
+		// is the same picture, so only a move off it counts.
 		const off = onTheClock(position - lastPosition, period);
-		const moved = off > 1 && off < period - 1;
+		const moved = nudged || (off > 0.5 && off < period - 0.5);
 
 		lastPosition = position;
+		nudged = false;
 
 		if (moved) {
 			lastMove = now;
@@ -2615,6 +2657,7 @@ function initMarquee(list, marquee) {
 		if (
 			!period ||
 			pressed ||
+			touching ||
 			travels.has(list) ||
 			(moved && null !== place)
 		) {
@@ -2650,20 +2693,34 @@ function initMarquee(list, marquee) {
 		setShift(short - period / 2);
 	};
 
+	// The keyboard has the carousel: it is given its snap back, so an arrow
+	// key moves it a slide, and the marquee takes it up again when the focus
+	// leaves.
+	const rest = (now) => {
+		if (null !== place || rate) {
+			letGo(now);
+		}
+
+		if ('none' === list.style.getPropertyValue(SNAP_TYPE_PROPERTY)) {
+			setSnap(snap);
+		}
+
+		lastPosition = getScrollPosition(list);
+	};
+
 	const stop = () => {
 		list.removeEventListener('pointerdown', onDown);
 		window.removeEventListener('pointerup', onUp);
 		window.removeEventListener('pointercancel', onUp);
+		list.removeEventListener('touchstart', onTouch);
+		window.removeEventListener('touchend', onTouch);
+		window.removeEventListener('touchcancel', onTouch);
+		list.removeEventListener('wheel', onWheel);
 		list.style.removeProperty(MARQUEE_SHIFT_PROPERTY);
-
-		if (snap) {
-			list.style.setProperty(SNAP_TYPE_PROPERTY, snap);
-		} else {
-			list.style.removeProperty(SNAP_TYPE_PROPERTY);
-		}
+		setSnap(snap);
 	};
 
-	return { drift, stop };
+	return { drift, rest, stop };
 }
 
 /**
@@ -2766,6 +2823,12 @@ function initAutoplay(list) {
 		// Under the pointer a marquee keeps the share of its speed it was
 		// given, and slows to it. A frame that comes long after the last one -
 		// a tab brought back - moves it no further than a frame's worth.
+		if (drifting && focusIn.size) {
+			drifting.rest(now);
+
+			return;
+		}
+
 		if (drifting) {
 			let wanted = pointerOn.size ? marquee.hover : 1;
 
