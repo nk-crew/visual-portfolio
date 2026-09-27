@@ -1005,7 +1005,10 @@ or a promise of it. The first call wins. A null, a rejection or anything but a
 string loads the address as if nobody had answered. An answer not settled after
 10 seconds is dropped: an `append` fetches the page itself, a `navigate` loads
 the address in full, as when the router's own fetch hangs. A newer navigation
-of the same loop makes an older answer do nothing.
+of the same loop makes an older answer do nothing. A `navigate` answer goes to
+the router, which keeps the first page it holds for an address for the rest of
+the visit and shows it again on Back: answer with the page the server would
+send, not an edited one.
 
 `vp-loop-loaded` comes after the loop shows what it loaded, with the same
 `detail.href` and `detail.purpose`. It is not sent for a load that failed or
@@ -1024,7 +1027,8 @@ history entry instead of adding one, and `ref` is an element inside the loop,
 the current element when left out. It returns a promise of whether this swap
 was the loop's latest and finished rendering, and leaves the focus alone. Call
 it from an action or a callback of any store, or from a function wrapped in
-`withScope()`, so that it reads the context of the loop.
+`withScope()`, inside the loop it swaps: the loading state is written on the
+context of the loop the call runs in, so `ref` belongs to that same loop.
 
 ### Carousel events
 
