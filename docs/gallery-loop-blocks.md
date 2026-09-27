@@ -374,7 +374,7 @@ visual-portfolio/loop                      query, block id, layout wrapper
 ├── visual-portfolio/loop-filter           links, one per term, or a GET form around a <select>
 │   └── visual-portfolio/loop-filter-item
 ├── visual-portfolio/loop-sort             a GET form around a <select>, or links
-├── visual-portfolio/loop-search           a GET form around a search input, Pro applies the term
+├── visual-portfolio/loop-search           nothing in free, Pro renders the form and runs the search
 ├── visual-portfolio/loop-query-total      the count or the range of the items found
 ├── visual-portfolio/item-template         runs the query, renders <ul><li>
 │   ├── visual-portfolio/item-image
@@ -518,7 +518,7 @@ it reads — no hook involved:
 | `vpf_loop_item_context` | filter `( $context, $item, $options )` | Add context keys to one item |
 | `vpf_loop_custom_output` | filter `( false\|string, $options, $block )` | Replace the whole item template output, before a single item is rendered. Content protection uses this |
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |
-| `vpf_loop_search` | filter `( false, $options )` | Whether an extension applies the visitor search of a loop. Until one returns true the search block renders nothing and the term reaches no query. See below |
+| `vpf_loop_search` | filter `( false, $options )` | Whether an extension applies the visitor search of a loop. Until one returns true the term reaches no query. The search block renders nothing by itself either way, see below |
 | `vpf_loop_source_supports` | filter `( $supports )` | Which controls each source leaves out, `queryType => array( 'sort'\|'filter'\|'search' => bool )`. A control missing from the map is supported. The sort and filter blocks render nothing where it is false, the search block reads the loop's `content_source` instead, and the editor reads the same map for its note |
 | `vpf_loop_tiles_presets` | filter `( $presets )` | Tiles notations offered in the editor |
 | `vpf_carousel_effects` | filter `( $effects )` | Carousel effects the item template offers, `name => settings`. See below |
@@ -552,6 +552,16 @@ is no key at all. It is never set for a loop without a query id, for social and
 taxonomy sources, or for the classic gallery. The filter block counts its terms
 over the searched items, and does not cache them while a search is active,
 since what visitors type has no end.
+
+The search block itself renders nothing in the free plugin. It stays
+registered, so a post that holds it keeps it, and its render callback returns
+an empty string. The extension supplies the render callback through
+`register_block_type_args`, and builds the form from public helpers:
+`Visual_Portfolio_Gutenberg::transform_context_to_attributes()`,
+`Visual_Portfolio_Block_Loop::get_query_id()`, `get_link()`,
+`get_control_random_seed()`, `get_preserved_inputs()` and `STORE`, and
+`Visual_Portfolio_Get::supports_loop_search()`, `get_query_var_name()`,
+`get_current_search()` and `LOOP_SEARCH_MAX_LENGTH`.
 
 **The active sort.** `Visual_Portfolio_Get::get_query_params()` reads the sort
 from the parameter of the gallery that asks, `vp-{queryId}-sort` for a loop and
@@ -911,12 +921,13 @@ without any change here.
 
 | Store | Module | What it does |
 |---|---|---|
-| `visual-portfolio/loop` | `build/gutenberg/blocks/loop/view.js` | Navigation of the whole family: `actions.navigate`, `actions.search`, `actions.loadMore`, `callbacks.initLayout` (masonry), `callbacks.observeInfinite`, `state.isLoading`, `state.ariaLiveMessage`, `state.isEnhanced` |
+| `visual-portfolio/loop` | `build/gutenberg/blocks/loop/view.js` | Navigation of the whole family: `actions.navigate`, `actions.navigateTo`, `actions.loadMore`, `callbacks.initLayout` (masonry), `callbacks.observeInfinite`, `state.isLoading`, `state.ariaLiveMessage`, `state.isEnhanced` |
 | `visual-portfolio/item-template` | `build/gutenberg/blocks/item-template/view.js` | Justified and carousel layouts, the carousel controls (`actions.carouselPrev`, `actions.carouselNext`, `actions.carouselGoTo`, `actions.carouselAutoplayToggle`), native masonry detection |
 | `visual-portfolio/item-cover` | `build/gutenberg/blocks/item-cover/view.js` | The `fly` effect only |
 
 Compose onto a namespace with another `store()` call, and **add** actions rather
-than replace the ones already there.
+than replace the ones already there. Pro adds `actions.search` to
+`visual-portfolio/loop`; free never defines it.
 
 Nothing in these modules is required for the gallery to work. Every control is a
 real link or a real form resolved by the server; the modules replace the page
@@ -1005,6 +1016,16 @@ A script working from the markup can rely on these: the loop wrapper has
 `a[data-wp-on--click="actions.navigate"]`; a Load More or infinite trigger is
 `.vp-block-loop-pagination-trigger`, and its `href` is the next page.
 
+A script leads a loop to an address of its own with
+`actions.navigateTo( href, { replace, ref } )` on `visual-portfolio/loop`. It
+swaps the loop the way a navigate link does, and sends the same two events.
+`href` is absolute or relative to the page, `replace` replaces the current
+history entry instead of adding one, and `ref` is an element inside the loop,
+the current element when left out. It returns a promise of whether this swap
+was the loop's latest and finished rendering, and leaves the focus alone. Call
+it from an action or a callback of any store, or from a function wrapped in
+`withScope()`, so that it reads the context of the loop.
+
 ### Carousel events
 
 The carousel takes commands as DOM events on the list element of an item
@@ -1065,8 +1086,9 @@ default order, and an empty value reads the same as none.
 
 The search has no legacy name. `vp_search` belongs to the classic search element,
 and every gallery on the page reads it, so a loop searches only under its own
-query id. A search replaces the history entry of the search before it rather
-than adding one per pause in the typing, so Back leaves the search in one step.
+query id. Pro's Gallery Search replaces the history entry of the search before
+it rather than adding one per pause in the typing, so Back leaves the search in
+one step.
 
 **The portfolio archive.** A loop with the Current Query source on the page mapped
 to the portfolio archive keeps its category and its page in the path, the way the

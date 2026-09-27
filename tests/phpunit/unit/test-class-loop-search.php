@@ -1,7 +1,7 @@
 <?php
 /**
  * Tests for the Gallery Search block and the term it hands to the query: read
- * only when an extension applies it, rendered only where it can search.
+ * only when an extension applies it. The block renders nothing by itself.
  *
  * @package Visual Portfolio
  */
@@ -148,8 +148,8 @@ class ClassLoopSearch extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Without an extension that applies it, the block renders nothing and the
-	 * term reaches no query. The extension is what turns both on.
+	 * Without an extension that applies it, the term reaches no query. The
+	 * extension is what turns it on.
 	 *
 	 * @return void
 	 */
@@ -158,7 +158,6 @@ class ClassLoopSearch extends WP_UnitTestCase {
 
 		$html = $this->render_loop();
 
-		$this->assertStringNotContainsString( 'vp-block-loop-search', $html );
 		$this->assertSame( 3, preg_match_all( '/<li [^>]*wp-block-visual-portfolio-item-template__item/', $html ) );
 		$this->assertSame(
 			array(
@@ -170,41 +169,9 @@ class ClassLoopSearch extends WP_UnitTestCase {
 
 		add_filter( 'vpf_loop_search', '__return_true' );
 
-		$this->assertStringContainsString( 'vp-block-loop-search', $this->render_loop() );
+		$this->render_loop();
+
 		$this->assertSame( 'Forest', $this->handed['vpf_extend_query_args'] );
-	}
-
-	/**
-	 * With an extension, the block is a labelled GET form that holds the
-	 * current term and carries every other parameter but the page along.
-	 *
-	 * @return void
-	 */
-	public function test_with_an_extension_the_block_is_a_labelled_form() {
-		add_filter( 'vpf_loop_search', '__return_true' );
-
-		$_GET['vp-1-search'] = 'Forest "path"';
-		$_GET['vp-1-page']   = '2';
-		$_GET['vp-1-sort']   = 'title';
-		$_GET['vp-2-page']   = '3';
-
-		$html = $this->render_loop( '<!-- wp:visual-portfolio/loop-search {"label":"Find images","placeholder":"Type a name"} /-->' );
-
-		$this->assertMatchesRegularExpression(
-			'/<form role="search" method="get" action="[^"?]*" [^>]*class="[^"]*vp-block-loop-search[^"]*"[^>]*data-wp-on--submit="actions.search">(.*?)<label><span class="vp-block-loop-search__label">Find images<\/span><input type="search" class="vp-block-loop-search__input" name="vp-1-search" value="Forest &quot;path&quot;" placeholder="Type a name" maxlength="100" data-wp-on--input="actions.search" data-wp-on--compositionend="actions.search" \/><\/label><\/form>/s',
-			$html
-		);
-
-		preg_match( '/<form role="search".*?<\/form>/s', $html, $form );
-		preg_match_all( '/<input type="hidden" name="([^"]*)" value="([^"]*)" \/>/', $form[0], $hidden, PREG_SET_ORDER );
-
-		$this->assertSame(
-			array(
-				'vp-1-sort' => 'title',
-				'vp-2-page' => '3',
-			),
-			array_column( $hidden, 2, 1 )
-		);
 	}
 
 	/**
@@ -238,17 +205,21 @@ class ClassLoopSearch extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Sources with no text to match render no search, and neither does a loop
-	 * without a query id, which could only read the parameter every gallery
-	 * on the page shares.
+	 * The block is registered and renders nothing by itself, even for a loop
+	 * whose search an extension applies. The form is the extension's.
 	 *
 	 * @return void
 	 */
-	public function test_the_block_renders_only_where_it_can_search() {
+	public function test_the_block_renders_nothing_by_itself() {
+		if ( class_exists( 'Visual_Portfolio_Pro_Search_Element' ) ) {
+			$this->markTestSkipped( 'Pro renders the search form.' );
+		}
+
 		add_filter( 'vpf_loop_search', '__return_true' );
 
-		$this->assertStringContainsString(
-			'<form role="search"',
+		$this->assertTrue( WP_Block_Type_Registry::get_instance()->is_registered( 'visual-portfolio/loop-search' ) );
+		$this->assertSame(
+			'',
 			$this->render_search(
 				array(
 					'vp/queryId'   => 1,
@@ -256,20 +227,5 @@ class ClassLoopSearch extends WP_UnitTestCase {
 				)
 			)
 		);
-
-		foreach ( array( 'social-stream', 'taxonomies' ) as $source ) {
-			$this->assertSame(
-				'',
-				$this->render_search(
-					array(
-						'vp/queryId'   => 1,
-						'vp/queryType' => $source,
-					)
-				),
-				$source
-			);
-		}
-
-		$this->assertSame( '', $this->render_search( array( 'vp/queryType' => 'images' ) ) );
 	}
 }

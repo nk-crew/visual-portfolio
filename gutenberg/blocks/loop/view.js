@@ -2,7 +2,6 @@ import {
 	getContext,
 	getElement,
 	store,
-	withScope,
 	withSyncEvent,
 } from '@wordpress/interactivity';
 
@@ -17,7 +16,8 @@ import { syncColumns } from '../item-template/auto-columns';
  * loop still navigates by full page loads. It only replaces the load with a
  * region swap, and hands the navigation back to the browser whenever it cannot.
  *
- * Pro composes onto the same namespace with another `store()` call.
+ * Pro composes onto the same namespace with another `store()` call, and adds
+ * `actions.search` there. Free never defines it, so the two cannot collide.
  */
 
 const LOOP_SELECTOR = '.vp-block-loop';
@@ -27,13 +27,9 @@ const PAGINATION_SELECTOR = '.vp-block-loop-pagination';
 const TRIGGER_SELECTOR = '.vp-block-loop-pagination-trigger';
 const END_SELECTOR = '.vp-block-loop-pagination-end';
 const MASONRY_CLASS = 'vp-layout-masonry';
-const SEARCH_INPUT_SELECTOR = '.vp-block-loop-search__input';
 const RANGE_SELECTOR = '.vp-block-loop-query-total[data-vp-range-text]';
 const THUMBS_SELECTOR = '.vp-block-loop-carousel-thumbnails';
 const THUMB_SELECTOR = '.vp-block-loop-carousel-thumb';
-
-// How long a search waits for the visitor to stop typing.
-const SEARCH_DELAY = 500;
 
 // Written on the list once Masonry is positioning the items, and read by the
 // stylesheet: until then the browser packs them into columns on its own. Not
@@ -85,14 +81,6 @@ const navigating = new WeakMap();
 // The navigation a loop was last asked for, kept after it ends, so that an
 // answer to an older one arriving late asks the router for nothing.
 const latestNavigations = new WeakMap();
-
-// Per loop: the search waiting for the visitor to stop typing, what they typed
-// last with where the caret was, and the address the last finished search
-// wrote.
-const searchTimers = new WeakMap();
-const searchesInFlight = new WeakMap();
-const typedSearches = new WeakMap();
-const searchAddresses = new WeakMap();
 
 /**
  * Context of the loop the current element belongs to.
@@ -862,12 +850,12 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 	// node while everything inside it is replaced.
 	const loop = ref.closest(LOOP_SELECTOR);
 
-	if (loop) {
-		// A search still waiting for a pause in the typing would follow this
-		// navigation from the page it replaces.
-		window.clearTimeout(searchTimers.get(loop));
-		searchTimers.delete(loop);
+	// Sent first, so that whatever would follow this navigation from the page
+	// it replaces, such as a search waiting for a pause in the typing, stops
+	// before anything else happens.
+	const answer = loop ? requestPage(loop, href, 'navigate') : null;
 
+	if (loop) {
 		// A Load More still in flight would append its page under the
 		// one the router is about to render, and register undos for a
 		// rollback that already ran.
@@ -910,8 +898,6 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 		const router = yield import('@wordpress/interactivity-router');
 
 		let asked = false;
-
-		const answer = loop ? requestPage(loop, href, 'navigate') : null;
 
 		const timedOut = yield Promise.race([
 			// A page an extension answered with is the request the router would
@@ -969,143 +955,6 @@ function* swapLoop(ref, href, context, { replace = false } = {}) {
 	}
 
 	return true;
-}
-
-/**
- * The address a search form leads to, the one it submits to without
- * JavaScript. An empty search is the default state, left out of the address.
- *
- * @param {HTMLInputElement} input Search input.
- *
- * @return {string} Address.
- */
-function getSearchUrl(input) {
-	// Not `form.action`, which a preserved parameter named `action` shadows.
-	const url = new window.URL(
-		input.form.getAttribute('action'),
-		window.location.href
-	);
-	const params = new window.URLSearchParams(new window.FormData(input.form));
-
-	if (!input.value.trim()) {
-		params.delete(input.name);
-	}
-
-	url.search = params.toString();
-
-	return url.href;
-}
-
-/**
- * Put back what the visitor was typing, when a swap took it away.
- *
- * The router renders the input again with the term the server read, which is
- * behind whatever was typed while the page was on its way, and a node it
- * rendered anew takes the focus with it.
- *
- * @param {HTMLElement} loop     Loop wrapper.
- * @param {string}      name     Name of the search input.
- * @param {boolean}     hadFocus Whether the input held the focus before the swap.
- */
-function getSearchInput(loop, name, index) {
-	return loop.querySelectorAll(`${SEARCH_INPUT_SELECTOR}[name="${name}"]`)[
-		index
-	];
-}
-
-function restoreSearch(loop, name, index, hadFocus) {
-	const typed = typedSearches.get(loop);
-	const input = getSearchInput(loop, name, index);
-
-	// What was typed belongs to the field it was typed in.
-	if (!typed || !input || typed.name !== name || typed.index !== index) {
-		return;
-	}
-
-	let moved = false;
-
-	if (input.value !== typed.value) {
-		input.value = typed.value;
-		moved = true;
-	}
-
-	const active = window.document.activeElement;
-
-	// Only a focus the swap dropped, not one the visitor took elsewhere.
-	if (
-		hadFocus &&
-		input !== active &&
-		(!active || window.document.body === active)
-	) {
-		input.focus();
-		moved = true;
-	}
-
-	if (moved && input === window.document.activeElement) {
-		input.setSelectionRange(typed.start, typed.end);
-	}
-}
-
-/**
- * Swap a loop for the search in its input.
- *
- * A search adds a history entry, and every search right after it replaces
- * that entry, so Back leaves the search rather than stepping through it a few
- * letters at a time.
- *
- * @param {HTMLElement} loop    Loop wrapper.
- * @param {string}      name    Name of the search input.
- * @param {Object}      context Loop context.
- *
- * @return {Generator} Done.
- */
-function* searchLoop(loop, name, index, context) {
-	searchTimers.delete(loop);
-
-	// Asked for again: a swap since the visitor typed may have rendered it
-	// anew. By its place, since a loop may hold two of them.
-	const input = getSearchInput(loop, name, index);
-
-	if (!input || !input.form) {
-		return;
-	}
-
-	const href = getSearchUrl(input);
-
-	// Already there, or already on the way: an Enter right after a pause
-	// would push the same address twice. The address the visitor stands on is
-	// still asked for while another search is on the way, or that one lands
-	// over a field that no longer holds it.
-	// Without the hash, which a search address never carries.
-	const here = window.location.href.split('#')[0];
-	const inFlight = searchesInFlight.get(loop);
-
-	if (href === inFlight || (href === here && !inFlight)) {
-		return;
-	}
-
-	// A cleared search is an entry of its own: replacing the search with the
-	// address it started from would leave Back two copies of that address.
-	// Asking for the address the visitor stands on is the reverse: a new entry
-	// would be the second copy.
-	const replace =
-		href === here ||
-		(!!input.value.trim() &&
-			(!!inFlight || searchAddresses.get(loop) === here));
-	const hadFocus = input === window.document.activeElement;
-
-	searchesInFlight.set(loop, href);
-
-	const done = yield* swapLoop(input, href, context, { replace });
-
-	if (searchesInFlight.get(loop) === href) {
-		searchesInFlight.delete(loop);
-	}
-
-	if (done) {
-		searchAddresses.set(loop, href);
-		restoreSearch(loop, name, index, hadFocus);
-	}
 }
 
 store('visual-portfolio/loop', {
@@ -1167,63 +1016,43 @@ store('visual-portfolio/loop', {
 		}),
 
 		/**
-		 * Search the loop for what the visitor typed.
+		 * Swap a loop for its state at another address, for a script that
+		 * leads the loop somewhere no control of its own links to.
 		 *
-		 * Typing waits for a pause, Enter searches at once. The input lives in
-		 * the region it swaps, so the focus, the caret and anything typed while
-		 * the page was on its way are put back afterwards.
+		 * Called from an action or a callback of any store, or from a function
+		 * wrapped in `withScope()`, so that the loop context is the one of the
+		 * element. Leaves the focus where it is.
 		 *
-		 * @param {Event} event Input or submit event.
+		 * @param {string}      href            Address, absolute or relative to
+		 *                                      the page.
+		 * @param {Object}      options         Options.
+		 * @param {boolean}     options.replace Whether the address replaces the
+		 *                                      current history entry.
+		 * @param {HTMLElement} options.ref     Element inside the loop, the
+		 *                                      current element when left out.
+		 *
+		 * @return {Generator} Whether the swap was the loop's latest and is
+		 *                     done.
 		 */
-		search: withSyncEvent(function* (event) {
-			const { ref } = getElement();
-			const loop = ref.closest(LOOP_SELECTOR);
-			const input = ref
-				.closest('form')
-				?.querySelector(SEARCH_INPUT_SELECTOR);
-
-			// An input method is still composing the text.
-			if (!loop || !input || event.isComposing) {
-				return;
+		navigateTo: function* (href, { replace = false, ref } = {}) {
+			// Bound as a directive, it would be handed an event.
+			if ('string' !== typeof href || !href) {
+				return false;
 			}
 
-			const isSubmit = 'submit' === event.type;
+			const element = ref || getElement()?.ref;
 
-			if (isSubmit) {
-				event.preventDefault();
+			if (!element) {
+				return false;
 			}
 
-			window.clearTimeout(searchTimers.get(loop));
-			searchTimers.delete(loop);
-			const { name } = input;
-			const index = Array.from(
-				loop.querySelectorAll(
-					`${SEARCH_INPUT_SELECTOR}[name="${name}"]`
-				)
-			).indexOf(input);
-
-			typedSearches.set(loop, {
-				name,
-				index,
-				value: input.value,
-				start: input.selectionStart,
-				end: input.selectionEnd,
-			});
-			const context = getLoopContext();
-			const run = function* () {
-				yield* searchLoop(loop, name, index, context);
-			};
-
-			if (isSubmit) {
-				yield* run();
-				return;
-			}
-
-			searchTimers.set(
-				loop,
-				window.setTimeout(withScope(run), SEARCH_DELAY)
+			return yield* swapLoop(
+				element,
+				new window.URL(href, window.location.href).href,
+				getLoopContext(),
+				{ replace }
 			);
-		}),
+		},
 
 		/**
 		 * Append the next page of items.
