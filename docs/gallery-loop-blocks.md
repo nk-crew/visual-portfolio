@@ -311,10 +311,11 @@ editor uses for the width of any block — *None* is the content width, then
 *Wide width*, *Full width* and *Custom*, whose width is typed in the menu.
 
 The carousel panel of the item template carries the rest: *Effect*, *Autoplay*
-and its delay, *Repeat*, *Peek*, *Slides per step* (zero
-moves a whole screen at a time, and a swipe comes to rest on the same frames an
-arrow does), *Slide height* and *Blocks fill the slide*,
-*Fade the edges*, *Slide width from content* and *Free scrolling*.
+with its mode (slide by slide, or a marquee with Pro) and its delay, *Repeat*,
+*Peek*, *Slides per step* (zero moves a whole screen at a time, and a swipe
+comes to rest on the same frames an arrow does), *Slide height* and *Blocks
+fill the slide*, *Fade the edges*, *Slide width from content* and *Free
+scrolling*.
 
 **Controls.** Filter, sort and pagination are server-rendered links and forms.
 With JavaScript they swap the gallery in place; without it they work as ordinary
@@ -786,6 +787,17 @@ stated in `cqw` rather than in a percentage of the list — a carousel that
 repeats is padded by half its width at each end, and a percentage of what that
 leaves is nothing.
 
+### Carousel marquee
+
+Autoplay has two modes. Slide by slide holds each slide for the delay. A
+marquee moves the carousel on without stopping, and is Pro's: the free editor
+offers it as a disabled "Marquee (Pro)" option of the *Mode* select, and the
+free plugin has no code that runs one. Choosing it keeps `extensions.marquee`
+on the item template, an object whose settings belong to the extension, turns
+*Repeat* on, and puts `vpf.itemTemplateMarqueeControls` (`null`, `{ attributes,
+setAttributes }`) where the delay was. The page runs it through the autoplay
+events below.
+
 ### Sitemap
 
 `vpf_parse_sitemap_images_from_blocks` filters the images a post contributes.
@@ -962,6 +974,8 @@ template:
 |---|---|
 | `vp-carousel-go-to` | `detail.index` — scroll to that slide |
 | `vp-carousel-autoplay` | `detail.playing` — `false` holds autoplay, `true` releases it |
+| `vp-carousel-place` | `detail.position` — a place on the loop of a repeating carousel, scrolled to at once and kept off the seam the way a step is; written back as the scroll it came to rest at |
+| `vp-carousel-autoplay-take` | the autoplay stops moving the carousel and hands each frame to the script that took it |
 
 And announces itself on the same element, bubbling, so that a script outside
 the module can run beside a carousel for as long as it runs:
@@ -970,6 +984,16 @@ the module can run beside a carousel for as long as it runs:
 |---|---|
 | `vp-carousel-start` | the module has started the carousel, once per start — a Load More starts it again |
 | `vp-carousel-stop` | the module is about to let go of it |
+| `vp-carousel-travel-start` | the module has started drawing a step of a repeating carousel, snapping held off (not bubbling) |
+| `vp-carousel-travel-end` | the step has arrived or was stopped, and the snap is back (not bubbling) |
+| `vp-carousel-autoplay-frame` | a frame of a taken autoplay: `detail.elapsed` in milliseconds, `detail.held` (the visitor's stop, a script's hold, off the screen, the keyboard), `detail.pointer` and `detail.keyboard` (not bubbling) |
+
+A script that takes the autoplay moves the carousel itself and keeps the rest:
+the pauses, the play and pause button, and a visitor who asked for less
+motion, for whom no frame ever comes. It takes it again on every
+`vp-carousel-start`, since a Load More starts a new autoplay. Snapping is
+switched by the list's `--snap-type` custom property, which the carousel
+library reads; a step saves it and puts it back when it arrives.
 
 Holding autoplay is not the same as stopping it: the pause a pointer or a focus
 already applies keeps working underneath, and releasing the hold does not

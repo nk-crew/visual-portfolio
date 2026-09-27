@@ -254,8 +254,19 @@ const RELAYOUT_EVENT = 'vp-relayout';
 //                                          it. A hold, not a play button: the
 //                                          pointer of the visitor still pauses
 //                                          a released carousel.
+// `vp-carousel-place`     `detail.position` a place on the clock of a
+//                                          repeating carousel, scrolled to at
+//                                          once - kept off the seam the way
+//                                          a step is. Written back as the
+//                                          scroll it came to rest at.
+// `vp-carousel-autoplay-take`              the autoplay stops moving the
+//                                          carousel itself and hands each
+//                                          frame it would have run to the
+//                                          script that took it.
 const GO_TO_EVENT = 'vp-carousel-go-to';
 const AUTOPLAY_EVENT = 'vp-carousel-autoplay';
+const PLACE_EVENT = 'vp-carousel-place';
+const AUTOPLAY_TAKE_EVENT = 'vp-carousel-autoplay-take';
 
 // Dispatched on the list, and bubbling, once the module runs a carousel and
 // again just before it lets go of one - so that a script that is not a module
@@ -266,6 +277,23 @@ const AUTOPLAY_EVENT = 'vp-carousel-autoplay';
 // `vp-carousel-stop`   it is about to be torn down.
 const START_EVENT = 'vp-carousel-start';
 const STOP_EVENT = 'vp-carousel-stop';
+
+// Dispatched on the list, so that a script moving the carousel as well keeps
+// out of the way of the module.
+//
+// `vp-carousel-travel-start`  the module has started drawing a step of a
+//                             repeating carousel, with snapping held off.
+// `vp-carousel-travel-end`    it has arrived, or was stopped, and the snap is
+//                             back to what it was.
+// `vp-carousel-autoplay-frame` a frame of a taken autoplay: `detail.elapsed`
+//                             in milliseconds, `detail.held` - stopped by the
+//                             visitor, held by a script, off the screen or
+//                             under the keyboard - `detail.pointer` when the
+//                             pointer rests on the carousel, and
+//                             `detail.keyboard` when the keyboard has it.
+const TRAVEL_START_EVENT = 'vp-carousel-travel-start';
+const TRAVEL_END_EVENT = 'vp-carousel-travel-end';
+const AUTOPLAY_FRAME_EVENT = 'vp-carousel-autoplay-frame';
 
 // Dispatched on the list by a press on an arrow or a dot. Autoplay starts
 // its wait over on it: a visitor who has just chosen a slide is owed a whole
@@ -673,6 +701,7 @@ function travelRepeating(list, from, to, period, speed = 0) {
 		}
 
 		remeasureLoop(list);
+		list.dispatchEvent(new window.CustomEvent(TRAVEL_END_EVENT));
 	};
 
 	// A carousel that was thrown is already going, and a move that eased in
@@ -740,6 +769,7 @@ function travelRepeating(list, from, to, period, speed = 0) {
 	// for. Blossom stops throwing a carousel the moment anything else scrolls
 	// it, and a travel that waited for its frame let a throw it was taking
 	// over from move the carousel once more first.
+	list.dispatchEvent(new window.CustomEvent(TRAVEL_START_EVENT));
 	place(from);
 
 	raf = window.requestAnimationFrame(frame);
@@ -2558,6 +2588,10 @@ function initAutoplay(list) {
 	// showing a different one.
 	let seen = -1;
 
+	// Taken by a script that moves the carousel itself. The pauses stay the
+	// autoplay's, and so does the play and pause button.
+	let taken = false;
+
 	const setProgress = (value) => {
 		root.style.setProperty(
 			'--vp-carousel-autoplay-progress',
@@ -2585,6 +2619,26 @@ function initAutoplay(list) {
 				}
 			});
 		});
+
+		if (taken) {
+			list.dispatchEvent(
+				new window.CustomEvent(AUTOPLAY_FRAME_EVENT, {
+					detail: {
+						elapsed: step,
+						held: !!(
+							focusIn.size ||
+							held ||
+							offscreen ||
+							stopped.has(list)
+						),
+						pointer: pointerOn.size > 0,
+						keyboard: focusIn.size > 0,
+					},
+				})
+			);
+
+			return;
+		}
 
 		// A held clock reads nothing: the slide it will count for is read on
 		// the first frame it runs again.
@@ -2699,7 +2753,13 @@ function initAutoplay(list) {
 		box.addEventListener('focusout', onFocusOut);
 	});
 	list.addEventListener(AUTOPLAY_EVENT, hold);
+	const take = () => {
+		taken = true;
+		setProgress(0);
+	};
+
 	list.addEventListener(STEP_EVENT, restart);
+	list.addEventListener(AUTOPLAY_TAKE_EVENT, take);
 	syncAutoplay(list, root);
 
 	raf = window.requestAnimationFrame((now) => {
@@ -2719,6 +2779,7 @@ function initAutoplay(list) {
 		});
 		list.removeEventListener(AUTOPLAY_EVENT, hold);
 		list.removeEventListener(STEP_EVENT, restart);
+		list.removeEventListener(AUTOPLAY_TAKE_EVENT, take);
 		root.style.removeProperty('--vp-carousel-autoplay-progress');
 	};
 }
@@ -2788,6 +2849,20 @@ function wakeControls(list, hasAutoplay) {
 function initCarousel(list, restore) {
 	const onScroll = () => syncNav(list);
 	const onGoTo = (event) => goToSlide(list, event.detail?.index);
+	const onPlace = (event) => {
+		const { period } = getRepeatGeometry(list);
+
+		if (
+			!isRepeating(list) ||
+			!period ||
+			!Number.isFinite(event.detail?.position)
+		) {
+			return;
+		}
+
+		placeRepeating(list, event.detail.position, period);
+		event.detail.position = getScrollPosition(list);
+	};
 
 	// Drag is the one thing the browser does not do for a scroll container, and
 	// it is the one thing Blossom adds - so it is loaded where a pointer can
@@ -2860,6 +2935,7 @@ function initCarousel(list, restore) {
 
 	list.addEventListener('scroll', onScroll, { passive: true });
 	list.addEventListener(GO_TO_EVENT, onGoTo);
+	list.addEventListener(PLACE_EVENT, onPlace);
 
 	const stopObserving = observeItems(list, () => {
 		syncSnapGroups(list);
@@ -2991,6 +3067,7 @@ function initCarousel(list, restore) {
 		sleepControls();
 		list.removeEventListener('scroll', onScroll);
 		list.removeEventListener(GO_TO_EVENT, onGoTo);
+		list.removeEventListener(PLACE_EVENT, onPlace);
 		list.removeEventListener('mousedown', onMouseDown);
 		list.removeEventListener('keydown', onKeyDown);
 		list.removeEventListener('blur', unmarkFocus);
