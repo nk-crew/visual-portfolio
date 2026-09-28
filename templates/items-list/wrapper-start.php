@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$logo_gradient_id = wp_unique_id( 'vpf-preloader-gradient-' );
+
 ?>
 
 <div class="<?php echo esc_attr( $class ); ?>"
@@ -31,6 +33,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 >
 	<div class="vp-portfolio__preloader-wrap">
 		<div class="vp-portfolio__preloader">
-			<img loading="eager" src="<?php echo esc_url( visual_portfolio()->plugin_url . 'assets/images/logo-dark.svg' ); ?>" alt="<?php echo esc_attr__( 'Visual Portfolio, Posts & Image Gallery for WordPress', 'visual-portfolio' ); ?>" width="20" height="20" data-skip-lazy>
+			<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+				<rect width="20" height="20" rx="10" fill="black" />
+				<path d="M11.5062 13.9L14.0488 6.59998H11.6894L9.39999 13.9H11.5062Z" fill="url(#<?php echo esc_attr( $logo_gradient_id ); ?>)" />
+				<path d="M8.54255 13.9L5.99999 6.59998H8.35932L10.6488 13.9H8.54255Z" fill="white" />
+				<defs>
+					<linearGradient id="<?php echo esc_attr( $logo_gradient_id ); ?>" x1="12.9" y1="6.59998" x2="6.59999" y2="15.4" gradientUnits="userSpaceOnUse">
+						<stop offset="0" stop-color="white" />
+						<stop offset="1" stop-color="white" stop-opacity="0" />
+					</linearGradient>
+				</defs>
+			</svg>
 		</div>
 	</div>
