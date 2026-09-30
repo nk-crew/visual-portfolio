@@ -2158,7 +2158,15 @@ test.describe('Gallery Item Template layouts', () => {
 		await dots.first().click();
 		await list.scrollIntoViewIfNeeded();
 		const resetBox = await list.boundingBox();
-		await page.mouse.move(resetBox.x + 100, resetBox.y + 80);
+		const visibleTop = Math.max(0, resetBox.y);
+		const visibleBottom = Math.min(
+			page.viewportSize().height,
+			resetBox.y + resetBox.height
+		);
+		await page.mouse.move(
+			resetBox.x + 100,
+			(visibleTop + visibleBottom) / 2
+		);
 		await page.mouse.down();
 		await page.evaluate(() =>
 			window.dispatchEvent(
@@ -2809,6 +2817,70 @@ test.describe('Gallery Item Template layouts', () => {
 		// Off the carousel the wait runs down and the carousel moves on.
 		await page.mouse.move(1, 1);
 		await expect.poll(position, { timeout: 10000 }).toBeGreaterThan(0);
+	});
+
+	test('a swipe resets autoplay progress while the pointer keeps it paused', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+		const content = getLoopMarkup({
+			blockId: 'e2e-carousel-paused-progress',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 1,
+				carouselAutoplay: true,
+				carouselAutoplayDelay: 10,
+			},
+			carousel: ['loop-carousel-indicator'],
+		}).replace(
+			'"clickAction":"url"',
+			'"clickAction":"none","aspectRatio":"16/9"'
+		);
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Layouts - paused autoplay progress',
+				status: 'publish',
+				content,
+			},
+		});
+		pageIds.push(created.id);
+		await page.goto(created.link, { waitUntil: 'domcontentloaded' });
+		const list = page.locator(LIST);
+		const root = page.locator(CAROUSEL);
+		const dots = root.locator(DOT);
+		await expect(list).toHaveAttribute('blossom-carousel', 'true');
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+		await list.scrollIntoViewIfNeeded();
+		await page.mouse.move(0, 0);
+		const progress = () =>
+			root.evaluate(
+				(node) =>
+					parseFloat(
+						node.style.getPropertyValue(
+							'--vp-carousel-autoplay-progress'
+						)
+					) || 0
+			);
+		await expect.poll(progress).toBeGreaterThan(15);
+		const box = await list.boundingBox();
+		await page.mouse.move(box.x + box.width * 0.8, box.y + box.height / 2);
+		await page.mouse.down();
+		await page.mouse.move(box.x + box.width * 0.2, box.y + box.height / 2, {
+			steps: 20,
+		});
+		await page.mouse.up();
+		await expect(dots.nth(1)).toHaveAttribute('aria-current', 'true');
+		await expect.poll(progress).toBe(0);
+		await page.waitForTimeout(200);
+		expect(await progress()).toBe(0);
+		await page.mouse.move(0, 0);
+		await expect.poll(progress).toBeGreaterThan(0);
+		expect(await progress()).toBeLessThan(5);
 	});
 
 	test('a wait starts again on the slide the carousel is moved to', async ({

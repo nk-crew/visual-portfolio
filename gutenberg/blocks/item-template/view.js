@@ -296,7 +296,7 @@ const noop = () => {};
 
 const carousels = new WeakMap();
 
-// The slide the last press asked for, per carousel.
+// The destination of an explicit step or a snap prediction, per carousel.
 const pending = new WeakMap();
 
 // Carousels a visitor has stopped. Kept apart from the hold an outside script
@@ -568,7 +568,11 @@ function goToRepeatingSlide(list, index, direction = 0, speed = 0) {
 		);
 	}
 
-	pending.set(list, { index: wanted, time: window.performance.now() });
+	pending.set(list, {
+		index: wanted,
+		time: window.performance.now(),
+		source: 'step',
+	});
 	syncNav(list);
 	travelRepeating(list, position, target, period, speed);
 }
@@ -2036,7 +2040,11 @@ function goToSlide(list, index, targets = getSlideTargets(list)) {
 		return;
 	}
 
-	pending.set(list, { index: wanted, time: window.performance.now() });
+	pending.set(list, {
+		index: wanted,
+		time: window.performance.now(),
+		source: 'step',
+	});
 	syncNav(list);
 
 	scrollListTo(list, targets[wanted]);
@@ -2446,18 +2454,6 @@ function initAutoplay(list) {
 			return;
 		}
 
-		// A held clock reads nothing: the slide it will count for is read on
-		// the first frame it runs again.
-		if (
-			pointerOn.size ||
-			focusIn.size ||
-			held ||
-			offscreen ||
-			stopped.has(list)
-		) {
-			return;
-		}
-
 		// Whichever way the carousel moved, the slide it moved to is owed the
 		// whole of a wait. A press on an arrow or a dot says so itself and is
 		// listened for, but a swipe says nothing - so the delay went on
@@ -2474,6 +2470,17 @@ function initAutoplay(list) {
 		if (showing !== seen) {
 			seen = showing;
 			restart();
+		}
+
+		// A pause holds time, but changing slides still starts a new wait.
+		if (
+			pointerOn.size ||
+			focusIn.size ||
+			held ||
+			offscreen ||
+			stopped.has(list)
+		) {
+			return;
 		}
 
 		elapsed += step;
@@ -2661,6 +2668,7 @@ function initCarousel(list, restore) {
 			pending.set(list, {
 				index: dotTarget,
 				time: window.performance.now(),
+				source: 'snap',
 			});
 			syncNav(list);
 		}
@@ -2696,11 +2704,11 @@ function initCarousel(list, restore) {
 
 		const targets = getSlideTargets(list);
 		const held = pending.get(list);
-		// A click can name the last visible slide at a shared scroll endpoint.
+		// Delayed snap events must not replace an explicit control destination.
 		if (
 			held &&
-			window.performance.now() - held.time < STEP_HOLD &&
-			targets[held.index] === targets[at]
+			'step' === held.source &&
+			window.performance.now() - held.time < STEP_HOLD
 		) {
 			return;
 		}
@@ -2886,6 +2894,21 @@ function initCarousel(list, restore) {
 		if (!MODIFIER_KEYS.has(event.key)) {
 			unmarkFocus();
 		}
+		if (
+			!isRepeating(list) &&
+			['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key) &&
+			!event.defaultPrevented &&
+			!event.altKey &&
+			!event.ctrlKey &&
+			!event.metaKey
+		) {
+			pending.delete(list);
+		}
+	};
+	const onWheel = (event) => {
+		if (event.deltaX || (event.shiftKey && event.deltaY)) {
+			pending.delete(list);
+		}
 	};
 
 	if (canDrag) {
@@ -2895,10 +2918,11 @@ function initCarousel(list, restore) {
 		window.addEventListener('pointercancel', onMouseUp, true);
 		window.addEventListener('blur', onMouseUp);
 		window.addEventListener('contextmenu', onMouseUp);
-		list.addEventListener('keydown', onKeyDown);
 		list.addEventListener('blur', unmarkFocus);
 	}
 
+	list.addEventListener('keydown', onKeyDown);
+	list.addEventListener('wheel', onWheel, { passive: true });
 	list.addEventListener('touchstart', onTouchStart, { passive: true });
 	window.addEventListener('touchend', onTouchEnd, { passive: true });
 	window.addEventListener('touchcancel', onTouchEnd, { passive: true });
@@ -3009,6 +3033,7 @@ function initCarousel(list, restore) {
 		window.removeEventListener('touchend', onTouchEnd);
 		window.removeEventListener('touchcancel', onTouchEnd);
 		list.removeEventListener('keydown', onKeyDown);
+		list.removeEventListener('wheel', onWheel);
 		list.removeEventListener('keydown', onArrowKey);
 		list.removeEventListener('blur', unmarkFocus);
 		unmarkFocus();
