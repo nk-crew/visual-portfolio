@@ -2121,13 +2121,29 @@ test.describe('Gallery Item Template layouts', () => {
 		});
 		const box = await list.boundingBox();
 		const cdp = await context.newCDPSession(page);
-		await cdp.send('Input.synthesizeScrollGesture', {
-			x: Math.round(box.x + box.width * 0.8),
-			y: Math.round(box.y + box.height / 2),
-			xDistance: -650,
-			yDistance: 0,
-			speed: 800,
-			gestureSourceType: 'touch',
+		const distance = await list.evaluate(
+			(node) => node.children[2].offsetLeft - node.children[0].offsetLeft
+		);
+		const x = box.x + box.width - 32;
+		const y = box.y + box.height / 2;
+		await cdp.send('Input.dispatchTouchEvent', {
+			type: 'touchStart',
+			touchPoints: [{ x, y }],
+		});
+		for (let step = 1; step <= 30; step += 1) {
+			await cdp.send('Input.dispatchTouchEvent', {
+				type: 'touchMove',
+				touchPoints: [{ x: x - (distance * step) / 30, y }],
+			});
+			await page.evaluate(
+				() => new Promise(window.requestAnimationFrame)
+			);
+		}
+		// Hold before lifting so the browser snaps without an inertial throw.
+		await page.waitForTimeout(200);
+		await cdp.send('Input.dispatchTouchEvent', {
+			type: 'touchEnd',
+			touchPoints: [],
 		});
 		await expect(dots.nth(2)).toHaveAttribute('aria-current', 'true');
 		await settle(list);
