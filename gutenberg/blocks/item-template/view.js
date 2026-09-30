@@ -2454,6 +2454,10 @@ function initAutoplay(list) {
 			return;
 		}
 
+		if (held || offscreen || stopped.has(list)) {
+			return;
+		}
+
 		// Whichever way the carousel moved, the slide it moved to is owed the
 		// whole of a wait. A press on an arrow or a dot says so itself and is
 		// listened for, but a swipe says nothing - so the delay went on
@@ -2473,13 +2477,7 @@ function initAutoplay(list) {
 		}
 
 		// A pause holds time, but changing slides still starts a new wait.
-		if (
-			pointerOn.size ||
-			focusIn.size ||
-			held ||
-			offscreen ||
-			stopped.has(list)
-		) {
+		if (pointerOn.size || focusIn.size) {
 			return;
 		}
 
@@ -2906,7 +2904,10 @@ function initCarousel(list, restore) {
 		}
 	};
 	const onWheel = (event) => {
-		if (event.deltaX || (event.shiftKey && event.deltaY)) {
+		if (
+			Math.abs(event.deltaX) > Math.abs(event.deltaY) ||
+			(event.shiftKey && event.deltaY)
+		) {
 			pending.delete(list);
 		}
 	};

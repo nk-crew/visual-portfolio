@@ -1940,6 +1940,16 @@ test.describe('Gallery Item Template layouts', () => {
 			return frames;
 		});
 		await dots.last().click();
+		await page.locator(LIST).evaluate((list) => {
+			list.dispatchEvent(
+				new WheelEvent('wheel', { deltaX: 1, deltaY: 30 })
+			);
+			list.dispatchEvent(
+				new CustomEvent('scrollsnapchanging', {
+					detail: { snapTargetInline: list.children[1] },
+				})
+			);
+		});
 		const frames = await watching;
 		for (const frame of frames) {
 			for (let index = 1; index < IMAGES_COUNT - 1; index += 1) {
