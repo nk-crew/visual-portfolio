@@ -2009,7 +2009,7 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(dots.last()).toHaveAttribute('aria-current', 'true');
 	});
 
-	test('a swipe selects its final dot before the throw arrives', async ({
+	test('a swipe selects its final dot before the throw arrives @webkit', async ({
 		page,
 		requestUtils,
 	}) => {
@@ -2040,7 +2040,10 @@ test.describe('Gallery Item Template layouts', () => {
 				window.swipeTargets.push({
 					index: items.indexOf(target),
 					scroll: node.scrollLeft,
-					target: target?.offsetLeft,
+					target: Math.min(
+						target?.offsetLeft,
+						node.scrollWidth - node.clientWidth
+					),
 				});
 			});
 		});
@@ -2058,7 +2061,7 @@ test.describe('Gallery Item Template layouts', () => {
 			target: window.swipeTargets.at(-1),
 		}));
 		expect(released.target.index).toBeGreaterThanOrEqual(3);
-		expect(released.active).toBe(released.target.index);
+		expect(released.active).toBe(3);
 		expect(
 			Math.abs(released.target.scroll - released.target.target)
 		).toBeGreaterThan(20);

@@ -2685,16 +2685,29 @@ function initCarousel(list, restore) {
 		}
 
 		const target = event.snapTargetInline || event.detail?.snapTargetInline;
-		const index = Array.prototype.indexOf.call(
+		const at = Array.prototype.indexOf.call(
 			list.querySelectorAll(ITEM_SELECTOR),
 			target
 		);
 
-		if (index < 0) {
+		if (at < 0) {
 			return;
 		}
 
-		dotTarget = index;
+		const targets = getSlideTargets(list);
+		const held = pending.get(list);
+		// A click can name the last visible slide at a shared scroll endpoint.
+		if (
+			held &&
+			window.performance.now() - held.time < STEP_HOLD &&
+			targets[held.index] === targets[at]
+		) {
+			return;
+		}
+
+		dotTarget = getRestingPlaces(list).find(
+			(place) => targets[place] === targets[at]
+		);
 		if (!dotDragging) {
 			selectDotTarget();
 		}
