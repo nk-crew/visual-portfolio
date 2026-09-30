@@ -1584,7 +1584,7 @@ test.describe('Gallery Item Template layouts', () => {
 		// And the indicator stops drawing a wait: a half filled pill on a
 		// stopped carousel is a countdown that never ends.
 		const fill = page.locator(
-			'.vp-block-loop-carousel-dot-worm .vp-block-loop-carousel-dot-progress'
+			'.vp-block-loop-carousel-dot[aria-current="true"] .vp-block-loop-carousel-dot-progress'
 		);
 
 		await expect
@@ -1887,191 +1887,291 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(current).toHaveText('1');
 	});
 
-	test('the pill of an indicator crawls from one dot to the next', async ({
+	test('only the previous and destination dots change size on a distant jump', async ({
 		page,
 		requestUtils,
 	}) => {
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
 		await publishLoop(requestUtils, page, {
-			title: 'Layouts - carousel worm',
-			blockId: 'e2e-carousel-worm',
+			title: 'Layouts - carousel dot sizes',
+			blockId: 'e2e-carousel-dot-sizes',
 			images,
 			layout: {
 				layoutType: 'carousel',
 				layoutColumnsMode: 'manual',
-				layoutColumnCount: 2,
+				layoutColumnCount: 1,
 			},
-			carousel: [
-				'loop-carousel-previous',
-				'loop-carousel-indicator',
-				'loop-carousel-next',
-			],
+			carousel: ['loop-carousel-indicator'],
 		});
 
 		const dots = page.locator(`${NAV} ${DOT}`);
-		const worm = page.locator('.vp-block-loop-carousel-dot-worm');
-
 		await expect(dots).toHaveCount(IMAGES_COUNT);
-
-		// One pill for the row, and it is out of the reach of a pointer and a
-		// screen reader: the dot underneath is the button.
-		await expect(worm).toHaveCount(1);
-		await expect(worm).toHaveAttribute('aria-hidden', 'true');
-
-		const at = () =>
-			worm.evaluate((node) => ({
-				left: Math.round(parseFloat(node.style.insetInlineStart) || 0),
-				width: Math.round(parseFloat(node.style.width) || 0),
-			}));
-
-		// It rests in the middle of the first slot: a 14px slot with an 18px
-		// pill in it, drawn inside the 6px the row keeps at either end for
-		// the dots to step aside into.
-		await expect.poll(at, { timeout: 10000 }).toEqual({
-			left: 4,
-			width: 18,
-		});
-
-		// The row is exactly as wide with the first slide showing as with any
-		// other - every slide keeps a slot of the same width, so a row centred
-		// under a gallery does not slide from side to side as the carousel
-		// moves. What makes room for the pill is the dots either side of it
-		// stepping aside, which is a move and not a layout.
-		const row = page.locator(
-			`${NAV} .vp-block-loop-carousel-indicator--dots`
-		);
-		const spread = () =>
-			row.evaluate((node) =>
-				Math.round(node.getBoundingClientRect().width)
+		const widths = () =>
+			dots.evaluateAll((nodes) =>
+				nodes.map((dot) =>
+					Math.round(
+						dot
+							.querySelector('.vp-block-loop-carousel-dot-value')
+							.getBoundingClientRect().width
+					)
+				)
 			);
-		const before = await spread();
+		await expect.poll(widths).toEqual([18, 6, 6, 6, 6, 6]);
 
-		// Where the dots have come to rest, from the middle of one to the
-		// middle of the next.
-		const gaps = () =>
-			dots.evaluateAll((nodes) => {
-				const centres = nodes.map((dot) => {
-					const box = dot.getBoundingClientRect();
-
-					return box.left + box.width / 2;
-				});
-
-				return centres
-					.slice(1)
-					.map((centre, index) =>
-						Math.round(centre - centres[index])
-					);
-			});
-
-		// And the pill moves along the row rather than being redrawn at the
-		// far end of it.
-		await page.locator(NEXT_ARROW).click();
-		await expect
-			.poll(async () => (await at()).left, { timeout: 10000 })
-			.toBe(18);
-		await expect
-			.poll(async () => (await at()).width, { timeout: 10000 })
-			.toBe(18);
-		await expect.poll(spread, { timeout: 10000 }).toBe(before);
-
-		// The dots either side of the pill have stood back to let it in: the
-		// gap they leave it is a slot and the six pixels it is wider by, and
-		// every other pair of dots is a plain slot apart.
-		await expect
-			.poll(async () => (await gaps()).slice(0, 2), { timeout: 10000 })
-			.toEqual([20, 20]);
-		await expect
-			.poll(async () => (await gaps()).slice(2), { timeout: 10000 })
-			.toEqual(Array.from({ length: IMAGES_COUNT - 3 }, () => 14));
-
-		await page.locator(PREV_ARROW).click();
-		await expect
-			.poll(async () => (await at()).left, { timeout: 10000 })
-			.toBe(4);
-		await expect.poll(spread, { timeout: 10000 }).toBe(before);
+		const watching = dots.evaluateAll(async (nodes) => {
+			const frames = [];
+			for (let frame = 0; frame < 60; frame += 1) {
+				frames.push(
+					nodes.map((dot) => {
+						const mark = dot
+							.querySelector('.vp-block-loop-carousel-dot-value')
+							.getBoundingClientRect();
+						return {
+							width: mark.width,
+							left: mark.left,
+							right: mark.right,
+						};
+					})
+				);
+				await new Promise((resolve) =>
+					window.requestAnimationFrame(resolve)
+				);
+			}
+			return frames;
+		});
+		await dots.last().click();
+		const frames = await watching;
+		for (const frame of frames) {
+			for (let index = 1; index < IMAGES_COUNT - 1; index += 1) {
+				expect(frame[index].width).toBeCloseTo(6, 3);
+			}
+			for (let index = 1; index < IMAGES_COUNT; index += 1) {
+				expect(
+					Math.abs(frame[index].left - frame[index - 1].right - 8)
+				).toBeLessThan(0.2);
+			}
+		}
+		expect(
+			frames.some((frame) => frame[0].width > 6 && frame[0].width < 18)
+		).toBe(true);
+		expect(
+			frames.some((frame) => frame[5].width > 6 && frame[5].width < 18)
+		).toBe(true);
+		await expect.poll(widths).toEqual([6, 6, 6, 6, 6, 18]);
 	});
 
-	test('a crawl interrupted carries on rather than jumping', async ({
+	test('a multi-slide scroll skips intermediate active dots', async ({
 		page,
 		requestUtils,
 	}) => {
-		// The pill only crawls for a visitor who has not asked for less
-		// motion; Playwright asks for less by default.
 		await page.emulateMedia({ reducedMotion: 'no-preference' });
-
 		await publishLoop(requestUtils, page, {
-			title: 'Layouts - carousel worm interrupted',
-			blockId: 'e2e-carousel-worm-interrupted',
+			title: 'Layouts - carousel dots after scrolling',
+			blockId: 'e2e-carousel-dots-scroll',
 			images,
 			layout: {
 				layoutType: 'carousel',
 				layoutColumnsMode: 'manual',
-				layoutColumnCount: 2,
+				layoutColumnCount: 1,
 			},
-			carousel: ['loop-carousel-indicator', 'loop-carousel-next'],
+			carousel: ['loop-carousel-indicator'],
 		});
-
-		const worm = page.locator('.vp-block-loop-carousel-dot-worm');
-
-		await expect(worm).toHaveCount(1);
-
-		// Two steps in quick succession, which is what a swipe does, with the
-		// pill watched as it is drawn.
-		await page.locator(NEXT_ARROW).click();
-		await page.waitForTimeout(100);
-
-		const watching = worm.evaluate(async (node) => {
-			const seen = [];
-
-			for (let i = 0; i < 14; i += 1) {
-				const box = node.getBoundingClientRect();
-
-				seen.push([box.left, box.width]);
-				await new Promise((settle) => {
-					window.requestAnimationFrame(() =>
-						window.setTimeout(settle, 24)
-					);
-				});
-			}
-
-			return seen;
-		});
-
-		await page.locator(NEXT_ARROW).click();
-
-		const seen = await watching;
-		const steps = seen
-			.slice(1)
-			.map(([at], index) => Math.abs(at - seen[index][0]));
-
-		// One dot is 14px along from the next. A crawl that carried on covers
-		// that in steps of a pixel or two; one that began again at the far end
-		// crossed most of it between two frames.
-		expect(Math.max(...steps)).toBeLessThan(9);
-
-		// And it stretches while it travels rather than sliding along at the
-		// width of a dot: the edge in front leaves first and the one behind
-		// follows, so a pill in motion spans the ground between two dots.
-		const widths = seen.map(([, width]) => width);
-
-		expect(Math.max(...widths)).toBeGreaterThan(24);
-
-		// Stretching once and not once per slide. A pill that gathered itself
-		// between the two steps and stretched again would grow, shrink and
-		// grow - which is the pulsing a swipe used to show.
-		const turns = widths
-			.slice(1)
-			.map((width, index) => Math.sign(Math.round(width - widths[index])))
-			.filter(Boolean)
-			.reduce(
-				(count, way, index, ways) =>
-					index && way !== ways[index - 1] ? count + 1 : count,
-				0
+		const dots = page.locator(`${NAV} ${DOT}`);
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+		await expect(dots.first()).toHaveAttribute('aria-current', 'true');
+		const seen = await page.locator(LIST).evaluate(async (list) => {
+			const dots = Array.from(
+				list
+					.closest('.vp-block-loop')
+					.querySelectorAll('.vp-block-loop-carousel-dot')
 			);
-
-		expect(turns).toBeLessThanOrEqual(1);
+			const active = [];
+			let scrolls = 0;
+			list.addEventListener('scroll', () => {
+				scrolls += 1;
+			});
+			list.scrollTo({ left: list.scrollWidth, behavior: 'smooth' });
+			const started = window.performance.now();
+			while (window.performance.now() - started < 2000) {
+				active.push(
+					dots.findIndex(
+						(dot) => dot.getAttribute('aria-current') === 'true'
+					)
+				);
+				await new Promise((resolve) =>
+					window.requestAnimationFrame(resolve)
+				);
+			}
+			return { active: [...new Set(active)], scrolls };
+		});
+		expect(seen.scrolls).toBeGreaterThan(5);
+		expect(seen.active).toEqual([0, 5]);
+		await expect(dots.last()).toHaveAttribute('aria-current', 'true');
 	});
 
-	test('the pill sits on its dot inside a box that is padded', async ({
+	test('a swipe selects its final dot before the throw arrives', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel swipe destination',
+			blockId: 'e2e-carousel-swipe-destination',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+			},
+			carousel: ['loop-carousel-indicator'],
+		});
+		const list = page.locator(LIST);
+		const dots = page.locator(`${NAV} ${DOT}`);
+		await expect(list).toHaveAttribute('blossom-carousel', 'true');
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+		await page.evaluate(() => {
+			window.swipeTargets = [];
+		});
+		await list.evaluate((node) => {
+			node.addEventListener('scrollsnapchanging', (event) => {
+				const target =
+					event.snapTargetInline || event.detail?.snapTargetInline;
+				const items = Array.from(node.children);
+				window.swipeTargets.push({
+					index: items.indexOf(target),
+					scroll: node.scrollLeft,
+					target: target?.offsetLeft,
+				});
+			});
+		});
+		const box = await list.boundingBox();
+		await page.mouse.move(box.x + box.width - 40, box.y + 80);
+		await page.mouse.down();
+		await page.mouse.move(box.x + 40, box.y + 80, { steps: 20 });
+		await page.mouse.up();
+		const released = await list.evaluate((node) => ({
+			active: Array.from(
+				node
+					.closest('.vp-block-loop')
+					.querySelectorAll('.vp-block-loop-carousel-dot')
+			).findIndex((dot) => dot.getAttribute('aria-current') === 'true'),
+			target: window.swipeTargets.at(-1),
+		}));
+		expect(released.target.index).toBeGreaterThanOrEqual(3);
+		expect(released.active).toBe(released.target.index);
+		expect(
+			Math.abs(released.target.scroll - released.target.target)
+		).toBeGreaterThan(20);
+	});
+
+	test('a touch swipe skips intermediate dots', async ({
+		browser,
+		requestUtils,
+	}) => {
+		const context = await browser.newContext({
+			viewport: { width: 960, height: 700 },
+			hasTouch: true,
+			isMobile: true,
+		});
+		const page = await context.newPage();
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel touch destination',
+			blockId: 'e2e-carousel-touch-destination',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+			},
+			carousel: ['loop-carousel-indicator'],
+		});
+		const list = page.locator(LIST);
+		const dots = page.locator(`${NAV} ${DOT}`);
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+		await list.scrollIntoViewIfNeeded();
+		await list.evaluate((node) => {
+			window.touchDots = [0];
+			new MutationObserver(() => {
+				const active = Array.from(
+					node
+						.closest('.vp-block-loop')
+						.querySelectorAll('.vp-block-loop-carousel-dot')
+				).findIndex(
+					(dot) => dot.getAttribute('aria-current') === 'true'
+				);
+				window.touchDots.push(active);
+			}).observe(node.closest('.vp-block-loop'), {
+				subtree: true,
+				attributes: true,
+				attributeFilter: ['aria-current'],
+			});
+		});
+		const box = await list.boundingBox();
+		const cdp = await context.newCDPSession(page);
+		await cdp.send('Input.synthesizeScrollGesture', {
+			x: Math.round(box.x + box.width * 0.8),
+			y: Math.round(box.y + box.height / 2),
+			xDistance: -650,
+			yDistance: 0,
+			speed: 800,
+			gestureSourceType: 'touch',
+		});
+		await expect(dots.nth(2)).toHaveAttribute('aria-current', 'true');
+		await settle(list);
+		expect(
+			await page.evaluate(() => [...new Set(window.touchDots)])
+		).toEqual([0, 2]);
+		await context.close();
+	});
+
+	test('a dot transition can reverse before it finishes', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel dot reversal',
+			blockId: 'e2e-carousel-dot-reversal',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 1,
+			},
+			carousel: ['loop-carousel-indicator'],
+		});
+		const dots = page.locator(`${NAV} ${DOT}`);
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+		await expect
+			.poll(() =>
+				dots
+					.first()
+					.locator('.vp-block-loop-carousel-dot-value')
+					.evaluate((mark) => mark.getBoundingClientRect().width)
+			)
+			.toBe(18);
+		await dots.last().click();
+		await page.waitForTimeout(80);
+		await dots.first().click();
+		await expect
+			.poll(() =>
+				dots.evaluateAll((nodes) =>
+					nodes.map((dot) =>
+						Math.round(
+							dot
+								.querySelector(
+									'.vp-block-loop-carousel-dot-value'
+								)
+								.getBoundingClientRect().width
+						)
+					)
+				)
+			)
+			.toEqual([18, 6, 6, 6, 6, 6]);
+		await expect(dots.first()).toHaveAttribute('aria-current', 'true');
+	});
+
+	test('the active mark stays centred inside a padded indicator', async ({
 		page,
 		requestUtils,
 	}) => {
@@ -2096,27 +2196,26 @@ test.describe('Gallery Item Template layouts', () => {
 
 		await expect(row).toHaveClass(/is-style-filled/);
 
-		// The pill is placed against the box the row sits in, and this box
-		// keeps a padding for itself - so the pill has to be placed inside it
-		// rather than a padding to the left of the dot it names.
 		const offset = () =>
 			row.evaluate((node) => {
-				const worm = node.querySelector(
-					'.vp-block-loop-carousel-dot-worm'
+				const mark = node.querySelector(
+					'.vp-block-loop-carousel-dot[aria-current="true"] .vp-block-loop-carousel-dot-value'
 				);
 				const dot = node.querySelector(
 					'.vp-block-loop-carousel-dot[aria-current="true"]'
 				);
 
-				if (!worm || !dot) {
+				if (!mark || !dot) {
 					return null;
 				}
 
-				const pill = worm.getBoundingClientRect();
-				const mark = dot.getBoundingClientRect();
+				const pill = mark.getBoundingClientRect();
+				const button = dot.getBoundingClientRect();
 
 				return Math.round(
-					pill.left + pill.width / 2 - (mark.left + mark.width / 2)
+					pill.left +
+						pill.width / 2 -
+						(button.left + button.width / 2)
 				);
 			});
 
@@ -2199,31 +2298,6 @@ test.describe('Gallery Item Template layouts', () => {
 				{ timeout: 10000 }
 			)
 			.toEqual(Array.from({ length: IMAGES_COUNT }, () => 14));
-
-		// The pill is drawn over every dot, the one it names included. A dot
-		// carries a translate, which puts it in the pill's own painting layer
-		// and after it in the markup, so without saying otherwise the marks
-		// are drawn on top of it - and while autoplay runs the pill is the
-		// wait running down, which is the one thing in the row a visitor is
-		// watching.
-		await expect
-			.poll(
-				() =>
-					indicator.evaluate((node) => [
-						window.getComputedStyle(
-							node.querySelector(
-								'.vp-block-loop-carousel-dot-worm'
-							)
-						).zIndex,
-						window.getComputedStyle(
-							node.querySelector(
-								'.vp-block-loop-carousel-dot[aria-current="true"]'
-							)
-						).zIndex,
-					]),
-				{ timeout: 10000 }
-			)
-			.toEqual(['2', '1']);
 
 		// And pressing one moves the carousel. The row used to slide under the
 		// pointer as the dot took focus, which took the dot out from under it
