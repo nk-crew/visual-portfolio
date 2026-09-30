@@ -1492,12 +1492,13 @@ function getDotGeometry(container, count, current) {
 		slot;
 	const spread = Math.max(0, (grown - size) / 2);
 	const inset = parseFloat(style.paddingInlineStart) || 0;
+	const endInset = parseFloat(style.paddingInlineEnd) || 0;
 	const stepOf = (at) =>
 		at < current ? 0 : at === current ? spread : spread * 2;
 
 	return {
 		centreOf: (at) => inset + at * slot + slot / 2 + stepOf(at),
-		content: count * slot + spread * 2,
+		content: count * slot + spread * 2 + inset + endInset,
 	};
 }
 
@@ -2838,7 +2839,7 @@ function initCarousel(list, restore) {
 		list.focus({ preventScroll: true });
 	};
 	const onMouseUp = (event) => {
-		if (event?.pointerType && 'mouse' !== event.pointerType) {
+		if ('touch' === event?.pointerType) {
 			return;
 		}
 
@@ -2876,6 +2877,7 @@ function initCarousel(list, restore) {
 
 	if (canDrag) {
 		list.addEventListener('mousedown', onMouseDown);
+		window.addEventListener('mouseup', onMouseUp);
 		window.addEventListener('pointerup', onMouseUp, true);
 		window.addEventListener('pointercancel', onMouseUp, true);
 		window.addEventListener('blur', onMouseUp);
@@ -2985,6 +2987,7 @@ function initCarousel(list, restore) {
 		list.removeEventListener(GO_TO_EVENT, onGoTo);
 		list.removeEventListener(PLACE_EVENT, onPlace);
 		list.removeEventListener('mousedown', onMouseDown);
+		window.removeEventListener('mouseup', onMouseUp);
 		window.removeEventListener('pointerup', onMouseUp, true);
 		window.removeEventListener('pointercancel', onMouseUp, true);
 		window.removeEventListener('blur', onMouseUp);

@@ -636,6 +636,10 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 	width: fit-content;
 	margin-inline: auto;
 
+	&.vp-block-loop-carousel-indicator--dots {
+		width: calc(var(--vp-carousel-dots-count, 3) * var(--vp-carousel-dot-slot) + var(--vp-carousel-dot-spread) * 2);
+	}
+
 	&.vp-block-loop-carousel-indicator--progress {
 		width: min(180px, 60%);
 	}

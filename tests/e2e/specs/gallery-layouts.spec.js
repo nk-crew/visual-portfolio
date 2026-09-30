@@ -2124,7 +2124,7 @@ test.describe('Gallery Item Template layouts', () => {
 		await context.close();
 	});
 
-	test('a cancelled mouse gesture releases dot updates', async ({
+	test('a cancelled gesture releases dot updates', async ({
 		page,
 		requestUtils,
 	}) => {
@@ -2147,6 +2147,21 @@ test.describe('Gallery Item Template layouts', () => {
 		await page.mouse.move(box.x + 100, box.y + 80);
 		await page.mouse.down();
 		await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+		await list.evaluate((node) =>
+			node.scrollTo({ left: node.scrollWidth, behavior: 'instant' })
+		);
+		await expect(dots.last()).toHaveAttribute('aria-current', 'true');
+		await page.mouse.up();
+		await dots.first().click();
+		await list.scrollIntoViewIfNeeded();
+		const resetBox = await list.boundingBox();
+		await page.mouse.move(resetBox.x + 100, resetBox.y + 80);
+		await page.mouse.down();
+		await page.evaluate(() =>
+			window.dispatchEvent(
+				new PointerEvent('pointercancel', { pointerType: 'pen' })
+			)
+		);
 		await list.evaluate((node) =>
 			node.scrollTo({ left: node.scrollWidth, behavior: 'instant' })
 		);
@@ -2224,6 +2239,68 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(dots.first()).toHaveAttribute('aria-current', 'true');
 	});
 
+	test('a standalone overlay dot row keeps its width during interruptions', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+		const content = getLoopMarkup({
+			blockId: 'e2e-carousel-standalone-dots',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 1,
+			},
+			carousel: ['loop-carousel-indicator'],
+			carouselOverlay: true,
+		})
+			.replace('<!-- wp:visual-portfolio/loop-carousel-nav -->', '')
+			.replace('<!-- /wp:visual-portfolio/loop-carousel-nav -->', '');
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Layouts - standalone overlay dots',
+				status: 'publish',
+				content,
+			},
+		});
+		pageIds.push(created.id);
+		await page.goto(created.link, { waitUntil: 'domcontentloaded' });
+		const dots = page.locator(DOT);
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+		await expect
+			.poll(() =>
+				dots
+					.first()
+					.locator('.vp-block-loop-carousel-dot-value')
+					.evaluate((mark) => mark.getBoundingClientRect().width)
+			)
+			.toBe(18);
+		const frames = await dots.evaluateAll(async (nodes) => {
+			const row = nodes[0].parentElement;
+			const frames = [];
+			nodes[5].click();
+			window.setTimeout(() => nodes[3].click(), 80);
+			window.setTimeout(() => nodes[5].click(), 140);
+			for (let frame = 0; frame < 60; frame += 1) {
+				const box = row.getBoundingClientRect();
+				frames.push({ width: box.width, left: box.left });
+				await new Promise((resolve) =>
+					window.requestAnimationFrame(resolve)
+				);
+			}
+			return frames;
+		});
+		const widths = frames.map((frame) => frame.width);
+		const positions = frames.map((frame) => frame.left);
+		expect(Math.max(...widths) - Math.min(...widths)).toBeLessThan(0.1);
+		expect(Math.max(...positions) - Math.min(...positions)).toBeLessThan(
+			0.1
+		);
+	});
+
 	test('the active mark stays centred inside a padded indicator', async ({
 		page,
 		requestUtils,
@@ -2238,7 +2315,10 @@ test.describe('Gallery Item Template layouts', () => {
 				layoutColumnCount: 2,
 			},
 			carousel: [
-				['loop-carousel-indicator', { className: 'is-style-filled' }],
+				[
+					'loop-carousel-indicator',
+					{ className: 'is-style-filled', maxDots: 3 },
+				],
 				'loop-carousel-next',
 			],
 		});
@@ -2276,6 +2356,18 @@ test.describe('Gallery Item Template layouts', () => {
 
 		await page.locator(NEXT_ARROW).click();
 		await expect.poll(offset, { timeout: 10000 }).toBe(0);
+		await row.locator(DOT).last().press('Enter');
+		const clipped = () =>
+			row.evaluate((node) => {
+				const box = node.getBoundingClientRect();
+				const mark = node
+					.querySelector(
+						'.vp-block-loop-carousel-dot[aria-current="true"] .vp-block-loop-carousel-dot-value'
+					)
+					.getBoundingClientRect();
+				return mark.left < box.left || mark.right > box.right;
+			});
+		await expect.poll(clipped).toBe(false);
 	});
 
 	test('an indicator given a window slides its dots under it', async ({
