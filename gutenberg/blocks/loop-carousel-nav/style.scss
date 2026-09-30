@@ -188,11 +188,8 @@
 	}
 
 	gap: 0;
-	// The room the dots step aside into, kept by the row rather than taken
-	// from whatever stands beside it: the row is as wide as the widest thing
-	// it can draw, so a dot at either end still sits inside its own box and
-	// an indicator drawn as a pill still has its padding around the dots.
-	padding-inline: var(--vp-carousel-dot-spread);
+	box-sizing: content-box;
+	inline-size: calc(var(--vp-carousel-dots-count, 3) * var(--vp-carousel-dot-slot) + var(--vp-carousel-dot-spread) * 2);
 
 	// Filled by the module, one per slide: a Load More brings more slides and a
 	// filter takes some away, and the dots follow.
@@ -212,7 +209,7 @@
 	isolation: isolate;
 
 	&.is-collapsed {
-		max-width: calc(var(--vp-carousel-dots-visible, 5) * var(--vp-carousel-dot-slot));
+		max-width: calc(var(--vp-carousel-dots-visible, 5) * var(--vp-carousel-dot-slot) + var(--vp-carousel-dot-spread) * 2);
 		overflow: clip;
 
 		> .vp-block-loop-carousel-dot {
@@ -237,7 +234,7 @@
 	}
 }
 
-// The row keeps its width while the marks make room for the active dot.
+// The button width includes the same gap on either side of its mark.
 .vp-block-loop-carousel-dot {
 	position: relative;
 	display: flex;
@@ -255,10 +252,7 @@
 	translate: calc(
 		var(--vp-carousel-dots-shift, 0px) * var(--vp-carousel-dot-way, 1)
 	);
-	transform: translateX(
-		calc(var(--vp-carousel-dot-step, 0px) * var(--vp-carousel-dot-way, 1))
-	);
-	transition: translate 0.25s ease, transform 0.25s ease;
+	transition: translate 0.25s ease, inline-size 0.25s ease;
 
 	&:focus {
 		outline: none;
@@ -270,34 +264,23 @@
 	}
 }
 
-.vp-block-loop-carousel-dot[aria-current="true"]
-	~ .vp-block-loop-carousel-dot {
-	--vp-carousel-dot-step: var(--vp-carousel-dot-spread);
-}
-
-.vp-block-loop-carousel-dot:has(
-		~ .vp-block-loop-carousel-dot[aria-current="true"]
-	) {
-	--vp-carousel-dot-step: calc(var(--vp-carousel-dot-spread) * -1);
-}
-
 .vp-block-loop-carousel-dot-value {
 	position: relative;
 	flex: none;
-	inline-size: var(--vp-carousel-dot-size, 6px);
+	inline-size: calc(100% - var(--vp-carousel-dot-slot, 18px) + var(--vp-carousel-dot-size, 6px));
 	block-size: var(--vp-carousel-dot-size, 6px);
 	overflow: hidden;
 	pointer-events: none;
 	background-color: var(--vp-carousel-dot-color);
 	border-radius: calc(var(--vp-carousel-dot-size, 6px) / 2);
-	transition: inline-size 0.25s ease, background-color 0.25s ease, opacity 0.2s ease, scale 0.25s ease;
+	transition: background-color 0.25s ease, opacity 0.2s ease, scale 0.25s ease;
 }
 
 .vp-block-loop-carousel-dot[aria-current="true"] {
 	z-index: 1;
+	inline-size: calc(var(--vp-carousel-dot-slot, 18px) + var(--vp-carousel-dot-active-size, 18px) - var(--vp-carousel-dot-size, 6px));
 
 	> .vp-block-loop-carousel-dot-value {
-		inline-size: var(--vp-carousel-dot-active-size, 18px);
 		background-color: currentcolor;
 	}
 }
@@ -494,13 +477,6 @@
 		box-sizing: content-box;
 		height: 4px;
 		background: linear-gradient(var(--vp-carousel-track), var(--vp-carousel-track)) content-box;
-	}
-
-	// The padding of the box, and the room the dots step aside into on top of
-	// it: the row keeps that room for itself, and a box around it has to
-	// leave it there or the dots at either end press against the edge.
-	&.vp-block-loop-carousel-indicator--dots {
-		padding-inline: calc(12px + var(--vp-carousel-dot-spread));
 	}
 }
 

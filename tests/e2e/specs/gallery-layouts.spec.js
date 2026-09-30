@@ -2124,7 +2124,37 @@ test.describe('Gallery Item Template layouts', () => {
 		await context.close();
 	});
 
-	test('a dot transition can reverse before it finishes', async ({
+	test('a cancelled mouse gesture releases dot updates', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel cancelled gesture',
+			blockId: 'e2e-carousel-cancelled-gesture',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 1,
+			},
+			carousel: ['loop-carousel-indicator'],
+		});
+		const list = page.locator(LIST);
+		const dots = page.locator(`${NAV} ${DOT}`);
+		await expect(list).toHaveAttribute('blossom-carousel', 'true');
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+		const box = await list.boundingBox();
+		await page.mouse.move(box.x + 100, box.y + 80);
+		await page.mouse.down();
+		await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+		await list.evaluate((node) =>
+			node.scrollTo({ left: node.scrollWidth, behavior: 'instant' })
+		);
+		await expect(dots.last()).toHaveAttribute('aria-current', 'true');
+		await page.mouse.up();
+	});
+
+	test('interrupted dot transitions preserve the gap', async ({
 		page,
 		requestUtils,
 	}) => {
@@ -2152,6 +2182,29 @@ test.describe('Gallery Item Template layouts', () => {
 			.toBe(18);
 		await dots.last().click();
 		await page.waitForTimeout(80);
+		await dots.nth(3).click();
+		const gaps = await dots.evaluateAll(async (nodes) => {
+			const gaps = [];
+			for (let frame = 0; frame < 40; frame += 1) {
+				const boxes = nodes.map((dot) =>
+					dot
+						.querySelector('.vp-block-loop-carousel-dot-value')
+						.getBoundingClientRect()
+				);
+				gaps.push(
+					...boxes
+						.slice(1)
+						.map((box, index) => box.left - boxes[index].right)
+				);
+				await new Promise((resolve) =>
+					window.requestAnimationFrame(resolve)
+				);
+			}
+			return gaps;
+		});
+		expect(Math.max(...gaps.map((gap) => Math.abs(gap - 8)))).toBeLessThan(
+			0.1
+		);
 		await dots.first().click();
 		await expect
 			.poll(() =>
@@ -2297,7 +2350,7 @@ test.describe('Gallery Item Template layouts', () => {
 					),
 				{ timeout: 10000 }
 			)
-			.toEqual(Array.from({ length: IMAGES_COUNT }, () => 14));
+			.toEqual([26, 14, 14, 14, 14, 14]);
 
 		// And pressing one moves the carousel. The row used to slide under the
 		// pointer as the dot took focus, which took the dot out from under it

@@ -57,7 +57,9 @@ export default function CarouselIndicatorEdit({
 				...blockProps.style,
 				'--vp-carousel-progress': `${PREVIEW_PROGRESS}%`,
 			}
-		: blockProps.style;
+		: isDots
+			? { ...blockProps.style, '--vp-carousel-dots-count': PREVIEW_DOTS }
+			: blockProps.style;
 
 	return (
 		<>

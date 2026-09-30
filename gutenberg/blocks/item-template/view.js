@@ -1448,6 +1448,7 @@ function fillDots(container, places) {
 	const dots = container.querySelectorAll(DOT_SELECTOR);
 	const label = container.dataset.vpDotLabel || '';
 	const items = places.length;
+	container.style.setProperty('--vp-carousel-dots-count', String(items));
 
 	// A dot with nowhere behind it does nothing when pressed.
 	for (let index = dots.length - 1; index >= items; index -= 1) {
@@ -1474,7 +1475,7 @@ function fillDots(container, places) {
 }
 
 /**
- * Measure fixed dot slots for the collapsed window.
+ * Use settled dot widths while the collapsed window is animating.
  *
  * @param {HTMLElement} container Indicator drawn as dots.
  * @param {number}      count     Number of dots.
@@ -1492,7 +1493,7 @@ function getDotGeometry(container, count, current) {
 	const spread = Math.max(0, (grown - size) / 2);
 	const inset = parseFloat(style.paddingInlineStart) || 0;
 	const stepOf = (at) =>
-		at === current ? 0 : at < current ? -spread : spread;
+		at < current ? 0 : at === current ? spread : spread * 2;
 
 	return {
 		centreOf: (at) => inset + at * slot + slot / 2 + stepOf(at),
@@ -2836,7 +2837,11 @@ function initCarousel(list, restore) {
 		list.classList.add(POINTER_FOCUS_CLASS);
 		list.focus({ preventScroll: true });
 	};
-	const onMouseUp = () => {
+	const onMouseUp = (event) => {
+		if (event?.pointerType && 'mouse' !== event.pointerType) {
+			return;
+		}
+
 		if (!dotDragging) {
 			return;
 		}
@@ -2872,6 +2877,8 @@ function initCarousel(list, restore) {
 	if (canDrag) {
 		list.addEventListener('mousedown', onMouseDown);
 		window.addEventListener('pointerup', onMouseUp, true);
+		window.addEventListener('pointercancel', onMouseUp, true);
+		window.addEventListener('blur', onMouseUp);
 		window.addEventListener('contextmenu', onMouseUp);
 		list.addEventListener('keydown', onKeyDown);
 		list.addEventListener('blur', unmarkFocus);
@@ -2979,6 +2986,8 @@ function initCarousel(list, restore) {
 		list.removeEventListener(PLACE_EVENT, onPlace);
 		list.removeEventListener('mousedown', onMouseDown);
 		window.removeEventListener('pointerup', onMouseUp, true);
+		window.removeEventListener('pointercancel', onMouseUp, true);
+		window.removeEventListener('blur', onMouseUp);
 		window.removeEventListener('contextmenu', onMouseUp);
 		list.removeEventListener('touchstart', onTouchStart);
 		window.removeEventListener('touchend', onTouchEnd);
