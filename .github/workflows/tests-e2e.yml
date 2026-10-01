@@ -48,10 +48,7 @@ jobs:
       - name: Npm build
         run: npm run build
 
-      # Chromium only. The shared preset gates its webkit and firefox projects
-      # behind `@webkit` and `@firefox` tags and no spec carries either, so the
-      # other two browsers were downloaded on every run and never launched. Tag a
-      # spec and add the browser back here if that changes.
+      # The shared preset runs Chromium and the carousel's tagged WebKit test.
       #
       # The browser comes from Playwright's own CDN and the libraries it needs
       # from Ubuntu's mirrors, which the runner cannot always reach: a day of
@@ -63,8 +60,8 @@ jobs:
       # missing fails the first test, not the install.
       - name: Install Playwright dependencies
         run: |
-          npx playwright install chromium
-          timeout 6m npx playwright install-deps chromium \
+          npx playwright install chromium webkit
+          timeout 6m npx playwright install-deps chromium webkit \
             || echo "::warning::System packages did not install; running on what the runner image carries"
 
       # The Gallery Loop family registers on WordPress 7.1 and above, so the

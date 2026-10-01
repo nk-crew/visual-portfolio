@@ -181,23 +181,6 @@ const DOT_SELECTOR = '.vp-block-loop-carousel-dot';
 // name rather than against what they look like.
 const SLIDE_TARGET_SELECTOR = '[data-vp-slide]';
 const DOT_PROGRESS_CLASS = 'vp-block-loop-carousel-dot-progress';
-// The filled pill that marks the slide on screen. One per indicator, drawn over
-// the dots rather than being one of them, so that moving from one slide to the
-// next is a single thing crawling across the row.
-const WORM_CLASS = 'vp-block-loop-carousel-dot-worm';
-const WORM_SELECTOR = `.${WORM_CLASS}`;
-// How long a crawl takes, and how the two edges of the pill divide it between
-// them. The leading edge is away and arrived inside the first stretch of it;
-// the trailing edge has not set off until well after that, and the ground
-// between them is the pill stretched out.
-const WORM_DURATION = 420;
-const WORM_LEAD_SPAN = 0.55;
-const WORM_TRAIL_DELAY = 0.32;
-// The most ground the pill covers at once, in slots. A swipe running several
-// slides together would otherwise stretch it the whole way, and a row that is
-// showing its dots through a window has no room for that - the pill would be
-// clipped by the window it is meant to be moving inside.
-const WORM_REACH = 3;
 // An indicator showing a window of its dots rather than all of them, and the
 // two states a dot takes as it reaches the edge of that window.
 const DOTS_COLLAPSED_CLASS = 'is-collapsed';
@@ -313,7 +296,7 @@ const noop = () => {};
 
 const carousels = new WeakMap();
 
-// The slide the last press asked for, per carousel.
+// The destination of an explicit step or a snap prediction, per carousel.
 const pending = new WeakMap();
 
 // Carousels a visitor has stopped. Kept apart from the hold an outside script
@@ -332,15 +315,6 @@ const dotWindows = new WeakMap();
 
 // Indicators already listening for a dot of theirs taking focus.
 const watched = new WeakSet();
-
-// Where the pill of an indicator was left, so that the next move knows the
-// ground it has to cover.
-const worms = new WeakMap();
-
-// The crawl drawing it, when one is: its two edges and the frame they are
-// drawn on. A step landing mid-crawl moves where it is headed rather than
-// starting a second one.
-const crawls = new WeakMap();
 
 // The slides a carousel can come to rest on, per carousel. One per slide
 // unless the arrows move a frame at a time, in which case the slides between
@@ -594,7 +568,12 @@ function goToRepeatingSlide(list, index, direction = 0, speed = 0) {
 		);
 	}
 
-	pending.set(list, { index: wanted, time: window.performance.now() });
+	pending.set(list, {
+		index: wanted,
+		time: window.performance.now(),
+		source: 'step',
+	});
+	syncNav(list);
 	travelRepeating(list, position, target, period, speed);
 }
 
@@ -1281,7 +1260,7 @@ function getScrollProgress(list) {
  *
  * @param {HTMLElement} list Item template list.
  */
-function syncNav(list) {
+function syncNav(list, updateDots = true) {
 	const root = getControlsRoot(list);
 
 	// Snapping never lands exactly on the edge, and a whole pixel of slack is
@@ -1312,7 +1291,7 @@ function syncNav(list) {
 		setFade(list, 'right', rtl ? atStart : atEnd);
 	}
 
-	syncIndicators(list, root);
+	syncIndicators(list, root, updateDots);
 }
 
 /**
@@ -1345,11 +1324,15 @@ function getDisplayedSlide(list) {
  * @param {HTMLElement} list Item template list.
  * @param {HTMLElement} root Box the controls of the carousel are published on.
  */
-function syncIndicators(list, root = getControlsRoot(list)) {
+function syncIndicators(list, root = getControlsRoot(list), updateDots = true) {
 	const current = getDisplayedSlide(list);
 	const total = list.querySelectorAll(ITEM_SELECTOR).length;
 
 	root.querySelectorAll(SLIDE_TARGET_SELECTOR).forEach((target) => {
+		if (target.matches(DOT_SELECTOR)) {
+			return;
+		}
+
 		const index = parseInt(target.dataset.vpSlide, 10);
 
 		target.setAttribute(
@@ -1360,9 +1343,11 @@ function syncIndicators(list, root = getControlsRoot(list)) {
 
 	const places = getRestingPlaces(list);
 
-	root.querySelectorAll(DOTS_SELECTOR).forEach((container) => {
-		syncDotRow(container, current, places);
-	});
+	if (updateDots) {
+		root.querySelectorAll(DOTS_SELECTOR).forEach((container) => {
+			syncDotRow(container, current, places);
+		});
+	}
 
 	root.querySelectorAll(THUMBS_SELECTOR).forEach((strip) => {
 		showThumb(strip, current);
@@ -1467,6 +1452,7 @@ function fillDots(container, places) {
 	const dots = container.querySelectorAll(DOT_SELECTOR);
 	const label = container.dataset.vpDotLabel || '';
 	const items = places.length;
+	container.style.setProperty('--vp-carousel-dots-count', String(items));
 
 	// A dot with nowhere behind it does nothing when pressed.
 	for (let index = dots.length - 1; index >= items; index -= 1) {
@@ -1478,6 +1464,7 @@ function fillDots(container, places) {
 
 		dot.type = 'button';
 		dot.className = DOT_SELECTOR.slice(1);
+		dot.innerHTML = `<span class="vp-block-loop-carousel-dot-value" aria-hidden="true"><span class="${DOT_PROGRESS_CLASS}"></span></span>`;
 		container.appendChild(dot);
 	}
 
@@ -1489,32 +1476,14 @@ function fillDots(container, places) {
 		dot.dataset.vpSlide = String(slide);
 		dot.setAttribute('aria-label', label.replace('%d', String(slide + 1)));
 	});
-
-	// The pill is drawn over the dots and is nobody's slide, so it is out of
-	// the reach of a pointer and of a screen reader: the dot underneath is the
-	// button, and it is the one that says which slide it names.
-	if (items && !container.querySelector(WORM_SELECTOR)) {
-		const worm = document.createElement('span');
-
-		worm.className = WORM_CLASS;
-		worm.setAttribute('aria-hidden', 'true');
-		worm.innerHTML = `<span class="${DOT_PROGRESS_CLASS}"></span>`;
-		container.prepend(worm);
-	}
 }
 
 /**
- * Where the dots of a row will come to rest.
- *
- * Worked out from the shape the stylesheet writes down rather than read off the
- * row: the dots are still making room for the pill while this runs, so a
- * measurement taken now is of a row halfway through a move.
+ * Use settled dot widths while the collapsed window is animating.
  *
  * @param {HTMLElement} container Indicator drawn as dots.
- * @param {number}      count     How many dots it has.
- * @param {number}      current   Slide the carousel is showing.
- *
- * @return {Object} The sizes, and where each dot starts and ends.
+ * @param {number}      count     Number of dots.
+ * @return {Object} Dot centres and total row width.
  */
 function getDotGeometry(container, count, current) {
 	const style = window.getComputedStyle(container);
@@ -1525,37 +1494,15 @@ function getDotGeometry(container, count, current) {
 	const grown =
 		parseFloat(style.getPropertyValue('--vp-carousel-dot-active-size')) ||
 		slot;
-	// How far a dot steps aside for the one on screen. The stylesheet works
-	// the same number out of the same two lengths; a custom property that is
-	// a sum of others is handed back unresolved, so it is worked out again
-	// here rather than read.
 	const spread = Math.max(0, (grown - size) / 2);
-	// The row is placed inside whatever the box around it keeps for itself,
-	// and the pill is placed against that box rather than against the row - so
-	// an indicator drawn as a filled pill, which is padded, had its own pill
-	// sitting a padding to the left of the dots it was meant to be on.
 	const inset = parseFloat(style.paddingInlineStart) || 0;
-	const index = Math.min(Math.max(current, 0), Math.max(0, count - 1));
-
-	// Every slide keeps a slot of the same width, so the row is the same width
-	// and the same shape whatever the carousel is doing. A dot rests where its
-	// slot puts it, give or take the step it takes aside for the one on
-	// screen - and the one on screen takes none, which is what keeps the pill
-	// travelling a slot at a time.
-	const stepOf = (at) => {
-		if (at === index) {
-			return 0;
-		}
-
-		return at < index ? -spread : spread;
-	};
+	const endInset = parseFloat(style.paddingInlineEnd) || 0;
+	const stepOf = (at) =>
+		at < current ? 0 : at === current ? spread : spread * 2;
 
 	return {
-		slot,
-		grown,
-		index,
 		centreOf: (at) => inset + at * slot + slot / 2 + stepOf(at),
-		content: count * slot + spread * 2,
+		content: count * slot + spread * 2 + inset + endInset,
 	};
 }
 
@@ -1685,138 +1632,9 @@ function showThumb(strip, current) {
 	strip.scrollTo({ left, behavior: getScrollBehavior() });
 }
 /**
- * Crawl the pill of an indicator to the dot the carousel has reached.
- *
- * Two edges rather than one box: the edge in front of the travel leaves at
- * once and the one behind it follows, so the pill stretches across the ground
- * between two dots and gathers itself once the trailing edge has caught up.
- *
- * Drawn frame by frame rather than handed to the browser as an animation,
- * because the far end moves: a swipe steps again before the pill has arrived,
- * and an animation can only be replaced - which either snapped the pill to
- * where the last step was aimed or stretched it a second time from a shape
- * that was already stretched, pulsing once per slide. Given a new destination
- * mid-crawl, the two edges simply carry on towards it.
- *
- * @param {HTMLElement} container Indicator drawn as dots.
- * @param {Object}      geometry  Where the dots come to rest.
- * @param {number}      reach     The most ground it may cover at once.
- */
-function moveWorm(container, geometry, reach) {
-	const worm = container.querySelector(WORM_SELECTOR);
-
-	if (!worm) {
-		return;
-	}
-
-	const to = {
-		left: Math.round(
-			geometry.centreOf(geometry.index) - geometry.grown / 2
-		),
-		width: geometry.grown,
-	};
-	const at = worms.get(container);
-
-	// Written only when it has changed. The row is asked about on every frame
-	// of a scroll, and writing the same two lengths back each time laid the
-	// page out again for nothing.
-	if (at && at.left === to.left && at.width === to.width) {
-		return;
-	}
-
-	worms.set(container, to);
-
-	const place = (left, width) => {
-		worm.style.insetInlineStart = `${Math.round(left)}px`;
-		worm.style.width = `${Math.round(width)}px`;
-	};
-
-	// Nothing to crawl from, or a visitor who asked for less motion: the pill
-	// is simply where it belongs.
-	if (!at || 'auto' === getScrollBehavior()) {
-		crawls.delete(container);
-		place(to.left, to.width);
-
-		return;
-	}
-
-	const crawl = crawls.get(container) || {
-		tail: at.left,
-		head: at.left + at.width,
-		frame: 0,
-	};
-
-	// A step landing mid-crawl sets off from where the edges are, so a pill
-	// that is already stretched stays stretched: the trailing edge is held
-	// back again rather than being allowed to catch up first.
-	crawl.tailFrom = crawl.tail;
-	crawl.headFrom = crawl.head;
-	crawl.tailTo = to.left;
-	crawl.headTo = to.left + to.width;
-	// Which edge is in front. Going back along the row it is the left one, and
-	// holding the right one back is what stretches the pill - hold the wrong
-	// one and it shrinks away from the direction it is travelling in.
-	crawl.onwards = crawl.tailTo >= crawl.tailFrom;
-	crawl.reach = reach;
-	crawl.started = window.performance.now();
-	crawls.set(container, crawl);
-
-	if (crawl.frame) {
-		return;
-	}
-
-	// The leading edge is away at once and slows into place; the trailing edge
-	// eases out of its wait as well as into its arrival, so that it gathers the
-	// pill up rather than snapping after it.
-	const settle = (part) => 1 - (1 - part) ** 3;
-	const gather = (part) => part * part * (3 - 2 * part);
-
-	const tick = () => {
-		if (!worm.isConnected || crawls.get(container) !== crawl) {
-			crawl.frame = 0;
-
-			return;
-		}
-
-		const part = Math.min(
-			1,
-			(window.performance.now() - crawl.started) / WORM_DURATION
-		);
-		const lead = settle(Math.min(1, part / WORM_LEAD_SPAN));
-		const trail = gather(
-			Math.max(0, (part - WORM_TRAIL_DELAY) / (1 - WORM_TRAIL_DELAY))
-		);
-		const headPart = crawl.onwards ? lead : trail;
-		const tailPart = crawl.onwards ? trail : lead;
-
-		crawl.head =
-			crawl.headFrom + (crawl.headTo - crawl.headFrom) * headPart;
-		crawl.tail =
-			crawl.tailFrom + (crawl.tailTo - crawl.tailFrom) * tailPart;
-
-		// Long enough to read as a crawl, never longer than the row can show.
-		if (crawl.head - crawl.tail > crawl.reach) {
-			if (crawl.onwards) {
-				crawl.tail = crawl.head - crawl.reach;
-			} else {
-				crawl.head = crawl.tail + crawl.reach;
-			}
-		}
-
-		place(crawl.tail, Math.max(1, crawl.head - crawl.tail));
-
-		crawl.frame = part < 1 ? window.requestAnimationFrame(tick) : 0;
-	};
-
-	crawl.frame = window.requestAnimationFrame(tick);
-}
-
-/**
  * Bring a row of dots in line with the slide the carousel is showing.
  *
- * The pill crawls to the dot that names it, and a row given a window slides
- * under that window - a gallery of forty slides draws forty dots, which is a
- * wall rather than an indicator. Every dot stays in the page either way: each
+ * A row given a window slides under it. Every dot stays in the page: each
  * one is still a button naming a slide, still reachable by keyboard and still
  * carrying the label a screen reader reads.
  *
@@ -1848,15 +1666,6 @@ function syncDotRow(container, current, places) {
 	const max = parseInt(container.dataset.vpMaxDots, 10) || 0;
 	const collapsed = max > 0 && dots.length > max;
 	const geometry = getDotGeometry(container, dots.length, at);
-
-	// A row showing its dots through a window has only so much room, and a
-	// pill drawn wider than the window would be clipped by it. A row showing
-	// all of its dots has the whole row to stretch across.
-	moveWorm(
-		container,
-		geometry,
-		collapsed ? geometry.slot * WORM_REACH : Number.POSITIVE_INFINITY
-	);
 
 	// A row that fits is a plain row: no window, no shift, and no classes left
 	// behind by a gallery that had more slides a moment ago.
@@ -1890,7 +1699,7 @@ function syncDotRow(container, current, places) {
 		// A dot the window has moved past is still a button in the page, so
 		// tabbing to it brings it back under the window - the alternative is a
 		// focus ring drawn on something nobody can see. The window alone
-		// moves: the dot lit and the pill stay with the slide on screen,
+		// moves: the active dot stays with the slide on screen,
 		// which a focus has not changed.
 		//
 		// Only for a visitor arriving by keyboard. A press gives the dot focus
@@ -2231,7 +2040,12 @@ function goToSlide(list, index, targets = getSlideTargets(list)) {
 		return;
 	}
 
-	pending.set(list, { index: wanted, time: window.performance.now() });
+	pending.set(list, {
+		index: wanted,
+		time: window.performance.now(),
+		source: 'step',
+	});
+	syncNav(list);
 
 	scrollListTo(list, targets[wanted]);
 }
@@ -2640,15 +2454,7 @@ function initAutoplay(list) {
 			return;
 		}
 
-		// A held clock reads nothing: the slide it will count for is read on
-		// the first frame it runs again.
-		if (
-			pointerOn.size ||
-			focusIn.size ||
-			held ||
-			offscreen ||
-			stopped.has(list)
-		) {
+		if (held || offscreen || stopped.has(list)) {
 			return;
 		}
 
@@ -2668,6 +2474,11 @@ function initAutoplay(list) {
 		if (showing !== seen) {
 			seen = showing;
 			restart();
+		}
+
+		// A pause holds time, but changing slides still starts a new wait.
+		if (pointerOn.size || focusIn.size) {
+			return;
 		}
 
 		elapsed += step;
@@ -2847,7 +2658,66 @@ function wakeControls(list, hasAutoplay) {
  * @return {Function} Teardown.
  */
 function initCarousel(list, restore) {
-	const onScroll = () => syncNav(list);
+	let dotTimer;
+	let dotDragging = false;
+	let dotTarget;
+	const selectDotTarget = () => {
+		if (undefined !== dotTarget) {
+			pending.set(list, {
+				index: dotTarget,
+				time: window.performance.now(),
+				source: 'snap',
+			});
+			syncNav(list);
+		}
+	};
+	const settleDots = () => {
+		if (dotDragging) {
+			dotTimer = window.setTimeout(settleDots, 120);
+			return;
+		}
+
+		syncNav(list);
+	};
+	const onScroll = () => {
+		syncNav(list, false);
+		window.clearTimeout(dotTimer);
+		// Blossom can scroll frame by frame, so scrollend alone cannot mark a completed swipe.
+		dotTimer = window.setTimeout(settleDots, 120);
+	};
+	const onSnapChanging = (event) => {
+		if (isRepeating(list)) {
+			return;
+		}
+
+		const target = event.snapTargetInline || event.detail?.snapTargetInline;
+		const at = Array.prototype.indexOf.call(
+			list.querySelectorAll(ITEM_SELECTOR),
+			target
+		);
+
+		if (at < 0) {
+			return;
+		}
+
+		const targets = getSlideTargets(list);
+		const held = pending.get(list);
+		// Delayed snap events must not replace an explicit control destination.
+		if (
+			held &&
+			'step' === held.source &&
+			window.performance.now() - held.time < STEP_HOLD
+		) {
+			return;
+		}
+
+		dotTarget = getRestingPlaces(list).find(
+			(place) => targets[place] === targets[at]
+		);
+		if (!dotDragging) {
+			selectDotTarget();
+		}
+	};
 	const onGoTo = (event) => goToSlide(list, event.detail?.index);
 	const onPlace = (event) => {
 		const { period } = getRepeatGeometry(list);
@@ -2861,6 +2731,7 @@ function initCarousel(list, restore) {
 		}
 
 		placeRepeating(list, event.detail.position, period);
+		syncNav(list);
 		event.detail.position = getScrollPosition(list);
 	};
 
@@ -2934,6 +2805,7 @@ function initCarousel(list, restore) {
 	syncNav(list);
 
 	list.addEventListener('scroll', onScroll, { passive: true });
+	list.addEventListener('scrollsnapchanging', onSnapChanging);
 	list.addEventListener(GO_TO_EVENT, onGoTo);
 	list.addEventListener(PLACE_EVENT, onPlace);
 
@@ -2979,8 +2851,38 @@ function initCarousel(list, restore) {
 		}
 
 		event.preventDefault();
+		dotDragging = true;
+		dotTarget = undefined;
+		pending.delete(list);
 		list.classList.add(POINTER_FOCUS_CLASS);
 		list.focus({ preventScroll: true });
+	};
+	const onMouseUp = (event) => {
+		if ('touch' === event?.pointerType) {
+			return;
+		}
+
+		if (!dotDragging) {
+			return;
+		}
+
+		dotDragging = false;
+		// The release can replace the target Blossom predicted while dragging.
+		window.queueMicrotask(() => {
+			if (!torn) {
+				selectDotTarget();
+			}
+		});
+	};
+	const onTouchStart = () => {
+		dotDragging = true;
+		dotTarget = undefined;
+		pending.delete(list);
+	};
+	const onTouchEnd = (event) => {
+		if (!event.touches.length) {
+			onMouseUp();
+		}
 	};
 	const unmarkFocus = () => list.classList.remove(POINTER_FOCUS_CLASS);
 	// A modifier on its own is not the keyboard taking over: Cmd is pressed
@@ -2990,13 +2892,41 @@ function initCarousel(list, restore) {
 		if (!MODIFIER_KEYS.has(event.key)) {
 			unmarkFocus();
 		}
+		if (
+			!isRepeating(list) &&
+			['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key) &&
+			!event.defaultPrevented &&
+			!event.altKey &&
+			!event.ctrlKey &&
+			!event.metaKey
+		) {
+			pending.delete(list);
+		}
+	};
+	const onWheel = (event) => {
+		if (
+			Math.abs(event.deltaX) > Math.abs(event.deltaY) ||
+			(event.shiftKey && event.deltaY)
+		) {
+			pending.delete(list);
+		}
 	};
 
 	if (canDrag) {
 		list.addEventListener('mousedown', onMouseDown);
-		list.addEventListener('keydown', onKeyDown);
+		window.addEventListener('mouseup', onMouseUp);
+		window.addEventListener('pointerup', onMouseUp, true);
+		window.addEventListener('pointercancel', onMouseUp, true);
+		window.addEventListener('blur', onMouseUp);
+		window.addEventListener('contextmenu', onMouseUp);
 		list.addEventListener('blur', unmarkFocus);
 	}
+
+	list.addEventListener('keydown', onKeyDown);
+	list.addEventListener('wheel', onWheel, { passive: true });
+	list.addEventListener('touchstart', onTouchStart, { passive: true });
+	window.addEventListener('touchend', onTouchEnd, { passive: true });
+	window.addEventListener('touchcancel', onTouchEnd, { passive: true });
 
 	// The browser's own arrow-key scroll stops at the end of the range Blossom
 	// keeps a repeating carousel in, so it never reaches the seam. The arrows
@@ -3080,6 +3010,7 @@ function initCarousel(list, restore) {
 
 	return () => {
 		torn = true;
+		window.clearTimeout(dotTimer);
 		list.dispatchEvent(
 			new window.CustomEvent(STOP_EVENT, { bubbles: true })
 		);
@@ -3090,10 +3021,20 @@ function initCarousel(list, restore) {
 		stopColumns();
 		sleepControls();
 		list.removeEventListener('scroll', onScroll);
+		list.removeEventListener('scrollsnapchanging', onSnapChanging);
 		list.removeEventListener(GO_TO_EVENT, onGoTo);
 		list.removeEventListener(PLACE_EVENT, onPlace);
 		list.removeEventListener('mousedown', onMouseDown);
+		window.removeEventListener('mouseup', onMouseUp);
+		window.removeEventListener('pointerup', onMouseUp, true);
+		window.removeEventListener('pointercancel', onMouseUp, true);
+		window.removeEventListener('blur', onMouseUp);
+		window.removeEventListener('contextmenu', onMouseUp);
+		list.removeEventListener('touchstart', onTouchStart);
+		window.removeEventListener('touchend', onTouchEnd);
+		window.removeEventListener('touchcancel', onTouchEnd);
 		list.removeEventListener('keydown', onKeyDown);
+		list.removeEventListener('wheel', onWheel);
 		list.removeEventListener('keydown', onArrowKey);
 		list.removeEventListener('blur', unmarkFocus);
 		unmarkFocus();
