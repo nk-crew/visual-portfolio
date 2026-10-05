@@ -186,6 +186,12 @@ class Visual_Portfolio_Welcome_Screen {
 	 * Redirect to Welcome page after activation.
 	 */
 	public function redirect_to_welcome_screen() {
+		// A background request, such as the heartbeat of another tab, leaves the
+		// redirect to the next page the user opens.
+		if ( wp_doing_ajax() || wp_doing_cron() ) {
+			return;
+		}
+
 		// Bail if no activation redirect.
 		if ( ! get_transient( '_visual_portfolio_welcome_screen_activation_redirect' ) ) {
 			return;
