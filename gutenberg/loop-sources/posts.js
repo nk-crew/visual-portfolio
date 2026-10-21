@@ -294,6 +294,7 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 		<ToolsPanel
 			label={__('Settings', 'visual-portfolio')}
 			dropdownMenuProps={dropdownMenuProps}
+			panelId={clientId}
 			resetAll={(filters) =>
 				update(
 					getResetAllValues(filters, {

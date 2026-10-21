@@ -14,4 +14,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! isset( $args['image'] ) || ! $args['image'] ) {
 	return;
 }
-echo wp_kses( $args['image'], 'vp_image' );
+echo Visual_Portfolio_Security::kses_image( $args['image'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- passed through wp_kses there.

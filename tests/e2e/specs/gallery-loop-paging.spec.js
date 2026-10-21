@@ -425,6 +425,13 @@ test.describe('Gallery Loop paging', () => {
 					}
 				});
 			});
+			// The trigger has to stay near after a click appends a page, or
+			// there is nothing for the rearm to report. How far a page pushes
+			// it down depends on the images and fonts, and 300px was not
+			// always enough; 4000px keeps every page of this loop in range.
+			await setInfiniteData(page, {
+				'data-vp-infinite-threshold': 4000,
+			});
 			await publish(
 				requestUtils,
 				page,
