@@ -157,6 +157,31 @@ class Visual_Portfolio_Security {
 	}
 
 	/**
+	 * Escape an item image with the `vp_image` rules.
+	 *
+	 * A lazy image comes with a `<noscript>` fallback. Since WordPress 7.2
+	 * `wp_kses()` stops at a `<noscript>` and drops everything from it on, so
+	 * the fallback is escaped on its own and the wrapper is added here.
+	 *
+	 * @param string $html - image HTML.
+	 *
+	 * @return string
+	 */
+	public static function kses_image( $html ) {
+		$parts  = preg_split( '#<noscript>(.*?)</noscript>#is', (string) $html, -1, PREG_SPLIT_DELIM_CAPTURE );
+		$output = '';
+
+		foreach ( $parts as $i => $part ) {
+			$part = wp_kses( $part, 'vp_image' );
+
+			// Odd parts are the contents of a `<noscript>`.
+			$output .= $i % 2 ? '<noscript>' . $part . '</noscript>' : $part;
+		}
+
+		return $output;
+	}
+
+	/**
 	 * Sanitize hidden attribute.
 	 *
 	 * @param string|bool $attribute - Unclear Hidden Attribute.

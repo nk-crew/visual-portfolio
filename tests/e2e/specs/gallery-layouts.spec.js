@@ -3884,7 +3884,10 @@ test.describe('Gallery Item Template layouts', () => {
 		// is brought out through the panel menu the way any unset one is.
 		await page.getByRole('button', { name: 'Carousel options' }).click();
 		await page
-			.getByRole('menuitemcheckbox', { name: 'Show Repeat' })
+			// `Repeat, show` from WordPress 7.2.
+			.getByRole('menuitemcheckbox', {
+				name: /^(Show Repeat|Repeat, show)$/,
+			})
 			.click();
 		await page.keyboard.press('Escape');
 
