@@ -501,11 +501,11 @@ test.describe('Gallery Loop blocks', () => {
 		const filters = page.locator('.components-tools-panel', {
 			has: page.getByRole('heading', { name: 'Filters' }),
 		});
-		// The panel menu names an item it would show as `Show {label}`.
+		// The panel menu names an item it would show as `Show {label}`, and
+		// as `{label}, show` from WordPress 7.2.
 		const menuItem = (label) =>
 			page.getByRole('menuitemcheckbox', {
-				name: `Show ${label}`,
-				exact: true,
+				name: new RegExp(`^(Show ${label}|${label}, show)$`),
 			});
 
 		await filters.getByRole('button', { name: /options/i }).click();
