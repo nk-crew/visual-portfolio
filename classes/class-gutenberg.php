@@ -343,24 +343,12 @@ class Visual_Portfolio_Gutenberg {
 
 		$attributes = self::get_block_attributes();
 
-		$gutenberg_script_dependencies = array( 'masonry' );
-		$editor_vendor_path            = 'build/gutenberg/editor-vendor';
-
-		// Webpack may split heavy editor vendors into a separate chunk.
-		if ( file_exists( visual_portfolio()->plugin_path . $editor_vendor_path . '.js' ) ) {
-			Visual_Portfolio_Assets::enqueue_script(
-				'visual-portfolio-gutenberg-editor-vendor',
-				$editor_vendor_path
-			);
-
-			$gutenberg_script_dependencies[] = 'visual-portfolio-gutenberg-editor-vendor';
-		}
-
-		// Block.
+		// Block. The code editor control loads Ace as a webpack chunk of its own
+		// when it first renders, so no vendor script is enqueued here.
 		Visual_Portfolio_Assets::enqueue_script(
 			'visual-portfolio-gutenberg',
 			'build/gutenberg/index',
-			$gutenberg_script_dependencies
+			array( 'masonry' )
 		);
 		wp_set_script_translations( 'visual-portfolio-gutenberg', 'visual-portfolio', visual_portfolio()->plugin_path . 'languages' );
 

@@ -1,8 +1,5 @@
 import { Button, DatePicker, Dropdown } from '@wordpress/components';
-import {
-	dateI18n,
-	__experimentalGetSettings as getSettings,
-} from '@wordpress/date';
+import { dateI18n, getSettings } from '@wordpress/date';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 

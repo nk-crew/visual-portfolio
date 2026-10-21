@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   playwright:
-    name: Playwright
+    name: Playwright (WP ${{ matrix.wp.name }})
     # 2 vCPU, not 4. `workers: 1` does not make this job single-threaded -- the
     # browser and the wp-env stack use the other cores, and measuring the switch
     # showed `playwright test` getting 40-70% slower. It still wins: Blacksmith
@@ -30,6 +30,22 @@ jobs:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 30
     if: ${{ github.repository == 'nk-crew/visual-portfolio' || github.event_name == 'pull_request' }}
+    # Only the trunk leg may fail without failing the workflow.
+    continue-on-error: ${{ matrix.wp.experimental }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        wp:
+          # The core .wp-env.json resolves to: the latest release, which
+          # carries the Gallery Loop (WordPress 7.1 and above).
+          - name: latest
+            core: ''
+            experimental: false
+          # WordPress trunk, to catch breakage from the next release early.
+          - name: trunk
+            core: WordPress/WordPress
+            experimental: true
 
     steps:
       - uses: actions/checkout@v4
@@ -64,14 +80,10 @@ jobs:
           timeout 6m npx playwright install-deps chromium webkit \
             || echo "::warning::System packages did not install; running on what the runner image carries"
 
-      # The Gallery Loop family registers on WordPress 7.1 and above, so the
-      # end-to-end suite has to meet a build that carries it. `.wp-env.json`
-      # pins the branch for local work; naming it here as well keeps the two
-      # from drifting apart silently, and is the line to change once 7.1 is
-      # released and `WordPress/WordPress` carries the family on its own.
+      # An empty WP_ENV_CORE leaves the core from .wp-env.json in place.
       - name: Install WordPress and start the server
         env:
-          WP_ENV_CORE: WordPress/WordPress#7.1-branch
+          WP_ENV_CORE: ${{ matrix.wp.core }}
         run: |
           npm run wp-env start
 
@@ -83,7 +95,7 @@ jobs:
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         if: ${{ failure() && !cancelled() }}
         with:
-          name: failures-artifacts
+          name: failures-artifacts-wp-${{ matrix.wp.name }}
           path: artifacts/test-results
           if-no-files-found: ignore
 
@@ -91,6 +103,6 @@ jobs:
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         if: ${{ !cancelled() }}
         with:
-          name: flaky-tests-report
+          name: flaky-tests-report-wp-${{ matrix.wp.name }}
           path: flaky-tests
           if-no-files-found: ignore

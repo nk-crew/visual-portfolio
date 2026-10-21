@@ -24,7 +24,11 @@ function UpdateEditor() {
 
 		const { getSelectedBlock, getBlocks } = select('core/block-editor');
 
-		const { getEditorMode } = select('core/edit-post');
+		// The editor mode moved to `core/editor` in WP 6.6, which also
+		// deprecated it in `core/edit-post`; older cores only have the latter.
+		const getEditorMode =
+			select('core/editor').getEditorMode ||
+			select('core/edit-post').getEditorMode;
 
 		const { getBlockData } = select('visual-portfolio/saved-layout-data');
 
@@ -42,15 +46,19 @@ function UpdateEditor() {
 
 	const { selectBlock, insertBlocks, resetBlocks } =
 		useDispatch('core/block-editor');
-	const { editPost } = useDispatch('core/editor');
-	const { switchEditorMode } = useDispatch('core/edit-post');
+	const { editPost, switchEditorMode: switchEditorModeInEditor } =
+		useDispatch('core/editor');
+	const { switchEditorMode: switchEditorModeInEditPost } =
+		useDispatch('core/edit-post');
+	const switchEditorMode =
+		switchEditorModeInEditor || switchEditorModeInEditPost;
 
 	/**
 	 * Force change gutenberg edit mode to Visual.
 	 */
 	useEffect(() => {
 		if (editorSettings.richEditingEnabled && editorMode === 'text') {
-			switchEditorMode();
+			switchEditorMode('visual');
 		}
 	}, [editorSettings, editorMode, switchEditorMode]);
 
