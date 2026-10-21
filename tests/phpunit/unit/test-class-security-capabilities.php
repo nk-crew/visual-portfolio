@@ -140,7 +140,7 @@ class Test_Visual_Portfolio_Security_Capabilities extends WP_UnitTestCase {
 			'.a {}alert(1)',
 			Visual_Portfolio_Security::sanitize_css( '.a {}</style><script>alert(1)</script>' )
 		);
-		$this->assertSame( '.a {}', Visual_Portfolio_Security::sanitize_css( '.a {}</STYLE' ) );
+		$this->assertSame( '.a {}\\3c /STYLE', Visual_Portfolio_Security::sanitize_css( '.a {}</STYLE' ) );
 	}
 
 	/**
@@ -151,7 +151,7 @@ class Test_Visual_Portfolio_Security_Capabilities extends WP_UnitTestCase {
 	public function test_sanitize_css_keeps_wrapped_rules() {
 		$this->assertSame( '.a{b:c}', Visual_Portfolio_Security::sanitize_css( '<style>.a{b:c}</style>' ) );
 		$this->assertSame( '.a{b:c}', Visual_Portfolio_Security::sanitize_css( '<style media="(width > 600px)">.a{b:c}</style>' ) );
-		$this->assertSame( ' .a{b:c} -->', Visual_Portfolio_Security::sanitize_css( '<!-- .a{b:c} -->' ) );
+		$this->assertSame( '  .a{b:c} -->', Visual_Portfolio_Security::sanitize_css( '<!-- .a{b:c} -->' ) );
 	}
 
 	/**
@@ -176,8 +176,47 @@ class Test_Visual_Portfolio_Security_Capabilities extends WP_UnitTestCase {
 
 			$this->assertFalse( stripos( $result, '</style' ), $css );
 			$this->assertFalse( stripos( $result, '</script' ), $css );
+			$this->assertFalse( strpos( $result, '</' ), $css );
 			$this->assertFalse( strpos( $result, '<!--' ), $css );
 		}
+	}
+
+	/**
+	 * An ESC byte cannot hide an end tag from the sanitizer on an ISO-2022-JP site.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_css_drops_escape_bytes() {
+		$result = Visual_Portfolio_Security::sanitize_css( "<\x1b(B/style><img src=x onerror=alert(1) a\">" );
+
+		$this->assertFalse( strpos( $result, '</' ) );
+		$this->assertFalse( strpos( $result, "\x1b" ) );
+	}
+
+	/**
+	 * An end tag of any element is escaped, not only style and script.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_css_escapes_any_end_tag() {
+		$result = Visual_Portfolio_Security::sanitize_css( '</noscript a\'><img src=x onerror=alert(1) b">' );
+
+		$this->assertFalse( strpos( $result, '</' ) );
+	}
+
+	/**
+	 * Deeply nested end tags are handled in one pass.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_css_nested_input_is_fast() {
+		$css = str_repeat( '</', 20000 ) . str_repeat( 'style', 20000 );
+
+		$start  = microtime( true );
+		$result = Visual_Portfolio_Security::sanitize_css( $css );
+
+		$this->assertLessThan( 0.1, microtime( true ) - $start );
+		$this->assertFalse( strpos( $result, '</' ) );
 	}
 
 	/**
