@@ -217,7 +217,16 @@ class Visual_Portfolio_Security {
 	 * @return string
 	 */
 	public static function sanitize_css( $css ) {
-		return preg_replace( '#</style#i', '', wp_strip_all_tags( (string) $css ) );
+		// Drop HTML tags such as a <style> wrapper but keep their text, so CSS pasted with tags still applies.
+		$css = preg_replace( '#</?[a-zA-Z](?:[^<>"\']|"[^"]*"|\'[^\']*\')*>#', '', (string) $css );
+
+		// Nothing may close the <style> or <script> element the CSS is printed in.
+		do {
+			$prev = $css;
+			$css  = preg_replace( '#</(style|script)|<!--#i', '', $css );
+		} while ( $prev !== $css );
+
+		return $css;
 	}
 
 	/**

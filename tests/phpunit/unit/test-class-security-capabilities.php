@@ -112,7 +112,7 @@ class Test_Visual_Portfolio_Security_Capabilities extends WP_UnitTestCase {
 	}
 
 	/**
-	 * An editor saves a Saved Layout.
+	 * An administrator saves a Saved Layout.
 	 *
 	 * @return void
 	 */
@@ -137,10 +137,47 @@ class Test_Visual_Portfolio_Security_Capabilities extends WP_UnitTestCase {
 			Visual_Portfolio_Security::sanitize_css( '.a > .b { &:hover { color: red; } }' )
 		);
 		$this->assertSame(
-			'.a {}',
+			'.a {}alert(1)',
 			Visual_Portfolio_Security::sanitize_css( '.a {}</style><script>alert(1)</script>' )
 		);
 		$this->assertSame( '.a {}', Visual_Portfolio_Security::sanitize_css( '.a {}</STYLE' ) );
+	}
+
+	/**
+	 * CSS pasted inside a style element or an HTML comment keeps its rules.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_css_keeps_wrapped_rules() {
+		$this->assertSame( '.a{b:c}', Visual_Portfolio_Security::sanitize_css( '<style>.a{b:c}</style>' ) );
+		$this->assertSame( '.a{b:c}', Visual_Portfolio_Security::sanitize_css( '<style media="(width > 600px)">.a{b:c}</style>' ) );
+		$this->assertSame( ' .a{b:c} -->', Visual_Portfolio_Security::sanitize_css( '<!-- .a{b:c} -->' ) );
+	}
+
+	/**
+	 * A `<` that starts no tag keeps the rules after it.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_css_keeps_less_than() {
+		$css = '@media (width <= 768px) { .a{b:c} } .d::before{content:"<"} .e{f:g}';
+
+		$this->assertSame( $css, Visual_Portfolio_Security::sanitize_css( $css ) );
+	}
+
+	/**
+	 * Removing one sequence cannot assemble another that closes the element.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_css_leaves_no_breakout() {
+		foreach ( array( '</st</styleyle>', '</STYLE >', 'a</sty<!---->le>b', '</scr<!--ipt>', '<<!---->!--' ) as $css ) {
+			$result = Visual_Portfolio_Security::sanitize_css( $css );
+
+			$this->assertFalse( stripos( $result, '</style' ), $css );
+			$this->assertFalse( stripos( $result, '</script' ), $css );
+			$this->assertFalse( strpos( $result, '<!--' ), $css );
+		}
 	}
 
 	/**
@@ -240,5 +277,134 @@ class Test_Visual_Portfolio_Security_Capabilities extends WP_UnitTestCase {
 
 		$this->login_as( 'contributor' );
 		$this->assertTrue( $this->preview_enabled() );
+	}
+
+	/**
+	 * The frame opens for a user whose only edit capability is on a post type
+	 * a theme registers after the plugin's own `init` callbacks.
+	 *
+	 * @return void
+	 */
+	public function test_preview_sees_post_types_registered_late_on_init() {
+		$this->login_as( 'subscriber' );
+		wp_get_current_user()->add_cap( 'edit_vp_sec_things' );
+
+		$_GET     = array( 'vp_preview' => 'vp_preview' );
+		$_POST    = array(
+			'vp_preview_nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
+			'vp_preview_frame' => 'true',
+		);
+		$_REQUEST = array_merge( $_GET, $_POST );
+
+		// Only the callbacks of this load; the test case restores the hooks.
+		remove_all_actions( 'init' );
+		remove_all_actions( 'wp_loaded' );
+
+		$preview = new Visual_Portfolio_Preview();
+
+		add_action(
+			'init',
+			static function () {
+				register_post_type(
+					'vp_sec_thing',
+					array(
+						'show_in_rest'    => true,
+						'capability_type' => array( 'vp_sec_thing', 'vp_sec_things' ),
+						'map_meta_cap'    => true,
+					)
+				);
+			},
+			20
+		);
+
+		do_action( 'init' );
+		do_action( 'wp_loaded' );
+
+		$this->assertTrue( $preview->preview_enabled );
+	}
+
+	/**
+	 * Post the preview flags with a valid nonce.
+	 *
+	 * @return void
+	 */
+	private function post_preview_request() {
+		$_POST    = array(
+			'vp_preview_nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
+			'vp_preview_frame' => 'true',
+		);
+		$_REQUEST = $_POST;
+	}
+
+	/**
+	 * Galleries switch to preview mode only for a user who may open the frame.
+	 *
+	 * @return void
+	 */
+	public function test_is_preview_requires_edit_capability() {
+		$this->login_as( 'subscriber' );
+		$this->post_preview_request();
+		$this->assertFalse( Visual_Portfolio_Get::is_preview() );
+
+		$this->login_as( 'contributor' );
+		$this->post_preview_request();
+		$this->assertTrue( Visual_Portfolio_Get::is_preview() );
+	}
+
+	/**
+	 * Render the preview frame of a gallery that asks for drafts.
+	 *
+	 * @return string
+	 */
+	private function render_draft_preview() {
+		$_POST    = array(
+			'vp_block_id'           => 'vp-sec-preview',
+			'vp_content_source'     => 'post-based',
+			'vp_posts_source'       => 'custom_query',
+			'vp_posts_custom_query' => 'post_type=post&post_status=draft',
+		);
+		$_REQUEST = $_POST;
+
+		$preview = new Visual_Portfolio_Preview();
+		$scripts = $GLOBALS['wp_scripts'] ?? null;
+		$styles  = $GLOBALS['wp_styles'] ?? null;
+
+		// Registries of their own, so assets other tests left half registered
+		// do not raise dependency notices here.
+		$GLOBALS['wp_scripts'] = new WP_Scripts();
+		$GLOBALS['wp_styles']  = new WP_Styles();
+
+		ob_start();
+		$preview->print_template();
+		$html = ob_get_clean();
+
+		$GLOBALS['wp_scripts'] = $scripts;
+		$GLOBALS['wp_styles']  = $styles;
+
+		return $html;
+	}
+
+	/**
+	 * The frame's gallery shows a contributor no other user's draft, and an
+	 * administrator the query as asked.
+	 *
+	 * @return void
+	 */
+	public function test_preview_gallery_query_is_narrowed_for_contributor() {
+		$owner = self::factory()->user->create( array( 'role' => 'editor' ) );
+
+		self::factory()->post->create(
+			array(
+				'post_author' => $owner,
+				'post_status' => 'draft',
+				'post_title'  => 'VP Sec Hidden Draft',
+			)
+		);
+
+		$this->login_as( 'contributor' );
+		$this->assertStringNotContainsString( 'VP Sec Hidden Draft', $this->render_draft_preview() );
+
+		$this->login_as( 'administrator' );
+		$this->assertStringContainsString( 'VP Sec Hidden Draft', $this->render_draft_preview() );
 	}
 }

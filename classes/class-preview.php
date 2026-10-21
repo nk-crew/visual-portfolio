@@ -32,7 +32,8 @@ class Visual_Portfolio_Preview {
 	 * Hooks.
 	 */
 	public function init_hooks() {
-		add_action( 'init', array( $this, 'is_preview_check' ) );
+		// After `init`, so the edit capabilities of post types a theme registers late are known.
+		add_action( 'wp_loaded', array( $this, 'is_preview_check' ) );
 		add_filter( 'pre_handle_404', array( $this, 'pre_handle_404' ) );
 		add_filter( 'vpf_get_options', array( $this, 'filter_preview_option' ) );
 		add_action( 'template_redirect', array( $this, 'template_redirect' ) );

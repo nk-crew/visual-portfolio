@@ -3805,7 +3805,6 @@ selector p {
 		$query_args = array(
 			'posts_per_page' => 50,
 			'post_type'      => $post_type,
-			'perm'           => 'readable',
 		);
 
 		if ( isset( $_POST['q'] ) ) {
