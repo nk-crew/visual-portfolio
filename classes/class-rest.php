@@ -328,35 +328,12 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	}
 
 	/**
-	 * Whether the current user edits content of any kind.
-	 *
-	 * The query endpoints answer with data the editor needs to preview a block,
-	 * so editing anything is enough - a user without the blanket `edit_posts` may
-	 * still edit a custom post type the block is used in.
-	 *
-	 * @return bool
-	 */
-	private function can_edit_content() {
-		if ( current_user_can( 'edit_posts' ) ) {
-			return true;
-		}
-
-		foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
-			if ( current_user_can( $post_type->cap->edit_posts ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Get filter items permission.
 	 *
 	 * @return mixed
 	 */
 	public function get_filter_items_permission() {
-		if ( $this->can_edit_content() ) {
+		if ( Visual_Portfolio_Security::current_user_can_edit_content() ) {
 			return true;
 		}
 
@@ -392,7 +369,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	 * @return mixed
 	 */
 	public function get_loop_items_permission() {
-		if ( $this->can_edit_content() ) {
+		if ( Visual_Portfolio_Security::current_user_can_edit_content() ) {
 			return true;
 		}
 
@@ -583,14 +560,8 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	 * @return mixed
 	 */
 	public function get_layouts_permission() {
-		if ( current_user_can( 'edit_posts' ) ) {
+		if ( Visual_Portfolio_Security::current_user_can_edit_content() ) {
 			return true;
-		}
-
-		foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
-			if ( current_user_can( $post_type->cap->edit_posts ) ) {
-				return true;
-			}
 		}
 
 		return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get list of saved layouts.', 'visual-portfolio' ), true );
@@ -642,7 +613,8 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			return $this->error( 'post_id_required', esc_html__( 'Post ID is required for this request.', 'visual-portfolio' ), true );
 		}
 
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		// The endpoint writes the meta of a Saved Layout, so it takes no other post.
+		if ( 'vp_lists' !== get_post_type( $post_id ) || ! current_user_can( 'edit_post', $post_id ) ) {
 			return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to edit saved layouts data.', 'visual-portfolio' ), true );
 		}
 
@@ -748,7 +720,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	 */
 	public function error( $code, $response, $true_error = false ) {
 		if ( $true_error ) {
-			return new WP_Error( $code, $response, array( 'status' => 401 ) );
+			return new WP_Error( $code, $response, array( 'status' => rest_authorization_required_code() ) );
 		}
 
 		return new WP_REST_Response(

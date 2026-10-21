@@ -32,7 +32,8 @@ class Visual_Portfolio_Preview {
 	 * Hooks.
 	 */
 	public function init_hooks() {
-		add_action( 'init', array( $this, 'is_preview_check' ) );
+		// After `init`, so the edit capabilities of post types a theme registers late are known.
+		add_action( 'wp_loaded', array( $this, 'is_preview_check' ) );
 		add_filter( 'pre_handle_404', array( $this, 'pre_handle_404' ) );
 		add_filter( 'vpf_get_options', array( $this, 'filter_preview_option' ) );
 		add_action( 'template_redirect', array( $this, 'template_redirect' ) );
@@ -150,7 +151,12 @@ class Visual_Portfolio_Preview {
 	 */
 	public function is_preview_check() {
 		$frame = false;
-		if ( isset( $_GET['vp_preview'] ) && isset( $_REQUEST['vp_preview_nonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['vp_preview_nonce'] ), 'vp-ajax-nonce' ) ) {
+		if (
+			isset( $_GET['vp_preview'] ) &&
+			isset( $_REQUEST['vp_preview_nonce'] ) &&
+			wp_verify_nonce( sanitize_key( $_REQUEST['vp_preview_nonce'] ), 'vp-ajax-nonce' ) &&
+			Visual_Portfolio_Security::current_user_can_edit_content()
+		) {
             // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 			$frame = isset( $_POST['vp_preview_frame'] ) ? Visual_Portfolio_Security::sanitize_boolean( $_POST['vp_preview_frame'] ) : false;
 			$id    = isset( $_POST['vp_preview_frame_id'] ) ? sanitize_text_field( wp_unslash( $_POST['vp_preview_frame_id'] ) ) : false;
@@ -300,6 +306,16 @@ class Visual_Portfolio_Preview {
 
 		// Disable the WP admin bar.
 		add_filter( 'show_admin_bar', '__return_false' );
+
+		// The gallery is built from posted attributes, so its queries reach only
+		// what the user may read, as in the REST preview endpoints.
+		add_filter( 'vpf_extend_query_args', array( 'Visual_Portfolio_Custom_Query_Guard', 'restrict_args' ), PHP_INT_MAX );
+		add_action(
+			'pre_get_posts',
+			static function ( $query ) {
+				$query->set( 'perm', 'readable' );
+			}
+		);
 
 		// Avoid Cloudflare's Rocket Loader lazy loading the editor iframe scripts.
 		//
