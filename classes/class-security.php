@@ -183,6 +183,53 @@ class Visual_Portfolio_Security {
 	}
 
 	/**
+	 * Whether the current user edits content of any kind.
+	 *
+	 * The editor endpoints answer with data the editor needs to build a block,
+	 * so editing anything is enough - a user without the blanket `edit_posts` may
+	 * still edit a custom post type the block is used in.
+	 *
+	 * @return bool
+	 */
+	public static function current_user_can_edit_content() {
+		if ( current_user_can( 'edit_posts' ) ) {
+			return true;
+		}
+
+		foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+			if ( current_user_can( $post_type->cap->edit_posts ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Make CSS safe to print inside a `<style>` element.
+	 *
+	 * `wp_kses()` treats CSS as HTML text and encodes `&` and `>`, which breaks
+	 * nesting and child selectors. CSS only needs to be kept from closing the
+	 * element it is printed in.
+	 *
+	 * @param string $css - CSS code.
+	 *
+	 * @return string
+	 */
+	public static function sanitize_css( $css ) {
+		// Drop HTML tags such as a <style> wrapper but keep their text, so CSS pasted with tags still applies.
+		$css = preg_replace( '#</?[a-zA-Z](?:[^<>"\']|"[^"]*"|\'[^\']*\')*>#', '', (string) $css );
+
+		// Nothing may close the <style> or <script> element the CSS is printed in.
+		do {
+			$prev = $css;
+			$css  = preg_replace( '#</(style|script)|<!--#i', '', $css );
+		} while ( $prev !== $css );
+
+		return $css;
+	}
+
+	/**
 	 * Sanitize Boolean.
 	 *
 	 * @param string|bool $attribute - Unclear Boolean Attribute.

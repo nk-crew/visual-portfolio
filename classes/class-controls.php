@@ -144,6 +144,12 @@ class Visual_Portfolio_Controls {
 	 */
 	public function ajax_dynamic_control_callback() {
 		check_ajax_referer( 'vp-ajax-nonce', 'nonce' );
+
+		// The callbacks list posts, terms and authors for the block controls.
+		if ( ! Visual_Portfolio_Security::current_user_can_edit_content() ) {
+			wp_die( -1, 403 );
+		}
+
 		if ( ! isset( $_POST['vp_control_name'] ) ) {
 			wp_die();
 		}

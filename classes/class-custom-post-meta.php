@@ -215,6 +215,10 @@ class Visual_Portfolio_Custom_Post_Meta {
 			return;
 		}
 
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
 		$meta = array(
 			'_vp_format_video_url',
 		);

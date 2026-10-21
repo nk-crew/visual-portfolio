@@ -378,7 +378,11 @@ class Visual_Portfolio_Get {
 	 */
 	public static function is_preview() {
 		$frame = false;
-		if ( isset( $_POST['vp_preview_nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['vp_preview_nonce'] ), 'vp-ajax-nonce' ) ) {
+		if (
+			isset( $_POST['vp_preview_nonce'] ) &&
+			wp_verify_nonce( sanitize_key( $_POST['vp_preview_nonce'] ), 'vp-ajax-nonce' ) &&
+			Visual_Portfolio_Security::current_user_can_edit_content()
+		) {
             // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 			$frame = isset( $_POST['vp_preview_frame'] ) ? Visual_Portfolio_Security::sanitize_boolean( $_POST['vp_preview_frame'] ) : false;
 			$id    = isset( $_POST['vp_preview_frame_id'] ) ? sanitize_text_field( wp_unslash( $_POST['vp_preview_frame_id'] ) ) : false;
