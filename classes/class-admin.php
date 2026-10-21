@@ -3802,23 +3802,20 @@ selector p {
 			$post_type = 'any';
 		}
 
+		$query_args = array(
+			'posts_per_page' => 50,
+			'post_type'      => $post_type,
+			'perm'           => 'readable',
+		);
+
 		if ( isset( $_POST['q'] ) ) {
-			$the_query = new WP_Query(
-				array(
-					's'              => sanitize_text_field( wp_unslash( $_POST['q'] ) ),
-					'posts_per_page' => 50,
-					'post_type'      => $post_type,
-				)
-			);
+			$query_args['s'] = sanitize_text_field( wp_unslash( $_POST['q'] ) );
 		} else {
-			$the_query = new WP_Query(
-				array(
-					'post__in'       => $selected_ids,
-					'posts_per_page' => 50,
-					'post_type'      => $post_type,
-				)
-			);
+			$query_args['post__in'] = $selected_ids;
 		}
+
+		// An admin request lists drafts and other unpublished statuses by default.
+		$the_query = new WP_Query( Visual_Portfolio_Custom_Query_Guard::restrict_args( $query_args ) );
 
 		if ( $the_query->have_posts() ) {
 			$result['options'] = array();
@@ -3915,6 +3912,12 @@ selector p {
 	 */
 	public function ajax_find_oembed() {
 		check_ajax_referer( 'vp-ajax-nonce', 'nonce' );
+
+		// The lookup sends a request from the site, for the video post format field.
+		if ( ! Visual_Portfolio_Security::current_user_can_edit_content() ) {
+			wp_die( -1, 403 );
+		}
+
 		if ( ! isset( $_POST['q'] ) ) {
 			wp_die();
 		}

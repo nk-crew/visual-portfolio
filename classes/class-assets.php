@@ -444,8 +444,7 @@ class Visual_Portfolio_Assets {
 		$controls_css_handle = 'vp-dynamic-styles-' . $options['id'];
 
 		if ( ! wp_style_is( $controls_css_handle, 'enqueued' ) ) {
-			$dynamic_styles = wp_kses( $dynamic_styles, array( '\'', '\"' ) );
-			$dynamic_styles = str_replace( '&gt;', '>', $dynamic_styles );
+			$dynamic_styles = Visual_Portfolio_Security::sanitize_css( $dynamic_styles );
 
 			$dynamic_styles_inline_style = apply_filters( 'vpf_enqueue_dynamic_styles_inline_style', ! self::$head_css_included, $dynamic_styles, $controls_css_handle );
 
@@ -836,7 +835,6 @@ class Visual_Portfolio_Assets {
 		if ( file_exists( $styles_path ) ) {
             // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 			$styles = file_get_contents( $styles_path );
-			$styles = str_replace( '&gt;', '>', $styles );
 		}
 
 		if ( ! $styles ) {
@@ -846,7 +844,7 @@ class Visual_Portfolio_Assets {
 		?>
 		<noscript>
 			<style type="text/css">
-				<?php echo wp_kses( $styles, array( '\'', '\"' ) ); ?>
+				<?php echo Visual_Portfolio_Security::sanitize_css( $styles ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</style>
 		</noscript>
 		<?php

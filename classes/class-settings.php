@@ -912,7 +912,7 @@ class Visual_Portfolio_Settings {
 	 * @return void
 	 */
 	public static function get_posts_ajax_callback() {
-		if ( isset( $_REQUEST['nonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['nonce'] ), 'vp-ajax-nonce' ) ) {
+		if ( isset( $_REQUEST['nonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['nonce'] ), 'vp-ajax-nonce' ) && current_user_can( 'manage_options' ) ) {
 			$return     = array();
 			$query_opts = array(
 				'post_status'            => 'publish',
@@ -940,7 +940,7 @@ class Visual_Portfolio_Settings {
 			echo wp_json_encode( $return );
 		}
 
-		die;
+		wp_die();
 	}
 }
 

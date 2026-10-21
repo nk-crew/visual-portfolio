@@ -732,7 +732,8 @@ class Visual_Portfolio_Archive_Mapping {
 		// We need to save the options ourselves; settings api does not trigger save for the permalinks page.
 		if (
 			isset( $_POST['permalink_structure'], $_POST['vp-permalinks-nonce'], $_POST['vp_category_slug'], $_POST['vp_tag_slug'] ) &&
-			wp_verify_nonce( sanitize_key( $_POST['vp-permalinks-nonce'] ), 'vp-permalinks' )
+			wp_verify_nonce( sanitize_key( $_POST['vp-permalinks-nonce'] ), 'vp-permalinks' ) &&
+			current_user_can( 'manage_options' )
 		) {
 			$permalinks                  = (array) get_option( 'portfolio_permalinks', array() );
 			$permalinks['category_base'] = sanitize_text_field( wp_unslash( $_POST['vp_category_slug'] ) );

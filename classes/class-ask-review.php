@@ -33,6 +33,11 @@ class Visual_Portfolio_Ask_Review_Notice {
 	 * Check if we can display notice.
 	 */
 	public function is_notice_allowed() {
+		// Only a user who may dismiss the notice for the site sees it.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return false;
+		}
+
 		$state = get_site_option( $this->option_name . '_state' );
 		$time  = (int) get_site_option( $this->option_name . '_time' );
 
@@ -119,6 +124,10 @@ class Visual_Portfolio_Ask_Review_Notice {
 	 */
 	public function ajax_vpf_dismiss_ask_review_notice() {
 		check_ajax_referer( $this->option_name, 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( -1, 403 );
+		}
 
 		$type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : 'yes';
 
