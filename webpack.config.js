@@ -18,7 +18,6 @@ const isQuietBuild = process.env.VP_QUIET === '1';
 // responses. Minified bundles can exceed that as a single line and break
 // the block editor script on those servers.
 const MAX_MINIFIED_LINE_LENGTH = 500000;
-const GUTENBERG_INDEX_ENTRY = 'gutenberg/index';
 
 const JS_ENTRY_PATTERNS = [
 	'./assets/js/**/*.js',
@@ -449,10 +448,6 @@ function shouldIgnoreQuietWarning(warning) {
 	);
 }
 
-function isGutenbergIndexChunk(chunk) {
-	return chunk.name === GUTENBERG_INDEX_ENTRY;
-}
-
 function createProductionMinimizers() {
 	return [
 		new TerserPlugin({
@@ -680,13 +675,9 @@ const newConfig = {
 			...splitChunks,
 			cacheGroups: {
 				...cacheGroups,
-				gutenbergEditorVendor: {
-					test: /[\\/]node_modules[\\/](ace-builds|react-ace|gutenberg-react-select-styles)[\\/]/,
-					name: 'gutenberg/editor-vendor',
-					chunks: isGutenbergIndexChunk,
-					enforce: true,
-					priority: 20,
-				},
+				// Keeps Ace inside the lazily loaded `gutenberg/code-editor` chunk
+				// instead of an id-named vendor chunk outside `build/gutenberg/`.
+				defaultVendors: false,
 				style: {
 					type: 'css/mini-extract',
 					test(module) {

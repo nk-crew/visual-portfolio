@@ -64,14 +64,13 @@ jobs:
           timeout 6m npx playwright install-deps chromium webkit \
             || echo "::warning::System packages did not install; running on what the runner image carries"
 
-      # The Gallery Loop family registers on WordPress 7.1 and above, so the
-      # end-to-end suite has to meet a build that carries it. `.wp-env.json`
-      # pins the branch for local work; naming it here as well keeps the two
-      # from drifting apart silently, and is the line to change once 7.1 is
-      # released and `WordPress/WordPress` carries the family on its own.
+      # The Gallery Loop family registers on WordPress 7.1 and above. Trunk
+      # carries it and the next release, so the suite meets what ships next.
+      # `.wp-env.json` names the same core for local work; naming it here as
+      # well keeps the two from drifting apart silently.
       - name: Install WordPress and start the server
         env:
-          WP_ENV_CORE: WordPress/WordPress#7.1-branch
+          WP_ENV_CORE: WordPress/WordPress
         run: |
           npm run wp-env start
 
