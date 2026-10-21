@@ -1,5 +1,5 @@
 {
-	"core": "WordPress/WordPress",
+	"core": null,
 	"themes": ["./tests/themes/empty-theme"],
 	"mappings": {
 		"wp-content/plugins/visual-portfolio": ".",

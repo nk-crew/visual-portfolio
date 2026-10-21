@@ -13,6 +13,7 @@ import { getPluginSlug } from '../utils/plugin-slug';
 const POSTS_SOURCE_BUTTON =
 	'button.components-button.vpf-component-icon-selector-item:has-text("Posts")';
 const CODE_EDITOR_CHUNK = /\/build\/gutenberg\/code-editor\.js/;
+const CSS_WORKER = /\/worker-css[^/]*\.js(\?|$)/;
 
 test.describe('Code editor control assets', () => {
 	test.beforeAll(async ({ requestUtils }) => {
@@ -69,9 +70,28 @@ test.describe('Code editor control assets', () => {
 			}
 		});
 
+		// The worker loads its script from inside a Web Worker, so listen on
+		// the browser context, which also reports worker traffic.
+		const workerResponses = [];
+		page.context().on('response', (response) => {
+			if (CSS_WORKER.test(response.url())) {
+				workerResponses.push({
+					url: response.url(),
+					status: response.status(),
+				});
+			}
+		});
+
 		await setupSavedLayout(admin, page, editor, 'Lazy Code Editor');
 
 		expect(chunkRequests).toEqual([]);
+
+		const consoleErrors = [];
+		page.on('console', (message) => {
+			if (message.type() === 'error') {
+				consoleErrors.push(message.text());
+			}
+		});
 
 		await page.getByRole('button', { name: 'Custom CSS' }).click();
 
@@ -79,5 +99,16 @@ test.describe('Code editor control assets', () => {
 		await expect(aceEditor).toBeVisible();
 		await expect(aceEditor).toContainText('selector');
 		expect(chunkRequests).toHaveLength(1);
+
+		// The first editor on the page must start the CSS worker from the
+		// built file, not from the relative fallback URL that does not exist.
+		await expect.poll(() => workerResponses.length).toBeGreaterThan(0);
+		expect(workerResponses).toEqual([
+			{
+				url: expect.stringContaining('/build/gutenberg/worker-css.'),
+				status: 200,
+			},
+		]);
+		expect(consoleErrors).toEqual([]);
 	});
 });

@@ -24,8 +24,8 @@ function UpdateEditor() {
 
 		const { getSelectedBlock, getBlocks } = select('core/block-editor');
 
-		// The editor mode moved to `core/editor` in WP 6.5 and is deprecated
-		// in `core/edit-post` since 6.6; older cores only have the latter.
+		// The editor mode moved to `core/editor` in WP 6.6, which also
+		// deprecated it in `core/edit-post`; older cores only have the latter.
 		const getEditorMode =
 			select('core/editor').getEditorMode ||
 			select('core/edit-post').getEditorMode;

@@ -17,21 +17,12 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 
 import { Component } from '@wordpress/element';
 
-let aceWorkersConfigured = false;
-
-function ensureAceWorkersConfigured() {
-	if (aceWorkersConfigured) {
-		return;
-	}
-
-	// Ace worker paths must be registered explicitly in our webpack build,
-	// otherwise the editor falls back to a relative `worker-*.js` URL that
-	// does not exist.
-	ace.config.setModuleUrl('ace/mode/css_worker', cssWorkerUrl);
-	ace.config.setModuleUrl('ace/mode/javascript_worker', javascriptWorkerUrl);
-
-	aceWorkersConfigured = true;
-}
+// Ace worker paths must be registered explicitly in our webpack build,
+// otherwise the editor falls back to a relative `worker-*.js` URL that
+// does not exist. This runs at module scope because react-ace sets the
+// mode in its own componentDidMount, before any parent mount hook runs.
+ace.config.setModuleUrl('ace/mode/css_worker', cssWorkerUrl);
+ace.config.setModuleUrl('ace/mode/javascript_worker', javascriptWorkerUrl);
 
 /**
  * Component Class
@@ -48,7 +39,6 @@ export default class CodeEditor extends Component {
 	}
 
 	componentDidMount() {
-		ensureAceWorkersConfigured();
 		this.maybeRemovePlaceholder();
 	}
 
