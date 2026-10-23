@@ -16,11 +16,18 @@ All notable changes to this project will be documented in this file.
 * added the Fade carousel effect, and carousel effects in Firefox and Safari versions without scroll-driven animations
 * improved block editor loading: the Custom CSS code editor loads only when it is opened, so the editor starts with about half the JavaScript
 * changed the experimental Gallery Loop blocks to print nothing below WordPress 7.1
+* changed the image picking buttons and the chosen image card to the WordPress 7.2 featured image style
+* changed Pro notes in the block inspector to a lighter list of each Pro feature with one Go Pro link, also in the experimental Gallery Loop
+* changed Pro-only settings tabs to preview their fields
 * fixed galleries showing no images on WordPress 7.2
 * fixed the Posts source Settings panel showing no settings on WordPress 7.2
+* fixed the Media Settings panel showing empty thumbnails for galleries saved with image IDs only
+* removed the grey inner border on Media Settings panel thumbnails
+* fixed the focal point control overlapping the image
 * fixed security issues where logged-in users without the needed role could search draft and private post titles, open the gallery preview, or run admin-only plugin requests
 * fixed a security issue where custom CSS could close the element it is printed in
 * fixed custom CSS losing `&` nesting, `>` selectors and rules wrapped in `<style>` tags
+* fixed custom CSS rules written after a closing style tag being dropped
 * fixed a custom query in a Gallery Loop saved by a contributor showing other authors' drafts
 * fixed right-to-left sites getting the left-to-right styles
 * fixed carousels and carousel effects on right-to-left sites
@@ -35,11 +42,13 @@ All notable changes to this project will be documented in this file.
 * added a feed source picked in each social gallery, so one connection serves several galleries, and mixed social feeds in the Gallery Loop
 * changed "Sync All Accounts" to "Sync Now", which syncs the feeds galleries show
 * added a link on the Updates page to where the license key is
+* changed the image pickers for the custom thumbnail, hover media, popup image, video cover and album images to the WordPress 7.2 style
 * fixed security issues where users without the needed role could activate the license, change watermark settings, list Facebook pages, search users by email, read album images of non-public content, rewrite an approved proofing selection, or use proofing on a password-protected gallery without its password
 * fixed every page of a social or taxonomy Gallery Loop showing the first page
 * fixed a deep link to a lightbox slide added by Load More opening nothing
 * fixed a local video without a cover image rendering as an empty item with a PHP warning
 * fixed browsers keeping old Pro stylesheets after an update
+* fixed album tiles showing no images on WordPress 7.2
 
 = 3.8.2 - Sep 10, 2026 =
 

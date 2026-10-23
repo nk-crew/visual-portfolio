@@ -314,12 +314,6 @@
          "Use this setting to skip over posts (e.g. `2` to skip over 2 posts)": [
             ""
          ],
-         "Premium Only": [
-            ""
-         ],
-         "Additional query settings, such as:": [
-            ""
-         ],
          "Filter by specific author": [
             ""
          ],
@@ -330,9 +324,6 @@
             ""
          ],
          "Exclude sticky posts": [
-            ""
-         ],
-         "etc...": [
             ""
          ],
          "Alt": [
@@ -386,9 +377,6 @@
          "Advanced": [
             ""
          ],
-         "Unlock advanced image and video options such as:": [
-            ""
-         ],
          "Image albums": [
             ""
          ],
@@ -440,10 +428,28 @@
          "Image Uploaded": [
             ""
          ],
-         "Protect your works using watermarks, password, and age gate": [
+         "Watermarks": [
+            ""
+         ],
+         "Protect your works using watermarks": [
+            ""
+         ],
+         "Password Protection": [
+            ""
+         ],
+         "Ask for a password before the gallery is shown.": [
+            ""
+         ],
+         "Age Gate Protection": [
+            ""
+         ],
+         "Ask for a date of birth before the gallery is shown.": [
             ""
          ],
          "Display taxonomy archives such as categories, tags, and custom taxonomies.": [
+            ""
+         ],
+         "Social Feeds": [
             ""
          ],
          "Display social feeds such as Instagram, Youtube, Flickr, X, etc...": [
@@ -495,6 +501,12 @@
             ""
          ],
          "Border Radius": [
+            ""
+         ],
+         "Filter": [
+            ""
+         ],
+         "Transform": [
             ""
          ],
          "Display": [
@@ -593,6 +605,24 @@
          "Links Hover": [
             ""
          ],
+         "Blend Mode": [
+            ""
+         ],
+         "Select blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more": [
+            ""
+         ],
+         "Manage fonts, sizing, and appearance of distinct text components within the Skin": [
+            ""
+         ],
+         "Padding": [
+            ""
+         ],
+         "Margin": [
+            ""
+         ],
+         "Items Gap": [
+            ""
+         ],
          "Disabled": [
             ""
          ],
@@ -645,9 +675,6 @@
             ""
          ],
          "End": [
-            ""
-         ],
-         "Filter": [
             ""
          ],
          "Sort": [
@@ -725,7 +752,22 @@
          "Hide on Reached End": [
             ""
          ],
-         "Adjust the loading threshold, limit the number of automatic loads and run the infinite scroll only after the Load button click.": [
+         "Load More on startup": [
+            ""
+         ],
+         "Load the next page as soon as the gallery is shown.": [
+            ""
+         ],
+         "Pause every": [
+            ""
+         ],
+         "Stop after a few pages and wait for a click.": [
+            ""
+         ],
+         "Threshold Distance": [
+            ""
+         ],
+         "How far from the end of the gallery the next page starts to load.": [
             ""
          ],
          "Use <code>selector</code> rule to change block styles.": [
@@ -980,6 +1022,9 @@
          "Proofing": [
             ""
          ],
+         "Premium Only": [
+            ""
+         ],
          "Send a collection of photographs to your client for approval.": [
             ""
          ],
@@ -1121,13 +1166,70 @@
          "Popup & Lightbox": [
             ""
          ],
-         "Watermarks": [
-            ""
-         ],
-         "Social Feeds": [
-            ""
-         ],
          "White Label": [
+            ""
+         ],
+         "Instagram": [
+            ""
+         ],
+         "YouTube": [
+            ""
+         ],
+         "Flickr": [
+            ""
+         ],
+         "+ Connect": [
+            ""
+         ],
+         "Watermark": [
+            ""
+         ],
+         "Add Watermark": [
+            ""
+         ],
+         "Size": [
+            ""
+         ],
+         "Watermark will be scaled to the chosen percentage of the original image size": [
+            ""
+         ],
+         "Opacity": [
+            ""
+         ],
+         "Autogenerate": [
+            ""
+         ],
+         "Automatically apply watermark during image upload": [
+            ""
+         ],
+         "Social feeds such as Instagram, Youtube, Flickr, X, etc...": [
+            ""
+         ],
+         "Remove our plugin brand and logos from Front and Admin areas": [
+            ""
+         ],
+         "Enable White Label": [
+            ""
+         ],
+         "Change the plugin name and logos to your brand.": [
+            ""
+         ],
+         "Brand Name": [
+            ""
+         ],
+         "Logo Dark": [
+            ""
+         ],
+         "Use circle image 100x100 in PNG format.": [
+            ""
+         ],
+         "Logo White": [
+            ""
+         ],
+         "%s comes with Visual Portfolio Pro.": [
+            ""
+         ],
+         "(opens in a new tab)": [
             ""
          ],
          "Register Portfolio Post Type": [
@@ -1368,15 +1470,6 @@
             ""
          ],
          "Background Color": [
-            ""
-         ],
-         "Protect your works using watermarks": [
-            ""
-         ],
-         "Social feeds such as Instagram, Youtube, Flickr, X, etc...": [
-            ""
-         ],
-         "Remove our plugin brand and logos from Front and Admin areas": [
             ""
          ],
          "-- Select Page --": [
@@ -1806,9 +1899,6 @@
          "Max number of words": [
             ""
          ],
-         "Watermark": [
-            ""
-         ],
          "Serve the watermarked copy of the picture instead of the original one.": [
             ""
          ],
@@ -1918,6 +2008,9 @@
             ""
          ],
          "Give a tablet and a phone a column count of their own, set for the screen you are previewing.": [
+            ""
+         ],
+         "Custom pattern": [
             ""
          ],
          "Draw a pattern of your own: resize, move and double the tiles on a canvas.": [
@@ -2083,9 +2176,6 @@
          "Panorama out": [
             ""
          ],
-         "Custom pattern": [
-            ""
-         ],
          "%1$s, %2$s": [
             ""
          ],
@@ -2214,24 +2304,6 @@
          "Previous page link": [
             ""
          ],
-         "Load More on startup": [
-            ""
-         ],
-         "Load the next page as soon as the gallery is shown.": [
-            ""
-         ],
-         "Pause every": [
-            ""
-         ],
-         "Stop after a few pages and wait for a click.": [
-            ""
-         ],
-         "Threshold Distance": [
-            ""
-         ],
-         "How far from the end of the gallery the next page starts to load.": [
-            ""
-         ],
          "Loading text": [
             ""
          ],
@@ -2308,18 +2380,6 @@
             ""
          ],
          "Labels": [
-            ""
-         ],
-         "Password Protection": [
-            ""
-         ],
-         "Ask for a password before the gallery is shown.": [
-            ""
-         ],
-         "Age Gate Protection": [
-            ""
-         ],
-         "Ask for a date of birth before the gallery is shown.": [
             ""
          ],
          "Right-click Protection": [
@@ -2536,6 +2596,13 @@
             ""
          ],
          "Less": [
+            ""
+         ],
+         "Pro": [
+            ""
+         ],
+         "This comes with Visual Portfolio Pro.": [
+            "",
             ""
          ],
          "%s (Pro)": [
@@ -2810,9 +2877,6 @@
             ""
          ],
          "Display social feeds such as Instagram, YouTube, Flickr, X, etc…": [
-            ""
-         ],
-         "Pro": [
             ""
          ],
          "Pause": [
