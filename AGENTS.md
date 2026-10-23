@@ -32,6 +32,11 @@ it here would be easier. This plugin gets only code free users run too, the exte
 Pro hooks into, and the editor teaser or setting slot. Anything more, a new filter or event
 included, is the user's call: ask before building it.
 
+## Tests
+
+- Visual Portfolio Pro's CI runs these E2E specs with Pro active (`CORE=true`, this repo as its `core-plugin` submodule). A test that asserts what free shows without Pro must skip itself, inside the test, when `process.env.CORE` is set or `VPGutenbergVariables.pro` is true. `npm run lint` fails on a test that checks a Pro note (`Go Pro`, `utm_campaign`, a `vpf-*pro-*` class) without that skip; the rule is `tests/e2e/pro-skip.grit`.
+- A locator must still find the same element when Pro adds settings, panels or options.
+
 ## Commands
 
 | Task | Command |

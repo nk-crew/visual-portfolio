@@ -779,6 +779,96 @@ $escaped-svg-characters: (
 		.vp-toggle-field-slider-round {
 			opacity: 1;
 		}
+
+		// Pro's html fields have no label.
+		&.vpf-setting-type-html > th {
+			display: none;
+		}
+	}
+
+	// The preview repeats the layout of Pro's tabs (Pro's
+	// modules/watermarks/settings and modules/socials/settings styles).
+	.vpf-settings-pro-preview.watermark_info,
+	.vpf-settings-pro-preview.watermark {
+		max-width: calc(50% - 15px);
+
+		@media only screen and (max-width: 1200px) {
+			max-width: none;
+		}
+	}
+
+	.vpf-settings-pro-preview.watermark_info p:first-child {
+		margin-top: 0;
+	}
+
+	.vpf-settings-pro-preview-networks {
+		position: relative;
+		display: flex;
+		flex-wrap: wrap;
+		margin: -15px -13px 40px;
+
+		&::after {
+			position: absolute;
+			right: -7px;
+			bottom: -20px;
+			left: -7px;
+			content: "";
+			border-bottom: 1px solid #d7dbde;
+		}
+
+		button {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			min-width: 90px;
+			padding: 15px 10px;
+			margin-top: 15px;
+			margin-left: 15px;
+			color: #000;
+			background-color: #f7f7f7;
+			border: none;
+			border-radius: 5px;
+		}
+
+		.vpf-settings-pro-preview-network-active {
+			background-color: #fff;
+			box-shadow: 0 0 0 2px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+		}
+
+		span {
+			padding-top: 8px;
+			margin: auto -8px 0;
+			font-size: 0.73em;
+			font-weight: 600;
+			text-transform: uppercase;
+			word-break: break-word;
+		}
+	}
+
+	.vpf-settings-pro-preview-network {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		margin: 20px 0;
+
+		h3 {
+			margin: 0;
+		}
+
+		.button {
+			margin-top: 2px;
+			margin-left: 15px;
+			font-weight: 600;
+			border-radius: 20px;
+		}
+	}
+
+	.vpf-settings-pro-preview .postbox {
+		margin-bottom: 0;
+
+		> .inside {
+			padding: 1px 18px 0;
+		}
 	}
 
 	/**

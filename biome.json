@@ -1,5 +1,6 @@
 {
 	"extends": ["@nk-crew/plugin-toolkit/biome"],
+	"plugins": ["./tests/e2e/pro-skip.grit"],
 	"linter": {
 		"rules": {
 			"a11y": {

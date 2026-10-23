@@ -89,17 +89,50 @@ test.describe('Pro notes without Pro', () => {
 			/utm_campaign=white_label/
 		);
 
-		// Pro's fields, by the names Pro gives them, and none of them takes
-		// a value here.
+		// Pro's tab as Pro first shows it: the toggle, by the name Pro gives
+		// it, and it takes no value here.
 		await expect(tab.locator('.vpf-settings-pro-preview th')).toHaveText([
 			'Enable White Label',
-			'Brand Name',
-			'Logo Dark',
-			'Logo White',
 		]);
 		await expect(
-			tab.locator('input[name="vp_white_label[brand_name]"]')
+			tab.locator('input[type="checkbox"][name="vp_white_label[enable]"]')
 		).toBeDisabled();
 		await expect(tab.locator('.metabox-holder-footer')).toBeHidden();
+	});
+
+	test('the Social Feeds tab lists the Pro networks with no account connected', async ({
+		admin,
+		page,
+	}) => {
+		// Pro's own suite runs this spec with Pro active, and Pro draws its real settings.
+		test.skip(!!process.env.CORE, 'Pro draws the real settings.');
+
+		await admin.visitAdminPage(
+			'edit.php',
+			'post_type=portfolio&page=visual-portfolio-settings'
+		);
+
+		await page.locator('.nav-tab', { hasText: 'Social Feeds' }).click();
+
+		const preview = page.locator(
+			'#vp_social_integrations .vpf-settings-pro-preview'
+		);
+
+		await expect(preview.locator('button span')).toHaveText([
+			'Instagram',
+			'YouTube',
+			'Vimeo',
+			'Unsplash',
+			'X',
+			'Flickr',
+			'Dribbble',
+			'Twitch',
+			'VK',
+			'RSS',
+		]);
+		await expect(preview.locator('h3')).toHaveText('Instagram');
+		await expect(preview).toContainText('No accounts connected yet.');
+		// Pro's buttons are only drawn here.
+		await expect(preview).toHaveAttribute('inert', '');
 	});
 });
