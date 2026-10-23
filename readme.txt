@@ -101,7 +101,7 @@ Supported Video Vendors:
 
 * Youtube
 * Vimeo
-* IGTV (Instagram)
+* Instagram (Reels, video posts and IGTV links)
 * TikTok
 * Twitch
 * Facebook Video
