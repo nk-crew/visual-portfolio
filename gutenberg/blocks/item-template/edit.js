@@ -72,11 +72,7 @@ import { TilesPresetsSelect, TilesPresetsToolbarButton } from './tiles-presets';
 import useEditorLayout from './use-editor-layout';
 import variations from './variations';
 
-const {
-	plugin_version: pluginVersion,
-	pro: isProPlugin,
-	site_rtl: isSiteRtl,
-} = window.VPGutenbergVariables;
+const { pro: isProPlugin, site_rtl: isSiteRtl } = window.VPGutenbergVariables;
 
 const ITEM_CLASS_NAME = 'wp-block-visual-portfolio-item-template__item';
 
@@ -480,30 +476,6 @@ const SCREENS = {
 	Tablet: 'tablet',
 	Mobile: 'mobile',
 };
-
-/**
- * A note where a Pro setting would be, for an install without Pro.
- *
- * @param {Object} props          - component props.
- * @param {string} props.children - what Pro adds here.
- * @param {string} props.campaign - the UTM campaign of the link.
- *
- * @return {Element} component.
- */
-function ProUpsell({ children, campaign }) {
-	return (
-		<ProNote title={__('Premium Only', 'visual-portfolio')}>
-			<p>{children}</p>
-			<ProNote.Button
-				target="_blank"
-				rel="noopener noreferrer"
-				href={`https://www.visualportfolio.com/pricing/?utm_source=plugin&utm_medium=block_settings&utm_campaign=${campaign}&utm_content=${pluginVersion}`}
-			>
-				{__('Go Pro', 'visual-portfolio')}
-			</ProNote.Button>
-		</ProNote>
-	);
-}
 
 // A slide height is typed in the same units, and in `vh` besides: a share of
 // the screen is what the legacy slider offered as a percentage height.
@@ -1102,17 +1074,29 @@ export default function BlockEdit({
 							: countLabel
 					}
 				>
-					<ProUpsell campaign="loop_responsive_layout">
-						{'tiles' === layoutType
-							? __(
-									'Give a tablet and a phone a tiles pattern of their own, set for the screen you are previewing.',
-									'visual-portfolio'
-								)
-							: __(
-									'Give a tablet and a phone a column count of their own, set for the screen you are previewing.',
-									'visual-portfolio'
-								)}
-					</ProUpsell>
+					<ProNote
+						campaign="loop_responsive_layout"
+						features={[
+							'tiles' === layoutType
+								? {
+										label: __(
+											'Pattern',
+											'visual-portfolio'
+										),
+										description: __(
+											'Give a tablet and a phone a tiles pattern of their own, set for the screen you are previewing.',
+											'visual-portfolio'
+										),
+									}
+								: {
+										label: countLabel,
+										description: __(
+											'Give a tablet and a phone a column count of their own, set for the screen you are previewing.',
+											'visual-portfolio'
+										),
+									},
+						]}
+					/>
 				</ToolsPanelItem>
 			</InspectorControls>
 		);
@@ -1157,12 +1141,21 @@ export default function BlockEdit({
 								setAttributes({ layoutTiles: value }),
 						}) ??
 							(!isProPlugin && (
-								<ProUpsell campaign="loop_tiles_editor">
-									{__(
-										'Draw a pattern of your own: resize, move and double the tiles on a canvas.',
-										'visual-portfolio'
-									)}
-								</ProUpsell>
+								<ProNote
+									campaign="loop_tiles_editor"
+									features={[
+										{
+											label: __(
+												'Custom pattern',
+												'visual-portfolio'
+											),
+											description: __(
+												'Draw a pattern of your own: resize, move and double the tiles on a canvas.',
+												'visual-portfolio'
+											),
+										},
+									]}
+								/>
 							))}
 					</VStack>
 				</ToolsPanelItem>

@@ -1646,15 +1646,12 @@ class Visual_Portfolio_Admin {
 				'category'    => 'content-source-post-based',
 				'type'        => 'pro_note',
 				'name'        => 'additional_query_settings_pro',
-				'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description' => esc_html__( 'Additional query settings, such as:', 'visual-portfolio' ) . '
-                                <ul>
-                                    <li>' . esc_html__( 'Filter by specific author', 'visual-portfolio' ) . '</li>
-                                    <li>' . esc_html__( 'Filter by publish date range', 'visual-portfolio' ) . '</li>
-                                    <li>' . esc_html__( 'Exclude posts without thumbnail', 'visual-portfolio' ) . '</li>
-                                    <li>' . esc_html__( 'Exclude sticky posts', 'visual-portfolio' ) . '</li>
-                                    <li>' . esc_html__( 'etc...', 'visual-portfolio' ) . '</li>
-                                </ul>',
+				'features'    => array(
+					array( 'label' => esc_html__( 'Filter by specific author', 'visual-portfolio' ) ),
+					array( 'label' => esc_html__( 'Filter by publish date range', 'visual-portfolio' ) ),
+					array( 'label' => esc_html__( 'Exclude posts without thumbnail', 'visual-portfolio' ) ),
+					array( 'label' => esc_html__( 'Exclude sticky posts', 'visual-portfolio' ) ),
+				),
 			)
 		);
 
@@ -1757,16 +1754,14 @@ class Visual_Portfolio_Admin {
 					),
 					'image_settings_pro_note' => array(
 						'type'        => 'pro_note',
-						'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-						'description' => '<p>' . esc_html__( 'Unlock advanced image and video options such as:', 'visual-portfolio' ) . '</p>
-										<ul>
-											<li>' . esc_html__( 'Image albums', 'visual-portfolio' ) . '</li>
-											<li>' . esc_html__( 'Audio formats', 'visual-portfolio' ) . '</li>
-											<li>' . esc_html__( 'Video thumbnails', 'visual-portfolio' ) . '</li>
-											<li>' . esc_html__( 'Thumbnails for hover state.', 'visual-portfolio' ) . '</li>
-											<li>' . esc_html__( 'Custom popup image', 'visual-portfolio' ) . '</li>
-											<li>' . esc_html__( 'Picture ID for deep linking', 'visual-portfolio' ) . '</li>
-										</ul>',
+						'features'    => array(
+							array( 'label' => esc_html__( 'Image albums', 'visual-portfolio' ) ),
+							array( 'label' => esc_html__( 'Audio formats', 'visual-portfolio' ) ),
+							array( 'label' => esc_html__( 'Video thumbnails', 'visual-portfolio' ) ),
+							array( 'label' => esc_html__( 'Thumbnails for hover state.', 'visual-portfolio' ) ),
+							array( 'label' => esc_html__( 'Custom popup image', 'visual-portfolio' ) ),
+							array( 'label' => esc_html__( 'Picture ID for deep linking', 'visual-portfolio' ) ),
+						),
 						'modal_width' => 'full',
 					),
 				),
@@ -1863,8 +1858,20 @@ class Visual_Portfolio_Admin {
 				'category'    => 'content-protection',
 				'type'        => 'pro_note',
 				'name'        => 'protection_pro_note',
-				'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description' => '<p>' . esc_html__( 'Protect your works using watermarks, password, and age gate', 'visual-portfolio' ) . '</p>',
+				'features'    => array(
+					array(
+						'label'       => esc_html__( 'Watermarks', 'visual-portfolio' ),
+						'description' => esc_html__( 'Protect your works using watermarks', 'visual-portfolio' ),
+					),
+					array(
+						'label'       => esc_html__( 'Password Protection', 'visual-portfolio' ),
+						'description' => esc_html__( 'Ask for a password before the gallery is shown.', 'visual-portfolio' ),
+					),
+					array(
+						'label'       => esc_html__( 'Age Gate Protection', 'visual-portfolio' ),
+						'description' => esc_html__( 'Ask for a date of birth before the gallery is shown.', 'visual-portfolio' ),
+					),
+				),
 				'condition'   => array(
 					array(
 						'control'  => 'content_source',
@@ -1883,8 +1890,12 @@ class Visual_Portfolio_Admin {
 				'category'     => 'content-source-taxonomies',
 				'type'         => 'pro_note',
 				'name'         => 'taxonomies_pro_note',
-				'label'        => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description'  => '<p>' . esc_html__( 'Display taxonomy archives such as categories, tags, and custom taxonomies.', 'visual-portfolio' ) . '</p>',
+				'features'     => array(
+					array(
+						'label'       => esc_html__( 'Taxonomies', 'visual-portfolio' ),
+						'description' => esc_html__( 'Display taxonomy archives such as categories, tags, and custom taxonomies.', 'visual-portfolio' ),
+					),
+				),
 				'setup_wizard' => true,
 			)
 		);
@@ -1897,8 +1908,12 @@ class Visual_Portfolio_Admin {
 				'category'     => 'content-source-social-stream',
 				'type'         => 'pro_note',
 				'name'         => 'social_pro_note',
-				'label'        => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description'  => '<p>' . esc_html__( 'Display social feeds such as Instagram, Youtube, Flickr, X, etc...', 'visual-portfolio' ) . '</p>',
+				'features'     => array(
+					array(
+						'label'       => esc_html__( 'Social Feeds', 'visual-portfolio' ),
+						'description' => esc_html__( 'Display social feeds such as Instagram, Youtube, Flickr, X, etc...', 'visual-portfolio' ),
+					),
+				),
 				'setup_wizard' => true,
 			)
 		);
@@ -2313,15 +2328,20 @@ class Visual_Portfolio_Admin {
 									'type'        => 'pro_note',
 									'category'    => 'items-style-image-normal',
 									'name'        => 'additional_image_skin_settings_pro',
-									'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-									'description' => 'Apply Instagram-like filters, change image transform',
+									'features'    => array(
+										array( 'label' => esc_html__( 'Filter', 'visual-portfolio' ) ),
+										array( 'label' => esc_html__( 'Transform', 'visual-portfolio' ) ),
+									),
 								);
 								$new_fields[] = array(
 									'type'        => 'pro_note',
 									'category'    => 'items-style-image-hover',
 									'name'        => 'additional_image_hover_skin_settings_pro',
-									'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-									'description' => 'Apply Instagram-like filters, change image transform and border radius for both default and hover states',
+									'features'    => array(
+										array( 'label' => esc_html__( 'Filter', 'visual-portfolio' ) ),
+										array( 'label' => esc_html__( 'Transform', 'visual-portfolio' ) ),
+										array( 'label' => esc_html__( 'Border Radius', 'visual-portfolio' ) ),
+									),
 								);
 							}
 							break;
@@ -2674,8 +2694,12 @@ class Visual_Portfolio_Admin {
 										'type'        => 'pro_note',
 										'category'    => 'items-style-' . $category_name . '-colors',
 										'name'        => 'additional_' . $category_name . '_mix_blend_mode_skin_settings_pro',
-										'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-										'description' => 'Select blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more',
+										'features'    => array(
+											array(
+												'label' => esc_html__( 'Blend Mode', 'visual-portfolio' ),
+												'description' => esc_html__( 'Select blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more', 'visual-portfolio' ),
+											),
+										),
 									);
 								}
 							}
@@ -2686,8 +2710,12 @@ class Visual_Portfolio_Admin {
 									'type'        => 'pro_note',
 									'category'    => 'items-style-' . $category_name . '-typography',
 									'name'        => 'additional_' . $category_name . '_typography_skin_settings_pro',
-									'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-									'description' => 'Manage fonts, sizing, and appearance of distinct text components within the Skin',
+									'features'    => array(
+										array(
+											'label'       => esc_html__( 'Typography', 'visual-portfolio' ),
+											'description' => esc_html__( 'Manage fonts, sizing, and appearance of distinct text components within the Skin', 'visual-portfolio' ),
+										),
+									),
 								);
 							}
 
@@ -2698,27 +2726,27 @@ class Visual_Portfolio_Admin {
 								$has_margin        = isset( $options['dimensions']['margin'] ) && $options['dimensions']['margin'];
 								$has_items_gap     = isset( $options['dimensions']['items_gap'] ) && $options['dimensions']['items_gap'];
 
+								// Named as Pro names its dimension controls.
 								$dimensions_list = array();
 
 								if ( $has_border_radius ) {
-									$dimensions_list[] = 'border radius';
+									$dimensions_list[] = array( 'label' => esc_html__( 'Border Radius', 'visual-portfolio' ) );
 								}
 								if ( $has_padding ) {
-									$dimensions_list[] = 'padding';
+									$dimensions_list[] = array( 'label' => esc_html__( 'Padding', 'visual-portfolio' ) );
 								}
 								if ( $has_margin ) {
-									$dimensions_list[] = 'margin';
+									$dimensions_list[] = array( 'label' => esc_html__( 'Margin', 'visual-portfolio' ) );
 								}
 								if ( $has_items_gap ) {
-									$dimensions_list[] = 'gap between elements';
+									$dimensions_list[] = array( 'label' => esc_html__( 'Items Gap', 'visual-portfolio' ) );
 								}
 
 								$new_fields[] = array(
 									'type'        => 'pro_note',
 									'category'    => 'items-style-' . $category_name . '-dimensions',
 									'name'        => 'additional_' . $category_name . '_dimensions_skin_settings_pro',
-									'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-									'description' => 'Adjust element spacing and dimensions such as ' . implode( ', ', $dimensions_list ),
+									'features'    => $dimensions_list,
 								);
 							}
 							break;
@@ -2854,8 +2882,9 @@ class Visual_Portfolio_Admin {
 				'category'    => 'items-click-action',
 				'type'        => 'pro_note',
 				'name'        => 'items_click_action_url_pro_note',
-				'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description' => '<p>' . esc_html__( 'Link URL click priority', 'visual-portfolio' ) . '</p>',
+				'features'    => array(
+					array( 'label' => esc_html__( 'Link URL click priority', 'visual-portfolio' ) ),
+				),
 				'condition'   => array(
 					array(
 						'control' => 'items_click_action',
@@ -2927,13 +2956,11 @@ class Visual_Portfolio_Admin {
 				'category'    => 'items-click-action',
 				'type'        => 'pro_note',
 				'name'        => 'items_click_action_popup_pro_note',
-				'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description' => '<ul>
-                                    <li>' . esc_html__( 'Manage media object priority', 'visual-portfolio' ) . '</li>
-                                    <li>' . esc_html__( 'Quick View for posts and pages', 'visual-portfolio' ) . '</li>
-                                    <li>' . esc_html__( 'Popup media item deep linking', 'visual-portfolio' ) . '</li>
-                                    <li>' . esc_html__( 'etc...', 'visual-portfolio' ) . '</li>
-                                </ul>',
+				'features'    => array(
+					array( 'label' => esc_html__( 'Manage media object priority', 'visual-portfolio' ) ),
+					array( 'label' => esc_html__( 'Quick View for posts and pages', 'visual-portfolio' ) ),
+					array( 'label' => esc_html__( 'Popup media item deep linking', 'visual-portfolio' ) ),
+				),
 				'condition'   => array(
 					array(
 						'control' => 'items_click_action',
@@ -2947,8 +2974,12 @@ class Visual_Portfolio_Admin {
 				'category'    => 'items-click-action',
 				'type'        => 'pro_note',
 				'name'        => 'items_click_action_advanced_pro_note',
-				'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description' => '<p>' . esc_html__( 'Deeply customize actions of clicks on different types of items and links.', 'visual-portfolio' ) . '</p>',
+				'features'    => array(
+					array(
+						'label'       => esc_html__( 'Advanced', 'visual-portfolio' ),
+						'description' => esc_html__( 'Deeply customize actions of clicks on different types of items and links.', 'visual-portfolio' ),
+					),
+				),
 				'condition'   => array(
 					array(
 						'control' => 'items_click_action',
@@ -3283,8 +3314,12 @@ class Visual_Portfolio_Admin {
 				'category'    => 'search',
 				'type'        => 'pro_note',
 				'name'        => 'search_pro_note',
-				'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description' => '<p>' . esc_html__( 'The search module is only available for Pro users.', 'visual-portfolio' ) . '</p>',
+				'features'    => array(
+					array(
+						'label'       => esc_html__( 'Search', 'visual-portfolio' ),
+						'description' => esc_html__( 'The search module is only available for Pro users.', 'visual-portfolio' ),
+					),
+				),
 			)
 		);
 
@@ -3625,8 +3660,20 @@ class Visual_Portfolio_Admin {
 				'category'    => 'pagination',
 				'type'        => 'pro_note',
 				'name'        => 'pagination_infinite_additional_options_pro_note',
-				'label'       => esc_html__( 'Premium Only', 'visual-portfolio' ),
-				'description' => '<p>' . esc_html__( 'Adjust the loading threshold, limit the number of automatic loads and run the infinite scroll only after the Load button click.', 'visual-portfolio' ) . '</p>',
+				'features'    => array(
+					array(
+						'label'       => esc_html__( 'Load More on startup', 'visual-portfolio' ),
+						'description' => esc_html__( 'Load the next page as soon as the gallery is shown.', 'visual-portfolio' ),
+					),
+					array(
+						'label'       => esc_html__( 'Pause every', 'visual-portfolio' ),
+						'description' => esc_html__( 'Stop after a few pages and wait for a click.', 'visual-portfolio' ),
+					),
+					array(
+						'label'       => esc_html__( 'Threshold Distance', 'visual-portfolio' ),
+						'description' => esc_html__( 'How far from the end of the gallery the next page starts to load.', 'visual-portfolio' ),
+					),
+				),
 				'condition'   => array(
 					array(
 						'control'  => 'pagination',
