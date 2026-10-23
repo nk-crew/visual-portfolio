@@ -50,6 +50,7 @@ All notable changes to this project will be documented in this file.
 * fixed a local video without a cover image rendering as an empty item with a PHP warning
 * fixed browsers keeping old Pro stylesheets after an update
 * fixed album tiles showing no images on WordPress 7.2
+* fixed Facebook watch links, Instagram links without a trailing slash or with `_` or `-` in their ID, and Twitch videos on sites with a port in the address not opening in the popup
 
 = 3.8.2 - Sep 10, 2026 =
 
