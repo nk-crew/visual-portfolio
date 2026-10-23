@@ -353,7 +353,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * changed the experimental Gallery Loop blocks to print nothing below WordPress 7.1
 * changed the image picking buttons and the chosen image card to the WordPress 7.2 featured image style
 * changed Pro notes in the block inspector to a lighter list of each Pro feature with one Go Pro link, also in the experimental Gallery Loop
-* changed Pro-only settings tabs to preview their fields
+* changed the Watermarks, Social Feeds and White Label settings tabs to preview how they look in Pro
 * fixed galleries showing no images on WordPress 7.2
 * fixed the Posts source Settings panel showing no settings on WordPress 7.2
 * fixed the Media Settings panel showing empty thumbnails for galleries saved with image IDs only
