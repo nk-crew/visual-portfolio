@@ -69,6 +69,9 @@ test.describe('Pro notes without Pro', () => {
 		admin,
 		page,
 	}) => {
+		// Pro's own suite runs this spec with Pro active, and Pro draws its real settings.
+		test.skip(!!process.env.CORE, 'Pro draws the real settings.');
+
 		await admin.visitAdminPage(
 			'edit.php',
 			'post_type=portfolio&page=visual-portfolio-settings'
