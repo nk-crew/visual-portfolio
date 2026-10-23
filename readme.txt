@@ -338,6 +338,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 = 3.9.0 - Oct 22, 2026 =
 
+* added WordPress 7.2 compatibility
 * raised the minimum PHP requirement to 8.3
 * added to the experimental Gallery Loop: Carousel Navigation, Previous, Next, Indicator, Autoplay and Thumbnails blocks, placed anywhere inside the loop
 * added Gallery Search, Query Total and End of List blocks to the experimental Gallery Loop
