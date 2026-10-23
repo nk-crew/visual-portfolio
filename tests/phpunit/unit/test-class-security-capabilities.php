@@ -144,6 +144,27 @@ class Test_Visual_Portfolio_Security_Capabilities extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Custom CSS reaches the page through sanitize_css() alone, so an end tag in it
+	 * leaves no `&lt;/` text that would swallow the rule after it.
+	 *
+	 * @return void
+	 */
+	public function test_dynamic_custom_css_end_tag_keeps_next_rule() {
+		$css = Visual_Portfolio_Security::sanitize_css(
+			Visual_Portfolio_Controls_Dynamic_CSS::get(
+				array(
+					'block_id'   => 'sec',
+					'custom_css' => 'a{b:c}</style><script>x</script> .d{e:f}',
+				)
+			)
+		);
+
+		$this->assertFalse( strpos( $css, '</' ) );
+		$this->assertFalse( strpos( $css, '&lt;' ) );
+		$this->assertStringEndsWith( 'a{b:c}x .d{e:f}', $css );
+	}
+
+	/**
 	 * CSS pasted inside a style element or an HTML comment keeps its rules.
 	 *
 	 * @return void
