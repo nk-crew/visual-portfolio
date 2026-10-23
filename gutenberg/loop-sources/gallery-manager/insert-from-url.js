@@ -32,7 +32,7 @@ export default function InsertFromUrl({ onSelectURL }) {
 		<>
 			<Button
 				ref={setAnchor}
-				className="vpf-gallery-manager__add"
+				className="vpf-gallery-manager__add vpf-component-media-picker-button"
 				icon={link}
 				aria-haspopup="dialog"
 				isPressed={isOpen}

@@ -92,3 +92,53 @@
 		}
 	}
 }
+
+// Pro settings as rows in the block inspector. The badge is the one the
+// Gallery Loop source picker draws on its Pro sources.
+.vpf-pro-features {
+	display: grid;
+	gap: 16px;
+
+	&__row {
+		display: grid;
+		gap: 4px;
+	}
+
+	&__name {
+		display: flex;
+		gap: 6px;
+		align-items: center;
+		font-weight: 500;
+	}
+
+	&__badge {
+		flex: none;
+		padding: 0 4px;
+		font-size: 10px;
+		font-weight: 600;
+		line-height: 16px;
+		color: #1e1e1e;
+		text-transform: uppercase;
+		background: var(--wp-components-color-gray-100, #f0f0f0);
+		border-radius: 2px;
+	}
+
+	&__description,
+	&__footer {
+		margin: 0;
+	}
+
+	&__description {
+		font-size: 12px;
+		color: #757575;
+	}
+
+	&__footer {
+		padding-top: 12px;
+		border-top: 1px solid #e0e0e0;
+
+		.components-external-link {
+			white-space: nowrap;
+		}
+	}
+}

@@ -59,7 +59,6 @@ const UnitControl = __stableUnitControl || __experimentalUnitControl;
 const {
 	controls: registeredControls,
 	controls_categories: registeredControlsCategories,
-	plugin_version: pluginVersion,
 } = window.VPGutenbergVariables;
 
 const openedCategoriesCache = {};
@@ -746,16 +745,7 @@ ControlsRender.Control = (props) => {
 			break;
 		case 'pro_note':
 			renderControl = (
-				<ProNote title={renderControlLabel}>
-					{renderControlHelp || ''}
-					<ProNote.Button
-						target="_blank"
-						rel="noopener noreferrer"
-						href={`https://www.visualportfolio.com/pricing/?utm_source=plugin&utm_medium=block_settings&utm_campaign=${props.name}&utm_content=${pluginVersion}`}
-					>
-						{__('Go Pro', 'visual-portfolio')}
-					</ProNote.Button>
-				</ProNote>
+				<ProNote features={props.features} campaign={props.name} />
 			);
 			renderControlLabel = false;
 			renderControlHelp = false;
