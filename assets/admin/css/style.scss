@@ -743,6 +743,44 @@ $escaped-svg-characters: (
 		}
 	}
 
+	// A tab Pro adds: one line with the link, and Pro's fields greyed out.
+	.vpf-settings-pro-note {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		align-items: center;
+		padding: 12px 20px;
+		margin: -10px -20px 20px;
+		border-bottom: 1px solid #d7dbde;
+
+		p {
+			flex: 1;
+			min-width: 200px;
+			margin: 0;
+		}
+
+		~ .metabox-holder-footer {
+			display: none;
+		}
+	}
+
+	.vpf-settings-pro-note-icon {
+		flex: none;
+		fill: currentColor;
+	}
+
+	.vpf-settings-pro-preview {
+		th,
+		td {
+			opacity: 0.4;
+		}
+
+		.description,
+		.vp-toggle-field-slider-round {
+			opacity: 1;
+		}
+	}
+
 	/**
      * Toggle Field.
      **/

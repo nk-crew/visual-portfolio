@@ -5,8 +5,7 @@ import ProNote from '../components/pro-note';
 import { SocialIcon, TaxonomiesIcon } from './icons';
 import { registerLoopSource } from './registry';
 
-const { plugin_version: pluginVersion, pro: isProPlugin } =
-	window.VPGutenbergVariables;
+const { pro: isProPlugin } = window.VPGutenbergVariables;
 
 /**
  * Sources Pro owns.
@@ -46,16 +45,10 @@ const PRO_SOURCES = [
 function UpsellPanel({ title, teaser, name }) {
 	return (
 		<PanelBody title={title}>
-			<ProNote title={__('Premium Only', 'visual-portfolio')}>
-				<p>{teaser}</p>
-				<ProNote.Button
-					target="_blank"
-					rel="noopener noreferrer"
-					href={`https://www.visualportfolio.com/pricing/?utm_source=plugin&utm_medium=block_settings&utm_campaign=loop_source_${name}&utm_content=${pluginVersion}`}
-				>
-					{__('Go Pro', 'visual-portfolio')}
-				</ProNote.Button>
-			</ProNote>
+			<ProNote
+				features={[{ label: title, description: teaser }]}
+				campaign={`loop_source_${name}`}
+			/>
 		</PanelBody>
 	);
 }
