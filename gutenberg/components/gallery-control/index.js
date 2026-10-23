@@ -29,6 +29,7 @@ import {
 	cloneElement,
 	isValidElement,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -37,6 +38,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import classnames from 'classnames/dedupe';
 import { isEqual } from 'lodash';
 
+import { usePreviewUrls } from '../../utils/use-preview-urls';
 import ControlsRender from '../controls-render';
 import FocalPointControl, {
 	hasCustomFocalPointValue,
@@ -103,7 +105,7 @@ function MediaUploadButton({ open, items, isSetupWizard }) {
 
 	return (
 		<Button
-			className="vpf-component-gallery-control-item-fullwidth vpf-component-gallery-control-item-add"
+			className="vpf-component-gallery-control-item-fullwidth vpf-component-gallery-control-item-add vpf-component-media-picker-button"
 			onClick={(event) => {
 				event.stopPropagation();
 				open();
@@ -269,7 +271,7 @@ function GalleryStateTabs({ activeMediaState, setActiveMediaState, isPro }) {
 function getGalleryItemPreview(img, props) {
 	const preview = (
 		<img
-			src={img.imgThumbnailUrl || img.imgUrl}
+			src={props.previewUrl}
 			alt={getItemAltValue(img) || img.imgThumbnailUrl || img.imgUrl}
 			loading="lazy"
 		/>
@@ -1012,6 +1014,11 @@ const SortableList = (props) => {
 	}, []);
 
 	const categories = getAllCategories(items);
+	const visibleItems = useMemo(
+		() => (items || []).slice(0, showingItems),
+		[items, showingItems]
+	);
+	const previewUrls = usePreviewUrls(visibleItems);
 
 	useEffect(() => {
 		if (
@@ -1235,6 +1242,7 @@ const SortableList = (props) => {
 								index={id}
 								id={id}
 								img={data}
+								previewUrl={previewUrls[data.id]}
 								items={items}
 								onChange={onChange}
 								imageControls={imageControls}
