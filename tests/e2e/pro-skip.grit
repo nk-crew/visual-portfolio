@@ -1,0 +1,19 @@
+language js
+
+// Pro's CI runs these specs with Pro active (CORE=true). A test that checks
+// what free shows in place of a Pro feature fails there unless it skips itself.
+`test($title, $body)` where {
+	$body <: contains or {
+		r".*Go Pro.*",
+		r".*utm_campaign.*",
+		r".*vpf-[a-z-]*pro-.*",
+		r".*comes with Visual Portfolio Pro.*"
+	},
+	$body <: not contains `test.skip($cond, $...)` where {
+		$cond <: contains or {
+			`process.env.CORE`,
+			r".*\.pro"
+		}
+	},
+	register_diagnostic(span=$title, message="This test checks a free-only Pro note. Pro's CI runs it with Pro active, so skip it inside the test when process.env.CORE is set or VPGutenbergVariables.pro is true.")
+}
