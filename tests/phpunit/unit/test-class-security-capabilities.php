@@ -152,9 +152,12 @@ class Test_Visual_Portfolio_Security_Capabilities extends WP_UnitTestCase {
 	public function test_dynamic_custom_css_end_tag_keeps_next_rule() {
 		$css = Visual_Portfolio_Security::sanitize_css(
 			Visual_Portfolio_Controls_Dynamic_CSS::get(
-				array(
-					'block_id'   => 'sec',
-					'custom_css' => 'a{b:c}</style><script>x</script> .d{e:f}',
+				Visual_Portfolio_Get::get_options(
+					array(
+						'block_id'   => 'sec',
+						// Stored encoded, as the editor saves it.
+						'custom_css' => visual_portfolio_encode( 'a{b:c}</style><script>x</script> .d{e:f}' ),
+					)
 				)
 			)
 		);
