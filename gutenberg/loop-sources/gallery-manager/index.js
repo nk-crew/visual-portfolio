@@ -20,13 +20,12 @@ import {
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { getProtocol, prependHTTPS } from '@wordpress/url';
 
+import { usePreviewUrls } from '../../utils/use-preview-urls';
 import GalleryImage from './gallery-image';
 import ImageSettingsModal from './image-settings-modal';
 import InsertFromUrl from './insert-from-url';
@@ -43,69 +42,6 @@ import {
 const ACCEPTED_MIME_TYPES = ALLOWED_MEDIA_TYPES.map((type) => `${type}/*`).join(
 	','
 );
-
-/**
- * Thumbnail URL of every image, by image key.
- *
- * Images added here carry their URLs, but a gallery can also arrive from a
- * pattern or from another editor, holding nothing but attachment ids. One
- * request for the missing ones beats a request per thumbnail.
- *
- * @param {Array} images - gallery images.
- * @return {Object} image key to thumbnail URL.
- */
-function usePreviewUrls(images) {
-	const missingIds = useMemo(
-		() =>
-			images
-				.filter(
-					(image) =>
-						image.id && !image.imgThumbnailUrl && !image.imgUrl
-				)
-				.map((image) => image.id),
-		[images]
-	);
-
-	const attachments = useSelect(
-		(select) => {
-			if (!missingIds.length) {
-				return null;
-			}
-
-			return select(coreStore).getEntityRecords(
-				'postType',
-				'attachment',
-				{
-					include: missingIds,
-					per_page: missingIds.length,
-				}
-			);
-		},
-		[missingIds]
-	);
-
-	return useMemo(() => {
-		const urls = {};
-
-		images.forEach((image) => {
-			const url = image.imgThumbnailUrl || image.imgUrl;
-
-			if (url) {
-				urls[getImageKey(image)] = url;
-			}
-		});
-
-		(attachments || []).forEach((attachment) => {
-			const sizes = attachment.media_details?.sizes || {};
-			const size =
-				sizes.large || sizes.medium || sizes.thumbnail || sizes.full;
-
-			urls[attachment.id] = size?.source_url || attachment.source_url;
-		});
-
-		return urls;
-	}, [images, attachments]);
-}
 
 /**
  * Spoken feedback of the drag and drop, in the user's language.
@@ -345,7 +281,7 @@ export default function GalleryManager({ images, onChange, clientId }) {
 									onSelect={onSelect}
 									render={({ open }) => (
 										<Button
-											className="vpf-gallery-manager__add"
+											className="vpf-gallery-manager__add vpf-component-media-picker-button"
 											icon={plus}
 											onClick={open}
 										>

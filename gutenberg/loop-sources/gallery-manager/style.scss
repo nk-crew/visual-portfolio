@@ -123,13 +123,12 @@
 	gap: 8px;
 }
 
-.components-button.vpf-gallery-manager__add {
+// Side by side when both fit, one per row when they do not.
+.vpf-gallery-manager__actions .components-button.vpf-gallery-manager__add {
 	flex: 1 1 auto;
-	white-space: nowrap;
 	justify-content: center;
-	height: 36px;
-	border: 1px solid var(--wp-components-color-foreground, #1e1e1e);
-	border-radius: 2px;
+	width: auto;
+	white-space: nowrap;
 }
 
 .vpf-gallery-manager__count {
