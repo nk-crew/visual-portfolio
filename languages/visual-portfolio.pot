@@ -2,22 +2,22 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Visual Portfolio 3.8.2\n"
+"Project-Id-Version: Visual Portfolio 3.9.0\n"
 "Report-Msgid-Bugs-To: https://github.com/nk-crew/visual-portfolio/issues\n"
 "Last-Translator: Visual Portfolio\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-10T07:45:05+00:00\n"
+"POT-Creation-Date: 2026-10-23T16:06:15+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: visual-portfolio\n"
 
 #. Plugin Name of the plugin
 #: class-visual-portfolio.php:3
-#: class-visual-portfolio.php:238
-#: classes/class-gutenberg.php:48
+#: class-visual-portfolio.php:266
+#: classes/class-settings.php:333
 msgid "Visual Portfolio"
 msgstr ""
 
@@ -43,7 +43,7 @@ msgid "-- Select Layout --"
 msgstr ""
 
 #: classes/3rd/plugins/class-elementor-widget.php:182
-#: classes/class-admin.php:2140
+#: classes/class-admin.php:2155
 #: classes/class-settings.php:199
 msgid "General"
 msgstr ""
@@ -76,16 +76,14 @@ msgstr ""
 #: classes/class-admin.php:246
 #: classes/class-admin.php:295
 #: classes/class-custom-post-type.php:1133
-#: classes/class-settings.php:802
-#: classes/class-settings.php:817
-#: classes/class-settings.php:832
-#: gutenberg/components/controls-render/index.js:756
-#: gutenberg/loop-sources/pro-sources.js:56
+#: classes/class-settings.php:397
+#: gutenberg/components/pro-note/index.js:45
+#: gutenberg/components/pro-teaser/index.js:63
 msgid "Go Pro"
 msgstr ""
 
 #: classes/class-admin.php:337
-#: gutenberg/blocks/item-template/edit.js:63
+#: gutenberg/blocks/item-template/variations.js:57
 #: gutenberg/components/tiles-selector/index.js:94
 msgid "Tiles"
 msgstr ""
@@ -95,15 +93,15 @@ msgid "Tiles Preview"
 msgstr ""
 
 #: classes/class-admin.php:461
-#: gutenberg/blocks/item-template/edit.js:62
+#: gutenberg/blocks/item-template/variations.js:32
 msgid "Masonry"
 msgstr ""
 
 #: classes/class-admin.php:466
 #: classes/class-admin.php:503
-#: gutenberg/blocks/item-template/edit.js:721
-#: gutenberg/blocks/item-template/edit.js:788
-#: gutenberg/blocks/item-template/edit.js:865
+#: gutenberg/blocks/item-template/edit.js:1054
+#: gutenberg/blocks/item-template/edit.js:1168
+#: gutenberg/blocks/item-template/edit.js:1179
 msgid "Columns"
 msgstr ""
 
@@ -121,13 +119,13 @@ msgid "It arranges items to (mostly) maintain horizontal left-to-right order. Yo
 msgstr ""
 
 #: classes/class-admin.php:498
-#: gutenberg/blocks/item-template/edit.js:61
+#: gutenberg/blocks/item-template/variations.js:23
 msgid "Grid"
 msgstr ""
 
 #: classes/class-admin.php:528
-#: gutenberg/blocks/item-template/edit.js:64
-#: gutenberg/blocks/item-template/edit.js:883
+#: gutenberg/blocks/item-template/edit.js:1274
+#: gutenberg/blocks/item-template/variations.js:82
 msgid "Justified"
 msgstr ""
 
@@ -152,28 +150,28 @@ msgid "Last Row Align"
 msgstr ""
 
 #: classes/class-admin.php:570
-#: gutenberg/blocks/item-template/edit.js:107
+#: gutenberg/blocks/item-template/edit.js:96
 #: gutenberg/components/focal-point-control/index.js:93
 msgid "Left"
 msgstr ""
 
 #: classes/class-admin.php:571
-#: gutenberg/blocks/item-template/edit.js:108
-#: gutenberg/blocks/item-template/edit.js:115
+#: gutenberg/blocks/item-template/edit.js:97
+#: gutenberg/blocks/item-template/edit.js:111
 msgid "Center"
 msgstr ""
 
 #: classes/class-admin.php:572
-#: gutenberg/blocks/item-template/edit.js:109
+#: gutenberg/blocks/item-template/edit.js:98
 msgid "Right"
 msgstr ""
 
 #: classes/class-admin.php:573
-#: classes/class-admin.php:1945
-#: classes/class-admin.php:2454
-#: classes/class-admin.php:2568
+#: classes/class-admin.php:1960
+#: classes/class-admin.php:2474
+#: classes/class-admin.php:2588
 #: classes/class-deprecated.php:228
-#: gutenberg/blocks/item-template/edit.js:110
+#: gutenberg/blocks/item-template/edit.js:99
 msgid "Hide"
 msgstr ""
 
@@ -182,10 +180,10 @@ msgid "Slider"
 msgstr ""
 
 #: classes/class-admin.php:586
-#: gutenberg/blocks/item-cover/edit.js:356
-#: gutenberg/blocks/item-cover/edit.js:365
-#: gutenberg/blocks/item-template/edit.js:1040
-#: gutenberg/blocks/item-template/edit.js:1045
+#: gutenberg/blocks/item-cover/edit.js:387
+#: gutenberg/blocks/item-cover/edit.js:396
+#: gutenberg/blocks/item-template/edit.js:1428
+#: gutenberg/blocks/item-template/edit.js:1432
 msgid "Effect"
 msgstr ""
 
@@ -194,13 +192,14 @@ msgid "Slide"
 msgstr ""
 
 #: classes/class-admin.php:598
-#: gutenberg/blocks/item-template/edit.js:128
+#: gutenberg/blocks/item-template/effects.js:19
 msgid "Coverflow"
 msgstr ""
 
 #: classes/class-admin.php:603
 #: classes/class-admin.php:1018
-#: gutenberg/blocks/item-cover/edit.js:76
+#: gutenberg/blocks/item-cover/effects.js:14
+#: gutenberg/blocks/item-template/effects.js:29
 msgid "Fade"
 msgstr ""
 
@@ -224,7 +223,7 @@ msgstr ""
 #: classes/class-admin.php:707
 #: classes/class-admin.php:840
 #: classes/class-admin.php:893
-#: gutenberg/blocks/item-template/edit.js:733
+#: gutenberg/blocks/item-template/edit.js:1191
 #: gutenberg/components/aspect-ratio/index.js:8
 #: gutenberg/utils/dimensions-tools/index.js:189
 #: gutenberg/utils/dimensions-tools/index.js:208
@@ -259,8 +258,9 @@ msgstr ""
 
 #: classes/class-admin.php:708
 #: classes/class-admin.php:894
-#: classes/class-admin.php:1796
-#: classes/class-admin.php:1814
+#: classes/class-admin.php:1791
+#: classes/class-admin.php:1809
+#: gutenberg/blocks/item-template/edit.js:145
 #: gutenberg/components/aspect-ratio/index.js:13
 #: gutenberg/loop-sources/images.js:21
 msgid "Custom"
@@ -271,7 +271,7 @@ msgid "Centered Slides"
 msgstr ""
 
 #: classes/class-admin.php:754
-#: classes/class-settings.php:542
+#: classes/class-settings.php:694
 msgid "Loop"
 msgstr ""
 
@@ -284,8 +284,8 @@ msgid "Free Scroll Sticky"
 msgstr ""
 
 #: classes/class-admin.php:782
-#: classes/class-admin.php:3544
-#: classes/class-settings.php:583
+#: classes/class-admin.php:3579
+#: classes/class-settings.php:735
 msgid "Display Arrows"
 msgstr ""
 
@@ -302,7 +302,7 @@ msgid "Mousewheel Control"
 msgstr ""
 
 #: classes/class-admin.php:814
-#: classes/class-settings.php:629
+#: classes/class-settings.php:781
 msgid "Display Thumbnails"
 msgstr ""
 
@@ -319,24 +319,24 @@ msgid "Thumbnails Per View"
 msgstr ""
 
 #: classes/class-admin.php:939
-#: classes/class-admin.php:3053
-#: classes/class-admin.php:3183
-#: classes/class-admin.php:3305
+#: classes/class-admin.php:3084
+#: classes/class-admin.php:3214
+#: classes/class-admin.php:3340
 msgid "Classic"
 msgstr ""
 
 #: classes/class-admin.php:1082
-#: gutenberg/blocks/item-cover/edit.js:77
+#: gutenberg/blocks/item-cover/effects.js:15
 msgid "Fly"
 msgstr ""
 
 #: classes/class-admin.php:1146
-#: gutenberg/blocks/item-cover/edit.js:78
+#: gutenberg/blocks/item-cover/effects.js:16
 msgid "Emerge"
 msgstr ""
 
 #: classes/class-admin.php:1238
-#: gutenberg/blocks/loop/edit.js:689
+#: gutenberg/blocks/loop/edit.js:762
 msgid "Content Source"
 msgstr ""
 
@@ -345,7 +345,7 @@ msgid "Posts Settings"
 msgstr ""
 
 #: classes/class-admin.php:1247
-#: gutenberg/components/gallery-control/index.js:909
+#: gutenberg/components/gallery-control/index.js:911
 msgid "Media Settings"
 msgstr ""
 
@@ -362,7 +362,6 @@ msgid "General Settings"
 msgstr ""
 
 #: classes/class-admin.php:1267
-#: gutenberg/blocks/item-template/edit.js:1233
 msgid "Layout"
 msgstr ""
 
@@ -375,48 +374,51 @@ msgid "Click Action"
 msgstr ""
 
 #: classes/class-admin.php:1282
+#: gutenberg/blocks/item-image/edit.js:505
+#: gutenberg/blocks/loop/edit.js:793
 msgid "Protection"
 msgstr ""
 
 #: classes/class-admin.php:1287
-#: classes/class-settings.php:761
-#: gutenberg/components/controls-render/index.js:585
+#: classes/class-settings.php:913
+#: gutenberg/components/controls-render/index.js:584
 msgid "Custom CSS"
 msgstr ""
 
 #: classes/class-admin.php:1330
 #: classes/class-custom-post-type.php:847
-#: gutenberg/loop-sources/posts.js:543
+#: gutenberg/loop-sources/posts.js:825
 msgid "Posts"
 msgstr ""
 
 #: classes/class-admin.php:1336
 #: classes/class-custom-post-type.php:848
-#: gutenberg/components/gallery-control/index.js:246
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:220
+#: gutenberg/components/gallery-control/index.js:248
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:324
 #: gutenberg/loop-sources/images.js:202
 msgid "Media"
 msgstr ""
 
 #: classes/class-admin.php:1342
 #: classes/class-admin.php:1462
-#: gutenberg/loop-sources/posts.js:314
-#: gutenberg/loop-sources/posts.js:322
-#: gutenberg/loop-sources/pro-sources.js:26
+#: classes/class-admin.php:1895
+#: gutenberg/loop-sources/posts.js:476
+#: gutenberg/loop-sources/posts.js:484
+#: gutenberg/loop-sources/pro-sources.js:25
 msgid "Taxonomies"
 msgstr ""
 
 #: classes/class-admin.php:1348
 #: classes/class-custom-post-type.php:849
-#: gutenberg/loop-sources/pro-sources.js:36
+#: gutenberg/loop-sources/pro-sources.js:35
 msgid "Social"
 msgstr ""
 
 #: classes/class-admin.php:1379
-#: classes/class-admin.php:3715
-#: gutenberg/loop-sources/posts.js:194
-#: gutenberg/loop-sources/posts.js:269
-#: gutenberg/loop-sources/posts.js:277
+#: classes/class-admin.php:3762
+#: gutenberg/loop-sources/posts.js:340
+#: gutenberg/loop-sources/posts.js:431
+#: gutenberg/loop-sources/posts.js:439
 msgid "Custom Query"
 msgstr ""
 
@@ -427,26 +429,26 @@ msgid "Build custom query according to WordPress Codex. See example here <a href
 msgstr ""
 
 #: classes/class-admin.php:1398
-#: gutenberg/loop-sources/posts.js:207
-#: gutenberg/loop-sources/posts.js:219
+#: gutenberg/loop-sources/posts.js:369
+#: gutenberg/loop-sources/posts.js:381
 msgid "Post Types"
 msgstr ""
 
 #: classes/class-admin.php:1415
-#: gutenberg/loop-sources/posts.js:247
-#: gutenberg/loop-sources/posts.js:253
+#: gutenberg/loop-sources/posts.js:409
+#: gutenberg/loop-sources/posts.js:415
 msgid "Specific Posts"
 msgstr ""
 
 #: classes/class-admin.php:1433
-#: gutenberg/loop-sources/posts.js:292
-#: gutenberg/loop-sources/posts.js:300
+#: gutenberg/loop-sources/posts.js:454
+#: gutenberg/loop-sources/posts.js:462
 msgid "Excluded Posts"
 msgstr ""
 
 #: classes/class-admin.php:1492
-#: gutenberg/loop-sources/posts.js:337
-#: gutenberg/loop-sources/posts.js:354
+#: gutenberg/loop-sources/posts.js:531
+#: gutenberg/loop-sources/posts.js:548
 msgid "Taxonomies Relation"
 msgstr ""
 
@@ -459,54 +461,56 @@ msgid "AND"
 msgstr ""
 
 #: classes/class-admin.php:1523
-#: classes/class-admin.php:1826
+#: classes/class-admin.php:1821
 msgid "Order by"
 msgstr ""
 
 #: classes/class-admin.php:1528
 #: templates/items-list/item-parts/meta-date.php:44
-#: gutenberg/loop-sources/posts.js:32
+#: gutenberg/loop-sources/posts.js:30
+#: gutenberg/loop-sources/posts.js:82
 msgid "Date"
 msgstr ""
 
 #: classes/class-admin.php:1529
-#: classes/class-admin.php:1676
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:266
-#: gutenberg/loop-sources/posts.js:33
+#: classes/class-admin.php:1673
+#: gutenberg/blocks/loop/lightbox-panel.js:81
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:381
+#: gutenberg/loop-sources/posts.js:83
 msgid "Title"
 msgstr ""
 
 #: classes/class-admin.php:1530
-#: gutenberg/loop-sources/posts.js:34
+#: gutenberg/loop-sources/posts.js:84
 msgid "ID"
 msgstr ""
 
 #: classes/class-admin.php:1531
-#: gutenberg/loop-sources/posts.js:35
+#: gutenberg/loop-sources/posts.js:85
 msgid "Comments Count"
 msgstr ""
 
 #: classes/class-admin.php:1532
-#: gutenberg/loop-sources/posts.js:36
+#: gutenberg/loop-sources/posts.js:86
 msgid "Modified"
 msgstr ""
 
 #: classes/class-admin.php:1533
-#: gutenberg/loop-sources/posts.js:37
+#: gutenberg/loop-sources/posts.js:87
 msgid "Menu Order"
 msgstr ""
 
 #: classes/class-admin.php:1534
-#: classes/class-admin.php:3710
-#: gutenberg/loop-sources/posts.js:38
-#: gutenberg/loop-sources/posts.js:190
+#: classes/class-admin.php:3757
+#: gutenberg/loop-sources/posts.js:88
+#: gutenberg/loop-sources/posts.js:336
 msgid "Manual Selection"
 msgstr ""
 
 #: classes/class-admin.php:1535
-#: classes/class-admin.php:1839
+#: classes/class-admin.php:1834
 #: gutenberg/loop-sources/images.js:43
-#: gutenberg/loop-sources/posts.js:39
+#: gutenberg/loop-sources/posts.js:89
 msgid "Random"
 msgstr ""
 
@@ -517,19 +521,19 @@ msgid "Menu Order is typically used in combination with one of these plugins: <a
 msgstr ""
 
 #: classes/class-admin.php:1583
-#: classes/class-admin.php:1847
+#: classes/class-admin.php:1842
 #: gutenberg/loop-sources/images.js:189
-#: gutenberg/loop-sources/posts.js:413
+#: gutenberg/loop-sources/posts.js:607
 msgid "Order Direction"
 msgstr ""
 
 #: classes/class-admin.php:1588
-#: classes/class-admin.php:1852
+#: classes/class-admin.php:1847
 msgid "ASC"
 msgstr ""
 
 #: classes/class-admin.php:1589
-#: classes/class-admin.php:1853
+#: classes/class-admin.php:1848
 msgid "DESC"
 msgstr ""
 
@@ -549,735 +553,822 @@ msgstr ""
 msgid "Use this setting to skip over posts (e.g. `2` to skip over 2 posts)"
 msgstr ""
 
-#: classes/class-admin.php:1649
-#: classes/class-admin.php:1760
-#: classes/class-admin.php:1866
-#: classes/class-admin.php:1886
-#: classes/class-admin.php:1900
-#: classes/class-admin.php:2316
-#: classes/class-admin.php:2323
-#: classes/class-admin.php:2677
-#: classes/class-admin.php:2689
-#: classes/class-admin.php:2720
-#: classes/class-admin.php:2857
-#: classes/class-admin.php:2930
-#: classes/class-admin.php:2950
-#: classes/class-admin.php:3286
-#: classes/class-admin.php:3628
-#: classes/class-custom-post-type.php:1128
-#: classes/class-settings.php:799
-#: classes/class-settings.php:814
-#: classes/class-settings.php:829
-#: gutenberg/loop-sources/pro-sources.js:49
-msgid "Premium Only"
-msgstr ""
-
 #: classes/class-admin.php:1650
-msgid "Additional query settings, such as:"
-msgstr ""
-
-#: classes/class-admin.php:1652
 msgid "Filter by specific author"
 msgstr ""
 
-#: classes/class-admin.php:1653
+#: classes/class-admin.php:1651
 msgid "Filter by publish date range"
 msgstr ""
 
-#: classes/class-admin.php:1654
+#: classes/class-admin.php:1652
 msgid "Exclude posts without thumbnail"
 msgstr ""
 
-#: classes/class-admin.php:1655
+#: classes/class-admin.php:1653
 msgid "Exclude sticky posts"
 msgstr ""
 
-#: classes/class-admin.php:1656
-#: classes/class-admin.php:2935
-msgid "etc..."
-msgstr ""
-
-#: classes/class-admin.php:1682
+#: classes/class-admin.php:1679
 msgid "Alt"
 msgstr ""
 
-#: classes/class-admin.php:1683
+#: classes/class-admin.php:1680
 msgid "Edit alt text for this gallery item only."
 msgstr ""
 
-#: classes/class-admin.php:1689
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:273
+#: classes/class-admin.php:1686
+#: gutenberg/blocks/loop/lightbox-panel.js:89
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:399
 msgid "Description"
 msgstr ""
 
-#: classes/class-admin.php:1697
+#: classes/class-admin.php:1694
 #: classes/class-custom-post-type.php:194
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:280
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:406
 msgid "Categories"
 msgstr ""
 
-#: classes/class-admin.php:1705
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:294
+#: classes/class-admin.php:1702
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:420
 msgid "Format"
 msgstr ""
 
-#: classes/class-admin.php:1708
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:28
+#: classes/class-admin.php:1705
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:33
+#: gutenberg/loop-sources/posts.js:69
 msgid "Standard"
 msgstr ""
 
-#: classes/class-admin.php:1709
+#: classes/class-admin.php:1706
 #: classes/class-custom-post-meta.php:149
+#: gutenberg/utils/item-format-badge/index.php:25
 #: gutenberg/custom-post-meta/video.js:106
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:29
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:34
+#: gutenberg/loop-sources/posts.js:71
+#: gutenberg/utils/item-format-badge/index.js:14
 msgid "Video"
 msgstr ""
 
-#: classes/class-admin.php:1716
-#: classes/class-admin.php:2795
+#: classes/class-admin.php:1713
+#: classes/class-admin.php:2823
+#: gutenberg/loop-sources/gallery-manager/insert-from-url.js:60
 msgid "URL"
 msgstr ""
 
-#: classes/class-admin.php:1717
+#: classes/class-admin.php:1714
 msgid "By default used full media url, you can use custom one"
 msgstr ""
 
-#: classes/class-admin.php:1718
-#: classes/class-admin.php:1724
+#: classes/class-admin.php:1715
+#: classes/class-admin.php:1721
 msgid "https://..."
 msgstr ""
 
-#: classes/class-admin.php:1723
+#: classes/class-admin.php:1720
 #: gutenberg/custom-post-meta/video.js:153
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:303
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:429
 msgid "Video URL"
 msgstr ""
 
-#: classes/class-admin.php:1725
+#: classes/class-admin.php:1722
 msgid "Full list of supported links"
 msgstr ""
 
-#: classes/class-admin.php:1725
+#: classes/class-admin.php:1722
 #: gutenberg/custom-post-meta/video.js:147
 msgid "see here"
 msgstr ""
 
-#: classes/class-admin.php:1736
+#: classes/class-admin.php:1733
 #: templates/items-list/item-parts/meta-author.php:50
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:324
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:450
 msgid "Author"
 msgstr ""
 
-#: classes/class-admin.php:1741
+#: classes/class-admin.php:1738
 msgid "Author Name"
 msgstr ""
 
-#: classes/class-admin.php:1748
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:331
+#: classes/class-admin.php:1745
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:459
 msgid "Author URL"
 msgstr ""
 
-#: classes/class-admin.php:1755
-#: classes/class-admin.php:2805
+#: classes/class-admin.php:1752
+#: classes/class-admin.php:2833
+#: classes/class-admin.php:2979
 msgid "Advanced"
 msgstr ""
 
-#: classes/class-admin.php:1761
-msgid "Unlock advanced image and video options such as:"
-msgstr ""
-
-#: classes/class-admin.php:1763
+#: classes/class-admin.php:1758
 msgid "Image albums"
 msgstr ""
 
-#: classes/class-admin.php:1764
+#: classes/class-admin.php:1759
 msgid "Audio formats"
 msgstr ""
 
-#: classes/class-admin.php:1765
+#: classes/class-admin.php:1760
 msgid "Video thumbnails"
 msgstr ""
 
-#: classes/class-admin.php:1766
+#: classes/class-admin.php:1761
 msgid "Thumbnails for hover state."
 msgstr ""
 
-#: classes/class-admin.php:1767
+#: classes/class-admin.php:1762
 msgid "Custom popup image"
 msgstr ""
 
-#: classes/class-admin.php:1768
+#: classes/class-admin.php:1763
 msgid "Picture ID for deep linking"
 msgstr ""
 
-#: classes/class-admin.php:1790
+#: classes/class-admin.php:1785
 #: gutenberg/loop-sources/images.js:139
 msgid "Items Title Source"
 msgstr ""
 
-#: classes/class-admin.php:1795
-#: classes/class-admin.php:1813
-#: classes/class-admin.php:2879
-#: classes/class-admin.php:2907
-#: gutenberg/blocks/item-cover/edit.js:75
-#: gutenberg/blocks/item-cover/edit.js:89
-#: gutenberg/blocks/item-image/edit.js:44
-#: gutenberg/blocks/item-read-more/edit.js:24
-#: gutenberg/blocks/item-template/edit.js:119
-#: gutenberg/blocks/item-template/edit.js:127
-#: gutenberg/blocks/item-title/edit.js:28
+#: classes/class-admin.php:1790
+#: classes/class-admin.php:1808
+#: classes/class-admin.php:2908
+#: classes/class-admin.php:2936
+#: gutenberg/blocks/item-cover/effects.js:13
+#: gutenberg/blocks/item-template/effects.js:17
+#: gutenberg/blocks/loop/lightbox-panel.js:15
 #: gutenberg/blocks/loop/starting-choices.js:27
 #: gutenberg/loop-sources/images.js:20
+#: gutenberg/utils/click-actions.js:13
 msgid "None"
 msgstr ""
 
-#: classes/class-admin.php:1797
-#: classes/class-admin.php:1815
-#: classes/class-admin.php:1834
-#: classes/class-admin.php:2880
-#: classes/class-admin.php:2908
+#: classes/class-admin.php:1792
+#: classes/class-admin.php:1810
+#: classes/class-admin.php:1829
+#: classes/class-admin.php:2909
+#: classes/class-admin.php:2937
+#: gutenberg/blocks/loop/lightbox-panel.js:16
 #: gutenberg/loop-sources/images.js:22
 #: gutenberg/loop-sources/images.js:35
 msgid "Image Title"
 msgstr ""
 
-#: classes/class-admin.php:1798
-#: classes/class-admin.php:1816
-#: classes/class-admin.php:1835
-#: classes/class-admin.php:2881
-#: classes/class-admin.php:2909
+#: classes/class-admin.php:1793
+#: classes/class-admin.php:1811
+#: classes/class-admin.php:1830
+#: classes/class-admin.php:2910
+#: classes/class-admin.php:2938
+#: gutenberg/blocks/loop/lightbox-panel.js:17
 #: gutenberg/loop-sources/images.js:23
 #: gutenberg/loop-sources/images.js:36
 msgid "Image Caption"
 msgstr ""
 
-#: classes/class-admin.php:1799
-#: classes/class-admin.php:1817
-#: classes/class-admin.php:1836
-#: classes/class-admin.php:2882
-#: classes/class-admin.php:2910
+#: classes/class-admin.php:1794
+#: classes/class-admin.php:1812
+#: classes/class-admin.php:1831
+#: classes/class-admin.php:2911
+#: classes/class-admin.php:2939
+#: gutenberg/blocks/loop/lightbox-panel.js:18
 #: gutenberg/loop-sources/images.js:24
 #: gutenberg/loop-sources/images.js:37
 msgid "Image Alt"
 msgstr ""
 
-#: classes/class-admin.php:1800
-#: classes/class-admin.php:1818
-#: classes/class-admin.php:1837
-#: classes/class-admin.php:2883
-#: classes/class-admin.php:2911
+#: classes/class-admin.php:1795
+#: classes/class-admin.php:1813
+#: classes/class-admin.php:1832
+#: classes/class-admin.php:2912
+#: classes/class-admin.php:2940
+#: gutenberg/blocks/loop/lightbox-panel.js:21
 #: gutenberg/loop-sources/images.js:27
 #: gutenberg/loop-sources/images.js:40
 msgid "Image Description"
 msgstr ""
 
-#: classes/class-admin.php:1808
+#: classes/class-admin.php:1803
 #: gutenberg/loop-sources/images.js:150
 msgid "Items Description Source"
 msgstr ""
 
-#: classes/class-admin.php:1831
-#: gutenberg/blocks/item-template/edit.js:737
+#: classes/class-admin.php:1826
+#: gutenberg/blocks/item-template/edit.js:1195
 #: gutenberg/loop-sources/images.js:32
 msgid "Manual"
 msgstr ""
 
-#: classes/class-admin.php:1832
-#: classes/class-admin.php:2884
-#: classes/class-admin.php:2912
+#: classes/class-admin.php:1827
+#: classes/class-admin.php:2913
+#: classes/class-admin.php:2941
+#: gutenberg/blocks/loop/lightbox-panel.js:23
 #: gutenberg/loop-sources/images.js:33
 msgid "Item Title"
 msgstr ""
 
-#: classes/class-admin.php:1833
-#: classes/class-admin.php:2885
-#: classes/class-admin.php:2913
+#: classes/class-admin.php:1828
+#: classes/class-admin.php:2914
+#: classes/class-admin.php:2942
+#: gutenberg/blocks/loop/lightbox-panel.js:26
 #: gutenberg/loop-sources/images.js:34
 msgid "Item Description"
 msgstr ""
 
-#: classes/class-admin.php:1838
+#: classes/class-admin.php:1833
 #: gutenberg/loop-sources/images.js:42
 msgid "Image Uploaded"
 msgstr ""
 
-#: classes/class-admin.php:1867
-msgid "Protect your works using watermarks, password, and age gate"
+#: classes/class-admin.php:1863
+#: classes/class-settings.php:214
+msgid "Watermarks"
 msgstr ""
 
-#: classes/class-admin.php:1887
-#: gutenberg/loop-sources/pro-sources.js:29
+#: classes/class-admin.php:1864
+#: classes/class-settings.php:275
+msgid "Protect your works using watermarks"
+msgstr ""
+
+#: classes/class-admin.php:1867
+#: gutenberg/blocks/loop/edit.js:43
+msgid "Password Protection"
+msgstr ""
+
+#: classes/class-admin.php:1868
+#: gutenberg/blocks/loop/edit.js:44
+msgid "Ask for a password before the gallery is shown."
+msgstr ""
+
+#: classes/class-admin.php:1871
+#: gutenberg/blocks/loop/edit.js:52
+msgid "Age Gate Protection"
+msgstr ""
+
+#: classes/class-admin.php:1872
+#: gutenberg/blocks/loop/edit.js:53
+msgid "Ask for a date of birth before the gallery is shown."
+msgstr ""
+
+#: classes/class-admin.php:1896
+#: gutenberg/loop-sources/pro-sources.js:28
 msgid "Display taxonomy archives such as categories, tags, and custom taxonomies."
 msgstr ""
 
-#: classes/class-admin.php:1901
+#: classes/class-admin.php:1913
+#: classes/class-settings.php:219
+msgid "Social Feeds"
+msgstr ""
+
+#: classes/class-admin.php:1914
 msgid "Display social feeds such as Instagram, Youtube, Flickr, X, etc..."
 msgstr ""
 
-#: classes/class-admin.php:1913
+#: classes/class-admin.php:1928
 msgid "Items Per Page"
 msgstr ""
 
-#: classes/class-admin.php:1939
+#: classes/class-admin.php:1954
 msgid "No Items Action"
 msgstr ""
 
-#: classes/class-admin.php:1944
-#: classes/class-admin.php:1953
+#: classes/class-admin.php:1959
+#: classes/class-admin.php:1968
 msgid "Notice"
 msgstr ""
 
-#: classes/class-admin.php:1956
+#: classes/class-admin.php:1971
+#: gutenberg/patterns/gallery-blog-roll.php:29
+#: gutenberg/patterns/gallery-carousel-coverflow.php:25
+#: gutenberg/patterns/gallery-carousel-showcase.php:29
+#: gutenberg/patterns/gallery-grid-classic.php:25
+#: gutenberg/patterns/gallery-grid-filtered.php:29
+#: gutenberg/patterns/gallery-grid-overlay.php:27
+#: gutenberg/patterns/gallery-grid-rounded.php:25
+#: gutenberg/patterns/gallery-justified-wall.php:24
+#: gutenberg/patterns/gallery-masonry-captions.php:26
+#: gutenberg/patterns/gallery-masonry-classic.php:24
+#: gutenberg/patterns/gallery-masonry-reveal.php:27
+#: gutenberg/patterns/gallery-posts-classic.php:27
+#: gutenberg/patterns/gallery-posts-paged.php:26
+#: gutenberg/patterns/gallery-tiles-mosaic.php:24
+#: gutenberg/blocks/loop/edit.js:116
 msgid "No items were found matching your selection."
 msgstr ""
 
-#: classes/class-admin.php:1971
+#: classes/class-admin.php:1986
 msgid "Note: you will see the notice in the preview. Block will be hidden in the site frontend."
 msgstr ""
 
-#: classes/class-admin.php:1988
+#: classes/class-admin.php:2003
 msgid "Stretch"
 msgstr ""
 
-#: classes/class-admin.php:1992
+#: classes/class-admin.php:2007
 msgid "Break the container and display the gallery wide. Helpful for 3rd-party page builders. In the block editor, use the built-in Wide and Fullwidth alignment instead."
 msgstr ""
 
-#: classes/class-admin.php:2060
+#: classes/class-admin.php:2075
 msgid "Gap"
 msgstr ""
 
-#: classes/class-admin.php:2080
+#: classes/class-admin.php:2095
 msgid "Vertical Gap"
 msgstr ""
 
-#: classes/class-admin.php:2081
+#: classes/class-admin.php:2096
 msgid "When empty, used Gap option"
 msgstr ""
 
-#: classes/class-admin.php:2144
+#: classes/class-admin.php:2159
+#: gutenberg/loop-sources/posts.js:66
 msgid "Image"
 msgstr ""
 
-#: classes/class-admin.php:2148
-#: gutenberg/blocks/item-cover/edit.js:253
-#: gutenberg/blocks/item-image/edit.js:183
+#: classes/class-admin.php:2163
+#: gutenberg/blocks/item-cover/edit.js:284
+#: gutenberg/blocks/item-image/edit.js:353
 msgid "Overlay"
 msgstr ""
 
-#: classes/class-admin.php:2152
+#: classes/class-admin.php:2167
 msgid "Caption"
 msgstr ""
 
-#: classes/class-admin.php:2285
-#: gutenberg/components/gallery-control/index.js:256
+#: classes/class-admin.php:2300
+#: gutenberg/components/gallery-control/index.js:258
 msgid "Normal"
 msgstr ""
 
-#: classes/class-admin.php:2289
-#: gutenberg/components/gallery-control/index.js:260
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:34
+#: classes/class-admin.php:2304
+#: gutenberg/components/gallery-control/index.js:262
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:52
 msgid "Hover"
 msgstr ""
 
-#: classes/class-admin.php:2299
+#: classes/class-admin.php:2314
+#: classes/class-admin.php:2343
+#: classes/class-admin.php:2733
 msgid "Border Radius"
 msgstr ""
 
-#: classes/class-admin.php:2336
-#: gutenberg/blocks/loop/edit.js:300
-msgid "Display"
-msgstr ""
-
-#: classes/class-admin.php:2340
-msgid "Hover State Only"
-msgstr ""
-
+#: classes/class-admin.php:2332
 #: classes/class-admin.php:2341
-msgid "Default State Only"
-msgstr ""
-
-#: classes/class-admin.php:2342
-#: gutenberg/blocks/item-cover/edit.js:85
-msgid "Always"
-msgstr ""
-
-#: classes/class-admin.php:2351
-msgid "Text Align"
-msgstr ""
-
-#: classes/class-admin.php:2364
-msgid "Elements"
-msgstr ""
-
-#: classes/class-admin.php:2368
-msgid "Colors"
-msgstr ""
-
-#: classes/class-admin.php:2372
-msgid "Typography"
-msgstr ""
-
-#: classes/class-admin.php:2376
-msgid "Dimensions"
-msgstr ""
-
-#: classes/class-admin.php:2390
-#: classes/class-deprecated.php:192
-msgid "Display Title"
-msgstr ""
-
-#: classes/class-admin.php:2398
-msgid "Title Tag"
-msgstr ""
-
-#: classes/class-admin.php:2423
-#: classes/class-deprecated.php:200
-msgid "Display Categories"
-msgstr ""
-
-#: classes/class-admin.php:2431
-#: classes/class-deprecated.php:207
-msgid "Categories Count"
-msgstr ""
-
-#: classes/class-admin.php:2449
-#: classes/class-deprecated.php:223
-msgid "Display Date"
-msgstr ""
-
-#: classes/class-admin.php:2455
-#: classes/class-admin.php:2823
-#: classes/class-archive-mapping.php:675
-#: classes/class-deprecated.php:229
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:33
-msgid "Default"
-msgstr ""
-
-#: classes/class-admin.php:2456
-#: classes/class-deprecated.php:230
-msgid "Human Format"
-msgstr ""
-
-#: classes/class-admin.php:2465
-#: classes/class-deprecated.php:238
-msgid "Date format example: F j, Y"
-msgstr ""
-
-#: classes/class-admin.php:2479
-#: classes/class-deprecated.php:250
-msgid "Display Author"
-msgstr ""
-
-#: classes/class-admin.php:2489
-#: classes/class-deprecated.php:258
-msgid "Display Comments Count"
-msgstr ""
-
-#: classes/class-admin.php:2505
-#: classes/class-deprecated.php:272
-msgid "Display Views Count"
-msgstr ""
-
-#: classes/class-admin.php:2521
-#: classes/class-deprecated.php:286
-msgid "Display Reading Time"
-msgstr ""
-
-#: classes/class-admin.php:2537
-#: classes/class-deprecated.php:300
-msgid "Display Excerpt"
-msgstr ""
-
-#: classes/class-admin.php:2545
-#: classes/class-deprecated.php:307
-msgid "Excerpt Words Count"
-msgstr ""
-
-#: classes/class-admin.php:2563
-msgid "Display Read More Button"
-msgstr ""
-
-#: classes/class-admin.php:2569
-msgid "Always Display"
-msgstr ""
-
-#: classes/class-admin.php:2570
-msgid "Display when used `More tag` in the post"
-msgstr ""
-
-#: classes/class-admin.php:2579
-msgid "Read More button label"
-msgstr ""
-
-#: classes/class-admin.php:2595
-#: classes/class-deprecated.php:323
-msgid "Display Icon"
-msgstr ""
-
-#: classes/class-admin.php:2613
-msgid "Background"
-msgstr ""
-
-#: classes/class-admin.php:2630
-msgid "Text"
-msgstr ""
-
-#: classes/class-admin.php:2646
-msgid "Links"
-msgstr ""
-
-#: classes/class-admin.php:2659
-msgid "Links Hover"
-msgstr ""
-
-#: classes/class-admin.php:2790
-#: classes/class-settings.php:404
-msgid "Disabled"
-msgstr ""
-
-#: classes/class-admin.php:2800
-msgid "Popup"
-msgstr ""
-
-#: classes/class-admin.php:2817
-msgid "Target"
-msgstr ""
-
-#: classes/class-admin.php:2824
-msgid "New Tab (_blank)"
-msgstr ""
-
-#: classes/class-admin.php:2825
-msgid "Top Frame (_top)"
-msgstr ""
-
-#: classes/class-admin.php:2839
-msgid "Rel"
-msgstr ""
-
-#: classes/class-admin.php:2858
-msgid "Link URL click priority"
-msgstr ""
-
-#: classes/class-admin.php:2873
-msgid "Title Source"
-msgstr ""
-
-#: classes/class-admin.php:2886
-#: classes/class-admin.php:2914
-msgid "Item Excerpt"
-msgstr ""
-
-#: classes/class-admin.php:2887
-#: classes/class-admin.php:2915
-msgid "Item Author"
-msgstr ""
-
-#: classes/class-admin.php:2901
-msgid "Description Source"
-msgstr ""
-
-#: classes/class-admin.php:2932
-msgid "Manage media object priority"
-msgstr ""
-
-#: classes/class-admin.php:2933
-msgid "Quick View for posts and pages"
-msgstr ""
-
-#: classes/class-admin.php:2934
-msgid "Popup media item deep linking"
-msgstr ""
-
-#: classes/class-admin.php:2951
-msgid "Deeply customize actions of clicks on different types of items and links."
-msgstr ""
-
-#: classes/class-admin.php:2971
-#: gutenberg/blocks/item-template/edit.js:114
-msgid "Start"
-msgstr ""
-
-#: classes/class-admin.php:2980
-msgid "Middle"
-msgstr ""
-
-#: classes/class-admin.php:2983
-msgid "End"
-msgstr ""
-
-#: classes/class-admin.php:3007
-#: gutenberg/blocks/loop/edit.js:573
+#: classes/class-admin.php:3038
+#: gutenberg/blocks/loop-filter/index.php:229
+#: gutenberg/blocks/loop/edit.js:633
 #: gutenberg/components/setup-wizard/index.js:213
 #: gutenberg/layouts-editor/block/index.js:97
 msgid "Filter"
 msgstr ""
 
-#: classes/class-admin.php:3013
-#: gutenberg/blocks/loop-sort/index.php:146
+#: classes/class-admin.php:2333
+#: classes/class-admin.php:2342
+msgid "Transform"
+msgstr ""
+
+#: classes/class-admin.php:2356
+#: gutenberg/blocks/loop/edit.js:358
+msgid "Display"
+msgstr ""
+
+#: classes/class-admin.php:2360
+msgid "Hover State Only"
+msgstr ""
+
+#: classes/class-admin.php:2361
+msgid "Default State Only"
+msgstr ""
+
+#: classes/class-admin.php:2362
+#: gutenberg/blocks/item-cover/edit.js:114
+msgid "Always"
+msgstr ""
+
+#: classes/class-admin.php:2371
+msgid "Text Align"
+msgstr ""
+
+#: classes/class-admin.php:2384
+msgid "Elements"
+msgstr ""
+
+#: classes/class-admin.php:2388
+msgid "Colors"
+msgstr ""
+
+#: classes/class-admin.php:2392
+#: classes/class-admin.php:2715
+msgid "Typography"
+msgstr ""
+
+#: classes/class-admin.php:2396
+msgid "Dimensions"
+msgstr ""
+
+#: classes/class-admin.php:2410
+#: classes/class-deprecated.php:192
+msgid "Display Title"
+msgstr ""
+
+#: classes/class-admin.php:2418
+msgid "Title Tag"
+msgstr ""
+
+#: classes/class-admin.php:2443
+#: classes/class-deprecated.php:200
+msgid "Display Categories"
+msgstr ""
+
+#: classes/class-admin.php:2451
+#: classes/class-deprecated.php:207
+msgid "Categories Count"
+msgstr ""
+
+#: classes/class-admin.php:2469
+#: classes/class-deprecated.php:223
+msgid "Display Date"
+msgstr ""
+
+#: classes/class-admin.php:2475
+#: classes/class-admin.php:2851
+#: classes/class-archive-mapping.php:675
+#: classes/class-deprecated.php:229
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:51
+msgid "Default"
+msgstr ""
+
+#: classes/class-admin.php:2476
+#: classes/class-deprecated.php:230
+msgid "Human Format"
+msgstr ""
+
+#: classes/class-admin.php:2485
+#: classes/class-deprecated.php:238
+msgid "Date format example: F j, Y"
+msgstr ""
+
+#: classes/class-admin.php:2499
+#: classes/class-deprecated.php:250
+msgid "Display Author"
+msgstr ""
+
+#: classes/class-admin.php:2509
+#: classes/class-deprecated.php:258
+msgid "Display Comments Count"
+msgstr ""
+
+#: classes/class-admin.php:2525
+#: classes/class-deprecated.php:272
+msgid "Display Views Count"
+msgstr ""
+
+#: classes/class-admin.php:2541
+#: classes/class-deprecated.php:286
+msgid "Display Reading Time"
+msgstr ""
+
+#: classes/class-admin.php:2557
+#: classes/class-deprecated.php:300
+msgid "Display Excerpt"
+msgstr ""
+
+#: classes/class-admin.php:2565
+#: classes/class-deprecated.php:307
+msgid "Excerpt Words Count"
+msgstr ""
+
+#: classes/class-admin.php:2583
+msgid "Display Read More Button"
+msgstr ""
+
+#: classes/class-admin.php:2589
+msgid "Always Display"
+msgstr ""
+
+#: classes/class-admin.php:2590
+msgid "Display when used `More tag` in the post"
+msgstr ""
+
+#: classes/class-admin.php:2599
+msgid "Read More button label"
+msgstr ""
+
+#: classes/class-admin.php:2615
+#: classes/class-deprecated.php:323
+msgid "Display Icon"
+msgstr ""
+
+#: classes/class-admin.php:2633
+msgid "Background"
+msgstr ""
+
+#: classes/class-admin.php:2650
+msgid "Text"
+msgstr ""
+
+#: classes/class-admin.php:2666
+msgid "Links"
+msgstr ""
+
+#: classes/class-admin.php:2679
+msgid "Links Hover"
+msgstr ""
+
+#: classes/class-admin.php:2699
+msgid "Blend Mode"
+msgstr ""
+
+#: classes/class-admin.php:2700
+msgid "Select blend mode layer effects such as Normal, Multiply, Screen, Overlay, and more"
+msgstr ""
+
+#: classes/class-admin.php:2716
+msgid "Manage fonts, sizing, and appearance of distinct text components within the Skin"
+msgstr ""
+
+#: classes/class-admin.php:2736
+msgid "Padding"
+msgstr ""
+
+#: classes/class-admin.php:2739
+msgid "Margin"
+msgstr ""
+
+#: classes/class-admin.php:2742
+msgid "Items Gap"
+msgstr ""
+
+#: classes/class-admin.php:2818
+#: classes/class-settings.php:556
+msgid "Disabled"
+msgstr ""
+
+#: classes/class-admin.php:2828
+msgid "Popup"
+msgstr ""
+
+#: classes/class-admin.php:2845
+msgid "Target"
+msgstr ""
+
+#: classes/class-admin.php:2852
+msgid "New Tab (_blank)"
+msgstr ""
+
+#: classes/class-admin.php:2853
+msgid "Top Frame (_top)"
+msgstr ""
+
+#: classes/class-admin.php:2867
+msgid "Rel"
+msgstr ""
+
+#: classes/class-admin.php:2886
+msgid "Link URL click priority"
+msgstr ""
+
+#: classes/class-admin.php:2902
+msgid "Title Source"
+msgstr ""
+
+#: classes/class-admin.php:2915
+#: classes/class-admin.php:2943
+#: gutenberg/blocks/loop/lightbox-panel.js:28
+msgid "Item Excerpt"
+msgstr ""
+
+#: classes/class-admin.php:2916
+#: classes/class-admin.php:2944
+#: gutenberg/blocks/loop/lightbox-panel.js:29
+msgid "Item Author"
+msgstr ""
+
+#: classes/class-admin.php:2930
+msgid "Description Source"
+msgstr ""
+
+#: classes/class-admin.php:2960
+msgid "Manage media object priority"
+msgstr ""
+
+#: classes/class-admin.php:2961
+msgid "Quick View for posts and pages"
+msgstr ""
+
+#: classes/class-admin.php:2962
+msgid "Popup media item deep linking"
+msgstr ""
+
+#: classes/class-admin.php:2980
+msgid "Deeply customize actions of clicks on different types of items and links."
+msgstr ""
+
+#: classes/class-admin.php:3002
+#: gutenberg/blocks/item-template/edit.js:106
+msgid "Start"
+msgstr ""
+
+#: classes/class-admin.php:3011
+msgid "Middle"
+msgstr ""
+
+#: classes/class-admin.php:3014
+msgid "End"
+msgstr ""
+
+#: classes/class-admin.php:3044
+#: gutenberg/blocks/loop-sort/index.php:178
 #: gutenberg/layouts-editor/block/index.js:102
 msgid "Sort"
 msgstr ""
 
-#: classes/class-admin.php:3019
+#: classes/class-admin.php:3050
+#: classes/class-admin.php:3319
+#: gutenberg/blocks/loop-search/edit.js:99
+#: gutenberg/blocks/loop-search/edit.js:114
 msgid "Search"
 msgstr ""
 
-#: classes/class-admin.php:3025
+#: classes/class-admin.php:3056
 msgid "Layout Items"
 msgstr ""
 
-#: classes/class-admin.php:3030
+#: classes/class-admin.php:3061
 #: gutenberg/blocks/loop-pagination/index.php:118
-#: gutenberg/blocks/loop/edit.js:595
+#: gutenberg/blocks/loop/edit.js:655
 #: gutenberg/components/setup-wizard/index.js:227
 msgid "Pagination"
 msgstr ""
 
-#: classes/class-admin.php:3046
-#: classes/class-admin.php:3176
-#: classes/class-admin.php:3298
+#: classes/class-admin.php:3077
+#: classes/class-admin.php:3207
+#: classes/class-admin.php:3333
 msgid "Minimal"
 msgstr ""
 
-#: classes/class-admin.php:3060
-#: classes/class-admin.php:3190
+#: classes/class-admin.php:3091
+#: classes/class-admin.php:3221
 msgid "Dropdown"
 msgstr ""
 
-#: classes/class-admin.php:3153
-#: gutenberg/blocks/loop-filter/edit.js:308
-#: gutenberg/blocks/loop-filter/edit.js:314
+#: classes/class-admin.php:3184
+#: gutenberg/blocks/loop-filter/edit.js:487
+#: gutenberg/blocks/loop-filter/edit.js:493
 msgid "Display Count"
 msgstr ""
 
-#: classes/class-admin.php:3162
+#: classes/class-admin.php:3193
 msgid "All Button Text"
 msgstr ""
 
-#: classes/class-admin.php:3164
+#: classes/class-admin.php:3195
 #: classes/class-dashboard.php:264
-#: classes/class-get-portfolio.php:1476
-#: classes/class-rest.php:175
+#: classes/class-get-portfolio.php:1646
+#: classes/class-rest.php:184
 #: classes/class-shortcode.php:58
-#: gutenberg/blocks/loop-filter/edit.js:68
-#: gutenberg/blocks/loop/edit.js:58
-#: gutenberg/blocks/loop/starting-choices.js:90
-#: gutenberg/components/gallery-control/index.js:1138
+#: gutenberg/blocks/loop-filter/index.php:84
+#: gutenberg/blocks/loop-filter/edit.js:80
+#: gutenberg/blocks/loop/edit.js:91
+#: gutenberg/blocks/loop/starting-choices.js:98
+#: gutenberg/components/gallery-control/index.js:1145
 msgid "All"
 msgstr ""
 
-#: classes/class-admin.php:3287
+#: classes/class-admin.php:3320
 msgid "The search module is only available for Pro users."
 msgstr ""
 
-#: classes/class-admin.php:3392
-#: gutenberg/blocks/item-template/edit.js:823
-#: gutenberg/blocks/item-template/edit.js:830
+#: classes/class-admin.php:3427
 msgid "Type"
 msgstr ""
 
-#: classes/class-admin.php:3399
+#: classes/class-admin.php:3434
 msgid "Paged"
 msgstr ""
 
-#: classes/class-admin.php:3404
-#: classes/class-admin.php:3437
-#: classes/class-admin.php:3492
-#: gutenberg/blocks/loop-pagination-trigger/index.php:57
-#: gutenberg/blocks/loop-pagination-trigger/edit.js:88
+#: classes/class-admin.php:3439
+#: classes/class-admin.php:3472
+#: classes/class-admin.php:3527
+#: gutenberg/blocks/loop-pagination-trigger/index.php:56
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:127
 #: gutenberg/blocks/loop-pagination-trigger/variations.js:24
 msgid "Load More"
 msgstr ""
 
-#: classes/class-admin.php:3409
+#: classes/class-admin.php:3444
 #: gutenberg/blocks/loop-pagination-trigger/variations.js:39
 msgid "Infinite"
 msgstr ""
 
-#: classes/class-admin.php:3419
+#: classes/class-admin.php:3454
 msgid "Note: you will see the \"Load More\" pagination in the preview. \"Infinite\" pagination will be visible on the site."
 msgstr ""
 
-#: classes/class-admin.php:3434
-#: classes/class-admin.php:3489
+#: classes/class-admin.php:3469
+#: classes/class-admin.php:3524
 msgid "Texts"
-msgstr ""
-
-#: classes/class-admin.php:3438
-#: classes/class-admin.php:3493
-msgid "Load more button label"
-msgstr ""
-
-#: classes/class-admin.php:3455
-#: classes/class-admin.php:3510
-msgid "Loading More..."
-msgstr ""
-
-#: classes/class-admin.php:3456
-#: classes/class-admin.php:3511
-msgid "Loading more button label"
 msgstr ""
 
 #: classes/class-admin.php:3473
 #: classes/class-admin.php:3528
+msgid "Load more button label"
+msgstr ""
+
+#: classes/class-admin.php:3490
+#: classes/class-admin.php:3545
+msgid "Loading More..."
+msgstr ""
+
+#: classes/class-admin.php:3491
+#: classes/class-admin.php:3546
+msgid "Loading more button label"
+msgstr ""
+
+#: classes/class-admin.php:3508
+#: classes/class-admin.php:3563
+#: gutenberg/blocks/loop-pagination-end/edit.js:11
 msgid "You’ve reached the end of the list"
 msgstr ""
 
-#: classes/class-admin.php:3474
-#: classes/class-admin.php:3529
+#: classes/class-admin.php:3509
+#: classes/class-admin.php:3564
 msgid "End of the list text"
 msgstr ""
 
-#: classes/class-admin.php:3559
+#: classes/class-admin.php:3594
 msgid "Display Numbers"
 msgstr ""
 
-#: classes/class-admin.php:3574
+#: classes/class-admin.php:3609
 msgid "Scroll to Top"
 msgstr ""
 
-#: classes/class-admin.php:3591
+#: classes/class-admin.php:3626
 msgid "Scroll to Top Offset"
 msgstr ""
 
-#: classes/class-admin.php:3611
+#: classes/class-admin.php:3646
 msgid "Hide on Reached End"
 msgstr ""
 
-#: classes/class-admin.php:3629
-msgid "Adjust the loading threshold, limit the number of automatic loads and run the infinite scroll only after the Load button click."
+#: classes/class-admin.php:3665
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:33
+msgid "Load More on startup"
 msgstr ""
 
-#: classes/class-admin.php:3658
-msgid "Use <code>selector</code> rule to change block styles."
+#: classes/class-admin.php:3666
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:34
+msgid "Load the next page as soon as the gallery is shown."
 msgstr ""
 
-#: classes/class-admin.php:3659
-msgid "Example:"
+#: classes/class-admin.php:3669
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:42
+msgid "Pause every"
+msgstr ""
+
+#: classes/class-admin.php:3670
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:43
+msgid "Stop after a few pages and wait for a click."
+msgstr ""
+
+#: classes/class-admin.php:3673
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:51
+msgid "Threshold Distance"
+msgstr ""
+
+#: classes/class-admin.php:3674
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:52
+msgid "How far from the end of the gallery the next page starts to load."
 msgstr ""
 
 #: classes/class-admin.php:3705
-#: gutenberg/loop-sources/posts.js:186
+msgid "Use <code>selector</code> rule to change block styles."
+msgstr ""
+
+#: classes/class-admin.php:3706
+msgid "Example:"
+msgstr ""
+
+#: classes/class-admin.php:3752
+#: gutenberg/loop-sources/posts.js:332
 msgid "Post Types Set"
 msgstr ""
 
-#: classes/class-admin.php:3720
-#: gutenberg/loop-sources/posts.js:198
+#: classes/class-admin.php:3767
+#: gutenberg/loop-sources/posts.js:344
 msgid "Current Query"
 msgstr ""
 
 #. translators: %s - taxonomy name.
 #: classes/class-archive-mapping.php:444
-#: classes/class-archive-mapping.php:1529
+#: classes/class-archive-mapping.php:1674
 #, php-format
 msgid "Portfolio Category: %s"
 msgstr ""
 
 #. translators: %s - taxonomy name.
 #: classes/class-archive-mapping.php:450
-#: classes/class-archive-mapping.php:1533
+#: classes/class-archive-mapping.php:1678
 #, php-format
 msgid "Portfolio Tag: %s"
 msgstr ""
@@ -1313,8 +1404,8 @@ msgid "If you like, you may enter custom structures for your portfolio URLs here
 msgstr ""
 
 #: classes/class-archive-mapping.php:660
-#: classes/class-archive-mapping.php:764
-#: classes/class-archive-mapping.php:1246
+#: classes/class-archive-mapping.php:765
+#: classes/class-archive-mapping.php:1247
 msgctxt "default-slug"
 msgid "portfolio"
 msgstr ""
@@ -1335,148 +1426,147 @@ msgstr ""
 msgid "Enter a custom base to use. A base must be set or WordPress will use default instead."
 msgstr ""
 
-#: classes/class-archive-mapping.php:1152
+#: classes/class-archive-mapping.php:1153
 msgid "Portfolio"
 msgstr ""
 
-#: classes/class-archive-mapping.php:1228
+#: classes/class-archive-mapping.php:1229
 msgid "Portfolio Page"
 msgstr ""
 
-#: classes/class-archive-mapping.php:1273
+#: classes/class-archive-mapping.php:1274
 msgctxt "default-label"
 msgid "Portfolio"
 msgstr ""
 
-#: classes/class-ask-review.php:70
+#: classes/class-ask-review.php:75
 msgid "Satisfied using Visual Portfolio?"
 msgstr ""
 
 #. translators: %s - Plugin name.
-#: classes/class-ask-review.php:74
+#: classes/class-ask-review.php:79
 #, php-format
 msgid "Hey, we noticed you've been using %s for more than two weeks now – that's awesome!"
 msgstr ""
 
 #. translators: %s - Plugin name.
-#: classes/class-ask-review.php:74
+#: classes/class-ask-review.php:79
 msgctxt "plugin name inside the review notice"
 msgid "Visual Portfolio"
 msgstr ""
 
-#: classes/class-ask-review.php:77
+#: classes/class-ask-review.php:82
 msgid "Could you please do us a BIG favor and give it a rating on WordPress.org to help us spread the word and boost our motivation?"
 msgstr ""
 
-#: classes/class-ask-review.php:82
+#: classes/class-ask-review.php:87
 msgid "Yes, you deserve it"
 msgstr ""
 
-#: classes/class-ask-review.php:87
+#: classes/class-ask-review.php:92
 msgid "No, maybe later"
 msgstr ""
 
-#: classes/class-ask-review.php:90
+#: classes/class-ask-review.php:95
 msgid "I already did"
 msgstr ""
 
 #. translators: %s - plugin name.
-#: classes/class-assets.php:737
+#: classes/class-assets.php:736
 #, php-format
 msgid "Couldn't retrieve %s ID."
 msgstr ""
 
-#: classes/class-assets.php:739
+#: classes/class-assets.php:738
 msgid "Gallery items updated."
 msgstr ""
 
-#: classes/class-assets.php:741
+#: classes/class-assets.php:740
 msgid "Close (Esc)"
 msgstr ""
 
-#: classes/class-assets.php:742
-#: classes/class-assets.php:762
+#: classes/class-assets.php:741
+#: classes/class-assets.php:761
 msgid "Share"
 msgstr ""
 
-#: classes/class-assets.php:743
+#: classes/class-assets.php:742
 msgid "Toggle fullscreen"
 msgstr ""
 
-#: classes/class-assets.php:744
-#: gutenberg/popup/index.php:280
+#: classes/class-assets.php:743
 msgid "Zoom in/out"
 msgstr ""
 
-#: classes/class-assets.php:745
+#: classes/class-assets.php:744
 msgid "Previous (arrow left)"
 msgstr ""
 
-#: classes/class-assets.php:746
+#: classes/class-assets.php:745
 msgid "Next (arrow right)"
 msgstr ""
 
-#: classes/class-assets.php:747
+#: classes/class-assets.php:746
 msgid "Share on Facebook"
 msgstr ""
 
-#: classes/class-assets.php:748
+#: classes/class-assets.php:747
+#: classes/class-settings.php:260
 msgid "X"
 msgstr ""
 
-#: classes/class-assets.php:749
+#: classes/class-assets.php:748
 msgid "LinkedIn"
 msgstr ""
 
-#: classes/class-assets.php:750
+#: classes/class-assets.php:749
 msgid "Pin it"
 msgstr ""
 
-#: classes/class-assets.php:751
-#: classes/class-assets.php:761
+#: classes/class-assets.php:750
+#: classes/class-assets.php:760
 msgid "Download"
 msgstr ""
 
-#: classes/class-assets.php:753
-#: gutenberg/popup/index.php:279
+#: classes/class-assets.php:752
 msgid "Close"
 msgstr ""
 
-#: classes/class-assets.php:754
-#: gutenberg/blocks/loop-pagination-next/index.php:64
-#: gutenberg/popup/index.php:282
+#: classes/class-assets.php:753
+#: gutenberg/blocks/loop-pagination-next/index.php:63
 #: gutenberg/blocks/loop-pagination-next/edit.js:27
 msgid "Next"
 msgstr ""
 
-#: classes/class-assets.php:755
-#: gutenberg/blocks/loop-pagination-previous/index.php:69
-#: gutenberg/popup/index.php:281
+#: classes/class-assets.php:754
+#: gutenberg/blocks/loop-pagination-previous/index.php:68
 #: gutenberg/blocks/loop-pagination-previous/edit.js:35
 msgid "Previous"
 msgstr ""
 
-#: classes/class-assets.php:756
+#: classes/class-assets.php:755
 msgid "The requested content cannot be loaded. <br /> Please try again later."
 msgstr ""
 
-#: classes/class-assets.php:757
+#: classes/class-assets.php:756
 msgid "Start slideshow"
 msgstr ""
 
-#: classes/class-assets.php:758
+#: classes/class-assets.php:757
 msgid "Pause slideshow"
 msgstr ""
 
-#: classes/class-assets.php:759
+#: classes/class-assets.php:758
 msgid "Full screen"
 msgstr ""
 
-#: classes/class-assets.php:760
+#: classes/class-assets.php:759
+#: gutenberg/blocks/loop-carousel-thumbnails/edit.js:49
 msgid "Thumbnails"
 msgstr ""
 
-#: classes/class-assets.php:763
+#: classes/class-assets.php:762
+#: gutenberg/blocks/item-template/effects.js:48
 msgid "Zoom"
 msgstr ""
 
@@ -1484,7 +1574,7 @@ msgstr ""
 msgid "Gallery Item"
 msgstr ""
 
-#: classes/class-controls.php:174
+#: classes/class-controls.php:180
 msgid "Dynamic control callback function is not found."
 msgstr ""
 
@@ -1492,7 +1582,7 @@ msgstr ""
 msgid "https://"
 msgstr ""
 
-#: classes/class-custom-post-meta.php:396
+#: classes/class-custom-post-meta.php:400
 msgid "< 1"
 msgstr ""
 
@@ -1617,6 +1707,7 @@ msgid "Portfolio Author"
 msgstr ""
 
 #: classes/class-custom-post-type.php:704
+#: gutenberg/loop-sources/posts.js:41
 msgid "Thumbnail"
 msgstr ""
 
@@ -1643,6 +1734,8 @@ msgid "Saved Layouts may be only used for 3rd-party builders (such as Elementor,
 msgstr ""
 
 #: classes/class-custom-post-type.php:788
+#: gutenberg/blocks/loop-carousel-autoplay/edit.js:45
+#: gutenberg/utils/carousel-controls/index.js:171
 msgid "Icon"
 msgstr ""
 
@@ -1664,13 +1757,17 @@ msgstr ""
 
 #: classes/class-custom-post-type.php:1074
 #: classes/class-custom-post-type.php:1075
-#: classes/class-welcome-screen.php:284
+#: classes/class-welcome-screen.php:290
 msgid "Documentation"
 msgstr ""
 
 #: classes/class-custom-post-type.php:1095
 #: classes/class-custom-post-type.php:1096
 msgid "Proofing"
+msgstr ""
+
+#: classes/class-custom-post-type.php:1128
+msgid "Premium Only"
 msgstr ""
 
 #: classes/class-custom-post-type.php:1131
@@ -1733,82 +1830,84 @@ msgstr ""
 msgid "Caption Align"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2692
+#: classes/class-get-portfolio.php:2998
 msgid "Default sorting"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2693
+#: classes/class-get-portfolio.php:2999
 msgid "Sort by date (newest)"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2694
+#: classes/class-get-portfolio.php:3000
 msgid "Sort by date (oldest)"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2695
+#: classes/class-get-portfolio.php:3001
 msgid "Sort by title (A-Z)"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2696
+#: classes/class-get-portfolio.php:3002
 msgid "Sort by title (Z-A)"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2856
+#: classes/class-get-portfolio.php:3162
 msgid "video"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2857
+#: classes/class-get-portfolio.php:3163
 msgid "audio"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2858
+#: classes/class-get-portfolio.php:3164
 msgid "gallery"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2873
+#: classes/class-get-portfolio.php:3179
 msgid "Post"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2874
+#: classes/class-get-portfolio.php:3180
 msgid "Page"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2875
+#: classes/class-get-portfolio.php:3181
 msgid "Product"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2876
+#: classes/class-get-portfolio.php:3182
 msgid "Shop"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2877
+#: classes/class-get-portfolio.php:3183
 msgid "Project"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2878
+#: classes/class-get-portfolio.php:3184
 msgid "Work"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2895
+#: classes/class-get-portfolio.php:3201
 msgid "image"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2896
+#: classes/class-get-portfolio.php:3202
 msgid "social post"
 msgstr ""
 
-#: classes/class-get-portfolio.php:2903
+#: classes/class-get-portfolio.php:3209
 msgid "item"
 msgstr ""
 
 #. translators: %s - item type label such as image, post type name, video, etc.
-#: classes/class-get-portfolio.php:2925
+#: classes/class-get-portfolio.php:3231
 #, php-format
 msgid "Open %s"
 msgstr ""
 
 #. translators: %s - published in human format.
-#: classes/class-get-portfolio.php:2992
+#. translators: %s: human-readable time difference.
+#: classes/class-get-portfolio.php:3302
+#: gutenberg/blocks/item-date/index.php:82
 #, php-format
 msgid "%s ago"
 msgstr ""
@@ -1829,57 +1928,59 @@ msgstr ""
 msgid "Extra Large (VP)"
 msgstr ""
 
-#: classes/class-rest.php:211
-#: classes/class-rest.php:452
+#: classes/class-rest.php:266
+#: classes/class-rest.php:434
 msgid "Required parameters are missing."
 msgstr ""
 
-#: classes/class-rest.php:358
+#: classes/class-rest.php:340
 msgid "Sorry, you are not allowed to get filter items."
 msgstr ""
 
-#: classes/class-rest.php:394
+#: classes/class-rest.php:376
 msgid "Sorry, you are not allowed to get gallery items."
 msgstr ""
 
-#: classes/class-rest.php:614
+#: classes/class-rest.php:567
 msgid "Sorry, you are not allowed to get list of saved layouts."
 msgstr ""
 
-#: classes/class-rest.php:660
+#: classes/class-rest.php:613
 msgid "Post ID is required for this request."
 msgstr ""
 
-#: classes/class-rest.php:664
+#: classes/class-rest.php:618
 msgid "Sorry, you are not allowed to edit saved layouts data."
 msgstr ""
 
-#: classes/class-rest.php:720
-#: classes/class-rest.php:724
+#: classes/class-rest.php:674
+#: classes/class-rest.php:678
 msgid "User don't have permissions to change options."
 msgstr ""
 
 #: classes/class-settings.php:128
 #: classes/class-settings.php:129
-#: classes/class-settings.php:853
-#: gutenberg/blocks/item-author/edit.js:48
-#: gutenberg/blocks/item-categories/edit.js:43
-#: gutenberg/blocks/item-cover/edit.js:343
-#: gutenberg/blocks/item-date/edit.js:50
-#: gutenberg/blocks/item-description/edit.js:91
-#: gutenberg/blocks/item-image/edit.js:215
-#: gutenberg/blocks/item-meta/edit.js:61
-#: gutenberg/blocks/item-read-more/edit.js:43
-#: gutenberg/blocks/item-template/edit.js:803
-#: gutenberg/blocks/item-title/edit.js:70
-#: gutenberg/blocks/loop-filter/edit.js:296
+#: classes/class-settings.php:967
+#: gutenberg/blocks/item-author/edit.js:95
+#: gutenberg/blocks/item-categories/edit.js:117
+#: gutenberg/blocks/item-cover/edit.js:374
+#: gutenberg/blocks/item-date/edit.js:59
+#: gutenberg/blocks/item-description/edit.js:103
+#: gutenberg/blocks/item-image/edit.js:385
+#: gutenberg/blocks/item-meta/edit.js:75
+#: gutenberg/blocks/item-read-more/edit.js:38
+#: gutenberg/blocks/item-template/edit.js:1106
+#: gutenberg/blocks/item-title/edit.js:76
+#: gutenberg/blocks/loop-filter/edit.js:445
 #: gutenberg/blocks/loop-pagination-numbers/edit.js:78
-#: gutenberg/blocks/loop-pagination-trigger/edit.js:38
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:71
 #: gutenberg/blocks/loop-pagination/edit.js:40
-#: gutenberg/blocks/loop-sort/edit.js:98
+#: gutenberg/blocks/loop-query-total/edit.js:62
+#: gutenberg/blocks/loop-search/edit.js:56
+#: gutenberg/blocks/loop-sort/edit.js:110
 #: gutenberg/components/elements-selector/index.js:141
 #: gutenberg/loop-sources/images.js:105
-#: gutenberg/loop-sources/posts.js:151
+#: gutenberg/loop-sources/posts.js:295
 msgid "Settings"
 msgstr ""
 
@@ -1892,381 +1993,450 @@ msgstr ""
 msgid "Popup & Lightbox"
 msgstr ""
 
-#: classes/class-settings.php:214
-msgid "Watermarks"
-msgstr ""
-
-#: classes/class-settings.php:219
-msgid "Social Feeds"
-msgstr ""
-
 #: classes/class-settings.php:224
 msgid "White Label"
 msgstr ""
 
-#: classes/class-settings.php:268
-msgid "Register Portfolio Post Type"
+#: classes/class-settings.php:257
+msgid "Instagram"
+msgstr ""
+
+#: classes/class-settings.php:258
+msgid "YouTube"
+msgstr ""
+
+#: classes/class-settings.php:259
+msgid "Flickr"
 msgstr ""
 
 #: classes/class-settings.php:269
-msgid "Add custom post type `portfolio` to showcase your works."
+msgid "+ Connect"
 msgstr ""
 
-#: classes/class-settings.php:275
-msgid "Archive Page"
+#: classes/class-settings.php:280
+#: gutenberg/blocks/item-image/edit.js:67
+msgid "Watermark"
 msgstr ""
 
-#: classes/class-settings.php:276
-msgid "Base page of your portfolio, where will be placed your works archive."
+#: classes/class-settings.php:283
+msgid "Add Watermark"
 msgstr ""
 
 #: classes/class-settings.php:288
-msgid "Archive Page Items Per Page"
+msgid "Size"
 msgstr ""
 
-#: classes/class-settings.php:301
-msgid "Filter Taxonomies"
+#: classes/class-settings.php:294
+msgid "Watermark will be scaled to the chosen percentage of the original image size"
 msgstr ""
 
-#: classes/class-settings.php:302
-msgid "You can show custom taxonomies in the portfolio Filter. Enter some taxonomies by \",\" separating values. Example: \"product_cat,product_tag\""
+#: classes/class-settings.php:298
+msgid "Opacity"
 msgstr ""
 
-#: classes/class-settings.php:308
-msgid "Placeholder Image"
+#: classes/class-settings.php:307
+msgid "Autogenerate"
 msgstr ""
 
-#: classes/class-settings.php:309
-msgid "This image used on items in layouts where image is not specified."
+#: classes/class-settings.php:310
+msgid "Automatically apply watermark during image upload"
 msgstr ""
 
-#: classes/class-settings.php:313
-msgid "Choose image"
+#: classes/class-settings.php:315
+msgid "Social feeds such as Instagram, Youtube, Flickr, X, etc..."
 msgstr ""
 
 #: classes/class-settings.php:320
+msgid "Remove our plugin brand and logos from Front and Admin areas"
+msgstr ""
+
+#: classes/class-settings.php:325
+msgid "Enable White Label"
+msgstr ""
+
+#: classes/class-settings.php:327
+msgid "Change the plugin name and logos to your brand."
+msgstr ""
+
+#: classes/class-settings.php:331
+msgid "Brand Name"
+msgstr ""
+
+#: classes/class-settings.php:337
+msgid "Logo Dark"
+msgstr ""
+
+#: classes/class-settings.php:339
+#: classes/class-settings.php:345
+msgid "Use circle image 100x100 in PNG format."
+msgstr ""
+
+#: classes/class-settings.php:343
+msgid "Logo White"
+msgstr ""
+
+#. translators: %s: name of a settings tab, such as "White Label".
+#: classes/class-settings.php:390
+#, php-format
+msgid "%s comes with Visual Portfolio Pro."
+msgstr ""
+
+#: classes/class-settings.php:398
+msgid "(opens in a new tab)"
+msgstr ""
+
+#: classes/class-settings.php:420
+msgid "Register Portfolio Post Type"
+msgstr ""
+
+#: classes/class-settings.php:421
+msgid "Add custom post type `portfolio` to showcase your works."
+msgstr ""
+
+#: classes/class-settings.php:427
+msgid "Archive Page"
+msgstr ""
+
+#: classes/class-settings.php:428
+msgid "Base page of your portfolio, where will be placed your works archive."
+msgstr ""
+
+#: classes/class-settings.php:440
+msgid "Archive Page Items Per Page"
+msgstr ""
+
+#: classes/class-settings.php:453
+msgid "Filter Taxonomies"
+msgstr ""
+
+#: classes/class-settings.php:454
+msgid "You can show custom taxonomies in the portfolio Filter. Enter some taxonomies by \",\" separating values. Example: \"product_cat,product_tag\""
+msgstr ""
+
+#: classes/class-settings.php:460
+msgid "Placeholder Image"
+msgstr ""
+
+#: classes/class-settings.php:461
+msgid "This image used on items in layouts where image is not specified."
+msgstr ""
+
+#: classes/class-settings.php:465
+msgid "Choose image"
+msgstr ""
+
+#: classes/class-settings.php:472
 msgid "AJAX Cache and Preload"
 msgstr ""
 
-#: classes/class-settings.php:321
+#: classes/class-settings.php:473
 msgid "Reduce AJAX calls request time."
 msgstr ""
 
-#: classes/class-settings.php:330
+#: classes/class-settings.php:482
 msgid "Responsive Breakpoints"
 msgstr ""
 
-#: classes/class-settings.php:336
-#: classes/class-settings.php:454
+#: classes/class-settings.php:488
+#: classes/class-settings.php:606
 msgid "Extra Large"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:343
+#: classes/class-settings.php:495
 #, php-format
 msgid "Sets the breakpoint on extra large screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:348
-#: classes/class-settings.php:447
-#: classes/class-settings.php:481
+#: classes/class-settings.php:500
+#: classes/class-settings.php:599
+#: classes/class-settings.php:633
 msgid "Large"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:355
+#: classes/class-settings.php:507
 #, php-format
 msgid "Sets the breakpoint on large screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:360
-#: classes/class-settings.php:440
-#: classes/class-settings.php:474
+#: classes/class-settings.php:512
+#: classes/class-settings.php:592
+#: classes/class-settings.php:626
 msgid "Medium"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:367
+#: classes/class-settings.php:519
 #, php-format
 msgid "Sets the breakpoint on medium screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:372
-#: classes/class-settings.php:433
-#: classes/class-settings.php:467
+#: classes/class-settings.php:524
+#: classes/class-settings.php:585
+#: classes/class-settings.php:619
 msgid "Small"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:379
+#: classes/class-settings.php:531
 #, php-format
 msgid "Sets the breakpoint on small screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:384
+#: classes/class-settings.php:536
 msgid "Extra Small"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:391
+#: classes/class-settings.php:543
 #, php-format
 msgid "Sets the breakpoint on extra small screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:398
+#: classes/class-settings.php:550
 msgid "Lazy Loading"
 msgstr ""
 
 #. translators: %s - plugin brand name.
-#: classes/class-settings.php:400
+#: classes/class-settings.php:552
 #, php-format
 msgid "Enable lazy loading for %s layouts only or for the whole website."
 msgstr ""
 
 #. translators: %s - plugin brand name.
-#: classes/class-settings.php:406
+#: classes/class-settings.php:558
 #, php-format
 msgid "%s Only"
 msgstr ""
 
-#: classes/class-settings.php:407
+#: classes/class-settings.php:559
 msgid "All images"
 msgstr ""
 
-#: classes/class-settings.php:412
+#: classes/class-settings.php:564
 msgid "Lazy Loading Excludes"
 msgstr ""
 
 #. translators: %s - link text.
-#: classes/class-settings.php:415
+#: classes/class-settings.php:567
 #, php-format
 msgid "Listed images will not be lazy loaded. Both full URLs and partial strings can be used. One per line. <a href=\"%1$s\">%2$s</a>"
 msgstr ""
 
 #. translators: %s - link text.
-#: classes/class-settings.php:415
+#: classes/class-settings.php:567
 msgid "More info"
 msgstr ""
 
-#: classes/class-settings.php:427
+#: classes/class-settings.php:579
 msgid "Layouts Image Sizes"
 msgstr ""
 
-#: classes/class-settings.php:428
+#: classes/class-settings.php:580
 msgid "Image sizes used in portfolio layouts."
 msgstr ""
 
-#: classes/class-settings.php:461
+#: classes/class-settings.php:613
 msgid "Lightbox Image Sizes"
 msgstr ""
 
-#: classes/class-settings.php:462
+#: classes/class-settings.php:614
 msgid "Image sizes used in lightbox images."
 msgstr ""
 
 #. translators: %s: regenerate thumbnails url.
-#: classes/class-settings.php:489
+#: classes/class-settings.php:641
 #, php-format
 msgid "After publishing your changes, new image sizes may not be shown until you <a href=\"%s\" target=\"_blank\">Regenerate Thumbnails</a>."
 msgstr ""
 
-#: classes/class-settings.php:497
+#: classes/class-settings.php:649
 msgid "Vendor Script"
 msgstr ""
 
-#: classes/class-settings.php:500
+#: classes/class-settings.php:652
 msgid "Fancybox"
 msgstr ""
 
-#: classes/class-settings.php:501
+#: classes/class-settings.php:653
 msgid "PhotoSwipe"
 msgstr ""
 
-#: classes/class-settings.php:509
+#: classes/class-settings.php:661
 msgid "Lightbox for WordPress Images"
 msgstr ""
 
-#: classes/class-settings.php:510
+#: classes/class-settings.php:662
 msgid "Enable lightbox for WordPress native galleries and images."
 msgstr ""
 
-#: classes/class-settings.php:524
+#: classes/class-settings.php:676
 msgid "Deep Linking"
 msgstr ""
 
-#: classes/class-settings.php:525
+#: classes/class-settings.php:677
 msgid "Makes URL automatically change to reflect the current opened popup, and you can easily link directly to that image or video."
 msgstr ""
 
-#: classes/class-settings.php:532
+#: classes/class-settings.php:684
 msgid "Use Deep Linking URL to Share Images"
 msgstr ""
 
-#: classes/class-settings.php:533
+#: classes/class-settings.php:685
 msgid "Check to share Deep Linking URLs when sharing images. When disabled, all galleries will share direct links to image files."
 msgstr ""
 
-#: classes/class-settings.php:551
+#: classes/class-settings.php:703
 msgid "Load Next Pages"
 msgstr ""
 
-#: classes/class-settings.php:552
+#: classes/class-settings.php:704
 msgid "Automatically load the next page of items while browsing the gallery when Load More or Infinite pagination is used."
 msgstr ""
 
-#: classes/class-settings.php:561
+#: classes/class-settings.php:713
 msgid "Click to Zoom"
 msgstr ""
 
-#: classes/class-settings.php:569
+#: classes/class-settings.php:721
 msgid "Restore Focus"
 msgstr ""
 
-#: classes/class-settings.php:570
+#: classes/class-settings.php:722
 msgid "Restore focus on the last active item after Popup is closed."
 msgstr ""
 
-#: classes/class-settings.php:578
+#: classes/class-settings.php:730
 msgid "UI Elements"
 msgstr ""
 
-#: classes/class-settings.php:584
+#: classes/class-settings.php:736
 msgid "Arrows to navigate between images."
 msgstr ""
 
-#: classes/class-settings.php:590
+#: classes/class-settings.php:742
 msgid "Display Images Counter"
 msgstr ""
 
-#: classes/class-settings.php:591
+#: classes/class-settings.php:743
 msgid "On the top left corner will be showed images counter."
 msgstr ""
 
-#: classes/class-settings.php:597
+#: classes/class-settings.php:749
 msgid "Display Zoom Button"
 msgstr ""
 
-#: classes/class-settings.php:603
+#: classes/class-settings.php:755
 msgid "Display Fullscreen Button"
 msgstr ""
 
-#: classes/class-settings.php:609
+#: classes/class-settings.php:761
 msgid "Display Share Button"
 msgstr ""
 
-#: classes/class-settings.php:615
+#: classes/class-settings.php:767
 msgid "Display Download Button"
 msgstr ""
 
-#: classes/class-settings.php:621
+#: classes/class-settings.php:773
 msgid "Display Close Button"
 msgstr ""
 
-#: classes/class-settings.php:642
+#: classes/class-settings.php:794
 msgid "Thumbnails Opened At Startup"
 msgstr ""
 
-#: classes/class-settings.php:659
+#: classes/class-settings.php:811
 msgid "Thumbnails Position"
 msgstr ""
 
-#: classes/class-settings.php:663
+#: classes/class-settings.php:815
 msgid "Vertical"
 msgstr ""
 
-#: classes/class-settings.php:664
+#: classes/class-settings.php:816
 msgid "Horizontal"
 msgstr ""
 
-#: classes/class-settings.php:680
+#: classes/class-settings.php:832
 msgid "Display Slideshow"
 msgstr ""
 
-#: classes/class-settings.php:695
+#: classes/class-settings.php:847
 msgid "Albums"
 msgstr ""
 
-#: classes/class-settings.php:701
+#: classes/class-settings.php:853
 msgid "Isolated Album Popup"
 msgstr ""
 
-#: classes/class-settings.php:702
+#: classes/class-settings.php:854
 msgid "When enabled, clicking an album opens a popup with only that album's images. Navigation to other items is disabled."
 msgstr ""
 
-#: classes/class-settings.php:709
+#: classes/class-settings.php:861
 msgid "Album Lazy Load Threshold"
 msgstr ""
 
-#: classes/class-settings.php:710
+#: classes/class-settings.php:862
 msgid "Number of album images to render inline. Additional images are loaded via REST API when the popup opens."
 msgstr ""
 
-#: classes/class-settings.php:721
+#: classes/class-settings.php:873
+#: gutenberg/utils/click-actions.js:44
 msgid "Quick View"
 msgstr ""
 
-#: classes/class-settings.php:727
+#: classes/class-settings.php:879
 msgid "Display URL Button"
 msgstr ""
 
-#: classes/class-settings.php:728
+#: classes/class-settings.php:880
 msgid "Button with page URL will be placed in the popup toolbar."
 msgstr ""
 
-#: classes/class-settings.php:735
+#: classes/class-settings.php:887
 msgid "Internal Links"
 msgstr ""
 
-#: classes/class-settings.php:739
-#: classes/class-settings.php:752
+#: classes/class-settings.php:891
+#: classes/class-settings.php:904
 msgid "Open in New Tab"
 msgstr ""
 
-#: classes/class-settings.php:740
-#: classes/class-settings.php:753
+#: classes/class-settings.php:892
+#: classes/class-settings.php:905
 msgid "Open in Current Tab"
 msgstr ""
 
-#: classes/class-settings.php:741
-#: classes/class-settings.php:754
+#: classes/class-settings.php:893
+#: classes/class-settings.php:906
 msgid "Open in Frame (not recommended)"
 msgstr ""
 
-#: classes/class-settings.php:742
-#: classes/class-settings.php:755
+#: classes/class-settings.php:894
+#: classes/class-settings.php:907
 msgid "Prevent Click"
 msgstr ""
 
-#: classes/class-settings.php:748
+#: classes/class-settings.php:900
 msgid "External Links"
 msgstr ""
 
-#: classes/class-settings.php:762
+#: classes/class-settings.php:914
 msgid "When you display posts and pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`."
 msgstr ""
 
-#: classes/class-settings.php:784
+#: classes/class-settings.php:936
 msgid "Misc"
 msgstr ""
 
-#: classes/class-settings.php:789
+#: classes/class-settings.php:941
 msgid "Background Color"
 msgstr ""
 
-#: classes/class-settings.php:801
-msgid "Protect your works using watermarks"
-msgstr ""
-
-#: classes/class-settings.php:816
-msgid "Social feeds such as Instagram, Youtube, Flickr, X, etc..."
-msgstr ""
-
-#: classes/class-settings.php:831
-msgid "Remove our plugin brand and logos from Front and Admin areas"
-msgstr ""
-
-#: classes/class-settings.php:897
+#: classes/class-settings.php:1011
 msgid "-- Select Page --"
 msgstr ""
 
@@ -2446,28 +2616,50 @@ msgstr ""
 msgid "Get access to many more Pro features for layout control, client work, integrations, performance, and advanced customization."
 msgstr ""
 
-#: classes/class-welcome-screen.php:213
-#: classes/class-welcome-screen.php:214
+#: classes/class-welcome-screen.php:219
+#: classes/class-welcome-screen.php:220
 msgid "Visual Portfolio Welcome Screen"
 msgstr ""
 
-#: classes/class-welcome-screen.php:282
+#: classes/class-welcome-screen.php:288
 msgid "Compare Free vs Pro"
 msgstr ""
 
-#: classes/class-welcome-screen.php:309
+#: classes/class-welcome-screen.php:315
 msgid "See Pro details"
 msgstr ""
 
 #: gutenberg/blocks/item-author/index.php:69
-#: gutenberg/blocks/item-author/edit.js:24
+#: gutenberg/blocks/item-author/edit.js:26
 msgid "by "
 msgstr ""
 
+#. translators: %s: human-readable time difference.
+#: gutenberg/blocks/item-date/index.php:80
+#, php-format
+msgid "%s from now"
+msgstr ""
+
+#: gutenberg/blocks/item-meta/index.php:121
+#: templates/items-list/item-parts/meta-comments.php:59
+#: gutenberg/blocks/item-meta/meta-types.js:26
+msgid "No Comments"
+msgstr ""
+
+#. translators: %s number of comments.
+#: gutenberg/blocks/item-meta/index.php:126
+#: templates/items-list/item-parts/meta-comments.php:62
+#: gutenberg/blocks/item-meta/meta-types.js:31
+#, php-format,js-format
+msgid "%s Comment"
+msgid_plural "%s Comments"
+msgstr[0] ""
+msgstr[1] ""
+
 #. translators: %s number of views.
-#: gutenberg/blocks/item-meta/index.php:80
+#: gutenberg/blocks/item-meta/index.php:141
 #: templates/items-list/item-parts/meta-views.php:51
-#: gutenberg/blocks/item-meta/meta-types.js:53
+#: gutenberg/blocks/item-meta/meta-types.js:45
 #, php-format,js-format
 msgid "%s View"
 msgid_plural "%s Views"
@@ -2475,28 +2667,12 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s reading time in minutes.
-#: gutenberg/blocks/item-meta/index.php:92
+#: gutenberg/blocks/item-meta/index.php:160
 #: templates/items-list/item-parts/meta-reading-time.php:53
-#: gutenberg/blocks/item-meta/meta-types.js:67
+#: gutenberg/blocks/item-meta/meta-types.js:63
 #, php-format,js-format
 msgid "%s Min Read"
 msgid_plural "%s Mins Read"
-msgstr[0] ""
-msgstr[1] ""
-
-#: gutenberg/blocks/item-meta/index.php:98
-#: templates/items-list/item-parts/meta-comments.php:59
-#: gutenberg/blocks/item-meta/meta-types.js:75
-msgid "No Comments"
-msgstr ""
-
-#. translators: %s number of comments.
-#: gutenberg/blocks/item-meta/index.php:103
-#: templates/items-list/item-parts/meta-comments.php:62
-#: gutenberg/blocks/item-meta/meta-types.js:80
-#, php-format,js-format
-msgid "%s Comment"
-msgid_plural "%s Comments"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2506,76 +2682,136 @@ msgstr[1] ""
 msgid ": %s"
 msgstr ""
 
-#: gutenberg/blocks/item-read-more/index.php:132
-#: gutenberg/blocks/item-read-more/edit.js:150
+#: gutenberg/blocks/item-read-more/index.php:128
+#: gutenberg/blocks/item-read-more/edit.js:145
 msgid "Read more"
 msgstr ""
 
-#: gutenberg/blocks/item-template/index.php:608
-msgid "Previous slide"
-msgstr ""
-
-#: gutenberg/blocks/item-template/index.php:609
-msgid "Next slide"
-msgstr ""
-
-#: gutenberg/blocks/item-template/index.php:644
-msgid "Carousel position"
-msgstr ""
-
-#. translators: %d: slide number.
-#: gutenberg/blocks/item-template/index.php:653
-#, php-format
-msgid "Go to slide %d"
-msgstr ""
-
-#: gutenberg/blocks/item-template/index.php:981
+#: gutenberg/blocks/item-template/index.php:1246
 msgid "Gallery carousel"
 msgstr ""
 
-#: gutenberg/blocks/loop-filter-item/index.php:149
-#: gutenberg/blocks/loop/edit.js:320
+#: gutenberg/blocks/loop-carousel-autoplay/index.php:81
+#: gutenberg/blocks/loop-carousel-autoplay/index.php:83
+#: gutenberg/blocks/loop-carousel-autoplay/edit.js:63
+msgid "Stop the carousel"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-autoplay/index.php:82
+msgid "Start the carousel"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/index.php:78
+msgid "Carousel position"
+msgstr ""
+
+#. translators: 1: slide number, 2: number of slides.
+#: gutenberg/blocks/loop-carousel-indicator/index.php:91
+#, php-format
+msgid "Slide %1$d of %2$d"
+msgstr ""
+
+#. translators: %d: slide number.
+#: gutenberg/blocks/loop-carousel-indicator/index.php:112
+#: gutenberg/blocks/loop-carousel-thumbnails/index.php:64
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:134
+#, php-format,js-format
+msgid "Go to slide %d"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-next/index.php:49
+#: gutenberg/blocks/loop-carousel-next/edit.js:58
+msgid "Next slide"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-previous/index.php:49
+#: gutenberg/blocks/loop-carousel-previous/edit.js:58
+msgid "Previous slide"
+msgstr ""
+
+#. translators: 1: category name, 2: number of items in it.
+#: gutenberg/blocks/loop-filter-item/index.php:129
+#: gutenberg/blocks/loop-filter/edit.js:121
+#, php-format,js-format
+msgid "%1$s (%2$s)"
+msgstr ""
+
+#: gutenberg/blocks/loop-filter-item/index.php:168
+#: gutenberg/blocks/loop/edit.js:378
 msgid "Display all items"
 msgstr ""
 
 #. translators: %s filter name.
-#: gutenberg/blocks/loop-filter-item/index.php:153
+#: gutenberg/blocks/loop-filter-item/index.php:172
 #, php-format
 msgid "Filter by %s"
 msgstr ""
 
-#: gutenberg/blocks/loop-filter/index.php:55
+#: gutenberg/blocks/loop-filter/index.php:227
+#: gutenberg/blocks/loop-filter/index.php:241
 msgid "Category filter"
 msgstr ""
 
+#: gutenberg/blocks/loop-filter/index.php:228
+#: gutenberg/blocks/loop-filter/edit.js:424
+msgid "Select category"
+msgstr ""
+
 #. translators: %s page number.
-#: gutenberg/blocks/loop-pagination-numbers/index.php:89
-#: gutenberg/blocks/loop-pagination-numbers/index.php:96
+#: gutenberg/blocks/loop-pagination-numbers/index.php:88
+#: gutenberg/blocks/loop-pagination-numbers/index.php:95
 #, php-format
 msgid "Page %s"
 msgstr ""
 
-#: gutenberg/blocks/loop-pagination-trigger/index.php:58
-#: gutenberg/blocks/loop-pagination-trigger/edit.js:64
+#: gutenberg/blocks/loop-pagination-trigger/index.php:57
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:97
 msgid "Loading..."
 msgstr ""
 
-#: gutenberg/blocks/loop-sort/index.php:144
+#. translators: 1: number of the first item shown, 2: number of the last item shown, 3: number of items found.
+#: gutenberg/blocks/loop-query-total/index.php:79
+#: gutenberg/blocks/loop-query-total/edit.js:46
+#, php-format,js-format
+msgid "Displaying %1$s – %2$s of %3$s"
+msgstr ""
+
+#. translators: 1: number of the item shown, 2: number of items found.
+#: gutenberg/blocks/loop-query-total/index.php:90
+#, php-format
+msgid "Displaying %1$s of %2$s"
+msgstr ""
+
+#. translators: %d: number of items found.
+#: gutenberg/blocks/loop-query-total/index.php:94
+#: gutenberg/blocks/loop-query-total/edit.js:53
+#, php-format,js-format
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: gutenberg/blocks/loop-sort/index.php:158
+#: gutenberg/blocks/loop-sort/index.php:176
 msgid "Sort items"
 msgstr ""
 
-#: gutenberg/popup/index.php:278
-#: gutenberg/loop-sources/gallery-manager/index.js:272
+#: gutenberg/blocks/loop-sort/index.php:177
+#: gutenberg/blocks/loop-sort/edit.js:222
+msgid "Select sorting"
+msgstr ""
+
+#: gutenberg/utils/item-format-badge/index.php:26
+#: gutenberg/loop-sources/posts.js:63
+#: gutenberg/utils/item-format-badge/index.js:25
+msgid "Audio"
+msgstr ""
+
+#: gutenberg/utils/item-format-badge/index.php:27
+#: gutenberg/loop-sources/gallery-manager/index.js:236
+#: gutenberg/loop-sources/posts.js:65
+#: gutenberg/utils/item-format-badge/index.js:56
 msgid "Gallery"
-msgstr ""
-
-#: gutenberg/popup/index.php:283
-msgid "The image could not be loaded."
-msgstr ""
-
-#: gutenberg/popup/index.php:284
-msgctxt "lightbox counter separator"
-msgid " / "
 msgstr ""
 
 #. translators: %s - author name.
@@ -2604,10 +2840,6 @@ msgstr ""
 msgid "Next Slide"
 msgstr ""
 
-#: templates/items-list/wrapper-start.php:34
-msgid "Visual Portfolio, Posts & Image Gallery for WordPress"
-msgstr ""
-
 #: gutenberg/block-saved/edit.js:36
 msgid "--- Select Layout ---"
 msgstr ""
@@ -2618,470 +2850,862 @@ msgstr ""
 msgid "Saved %s"
 msgstr ""
 
-#: gutenberg/blocks/item-author/edit.js:41
+#. translators: %d: avatar size in pixels.
+#: gutenberg/blocks/item-author/edit.js:32
+#, js-format
+msgid "%dpx"
+msgstr ""
+
+#: gutenberg/blocks/item-author/edit.js:65
 msgid "Gallery item author"
 msgstr ""
 
-#: gutenberg/blocks/item-author/edit.js:62
-#: gutenberg/blocks/item-author/edit.js:70
-#: gutenberg/blocks/item-meta/edit.js:113
-#: gutenberg/blocks/item-meta/edit.js:119
+#: gutenberg/blocks/item-author/edit.js:111
+#: gutenberg/blocks/item-author/edit.js:119
+msgid "Show avatar"
+msgstr ""
+
+#: gutenberg/blocks/item-author/edit.js:120
+msgid "Shown where the item has one: the author of a post, or the channel of a social feed."
+msgstr ""
+
+#: gutenberg/blocks/item-author/edit.js:132
+#: gutenberg/blocks/item-author/edit.js:140
+msgid "Avatar size"
+msgstr ""
+
+#: gutenberg/blocks/item-author/edit.js:155
+#: gutenberg/blocks/item-author/edit.js:163
+#: gutenberg/blocks/item-meta/edit.js:127
+#: gutenberg/blocks/item-meta/edit.js:133
 msgid "Prefix text"
 msgstr ""
 
-#: gutenberg/blocks/item-author/edit.js:78
-#: gutenberg/blocks/item-author/edit.js:84
+#: gutenberg/blocks/item-author/edit.js:171
+#: gutenberg/blocks/item-author/edit.js:177
 msgid "Link to author"
 msgstr ""
 
-#: gutenberg/blocks/item-author/edit.js:94
-#: gutenberg/blocks/item-author/edit.js:107
-#: gutenberg/blocks/item-cover/edit.js:474
-#: gutenberg/blocks/item-cover/edit.js:487
-#: gutenberg/blocks/item-image/edit.js:266
-#: gutenberg/blocks/item-image/edit.js:279
-#: gutenberg/blocks/item-read-more/edit.js:94
-#: gutenberg/blocks/item-read-more/edit.js:106
-#: gutenberg/blocks/item-title/edit.js:103
-#: gutenberg/blocks/item-title/edit.js:116
+#: gutenberg/blocks/item-author/edit.js:187
+#: gutenberg/blocks/item-author/edit.js:200
+#: gutenberg/blocks/item-cover/edit.js:505
+#: gutenberg/blocks/item-cover/edit.js:518
+#: gutenberg/blocks/item-image/edit.js:436
+#: gutenberg/blocks/item-image/edit.js:449
+#: gutenberg/blocks/item-read-more/edit.js:89
+#: gutenberg/blocks/item-read-more/edit.js:101
+#: gutenberg/blocks/item-title/edit.js:109
+#: gutenberg/blocks/item-title/edit.js:122
 msgid "Open in new tab"
 msgstr ""
 
-#: gutenberg/blocks/item-author/edit.js:122
-#: gutenberg/blocks/item-author/edit.js:133
-#: gutenberg/blocks/item-title/edit.js:131
-#: gutenberg/blocks/item-title/edit.js:142
+#: gutenberg/blocks/item-author/edit.js:215
+#: gutenberg/blocks/item-author/edit.js:226
+#: gutenberg/blocks/item-title/edit.js:137
+#: gutenberg/blocks/item-title/edit.js:148
 msgid "Link relation"
 msgstr ""
 
-#: gutenberg/blocks/item-author/edit.js:138
-#: gutenberg/blocks/item-title/edit.js:147
+#: gutenberg/blocks/item-author/edit.js:231
+#: gutenberg/blocks/item-title/edit.js:153
 msgid "The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document."
 msgstr ""
 
-#: gutenberg/blocks/item-categories/edit.js:54
-#: gutenberg/blocks/item-categories/edit.js:64
-msgid "Separator"
-msgstr ""
-
-#: gutenberg/blocks/item-categories/edit.js:65
-msgid "Character(s) placed between the categories."
-msgstr ""
-
-#: gutenberg/blocks/item-categories/edit.js:94
+#: gutenberg/blocks/item-categories/edit.js:110
 msgid "Gallery item categories"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:83
+#: gutenberg/blocks/item-categories/edit.js:131
+#: gutenberg/blocks/item-categories/edit.js:139
+msgid "Taxonomy"
+msgstr ""
+
+#: gutenberg/blocks/item-categories/edit.js:144
+msgid "All filter taxonomies"
+msgstr ""
+
+#: gutenberg/blocks/item-categories/edit.js:161
+#: gutenberg/blocks/item-categories/edit.js:171
+msgid "Separator"
+msgstr ""
+
+#: gutenberg/blocks/item-categories/edit.js:172
+msgid "Character(s) placed between the categories."
+msgstr ""
+
+#: gutenberg/blocks/item-categories/edit.js:185
+#: gutenberg/blocks/item-categories/edit.js:190
+msgid "Maximum categories"
+msgstr ""
+
+#: gutenberg/blocks/item-categories/edit.js:194
+msgid "How many categories an item shows. Zero shows them all."
+msgstr ""
+
+#: gutenberg/blocks/item-cover/edit.js:70
+msgid "Move under image"
+msgstr ""
+
+#: gutenberg/blocks/item-cover/edit.js:71
+msgid "Draw the content below the picture under a screen width you choose."
+msgstr ""
+
+#: gutenberg/blocks/item-cover/edit.js:80
+msgid "Skew"
+msgstr ""
+
+#: gutenberg/blocks/item-cover/edit.js:81
+msgid "How far the edge of the emerging panel slants."
+msgstr ""
+
+#: gutenberg/blocks/item-cover/edit.js:112
 msgid "On hover"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:84
+#: gutenberg/blocks/item-cover/edit.js:113
 msgid "Except on hover"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:90
-#: gutenberg/blocks/item-image/edit.js:45
-#: gutenberg/blocks/item-read-more/edit.js:25
-#: gutenberg/blocks/item-title/edit.js:29
-msgid "Open the item"
-msgstr ""
-
-#: gutenberg/blocks/item-cover/edit.js:91
-#: gutenberg/blocks/item-image/edit.js:46
-#: gutenberg/blocks/item-read-more/edit.js:26
-#: gutenberg/blocks/item-title/edit.js:30
-msgid "Open the lightbox"
-msgstr ""
-
-#: gutenberg/blocks/item-cover/edit.js:240
+#: gutenberg/blocks/item-cover/edit.js:271
 msgid "Content position"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:263
+#: gutenberg/blocks/item-cover/edit.js:294
 msgid "Hover overlay"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:278
-#: gutenberg/blocks/item-image/edit.js:198
+#: gutenberg/blocks/item-cover/edit.js:309
+#: gutenberg/blocks/item-image/edit.js:368
 msgid "Overlay opacity"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:286
+#: gutenberg/blocks/item-cover/edit.js:317
 msgid "Hover overlay opacity"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:310
-#: gutenberg/blocks/item-cover/edit.js:319
+#: gutenberg/blocks/item-cover/edit.js:341
+#: gutenberg/blocks/item-cover/edit.js:350
 msgid "Minimum height"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:366
+#: gutenberg/blocks/item-cover/edit.js:397
 msgid "How the content appears above the image. Fly follows the side the pointer came in from."
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:378
-#: gutenberg/blocks/item-cover/edit.js:387
+#: gutenberg/blocks/item-cover/edit.js:409
+#: gutenberg/blocks/item-cover/edit.js:418
 msgid "Show content"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:391
+#: gutenberg/blocks/item-cover/edit.js:422
 msgid "When the overlay and the blocks on it are drawn. Touch screens show them whatever this says."
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:403
-#: gutenberg/blocks/item-cover/edit.js:412
-#: gutenberg/blocks/item-image/edit.js:228
-#: gutenberg/blocks/item-image/edit.js:237
+#: gutenberg/blocks/item-cover/edit.js:434
+#: gutenberg/blocks/item-cover/edit.js:443
+#: gutenberg/blocks/item-image/edit.js:398
+#: gutenberg/blocks/item-image/edit.js:407
 msgid "Image size"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:422
-#: gutenberg/blocks/item-cover/edit.js:433
+#: gutenberg/blocks/item-cover/edit.js:453
+#: gutenberg/blocks/item-cover/edit.js:464
 msgid "Focal point"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:437
+#: gutenberg/blocks/item-cover/edit.js:468
 msgid "Overrides the focal point stored with each image."
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:450
-#: gutenberg/blocks/item-cover/edit.js:459
-#: gutenberg/blocks/item-image/edit.js:165
-#: gutenberg/blocks/item-image/edit.js:246
-#: gutenberg/blocks/item-image/edit.js:255
-#: gutenberg/blocks/item-read-more/edit.js:75
-#: gutenberg/blocks/item-read-more/edit.js:83
-#: gutenberg/blocks/item-title/edit.js:84
-#: gutenberg/blocks/item-title/edit.js:92
+#: gutenberg/blocks/item-cover/edit.js:481
+#: gutenberg/blocks/item-cover/edit.js:490
+#: gutenberg/blocks/item-image/edit.js:296
+#: gutenberg/blocks/item-image/edit.js:416
+#: gutenberg/blocks/item-image/edit.js:425
+#: gutenberg/blocks/item-read-more/edit.js:70
+#: gutenberg/blocks/item-read-more/edit.js:78
+#: gutenberg/blocks/item-title/edit.js:90
+#: gutenberg/blocks/item-title/edit.js:98
 msgid "On click"
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:460
+#: gutenberg/blocks/item-cover/edit.js:491
 msgid "Covers the whole item with a link, and gives the keyboard something to focus so the content can be reached."
 msgstr ""
 
-#: gutenberg/blocks/item-cover/edit.js:502
-#: gutenberg/blocks/item-cover/edit.js:513
-#: gutenberg/blocks/item-image/edit.js:294
-#: gutenberg/blocks/item-image/edit.js:305
-#: gutenberg/blocks/item-read-more/edit.js:121
-#: gutenberg/blocks/item-read-more/edit.js:128
+#: gutenberg/blocks/item-cover/edit.js:533
+#: gutenberg/blocks/item-cover/edit.js:544
+#: gutenberg/blocks/item-image/edit.js:464
+#: gutenberg/blocks/item-image/edit.js:475
+#: gutenberg/blocks/item-read-more/edit.js:116
+#: gutenberg/blocks/item-read-more/edit.js:123
 msgid "Link rel"
 msgstr ""
 
-#: gutenberg/blocks/item-date/edit.js:62
+#: gutenberg/blocks/item-cover/effects.js:22
+msgid "Caption move"
+msgstr ""
+
+#: gutenberg/blocks/item-cover/effects.js:30
+msgid "Image filter"
+msgstr ""
+
+#: gutenberg/blocks/item-cover/effects.js:31
+msgid "Brightness, contrast, saturation and more, at rest and on hover."
+msgstr ""
+
+#: gutenberg/blocks/item-cover/effects.js:39
+msgid "Hover transform"
+msgstr ""
+
+#: gutenberg/blocks/item-cover/effects.js:40
+msgid "Zoom or shift the picture while the pointer is over it."
+msgstr ""
+
+#: gutenberg/blocks/item-cover/effects.js:48
+msgid "Blend mode"
+msgstr ""
+
+#: gutenberg/blocks/item-cover/effects.js:49
+msgid "Blend the overlay into the picture instead of laying it over."
+msgstr ""
+
+#: gutenberg/blocks/item-cover/effects.js:57
+msgid "Tilt"
+msgstr ""
+
+#: gutenberg/blocks/item-cover/effects.js:58
+msgid "Tilt the picture in 3D under the pointer."
+msgstr ""
+
+#: gutenberg/blocks/item-date/edit.js:72
 msgid "Date format"
 msgstr ""
 
-#: gutenberg/blocks/item-date/edit.js:78
-#: gutenberg/blocks/item-date/edit.js:84
+#: gutenberg/blocks/item-date/edit.js:88
+#: gutenberg/blocks/item-date/edit.js:98
+msgid "Display last modified date"
+msgstr ""
+
+#: gutenberg/blocks/item-date/edit.js:102
+msgid "An item never edited after it was published, and an image, shows its publish date."
+msgstr ""
+
+#: gutenberg/blocks/item-date/edit.js:117
+#: gutenberg/blocks/item-date/edit.js:123
 msgid "Link to item"
 msgstr ""
 
-#: gutenberg/blocks/item-description/edit.js:80
+#: gutenberg/blocks/item-description/edit.js:88
 msgid "Gallery item description"
 msgstr ""
 
-#: gutenberg/blocks/item-description/edit.js:103
-#: gutenberg/blocks/item-description/edit.js:111
-#: gutenberg/loop-sources/posts.js:170
-#: gutenberg/loop-sources/posts.js:177
+#: gutenberg/blocks/item-description/edit.js:115
+#: gutenberg/blocks/item-description/edit.js:123
+#: gutenberg/loop-sources/posts.js:316
+#: gutenberg/loop-sources/posts.js:323
 msgid "Source"
 msgstr ""
 
-#: gutenberg/blocks/item-description/edit.js:115
+#: gutenberg/blocks/item-description/edit.js:127
 msgid "Excerpt"
 msgstr ""
 
-#: gutenberg/blocks/item-description/edit.js:122
+#: gutenberg/blocks/item-description/edit.js:134
 msgid "Full content"
 msgstr ""
 
-#: gutenberg/blocks/item-description/edit.js:136
-#: gutenberg/blocks/item-description/edit.js:151
+#: gutenberg/blocks/item-description/edit.js:148
+#: gutenberg/blocks/item-description/edit.js:163
 msgid "Max number of words"
 msgstr ""
 
-#: gutenberg/blocks/item-meta/edit.js:76
-#: gutenberg/blocks/item-meta/edit.js:82
-msgid "Show icon"
+#: gutenberg/blocks/item-image/edit.js:68
+msgid "Serve the watermarked copy of the picture instead of the original one."
+msgstr ""
+
+#: gutenberg/blocks/item-image/edit.js:317
+msgid "Crop"
+msgstr ""
+
+#: gutenberg/blocks/item-image/edit.js:337
+#: gutenberg/components/media-preview-card/index.js:16
+msgid "Replace"
+msgstr ""
+
+#. translators: %s: name of a meta type this site does not offer.
+#: gutenberg/blocks/item-meta/edit.js:64
+#, js-format
+msgid "Unavailable meta: %s"
 msgstr ""
 
 #: gutenberg/blocks/item-meta/edit.js:90
-#: gutenberg/blocks/item-meta/edit.js:98
+#: gutenberg/blocks/item-meta/edit.js:96
+msgid "Show icon"
+msgstr ""
+
+#: gutenberg/blocks/item-meta/edit.js:104
+#: gutenberg/blocks/item-meta/edit.js:112
 msgid "Show empty value"
 msgstr ""
 
-#: gutenberg/blocks/item-meta/edit.js:102
+#: gutenberg/blocks/item-meta/edit.js:116
 msgid "Items with nothing to show here are skipped unless this is on."
 msgstr ""
 
-#: gutenberg/blocks/item-meta/edit.js:127
-#: gutenberg/blocks/item-meta/edit.js:133
+#: gutenberg/blocks/item-meta/edit.js:141
+#: gutenberg/blocks/item-meta/edit.js:147
 msgid "Suffix text"
 msgstr ""
 
-#: gutenberg/blocks/item-meta/edit.js:142
-#: gutenberg/blocks/item-meta/edit.js:153
+#: gutenberg/blocks/item-meta/edit.js:156
+#: gutenberg/blocks/item-meta/edit.js:167
 msgid "Link to comments"
 msgstr ""
 
-#: gutenberg/blocks/item-meta/variations.js:54
+#: gutenberg/blocks/item-meta/variations.js:55
 msgid "Gallery Item Comments (Experimental)"
 msgstr ""
 
-#: gutenberg/blocks/item-meta/variations.js:55
+#: gutenberg/blocks/item-meta/variations.js:56
 msgid "Displays the number of comments of a gallery item. Block is experimental and will change in future releases. Please use with caution."
 msgstr ""
 
-#: gutenberg/blocks/item-meta/variations.js:64
+#: gutenberg/blocks/item-meta/variations.js:65
 msgid "Gallery Item Views (Experimental)"
 msgstr ""
 
-#: gutenberg/blocks/item-meta/variations.js:65
+#: gutenberg/blocks/item-meta/variations.js:66
 msgid "Displays the number of views of a gallery item. Block is experimental and will change in future releases. Please use with caution."
 msgstr ""
 
-#: gutenberg/blocks/item-meta/variations.js:72
+#: gutenberg/blocks/item-meta/variations.js:73
 msgid "Gallery Item Reading Time (Experimental)"
 msgstr ""
 
-#: gutenberg/blocks/item-meta/variations.js:73
+#: gutenberg/blocks/item-meta/variations.js:74
 msgid "Displays the reading time of a gallery item. Block is experimental and will change in future releases. Please use with caution."
 msgstr ""
 
-#: gutenberg/blocks/item-read-more/edit.js:57
-#: gutenberg/blocks/item-read-more/edit.js:65
+#: gutenberg/blocks/item-read-more/edit.js:52
+#: gutenberg/blocks/item-read-more/edit.js:60
 #: gutenberg/blocks/loop-pagination/edit.js:69
 #: gutenberg/blocks/loop-pagination/edit.js:75
 msgid "Show arrow"
 msgstr ""
 
-#: gutenberg/blocks/item-read-more/edit.js:149
+#: gutenberg/blocks/item-read-more/edit.js:144
 msgid "“Read more” link text"
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:65
-#: gutenberg/blocks/item-template/edit.js:983
-msgid "Carousel"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:70
-msgid "Equal cells in a fixed grid."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:71
-msgid "Columns of equal width, items keep their own height."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:75
-msgid "A repeating pattern of differently sized cells."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:79
-msgid "Rows of equal height, items keep their own aspect ratio."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:83
-msgid "A single row the visitor scrolls through."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:120
-msgid "Dots"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:121
-msgid "Progress bar"
-msgstr ""
-
 #: gutenberg/blocks/item-template/edit.js:130
-msgid "Slideshow"
+msgctxt "Alignment option"
+msgid "None"
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:722
-msgid "Auto fits as many columns as the width allows. Manual keeps the count you set."
+#: gutenberg/blocks/item-template/edit.js:135
+msgid "Wide width"
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:744
-msgid "Minimum column width"
+#: gutenberg/blocks/item-template/edit.js:140
+msgid "Full width"
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:745
-msgid "The narrowest a column may get before the row drops one."
+#. translators: %s: a CSS length, such as 640px.
+#: gutenberg/blocks/item-template/edit.js:170
+#, js-format
+msgid "Max %s wide"
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:759
-msgid "Maximum columns"
+#: gutenberg/blocks/item-template/edit.js:191
+msgid "A carousel that repeats has no edge for its slides to start from."
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:760
-msgid "Zero lets the gallery use every column that fits."
+#: gutenberg/blocks/item-template/edit.js:198
+msgid "Slides that rest in the middle have no edge to start from."
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:772
-msgid "Fill available space"
+#: gutenberg/blocks/item-template/edit.js:280
+msgid "Slides of their own width have no step to count the loop in, so the carousel cannot run round."
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:773
-msgid "A row that cannot be filled drops its empty columns instead of keeping them."
+#: gutenberg/blocks/item-template/edit.js:287
+msgid "This effect pins its slides in place, so the carousel cannot run round."
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:787
-msgid "Slides per view"
+#: gutenberg/blocks/item-template/edit.js:294
+msgid "A right-to-left carousel cannot run round, so it stops at its ends."
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:899
-#: gutenberg/blocks/item-template/edit.js:903
-msgid "Row height"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:904
-msgid "The height every row aims for."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:919
-#: gutenberg/blocks/item-template/edit.js:925
-msgid "Row height tolerance"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:926
-msgid "How far a row may drift from that height to keep items uncropped."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:942
-#: gutenberg/blocks/item-template/edit.js:946
-msgid "Maximum rows"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:947
-msgid "Zero shows every row the items make."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:962
-#: gutenberg/blocks/item-template/edit.js:966
-msgid "Last row"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:967
-msgid "What happens to a row that has too few items to fill it."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1006
-#: gutenberg/blocks/item-template/edit.js:1010
-msgid "Arrows"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1021
-#: gutenberg/blocks/item-template/edit.js:1025
-msgid "Indicator"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1026
-msgid "What marks the visitor's place in the carousel."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1046
-msgid "How one slide gives way to the next."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1058
-msgid "Effects are drawn by the browser as the carousel scrolls. Browsers without scroll-driven animations simply show the carousel without them."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1069
-#: gutenberg/blocks/item-template/edit.js:1079
-msgid "Autoplay"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1080
-msgid "Pauses while the visitor is on the carousel, and never runs for a visitor who asked for less motion."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1091
-msgid "Delay, seconds"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1092
-msgid "How long a slide is held before the carousel moves on."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1110
-#: gutenberg/blocks/item-template/edit.js:1114
-msgid "Repeat"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1115
+#: gutenberg/blocks/item-template/edit.js:300
 msgid "The carousel runs on without an end, in both directions."
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:1128
-#: gutenberg/blocks/item-template/edit.js:1132
+#: gutenberg/blocks/item-template/edit.js:317
+msgid "A marquee moves the carousel on without stopping, at a steady speed."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:326
+msgid "A marquee runs round, and this carousel cannot, so it moves slide by slide."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:332
+msgid "Slide by slide holds each slide for the delay. A marquee moves on without stopping, and the arrows, dots and dragging still work."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:372
+#: gutenberg/blocks/item-template/edit.js:1236
+msgid "Min. column width"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:404
+msgid "Columns wrap to fewer per row when they can no longer keep the minimum width."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:423
+#: gutenberg/blocks/item-template/edit.js:1220
+msgid "Max. columns"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:461
+msgid "Zero lets the gallery use every column that fits."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1053
+msgid "Slides per view"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1073
+#: gutenberg/blocks/item-template/edit.js:1082
+#: gutenberg/blocks/item-template/edit.js:1124
+#: gutenberg/blocks/item-template/tiles-presets.js:163
+msgid "Pattern"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1086
+msgid "Give a tablet and a phone a tiles pattern of their own, set for the screen you are previewing."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1093
+msgid "Give a tablet and a phone a column count of their own, set for the screen you are previewing."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1148
+#: gutenberg/blocks/item-template/tiles-presets.js:121
+msgid "Custom pattern"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1152
+msgid "Draw a pattern of your own: resize, move and double the tiles on a canvas."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1180
+msgid "Auto fits as many columns as the width allows. Manual keeps the count you set."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1253
+#: gutenberg/blocks/item-template/edit.js:1257
+msgid "Fill available space"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1258
+msgid "A row that cannot be filled drops its empty columns instead of keeping them."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1290
+#: gutenberg/blocks/item-template/edit.js:1294
+msgid "Row height"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1295
+msgid "The height every row aims for."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1310
+#: gutenberg/blocks/item-template/edit.js:1316
+msgid "Row height tolerance"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1317
+msgid "How far a row may drift from that height to keep items uncropped."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1333
+#: gutenberg/blocks/item-template/edit.js:1337
+msgid "Maximum rows"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1338
+msgid "Zero shows every row the items make."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1353
+#: gutenberg/blocks/item-template/edit.js:1357
+msgid "Last row"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1358
+msgid "What happens to a row that has too few items to fill it."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1405
+#: gutenberg/blocks/item-template/variations.js:107
+msgid "Carousel"
+msgstr ""
+
+#. translators: %d: number of effects that come with Pro.
+#: gutenberg/blocks/item-template/edit.js:1438
+#, js-format
+msgid "How one slide gives way to the next. %d more effect comes with Pro."
+msgid_plural "How one slide gives way to the next. %d more effects come with Pro."
+msgstr[0] ""
+msgstr[1] ""
+
+#: gutenberg/blocks/item-template/edit.js:1448
+msgid "How one slide gives way to the next."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1464
+#: gutenberg/blocks/item-template/edit.js:1475
+msgid "Autoplay"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1476
+msgid "Pauses while the visitor is on the carousel, and never runs for a visitor who asked for less motion."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1492
+msgid "Mode"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1497
+msgid "Slide by slide"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1505
+#: gutenberg/blocks/item-template/edit.js:1507
+msgid "Marquee"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1542
+msgid "Delay, seconds"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1543
+msgid "How long a slide is held before the carousel moves on."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1561
+#: gutenberg/blocks/item-template/edit.js:1570
+msgid "Repeat"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1573
+msgid "A marquee runs round, so the carousel repeats."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1589
+#: gutenberg/blocks/item-template/edit.js:1593
 msgid "Peek"
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:1133
+#: gutenberg/blocks/item-template/edit.js:1596
 msgid "How much of the next slide shows at the edge, as an invitation to scroll."
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:1146
-#: gutenberg/blocks/item-template/edit.js:1150
+#: gutenberg/blocks/item-template/edit.js:1600
+msgid "This effect lays the slides out itself, so no part of the next one shows at the edge."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1615
+#: gutenberg/blocks/item-template/edit.js:1619
+msgid "Slides per step"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1620
+msgid "How many slides an arrow moves at a press. Zero moves a whole screen at a time, however many slides that is."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1635
+#: gutenberg/blocks/item-template/edit.js:1639
+msgid "Slide height"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1640
+msgid "The height of the box a slide is drawn in. Left empty, a slide is as tall as the tallest one beside it."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1655
+#: gutenberg/blocks/item-template/edit.js:1661
+msgid "Blocks fill the slide"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1662
+msgid "The image grows to take whatever the title and the text leave, so every slide ends at the same line. The shape of the picture itself is the image block’s own aspect ratio."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1675
+#: gutenberg/blocks/item-template/edit.js:1679
 msgid "Fade the edges"
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:1151
+#: gutenberg/blocks/item-template/edit.js:1680
 msgid "Slides dissolve at the edges of the carousel instead of being cut off."
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:1164
-#: gutenberg/blocks/item-template/edit.js:1168
+#: gutenberg/blocks/item-template/edit.js:1693
+#: gutenberg/blocks/item-template/edit.js:1697
 msgid "Slide width from content"
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:1169
+#: gutenberg/blocks/item-template/edit.js:1698
 msgid "Each slide is as wide as its own image instead of a share of the row."
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:1182
-#: gutenberg/blocks/item-template/edit.js:1186
-msgid "Snap slides to"
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1187
-msgid "Where a slide comes to rest when scrolling stops."
-msgstr ""
-
-#: gutenberg/blocks/item-template/edit.js:1201
-#: gutenberg/blocks/item-template/edit.js:1205
+#: gutenberg/blocks/item-template/edit.js:1711
+#: gutenberg/blocks/item-template/edit.js:1715
 msgid "Free scrolling"
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:1206
+#: gutenberg/blocks/item-template/edit.js:1716
 msgid "Scroll stops wherever it is let go, instead of settling on a slide."
 msgstr ""
 
-#: gutenberg/blocks/item-template/edit.js:1267
+#: gutenberg/blocks/item-template/edit.js:1764
+msgid "Snap slides to"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1777
+msgid "Container width"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1779
+msgid "Hold the slides to a width while the carousel keeps the full one, so a full-width gallery starts where the text above it does."
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1837
+#: gutenberg/components/aspect-ratio/index.js:109
+#: gutenberg/utils/dimensions-tools/index.js:180
+#: gutenberg/utils/dimensions-tools/index.js:188
+msgid "Width"
+msgstr ""
+
+#: gutenberg/blocks/item-template/edit.js:1875
 msgid "No results found."
 msgstr ""
 
-#: gutenberg/blocks/item-title/edit.js:53
+#: gutenberg/blocks/item-template/effects.js:24
+msgid "Slideshow"
+msgstr ""
+
+#: gutenberg/blocks/item-template/effects.js:39
+msgid "Cards"
+msgstr ""
+
+#: gutenberg/blocks/item-template/effects.js:40
+msgid "Flipbook"
+msgstr ""
+
+#: gutenberg/blocks/item-template/effects.js:41
+msgid "Cover"
+msgstr ""
+
+#: gutenberg/blocks/item-template/effects.js:42
+msgid "Reveal"
+msgstr ""
+
+#: gutenberg/blocks/item-template/effects.js:43
+msgid "Warp"
+msgstr ""
+
+#: gutenberg/blocks/item-template/effects.js:44
+msgid "Drop"
+msgstr ""
+
+#: gutenberg/blocks/item-template/effects.js:45
+msgid "Stack"
+msgstr ""
+
+#: gutenberg/blocks/item-template/effects.js:46
+msgid "Panorama"
+msgstr ""
+
+#: gutenberg/blocks/item-template/effects.js:47
+msgid "Panorama out"
+msgstr ""
+
+#. translators: %1$s: "3 columns", %2$s: "5 tiles".
+#: gutenberg/blocks/item-template/tiles-presets.js:128
+#, js-format
+msgid "%1$s, %2$s"
+msgstr ""
+
+#. translators: %d: number of columns.
+#: gutenberg/blocks/item-template/tiles-presets.js:131
+#, js-format
+msgid "%d column"
+msgid_plural "%d columns"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of tiles in the repeating pattern.
+#: gutenberg/blocks/item-template/tiles-presets.js:136
+#, js-format
+msgid "%d tile"
+msgid_plural "%d tiles"
+msgstr[0] ""
+msgstr[1] ""
+
+#: gutenberg/blocks/item-template/tiles-presets.js:222
+msgid "Pattern presets"
+msgstr ""
+
+#: gutenberg/blocks/item-template/variations.js:24
+msgid "Equal cells in a fixed grid."
+msgstr ""
+
+#: gutenberg/blocks/item-template/variations.js:33
+msgid "Columns of equal width, items keep their own height."
+msgstr ""
+
+#: gutenberg/blocks/item-template/variations.js:58
+msgid "A repeating pattern of differently sized cells."
+msgstr ""
+
+#: gutenberg/blocks/item-template/variations.js:83
+msgid "Rows of equal height, items keep their own aspect ratio."
+msgstr ""
+
+#: gutenberg/blocks/item-template/variations.js:108
+msgid "A single row the visitor scrolls through."
+msgstr ""
+
+#: gutenberg/blocks/item-title/edit.js:55
 msgid "Gallery item title"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-autoplay/edit.js:43
+msgid "Play and pause"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:68
+msgid "Indicator"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:71
+msgid "Dots at once"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:72
+msgid "How many dots the row shows before it starts sliding them under a window. Zero draws one dot per slide, however many there are."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:86
+msgid "Can be dragged"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:87
+msgid "The bar answers a drag, and the arrow keys, Home and End when focused. Switched off it only says where the carousel is."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/variations.js:11
+msgid "Carousel Dots (Experimental)"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/variations.js:12
+msgid "One dot per slide, filled as the carousel moves. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/variations.js:26
+msgid "Carousel Progress Bar (Experimental)"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/variations.js:27
+msgid "A single bar that fills as the carousel scrolls. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/variations.js:41
+msgid "Carousel Counter (Experimental)"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/variations.js:42
+msgid "The slide on screen and how many there are, as a pair of numbers. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-nav/edit.js:93
+msgid "Over the slides"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-nav/edit.js:104
+msgid "Arrows"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-next/edit.js:46
+#: gutenberg/blocks/loop-carousel-next/variations.js:32
+#: gutenberg/blocks/loop-carousel-previous/edit.js:46
+#: gutenberg/blocks/loop-carousel-previous/variations.js:32
+#: gutenberg/utils/carousel-controls/index.js:43
+msgid "Arrow"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-next/variations.js:20
+#: gutenberg/blocks/loop-carousel-previous/variations.js:20
+#: gutenberg/utils/carousel-controls/index.js:42
+msgid "Chevron"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-next/variations.js:21
+#: gutenberg/blocks/loop-carousel-previous/variations.js:21
+msgid "A thin angle bracket, the way the editor draws its own arrows."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-next/variations.js:33
+#: gutenberg/blocks/loop-carousel-previous/variations.js:33
+msgid "A line with a head, for a gallery that reads better with one."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-thumbnails/edit.js:51
+#: gutenberg/components/aspect-ratio/index.js:115
+#: gutenberg/utils/dimensions-tools/index.js:199
+#: gutenberg/utils/dimensions-tools/index.js:207
+msgid "Height"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-thumbnails/edit.js:60
+#: gutenberg/utils/dimensions-tools/index.js:130
+#: gutenberg/utils/dimensions-tools/index.js:138
+msgid "Aspect ratio"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-thumbnails/edit.js:61
+msgid "The shape of one thumbnail, written the way CSS writes it: 1, 4/3, 16/9."
 msgstr ""
 
 #: gutenberg/blocks/loop-filter-item/edit.js:33
 msgid "Add category text…"
 msgstr ""
 
-#: gutenberg/blocks/loop-filter/edit.js:315
+#: gutenberg/blocks/loop-filter/edit.js:459
+msgid "Filtering is not available for this source, so the page shows no filter."
+msgstr ""
+
+#: gutenberg/blocks/loop-filter/edit.js:466
+#: gutenberg/blocks/loop-filter/edit.js:474
+#: gutenberg/blocks/loop-sort/edit.js:131
+#: gutenberg/blocks/loop-sort/edit.js:139
+msgid "Display as dropdown"
+msgstr ""
+
+#: gutenberg/blocks/loop-filter/edit.js:494
 msgid "Show how many items each category holds."
 msgstr ""
 
-#: gutenberg/blocks/loop-filter/edit.js:326
-#: gutenberg/blocks/loop-filter/edit.js:332
+#: gutenberg/blocks/loop-filter/edit.js:505
+#: gutenberg/blocks/loop-filter/edit.js:511
 msgid "Show 'All' item"
 msgstr ""
 
-#: gutenberg/blocks/loop-filter/edit.js:333
+#: gutenberg/blocks/loop-filter/edit.js:512
 msgid "The item that clears the filter and brings the whole gallery back."
 msgstr ""
 
@@ -3106,20 +3730,24 @@ msgstr ""
 msgid "Previous page link"
 msgstr ""
 
-#: gutenberg/blocks/loop-pagination-trigger/edit.js:49
-#: gutenberg/blocks/loop-pagination-trigger/edit.js:58
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:82
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:91
 msgid "Loading text"
 msgstr ""
 
-#: gutenberg/blocks/loop-pagination-trigger/edit.js:59
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:92
 msgid "Announced to screen readers while the next items are loading."
 msgstr ""
 
-#: gutenberg/blocks/loop-pagination-trigger/edit.js:85
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:107
+msgid "Infinite Scroll"
+msgstr ""
+
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:124
 msgid "Infinite scroll trigger"
 msgstr ""
 
-#: gutenberg/blocks/loop-pagination-trigger/edit.js:86
+#: gutenberg/blocks/loop-pagination-trigger/edit.js:125
 msgid "Load more link"
 msgstr ""
 
@@ -3152,124 +3780,188 @@ msgstr ""
 msgid "Displays a load more button for pagination. Block is experimental and will change in future releases. Please use with caution."
 msgstr ""
 
-#: gutenberg/blocks/loop-pagination/variations.js:47
+#: gutenberg/blocks/loop-pagination/variations.js:50
 msgid "Pagination Infinite (Experimental)"
 msgstr ""
 
-#: gutenberg/blocks/loop-pagination/variations.js:48
+#: gutenberg/blocks/loop-pagination/variations.js:51
 msgid "Displays an infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution."
 msgstr ""
 
-#: gutenberg/blocks/loop-sort/edit.js:110
+#: gutenberg/blocks/loop-query-total/edit.js:73
+#: gutenberg/blocks/loop-query-total/edit.js:85
+msgid "Display type"
+msgstr ""
+
+#: gutenberg/blocks/loop-query-total/edit.js:90
+msgid "Total results"
+msgstr ""
+
+#: gutenberg/blocks/loop-query-total/edit.js:97
+msgid "Range display"
+msgstr ""
+
+#: gutenberg/blocks/loop-search/edit.js:39
+msgid "Search is not available for this source, so the page shows no search field."
+msgstr ""
+
+#: gutenberg/blocks/loop-search/edit.js:47
+msgid "Let visitors search the gallery."
+msgstr ""
+
+#: gutenberg/blocks/loop-search/edit.js:73
+#: gutenberg/blocks/loop-search/edit.js:79
+msgid "Placeholder"
+msgstr ""
+
+#: gutenberg/blocks/loop-search/edit.js:80
+#: gutenberg/blocks/loop-search/edit.js:118
+msgid "Search…"
+msgstr ""
+
+#: gutenberg/blocks/loop-search/edit.js:88
+#: gutenberg/blocks/loop-search/edit.js:94
+msgid "Label"
+msgstr ""
+
+#: gutenberg/blocks/loop-search/edit.js:95
+msgid "Read by screen readers, not shown."
+msgstr ""
+
+#: gutenberg/blocks/loop-sort/edit.js:124
+msgid "Sorting is not available for this source, so the page shows no sort control."
+msgstr ""
+
+#: gutenberg/blocks/loop-sort/edit.js:152
 msgid "Sort Options"
 msgstr ""
 
-#: gutenberg/blocks/loop-sort/edit.js:137
+#: gutenberg/blocks/loop-sort/edit.js:179
 msgid "Labels"
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:214
+#: gutenberg/blocks/loop/edit.js:61
+msgid "Right-click Protection"
+msgstr ""
+
+#: gutenberg/blocks/loop/edit.js:62
+msgid "Keep visitors from saving the pictures with a right click or by dragging them."
+msgstr ""
+
+#: gutenberg/blocks/loop/edit.js:272
 #: gutenberg/extensions/items-count-all.js:93
 msgid "Ok, I understand"
 msgstr ""
 
 #. translators: %d: number of items a page should stay under.
-#: gutenberg/blocks/loop/edit.js:231
+#: gutenberg/blocks/loop/edit.js:289
 #, js-format
 msgid "Large galleries slow the page down. Keep the items per page under %d and add Load More or Infinite Scroll pagination."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:267
+#: gutenberg/blocks/loop/edit.js:325
 msgid "A random order is held still by a seed in the page links, which page caches store as separate pages. Display all items, or order the gallery some other way, if the site is cached."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:314
-#: gutenberg/blocks/loop/edit.js:333
+#: gutenberg/blocks/loop/edit.js:372
+#: gutenberg/blocks/loop/edit.js:391
 msgid "Items per page"
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:321
+#: gutenberg/blocks/loop/edit.js:379
 msgid "Render the whole gallery on a single page."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:334
+#: gutenberg/blocks/loop/edit.js:392
 msgid "How many items one page of the gallery carries."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:359
-#: gutenberg/blocks/loop/edit.js:368
+#: gutenberg/blocks/loop/edit.js:417
+#: gutenberg/blocks/loop/edit.js:426
 msgctxt "Number of posts to skip in a query"
 msgid "Offset"
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:373
+#: gutenberg/blocks/loop/edit.js:431
 msgid "Skip this many items before the gallery begins."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:387
-#: gutenberg/blocks/loop/edit.js:392
+#: gutenberg/blocks/loop/edit.js:445
+#: gutenberg/blocks/loop/edit.js:450
 msgid "Max pages to show"
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:393
+#: gutenberg/blocks/loop/edit.js:451
 msgid "Limit the pages you want to show, even if the query has more results. To show all pages use 0 (zero)."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:450
+#: gutenberg/blocks/loop/edit.js:508
 msgid "Source Settings"
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:453
+#: gutenberg/blocks/loop/edit.js:511
 msgid "This source is set up and working. Editing it here arrives in the next update."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:492
-#: gutenberg/blocks/loop/edit.js:515
-#: gutenberg/blocks/loop/edit.js:558
+#: gutenberg/blocks/loop/edit.js:549
+#: gutenberg/blocks/loop/edit.js:572
+#: gutenberg/blocks/loop/edit.js:618
 msgid "Gallery Loop"
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:493
+#: gutenberg/blocks/loop/edit.js:550
 msgid "Choose where the gallery takes its items from."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:516
+#: gutenberg/blocks/loop/edit.js:573
 msgid "Add the images of the gallery."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:541
+#: gutenberg/blocks/loop/edit.js:598
 #: gutenberg/components/setup-wizard/index.js:310
 msgid "Continue"
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:544
-#: gutenberg/blocks/loop/edit.js:619
+#: gutenberg/blocks/loop/edit.js:604
+#: gutenberg/blocks/loop/edit.js:690
 msgid "Start blank"
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:559
+#: gutenberg/blocks/loop/edit.js:619
 msgid "Choose what the gallery carries, then pick a shape for it."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:574
+#: gutenberg/blocks/loop/edit.js:634
 msgid "Links above the gallery, one per category."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:584
+#: gutenberg/blocks/loop/edit.js:644
 msgid "Open in a lightbox"
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:585
-msgid "A click opens the picture over the page instead of following a link."
+#: gutenberg/blocks/loop/edit.js:645
+msgid "A click on a picture opens it over the page."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:596
+#: gutenberg/blocks/loop/edit.js:656
 msgid "How a visitor reaches the items past the first page."
 msgstr ""
 
-#: gutenberg/blocks/loop/edit.js:616
+#: gutenberg/blocks/loop/edit.js:676
 #: gutenberg/blocks/loop/pattern-setup.js:139
 msgid "Choose a gallery"
+msgstr ""
+
+#: gutenberg/blocks/loop/lightbox-panel.js:82
+msgid "What the lightbox shows as the title of a slide."
+msgstr ""
+
+#: gutenberg/blocks/loop/lightbox-panel.js:90
+msgid "What the lightbox shows under the title."
+msgstr ""
+
+#: gutenberg/blocks/loop/lightbox-panel.js:99
+msgid "Lightbox"
 msgstr ""
 
 #: gutenberg/blocks/loop/pattern-setup.js:147
@@ -3308,36 +4000,24 @@ msgstr ""
 msgid "Classic Film 3:2"
 msgstr ""
 
-#: gutenberg/components/aspect-ratio/index.js:109
-#: gutenberg/utils/dimensions-tools/index.js:180
-#: gutenberg/utils/dimensions-tools/index.js:188
-msgid "Width"
-msgstr ""
-
-#: gutenberg/components/aspect-ratio/index.js:115
-#: gutenberg/utils/dimensions-tools/index.js:199
-#: gutenberg/utils/dimensions-tools/index.js:207
-msgid "Height"
-msgstr ""
-
-#: gutenberg/components/controls-render/index.js:215
+#: gutenberg/components/controls-render/index.js:214
 #: gutenberg/components/elements-selector/index.js:428
 msgid "PRO"
 msgstr ""
 
-#: gutenberg/components/controls-render/index.js:586
+#: gutenberg/components/controls-render/index.js:585
 msgid "Open in Modal"
 msgstr ""
 
-#: gutenberg/components/controls-render/index.js:608
+#: gutenberg/components/controls-render/index.js:607
 msgid "Classes Tree:"
 msgstr ""
 
-#: gutenberg/components/date-picker/index.js:25
+#: gutenberg/components/date-picker/index.js:22
 msgid "Select Date"
 msgstr ""
 
-#: gutenberg/components/date-picker/index.js:38
+#: gutenberg/components/date-picker/index.js:35
 msgid "Reset Date"
 msgstr ""
 
@@ -3351,7 +4031,7 @@ msgid "Remove"
 msgstr ""
 
 #: gutenberg/components/focal-point-control/index.js:71
-#: gutenberg/components/gallery-control/index.js:382
+#: gutenberg/components/gallery-control/index.js:384
 msgid "Image focal point"
 msgstr ""
 
@@ -3375,95 +4055,95 @@ msgstr ""
 msgid "Loaded automatically from the image Description"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:129
+#: gutenberg/components/gallery-control/index.js:131
 msgid "Edit Gallery"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:130
+#: gutenberg/components/gallery-control/index.js:132
 msgid "Add Media"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:400
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:77
+#: gutenberg/components/gallery-control/index.js:402
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:95
 msgid "Additional media info"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:434
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:101
+#: gutenberg/components/gallery-control/index.js:436
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:119
 msgid "File URL"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:445
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:112
+#: gutenberg/components/gallery-control/index.js:447
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:130
 msgid "Attachment page"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:456
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:122
+#: gutenberg/components/gallery-control/index.js:458
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:140
 msgid "Edit details"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:672
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:181
+#: gutenberg/components/gallery-control/index.js:674
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:285
 msgid "Previous image"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:689
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:196
+#: gutenberg/components/gallery-control/index.js:691
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:300
 msgid "Next image"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:846
+#: gutenberg/components/gallery-control/index.js:848
 msgid "Select"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1067
+#: gutenberg/components/gallery-control/index.js:1074
 msgid "Select All"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1083
+#: gutenberg/components/gallery-control/index.js:1090
 msgid "Bulk Actions"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1088
+#: gutenberg/components/gallery-control/index.js:1095
 msgid "Bulk actions"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1095
+#: gutenberg/components/gallery-control/index.js:1102
 msgid "Edit"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1099
+#: gutenberg/components/gallery-control/index.js:1106
 msgid "Delete"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1108
+#: gutenberg/components/gallery-control/index.js:1115
 msgid "Are you sure you want to remove selected items?"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1131
+#: gutenberg/components/gallery-control/index.js:1138
 msgid "Filter by Category"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1142
+#: gutenberg/components/gallery-control/index.js:1149
 msgid "Uncategorized"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1174
+#: gutenberg/components/gallery-control/index.js:1181
 msgid "Bulk Image Settings"
 msgstr ""
 
 #. translators: %1$s: number of items shown, %2$s: total number of items.
-#: gutenberg/components/gallery-control/index.js:1322
+#: gutenberg/components/gallery-control/index.js:1330
 #, js-format
 msgid "Showing %1$s of %2$s media items"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1340
+#: gutenberg/components/gallery-control/index.js:1348
 msgid "Show More"
 msgstr ""
 
-#: gutenberg/components/gallery-control/index.js:1348
+#: gutenberg/components/gallery-control/index.js:1356
 msgid "Show All"
 msgstr ""
 
@@ -3475,8 +4155,21 @@ msgstr ""
 msgid "Less"
 msgstr ""
 
-#: gutenberg/components/media-preview-card/index.js:16
-msgid "Replace"
+#: gutenberg/components/pro-note/index.js:27
+#: gutenberg/loop-sources/source-picker.js:51
+msgid "Pro"
+msgstr ""
+
+#: gutenberg/components/pro-note/index.js:38
+msgid "This comes with Visual Portfolio Pro."
+msgid_plural "These come with Visual Portfolio Pro."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: name of a setting that comes with Pro.
+#: gutenberg/components/pro-teaser/index.js:46
+#, js-format
+msgid "%s (Pro)"
 msgstr ""
 
 #: gutenberg/components/select-control/index.js:642
@@ -3584,110 +4277,142 @@ msgid "Show Additional Shortcodes"
 msgstr ""
 
 #. translators: %d: position of the image in the gallery.
-#: gutenberg/loop-sources/gallery-manager/gallery-image.js:39
+#: gutenberg/loop-sources/gallery-manager/gallery-image.js:42
 #, js-format
 msgid "Image %d"
 msgstr ""
 
 #. translators: %s: image title.
-#: gutenberg/loop-sources/gallery-manager/gallery-image.js:60
+#: gutenberg/loop-sources/gallery-manager/gallery-image.js:63
 #, js-format
 msgid "Edit %s"
 msgstr ""
 
 #. translators: %s: image title.
-#: gutenberg/loop-sources/gallery-manager/gallery-image.js:81
+#: gutenberg/loop-sources/gallery-manager/gallery-image.js:84
 #, js-format
 msgid "Reorder %s"
 msgstr ""
 
 #. translators: %s: image title.
-#: gutenberg/loop-sources/gallery-manager/gallery-image.js:94
+#: gutenberg/loop-sources/gallery-manager/gallery-image.js:97
 #, js-format
 msgid "Remove %s"
 msgstr ""
 
 #. translators: %1$d: image width, %2$d: image height.
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:91
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:109
 #, js-format
 msgid "%1$d by %2$d pixels"
 msgstr ""
 
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:176
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:201
+msgid "Image uploaded to the Media Library."
+msgstr ""
+
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:211
+msgid "The image could not be uploaded."
+msgstr ""
+
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:229
+msgid "Upload to Media Library"
+msgstr ""
+
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:280
 msgid "Image Settings"
 msgstr ""
 
 #. translators: %1$d: current image, %2$d: number of images.
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:188
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:292
 #, js-format
 msgid "Image %1$d of %2$d"
 msgstr ""
 
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:281
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:388
+msgid "Alt text"
+msgstr ""
+
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:389
+msgid "Describes the picture to someone who cannot see it. Left empty, the alt text from the media library is used."
+msgstr ""
+
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:407
 msgid "What the gallery filter offers. Type anything and press Enter."
 msgstr ""
 
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:313
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:439
 msgid "Link URL"
 msgstr ""
 
-#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:314
+#: gutenberg/loop-sources/gallery-manager/image-settings-modal.js:440
 msgid "Where the item links to. Left empty, it opens the image in the popup."
 msgstr ""
 
-#: gutenberg/loop-sources/gallery-manager/index.js:128
+#: gutenberg/loop-sources/gallery-manager/index.js:66
 msgid "To reorder an image, press Space or Enter, move it with the arrow keys, then press Space or Enter again. Press Escape to cancel."
 msgstr ""
 
 #. translators: %d: position of the image in the gallery.
-#: gutenberg/loop-sources/gallery-manager/index.js:137
+#: gutenberg/loop-sources/gallery-manager/index.js:75
 #, js-format
 msgid "Picked up image %d."
 msgstr ""
 
 #. translators: %d: position the image would move to.
-#: gutenberg/loop-sources/gallery-manager/index.js:144
+#: gutenberg/loop-sources/gallery-manager/index.js:82
 #, js-format
 msgid "Image moved to position %d."
 msgstr ""
 
 #. translators: %d: final position of the image.
-#: gutenberg/loop-sources/gallery-manager/index.js:155
+#: gutenberg/loop-sources/gallery-manager/index.js:93
 #, js-format
 msgid "Image dropped at position %d."
 msgstr ""
 
-#: gutenberg/loop-sources/gallery-manager/index.js:161
+#: gutenberg/loop-sources/gallery-manager/index.js:99
 msgid "Image dropped."
 msgstr ""
 
-#: gutenberg/loop-sources/gallery-manager/index.js:163
+#: gutenberg/loop-sources/gallery-manager/index.js:101
 msgid "Reordering cancelled."
 msgstr ""
 
-#: gutenberg/loop-sources/gallery-manager/index.js:273
+#: gutenberg/loop-sources/gallery-manager/index.js:237
 msgid "Drag images, upload new ones or pick from your media library."
 msgstr ""
 
-#: gutenberg/loop-sources/gallery-manager/index.js:322
+#: gutenberg/loop-sources/gallery-manager/index.js:288
 msgid "Add media"
 msgstr ""
 
 #. translators: %d: number of images in the gallery.
-#: gutenberg/loop-sources/gallery-manager/index.js:334
+#: gutenberg/loop-sources/gallery-manager/index.js:305
 #, js-format
 msgid "%d image"
 msgid_plural "%d images"
 msgstr[0] ""
 msgstr[1] ""
 
+#: gutenberg/loop-sources/gallery-manager/insert-from-url.js:41
+msgid "Insert from URL"
+msgstr ""
+
+#: gutenberg/loop-sources/gallery-manager/insert-from-url.js:62
+msgid "Paste or type URL"
+msgstr ""
+
+#: gutenberg/loop-sources/gallery-manager/insert-from-url.js:73
+msgid "Apply"
+msgstr ""
+
 #: gutenberg/loop-sources/images.js:47
-#: gutenberg/loop-sources/posts.js:44
+#: gutenberg/loop-sources/posts.js:94
 msgid "Ascending"
 msgstr ""
 
 #: gutenberg/loop-sources/images.js:48
-#: gutenberg/loop-sources/posts.js:43
+#: gutenberg/loop-sources/posts.js:93
 msgid "Descending"
 msgstr ""
 
@@ -3704,70 +4429,170 @@ msgid "Which field of the image the description is read from."
 msgstr ""
 
 #: gutenberg/loop-sources/images.js:168
-#: gutenberg/loop-sources/posts.js:392
+#: gutenberg/loop-sources/posts.js:586
 msgid "Order"
 msgstr ""
 
 #: gutenberg/loop-sources/images.js:182
-#: gutenberg/loop-sources/posts.js:406
+#: gutenberg/loop-sources/posts.js:600
 msgid "Order By"
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:278
+#: gutenberg/loop-sources/posts.js:31
+msgid "Only posts published in the past day, week, month, quarter or year, or between two dates."
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:42
+msgid "Keep out the posts that have no featured image to show."
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:54
+msgid "Include"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:55
+msgid "Ignore"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:56
+msgid "Exclude"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:57
+msgid "Only"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:62
+msgid "Aside"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:64
+msgid "Chat"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:67
+msgid "Link"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:68
+msgid "Quote"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:70
+msgid "Status"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:440
 msgid "Build a custom query the same way `WP_Query` arguments are written."
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:358
+#: gutenberg/loop-sources/posts.js:498
+#: gutenberg/loop-sources/posts.js:508
+msgid "Excluded Taxonomies"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:512
+msgid "Leave out the items in any of these, whatever the taxonomies above let in."
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:552
 msgid "AND keeps items that match every taxonomy, OR keeps items that match any of them."
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:366
+#: gutenberg/loop-sources/posts.js:560
 msgid "Any of the selected"
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:373
+#: gutenberg/loop-sources/posts.js:567
 msgid "All of the selected"
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:468
+#: gutenberg/loop-sources/posts.js:671
 msgid "Filters"
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:485
-#: gutenberg/loop-sources/posts.js:490
+#: gutenberg/loop-sources/posts.js:691
+#: gutenberg/loop-sources/posts.js:696
+msgid "Authors"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:697
+msgid "Only posts written by the authors you list."
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:711
+#: gutenberg/loop-sources/posts.js:716
 msgid "Keyword"
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:491
+#: gutenberg/loop-sources/posts.js:717
 msgid "Show only the items whose text contains this."
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:504
+#: gutenberg/loop-sources/posts.js:730
+#: gutenberg/loop-sources/posts.js:735
+msgid "Formats"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:760
+#: gutenberg/loop-sources/posts.js:765
+msgid "Sticky posts"
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:766
+msgid "Sticky posts always appear first, regardless of their publish date."
+msgstr ""
+
+#: gutenberg/loop-sources/posts.js:781
 msgid "Exclusions"
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:515
+#: gutenberg/loop-sources/posts.js:792
 msgid "Avoid duplicates"
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:516
+#: gutenberg/loop-sources/posts.js:793
 msgid "Hide posts another gallery on the page has already shown, or that a listing page already lists."
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:524
+#: gutenberg/loop-sources/posts.js:801
 msgid "Exclude the current post"
 msgstr ""
 
-#: gutenberg/loop-sources/posts.js:528
+#: gutenberg/loop-sources/posts.js:805
 msgid "Keep the post being viewed out of a gallery placed on its own page."
 msgstr ""
 
-#: gutenberg/loop-sources/pro-sources.js:39
+#: gutenberg/loop-sources/pro-sources.js:38
 msgid "Display social feeds such as Instagram, YouTube, Flickr, X, etc…"
 msgstr ""
 
-#: gutenberg/loop-sources/source-picker.js:40
-msgid "Pro"
+#: gutenberg/utils/carousel-controls/index.js:49
+msgid "Pause"
+msgstr ""
+
+#: gutenberg/utils/carousel-controls/index.js:50
+msgid "Stop"
+msgstr ""
+
+#: gutenberg/utils/carousel-controls/index.js:148
+msgid "Show on hover"
+msgstr ""
+
+#: gutenberg/utils/carousel-controls/index.js:149
+msgid "Fades in while the pointer rests on the carousel. Always shown on touch screens."
+msgstr ""
+
+#: gutenberg/utils/click-actions.js:14
+msgid "Open the item"
+msgstr ""
+
+#: gutenberg/utils/click-actions.js:15
+msgid "Open in lightbox"
+msgstr ""
+
+#: gutenberg/utils/click-actions.js:17
+msgid "Open its link, else in lightbox"
 msgstr ""
 
 #: gutenberg/utils/dimensions-tools/index.js:33
@@ -3807,14 +4632,38 @@ msgctxt "Aspect ratio option for dimensions control"
 msgid "Custom"
 msgstr ""
 
-#: gutenberg/utils/dimensions-tools/index.js:130
-#: gutenberg/utils/dimensions-tools/index.js:138
-msgid "Aspect ratio"
-msgstr ""
-
 #: gutenberg/utils/dimensions-tools/index.js:241
 msgctxt "Image scaling options"
 msgid "Scale"
+msgstr ""
+
+#: gutenberg/utils/item-format-badge/index.js:80
+msgid "Top left"
+msgstr ""
+
+#: gutenberg/utils/item-format-badge/index.js:81
+msgid "Top right"
+msgstr ""
+
+#: gutenberg/utils/item-format-badge/index.js:82
+msgid "Bottom left"
+msgstr ""
+
+#: gutenberg/utils/item-format-badge/index.js:83
+msgid "Bottom right"
+msgstr ""
+
+#: gutenberg/utils/item-format-badge/index.js:135
+#: gutenberg/utils/item-format-badge/index.js:141
+msgid "Format badge"
+msgstr ""
+
+#: gutenberg/utils/item-format-badge/index.js:142
+msgid "Marks video, audio and gallery items with an icon."
+msgstr ""
+
+#: gutenberg/utils/item-format-badge/index.js:151
+msgid "Badge position"
 msgstr ""
 
 #: gutenberg/block-saved/block.json
@@ -3911,7 +4760,7 @@ msgstr ""
 
 #: gutenberg/blocks/item-date/block.json
 msgctxt "block description"
-msgid "Displays the publish date of a gallery item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays the publish or last modified date of a gallery item. Block is experimental and will change in future releases. Please use with caution."
 msgstr ""
 
 #: gutenberg/blocks/item-description/block.json
@@ -3986,6 +4835,188 @@ msgctxt "block description"
 msgid "Displays the title of a gallery item. Block is experimental and will change in future releases. Please use with caution."
 msgstr ""
 
+#: gutenberg/blocks/loop-carousel-autoplay/block.json
+msgctxt "block title"
+msgid "Carousel Play and Pause (Experimental)"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-autoplay/block.json
+msgctxt "block description"
+msgid "Stops a carousel gallery that moves on its own, and starts it again. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-autoplay/block.json
+#: gutenberg/blocks/loop-carousel-indicator/block.json
+#: gutenberg/blocks/loop-carousel-nav/block.json
+#: gutenberg/blocks/loop-carousel-next/block.json
+#: gutenberg/blocks/loop-carousel-previous/block.json
+#: gutenberg/blocks/loop-carousel-thumbnails/block.json
+msgctxt "block keyword"
+msgid "carousel"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-autoplay/block.json
+#: gutenberg/blocks/loop-carousel-indicator/block.json
+#: gutenberg/blocks/loop-carousel-nav/block.json
+#: gutenberg/blocks/loop-carousel-next/block.json
+#: gutenberg/blocks/loop-carousel-previous/block.json
+#: gutenberg/blocks/loop-carousel-thumbnails/block.json
+msgctxt "block keyword"
+msgid "slider"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-autoplay/block.json
+msgctxt "block keyword"
+msgid "autoplay"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-autoplay/block.json
+msgctxt "block keyword"
+msgid "pause"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-autoplay/block.json
+msgctxt "block keyword"
+msgid "play"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-autoplay/block.json
+#: gutenberg/blocks/loop-carousel-indicator/block.json
+#: gutenberg/blocks/loop-carousel-next/block.json
+#: gutenberg/blocks/loop-carousel-previous/block.json
+#: gutenberg/blocks/loop-carousel-thumbnails/block.json
+msgctxt "block style label"
+msgid "Plain"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-autoplay/block.json
+#: gutenberg/blocks/loop-carousel-indicator/block.json
+#: gutenberg/blocks/loop-carousel-next/block.json
+#: gutenberg/blocks/loop-carousel-previous/block.json
+msgctxt "block style label"
+msgid "Outlined"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-autoplay/block.json
+#: gutenberg/blocks/loop-carousel-indicator/block.json
+#: gutenberg/blocks/loop-carousel-next/block.json
+#: gutenberg/blocks/loop-carousel-previous/block.json
+msgctxt "block style label"
+msgid "Filled"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/block.json
+msgctxt "block title"
+msgid "Carousel Indicator (Experimental)"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/block.json
+msgctxt "block description"
+msgid "Says which slide of a carousel gallery is on screen, as dots or as a bar. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/block.json
+#: gutenberg/blocks/loop-carousel-nav/block.json
+msgctxt "block keyword"
+msgid "dots"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/block.json
+msgctxt "block keyword"
+msgid "bullets"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/block.json
+msgctxt "block keyword"
+msgid "pagination"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/block.json
+msgctxt "block keyword"
+msgid "progress"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-nav/block.json
+msgctxt "block title"
+msgid "Carousel Navigation (Experimental)"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-nav/block.json
+msgctxt "block description"
+msgid "Holds the controls of a carousel gallery in one row. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-nav/block.json
+msgctxt "block keyword"
+msgid "arrows"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-nav/block.json
+msgctxt "block keyword"
+msgid "navigation"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-next/block.json
+msgctxt "block title"
+msgid "Carousel Next Slide (Experimental)"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-next/block.json
+msgctxt "block description"
+msgid "Moves a carousel gallery on one slide. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-next/block.json
+#: gutenberg/blocks/loop-carousel-previous/block.json
+msgctxt "block keyword"
+msgid "arrow"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-next/block.json
+msgctxt "block keyword"
+msgid "next"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-previous/block.json
+msgctxt "block title"
+msgid "Carousel Previous Slide (Experimental)"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-previous/block.json
+msgctxt "block description"
+msgid "Moves a carousel gallery back one slide. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-previous/block.json
+msgctxt "block keyword"
+msgid "previous"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-thumbnails/block.json
+msgctxt "block title"
+msgid "Carousel Thumbnails (Experimental)"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-thumbnails/block.json
+msgctxt "block description"
+msgid "A strip of small pictures a carousel gallery can be steered by. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-thumbnails/block.json
+msgctxt "block keyword"
+msgid "thumbnails"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-thumbnails/block.json
+msgctxt "block keyword"
+msgid "filmstrip"
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-thumbnails/block.json
+msgctxt "block style label"
+msgid "Dimmed"
+msgstr ""
+
 #: gutenberg/blocks/loop-filter-item/block.json
 msgctxt "block title"
 msgid "Filter Item"
@@ -4014,6 +5045,16 @@ msgstr ""
 #: gutenberg/blocks/loop-no-results/block.json
 msgctxt "block description"
 msgid "Contains the block elements used to render content when no gallery items are found. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-pagination-end/block.json
+msgctxt "block title"
+msgid "End of List"
+msgstr ""
+
+#: gutenberg/blocks/loop-pagination-end/block.json
+msgctxt "block description"
+msgid "Contains the blocks shown once the last page of the gallery is on screen."
 msgstr ""
 
 #: gutenberg/blocks/loop-pagination-next/block.json
@@ -4064,6 +5105,26 @@ msgstr ""
 #: gutenberg/blocks/loop-pagination/block.json
 msgctxt "block description"
 msgid "Displays pagination wrapper which can include paged, load more and infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-query-total/block.json
+msgctxt "block title"
+msgid "Gallery Query Total (Experimental)"
+msgstr ""
+
+#: gutenberg/blocks/loop-query-total/block.json
+msgctxt "block description"
+msgid "Displays how many items the gallery found, or which of them are on screen. Block is experimental and will change in future releases. Please use with caution."
+msgstr ""
+
+#: gutenberg/blocks/loop-search/block.json
+msgctxt "block title"
+msgid "Gallery Search (Experimental)"
+msgstr ""
+
+#: gutenberg/blocks/loop-search/block.json
+msgctxt "block description"
+msgid "Lets visitors search the items of Gallery Loop. Block is experimental and will change in future releases. Please use with caution."
 msgstr ""
 
 #: gutenberg/blocks/loop-sort/block.json

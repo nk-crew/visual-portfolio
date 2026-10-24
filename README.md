@@ -32,7 +32,7 @@ Visual Portfolio provides powerful tools to showcase your works and photo galler
 
 ### Prerequisites
 
-- PHP >= 7.2
+- PHP >= 8.3
 - Node.js >= 22.0
 - Composer >= 2.0
 - Docker (for the local WordPress environment)

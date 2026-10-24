@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.9.0 - Oct 24, 2026 =
+
+* added WordPress 7.2 compatibility
+* raised the minimum PHP requirement to 8.3
+* improved the experimental Gallery Loop blocks:
+  * added Carousel Navigation, Previous, Next, Indicator, Autoplay and Thumbnails blocks, placed anywhere inside the loop
+  * added Gallery Search, Query Total and End of List blocks
+  * added the Fade carousel effect, and carousel effects in browsers without scroll-driven animations
+  * added a pattern editor for the Tiles layout, with the old patterns kept as presets
+  * added Sticky posts, Authors, Formats and excluded terms to the Posts source
+  * added images by URL from outside the Media Library, and Crop and Replace in the image toolbar, to the Media source
+  * added the filter as a dropdown, the sort as links, row gaps, grid alignment, and tablet and phone column counts
+  * added the lightbox chosen in Settings, with its caption sources
+  * added transforms from the Gallery, Latest Posts and Query Loop blocks
+  * changed the blocks to print nothing below WordPress 7.1
+  * security fix: a custom query saved by a contributor could show other authors' drafts
+* improved block editor loading: the Custom CSS code editor loads only when it is opened, so the editor starts with about half the JavaScript
+* changed the image picking buttons and the chosen image card to the WordPress 7.2 featured image style
+* security fix: logged-in users without the needed role could search draft and private post titles, open the gallery preview, or run admin-only plugin requests
+* security fix: custom CSS could close the tag it is printed in
+* fixed custom CSS losing `&` nesting, `>` selectors, rules wrapped in `<style>` tags and rules written after a closing style tag
+* fixed styles and carousels on right-to-left sites
+* fixed the Media Settings panel showing empty thumbnails for galleries saved with image IDs only
+* fixed the focal point control overlapping the image
+* fixed the block editor preview breaking on galleries with a few hundred images
+* fixed the welcome screen being skipped right after activation
+* **Pro:**
+* improved the experimental Gallery Loop blocks:
+  * added albums, image effects, tilt, caption move, hover media, video thumbnails, deep links, right-click protection, watermarks and Quick View
+  * added a marquee mode to the carousel autoplay
+  * added the Cover, Reveal, Warp, Drop and Stack carousel effects, with more transitions and rows
+  * added a tiles pattern of its own for tablets and phones
+  * added mixed social feeds
+  * fixed every page of a social or taxonomy loop showing the first page
+* added a feed source picked in each social gallery, so one connection serves several galleries
+* changed "Sync All Accounts" to "Sync Now", which syncs the feeds galleries show
+* added a link on the Updates page to where the license key is
+* security fix: users without the needed role could activate the license, change watermark settings, list Facebook pages, search users by email, read album images of non-public content, rewrite an approved proofing selection, or use proofing on a password-protected gallery without its password
+* fixed a deep link to a lightbox slide added by Load More opening nothing
+* fixed a local video without a cover image showing as an empty item with a PHP warning
+* fixed browsers keeping old Pro styles after an update
+* fixed Facebook watch links, Instagram links without a trailing slash or with `_` or `-` in their ID, and Twitch videos on sites with a port in the address not opening in the popup
+
 = 3.8.2 - Sep 10, 2026 =
 
 * fixed images with empty alt text being written with a valueless attribute, which SEO crawlers counted as missing alt text
