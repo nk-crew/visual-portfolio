@@ -336,54 +336,47 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 ## Changelog ##
 
-= 3.9.0 - Oct 22, 2026 =
+= 3.9.0 - Oct 24, 2026 =
 
 * added WordPress 7.2 compatibility
 * raised the minimum PHP requirement to 8.3
-* added to the experimental Gallery Loop: Carousel Navigation, Previous, Next, Indicator, Autoplay and Thumbnails blocks, placed anywhere inside the loop
-* added Gallery Search, Query Total and End of List blocks to the experimental Gallery Loop
-* added a pattern editor for the Tiles layout of the experimental Gallery Loop, with the old patterns kept as presets
-* added Sticky posts, Authors, Formats and excluded terms to posts in the experimental Gallery Loop
-* added images by URL from outside the Media Library, and Crop and Replace in the image toolbar, to the Media source of the experimental Gallery Loop
-* added the filter as a dropdown, the sort as links, row gaps, grid alignment and tablet and phone column counts set in the editor's Responsive styles to the experimental Gallery Loop
-* added the lightbox chosen in Settings, with its caption sources, to the experimental Gallery Loop
-* added transforms from the Gallery, Latest Posts and Query Loop blocks to the experimental Gallery Loop
-* added the Fade carousel effect, and carousel effects in Firefox and Safari versions without scroll-driven animations
+* improved the experimental Gallery Loop blocks:
+  * added Carousel Navigation, Previous, Next, Indicator, Autoplay and Thumbnails blocks, placed anywhere inside the loop
+  * added Gallery Search, Query Total and End of List blocks
+  * added the Fade carousel effect, and carousel effects in browsers without scroll-driven animations
+  * added a pattern editor for the Tiles layout, with the old patterns kept as presets
+  * added Sticky posts, Authors, Formats and excluded terms to the Posts source
+  * added images by URL from outside the Media Library, and Crop and Replace in the image toolbar, to the Media source
+  * added the filter as a dropdown, the sort as links, row gaps, grid alignment, and tablet and phone column counts
+  * added the lightbox chosen in Settings, with its caption sources
+  * added transforms from the Gallery, Latest Posts and Query Loop blocks
+  * changed the blocks to print nothing below WordPress 7.1
+  * security fix: a custom query saved by a contributor could show other authors' drafts
 * improved block editor loading: the Custom CSS code editor loads only when it is opened, so the editor starts with about half the JavaScript
-* changed the experimental Gallery Loop blocks to print nothing below WordPress 7.1
 * changed the image picking buttons and the chosen image card to the WordPress 7.2 featured image style
-* changed Pro notes in the block inspector to a lighter list of each Pro feature with one Go Pro link, also in the experimental Gallery Loop
-* changed the Watermarks, Social Feeds and White Label settings tabs to preview how they look in Pro
-* fixed galleries showing no images on WordPress 7.2
-* fixed the Posts source Settings panel showing no settings on WordPress 7.2
+* security fix: logged-in users without the needed role could search draft and private post titles, open the gallery preview, or run admin-only plugin requests
+* security fix: custom CSS could close the tag it is printed in
+* fixed custom CSS losing `&` nesting, `>` selectors, rules wrapped in `<style>` tags and rules written after a closing style tag
+* fixed styles and carousels on right-to-left sites
 * fixed the Media Settings panel showing empty thumbnails for galleries saved with image IDs only
-* removed the grey inner border on Media Settings panel thumbnails
 * fixed the focal point control overlapping the image
-* fixed security issues where logged-in users without the needed role could search draft and private post titles, open the gallery preview, or run admin-only plugin requests
-* fixed a security issue where custom CSS could close the element it is printed in
-* fixed custom CSS losing `&` nesting, `>` selectors and rules wrapped in `<style>` tags
-* fixed custom CSS rules written after a closing style tag being dropped
-* fixed a custom query in a Gallery Loop saved by a contributor showing other authors' drafts
-* fixed right-to-left sites getting the left-to-right styles
-* fixed carousels and carousel effects on right-to-left sites
 * fixed the block editor preview breaking on galleries with a few hundred images
-* fixed the welcome screen being skipped, and a background request getting a page instead of its answer, right after activation
-* removed the plugin name from the alternative text of the gallery loading logo
+* fixed the welcome screen being skipped right after activation
 * **Pro:**
-* added albums, image effects, tilt, caption move, hover media, video thumbnails, deep links, right-click protection, watermarks and Quick View to the Gallery Loop
-* added a marquee mode to the carousel autoplay
-* added the Cover, Reveal, Warp, Drop and Stack carousel effects, with more transitions and rows
-* added a tiles pattern of its own for tablets and phones
-* added a feed source picked in each social gallery, so one connection serves several galleries, and mixed social feeds in the Gallery Loop
+* improved the experimental Gallery Loop blocks:
+  * added albums, image effects, tilt, caption move, hover media, video thumbnails, deep links, right-click protection, watermarks and Quick View
+  * added a marquee mode to the carousel autoplay
+  * added the Cover, Reveal, Warp, Drop and Stack carousel effects, with more transitions and rows
+  * added a tiles pattern of its own for tablets and phones
+  * added mixed social feeds
+  * fixed every page of a social or taxonomy loop showing the first page
+* added a feed source picked in each social gallery, so one connection serves several galleries
 * changed "Sync All Accounts" to "Sync Now", which syncs the feeds galleries show
 * added a link on the Updates page to where the license key is
-* changed the image pickers for the custom thumbnail, hover media, popup image, video cover and album images to the WordPress 7.2 style
-* fixed security issues where users without the needed role could activate the license, change watermark settings, list Facebook pages, search users by email, read album images of non-public content, rewrite an approved proofing selection, or use proofing on a password-protected gallery without its password
-* fixed every page of a social or taxonomy Gallery Loop showing the first page
+* security fix: users without the needed role could activate the license, change watermark settings, list Facebook pages, search users by email, read album images of non-public content, rewrite an approved proofing selection, or use proofing on a password-protected gallery without its password
 * fixed a deep link to a lightbox slide added by Load More opening nothing
-* fixed a local video without a cover image rendering as an empty item with a PHP warning
-* fixed browsers keeping old Pro stylesheets after an update
-* fixed album tiles showing no images on WordPress 7.2
+* fixed a local video without a cover image showing as an empty item with a PHP warning
+* fixed browsers keeping old Pro styles after an update
 * fixed Facebook watch links, Instagram links without a trailing slash or with `_` or `-` in their ID, and Twitch videos on sites with a port in the address not opening in the popup
 
 = 3.8.2 - Sep 10, 2026 =
