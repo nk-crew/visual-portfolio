@@ -97,16 +97,163 @@
 	background: #fff;
 }
 
-// The three things a gallery is assembled from, asked before its shape.
-.vpf-loop-wizard {
-	width: 100%;
+// The first step of an empty loop: the shapes of a gallery, fading out before
+// they read as one, with the way to add its images over them.
+.vpf-loop-start {
+	position: relative;
+	min-height: 560px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
-.vpf-loop-wizard__choices {
-	align-items: flex-start;
+.vpf-loop-start__shapes {
+	display: flex;
+	gap: 20px;
+	max-height: 560px;
+	overflow: hidden;
+	mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.5) 45%, transparent 95%);
+
+	> div {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: 20px;
+	}
+
+	span {
+		display: block;
+		background: var(--wp-components-color-gray-100, #f0f0f0);
+		border-radius: 2px;
+	}
+}
+
+.vpf-loop-start__card {
+	position: absolute;
+	top: 96px;
+	left: 50%;
+	width: min(480px, calc(100% - 32px));
+	transform: translateX(-50%);
+
+	// A narrow canvas makes the Placeholder drop its instructions and centre
+	// or stretch its buttons; the card keeps the wide layout.
+	.components-placeholder__instructions {
+		display: block;
+	}
+
+	.components-placeholder__fieldset {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}
+
+.vpf-loop-start__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+
+	.components-placeholder__fieldset & {
+		justify-content: flex-start;
+	}
 
 	> * {
-		flex: 1 1 180px;
-		min-width: 0;
+		flex: none;
+		width: auto;
+	}
+}
+
+.vpf-loop-start__badge {
+	padding: 0 6px;
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 18px;
+	background: var(--wp-components-color-gray-100, #f0f0f0);
+	border-radius: 2px;
+}
+
+// The second step: the gallery's layouts, previewed with its own content, in
+// the frame of a Placeholder.
+.vpf-loop-layouts {
+	padding: 24px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	font-size: 13px;
+	color: #1e1e1e;
+	background: #fff;
+	border-radius: 2px;
+	box-shadow: inset 0 0 0 1px #1e1e1e;
+
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+		gap: 24px 16px;
+		height: auto;
+		overflow: visible;
+	}
+
+	.block-editor-block-patterns-list__list-item {
+		position: relative;
+		margin: 0;
+		cursor: pointer;
+	}
+
+	// The editor's preview styles belong to the editor around the canvas and
+	// are not loaded inside it, where this step is drawn. These are the rules a
+	// preview needs to scale its page into the card, cut to one height so a
+	// tall masonry does not stretch its row.
+	.block-editor-block-preview__container {
+		position: relative;
+		width: 100%;
+		height: 200px;
+		overflow: hidden;
+		border-radius: 2px;
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+
+		&::after {
+			position: absolute;
+			inset: 0;
+			z-index: 1;
+			content: "";
+		}
+	}
+
+	.block-editor-block-preview__content {
+		top: 0;
+		left: 0;
+		width: 100%;
+		min-height: auto;
+		margin: 0;
+		overflow: visible;
+		text-align: initial;
+		transform-origin: top left;
+	}
+
+	.block-editor-block-patterns-list__item:hover .block-editor-block-preview__container,
+	.block-editor-block-patterns-list__item[data-focus-visible] .block-editor-block-preview__container {
+		box-shadow: 0 0 0 2px var(--wp-admin-theme-color, #3858e9);
+	}
+
+	.block-editor-block-patterns-list__item-title {
+		padding-top: 8px;
+		text-align: left;
+	}
+}
+
+.vpf-loop-layouts__head {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+	justify-content: space-between;
+	margin-bottom: 16px;
+
+	h2 {
+		margin: 0 0 4px;
+		font-family: inherit;
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 1.4;
+	}
+
+	p {
+		margin: 0;
+		font-size: 12px;
+		color: #757575;
 	}
 }

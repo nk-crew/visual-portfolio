@@ -1,21 +1,18 @@
 import apiFetch from '@wordpress/api-fetch';
 import {
+	BlockControls,
 	store as blockEditorStore,
 	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 import {
-	Button,
-	__experimentalHStack as HStack,
 	Notice,
 	__experimentalNumberControl as NumberControl,
 	PanelBody,
-	Placeholder,
 	RangeControl,
-	SelectControl,
 	ToggleControl,
+	ToolbarButton,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
@@ -24,7 +21,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { ProTeaserPanel } from '../../components/pro-teaser';
-import GalleryManager from '../../loop-sources/gallery-manager';
 import { useLoopSource } from '../../loop-sources/registry';
 import SourcePicker from '../../loop-sources/source-picker';
 import {
@@ -32,9 +28,10 @@ import {
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
+import { applyLayoutDefaults, getLayoutAttributes } from './layout-defaults';
 import LightboxPanel from './lightbox-panel';
 import PatternSetup from './pattern-setup';
-import { applyChoices, PAGINATION_OPTIONS } from './starting-choices';
+import { LayoutStart, SourceStart } from './start';
 
 // The protection Pro adds to a gallery, for an install without it.
 const PROTECTION_TEASERS = [
@@ -78,60 +75,6 @@ const NOTICE_LIMIT = parseInt(itemsCountNoticeLimit, 10);
 const NOTICE_AFTER = NOTICE_LIMIT + 5;
 
 const PER_PAGE_ALL = -1;
-
-const TEMPLATE = [
-	[
-		'visual-portfolio/loop-filter',
-		{},
-		// A placeholder until the filter block has fetched its items. It carries
-		// the default `filter` of `*`, so the fetched "All" item reuses it.
-		[
-			[
-				'visual-portfolio/loop-filter-item',
-				{ text: __('All', 'visual-portfolio') },
-			],
-		],
-	],
-	[
-		'visual-portfolio/item-template',
-		{ layoutType: 'grid' },
-		[
-			[
-				'visual-portfolio/item-image',
-				{ aspectRatio: '1', clickAction: 'popup' },
-			],
-			[
-				'visual-portfolio/item-title',
-				{ style: { typography: { textAlign: 'center' } } },
-			],
-		],
-	],
-	[
-		'visual-portfolio/loop-no-results',
-		{},
-		[
-			[
-				'core/paragraph',
-				{
-					content: __(
-						'No items were found matching your selection.',
-						'visual-portfolio'
-					),
-				},
-			],
-		],
-	],
-	[
-		'visual-portfolio/loop-pagination',
-		{},
-		// The `paged` variation, expressed by its inner blocks.
-		[
-			['visual-portfolio/loop-pagination-previous'],
-			['visual-portfolio/loop-pagination-numbers'],
-			['visual-portfolio/loop-pagination-next'],
-		],
-	],
-];
 
 /**
  * Keep `baseQuery.maxPages` in step with the query.
@@ -518,9 +461,28 @@ function SourcePanel(props) {
 }
 
 /**
- * What an empty loop shows: pick a source, fill it, then pick a shape.
+ * The blocks and attributes a layout makes, for the loop's source.
  *
- * The order is the point. A pattern is previewed by rendering it, so a gallery
+ * @param {Object} layout     - chosen layout, from `useLayouts`.
+ * @param {Object} attributes - loop attributes.
+ * @return {Object} `{ blocks, attributes }`.
+ */
+function buildLayout(layout, attributes) {
+	return {
+		blocks: applyLayoutDefaults(layout.innerBlocks, attributes.queryType),
+		attributes: {
+			...getLayoutAttributes(attributes),
+			// Named after the pattern and derived from by core, the same as a
+			// block core inserted from a pattern itself.
+			metadata: layout.blocks[0].attributes.metadata,
+		},
+	};
+}
+
+/**
+ * What an empty loop shows: its content, then its layout.
+ *
+ * The order is the point. A layout is previewed by rendering it, so a gallery
  * of images has to have its images before the previews can be of anything - and
  * a preview of somebody else's photographs is not a choice between layouts.
  *
@@ -532,182 +494,69 @@ function SourcePanel(props) {
  */
 function LoopPlaceholder({ attributes, setAttributes, clientId }) {
 	const [step, setStep] = useState('source');
-	const [choices, setChoices] = useState({
-		filter: false,
-		pagination: 'paged',
-		lightbox: true,
-	});
 	const { replaceInnerBlocks } = useDispatch(blockEditorStore);
-
-	const insert = (blocks) => replaceInnerBlocks(clientId, blocks);
-
-	const blank = () => createBlocksFromInnerBlocksTemplate(TEMPLATE);
 
 	if ('source' === step) {
 		return (
-			<Placeholder
-				label={__('Gallery Loop', 'visual-portfolio')}
-				instructions={__(
-					'Choose where the gallery takes its items from.',
-					'visual-portfolio'
-				)}
-			>
-				<SourcePicker
-					value={attributes.queryType}
-					onChange={(name) => {
-						setAttributes({ queryType: name });
-						setStep('images' === name ? 'media' : 'pattern');
-					}}
-				/>
-			</Placeholder>
+			<SourceStart
+				attributes={attributes}
+				setAttributes={setAttributes}
+				clientId={clientId}
+				onSource={() => setStep('layout')}
+			/>
 		);
 	}
 
-	// The gallery manager, before anything is drawn from it.
-	if ('media' === step) {
-		const images = attributes.imagesQuery?.images || [];
-
-		return (
-			<Placeholder
-				label={__('Gallery Loop', 'visual-portfolio')}
-				instructions={__(
-					'Add the images of the gallery.',
-					'visual-portfolio'
-				)}
-			>
-				<VStack spacing={4} className="vpf-loop-setup__media">
-					<GalleryManager
-						images={images}
-						clientId={clientId}
-						onChange={(value) =>
-							setAttributes({
-								imagesQuery: {
-									...attributes.imagesQuery,
-									images: value,
-								},
-							})
-						}
-					/>
-					<HStack justify="flex-start" spacing={3}>
-						<Button
-							variant="primary"
-							disabled={!images.length}
-							accessibleWhenDisabled
-							onClick={() => setStep('pattern')}
-						>
-							{__('Continue', 'visual-portfolio')}
-						</Button>
-						<Button
-							variant="tertiary"
-							onClick={() => insert(blank())}
-						>
-							{__('Start blank', 'visual-portfolio')}
-						</Button>
-					</HStack>
-				</VStack>
-			</Placeholder>
-		);
-	}
-
-	// What the gallery is made of is asked here, beside the source, and applied
-	// to whichever pattern is chosen. The chooser itself is a modal holding
-	// nothing but patterns - a preview of a gallery needs the width of the
-	// screen to be a preview of anything.
 	return (
-		<Placeholder
-			label={__('Gallery Loop', 'visual-portfolio')}
-			instructions={__(
-				'Choose what the gallery carries, then pick a shape for it.',
-				'visual-portfolio'
-			)}
-		>
-			<VStack spacing={4} className="vpf-loop-wizard">
-				<HStack
-					className="vpf-loop-wizard__choices"
-					spacing={4}
-					justify="flex-start"
-					alignment="flex-start"
-					wrap
-				>
-					<ToggleControl
-						label={__('Filter', 'visual-portfolio')}
-						help={__(
-							'Links above the gallery, one per category.',
-							'visual-portfolio'
-						)}
-						checked={choices.filter}
-						onChange={(filter) =>
-							setChoices((current) => ({ ...current, filter }))
-						}
-					/>
-					<ToggleControl
-						label={__('Open in a lightbox', 'visual-portfolio')}
-						help={__(
-							'A click on a picture opens it over the page.',
-							'visual-portfolio'
-						)}
-						checked={choices.lightbox}
-						onChange={(lightbox) =>
-							setChoices((current) => ({ ...current, lightbox }))
-						}
-					/>
-					<SelectControl
-						label={__('Pagination', 'visual-portfolio')}
-						help={__(
-							'How a visitor reaches the items past the first page.',
-							'visual-portfolio'
-						)}
-						value={choices.pagination}
-						options={PAGINATION_OPTIONS}
-						onChange={(pagination) =>
-							setChoices((current) => ({
-								...current,
-								pagination,
-							}))
-						}
-					/>
-				</HStack>
+		<LayoutStart
+			attributes={attributes}
+			clientId={clientId}
+			onChoose={(layout) => {
+				const made = buildLayout(layout, attributes);
 
-				<HStack justify="flex-start" spacing={3}>
-					<Button
-						variant="primary"
-						onClick={() => setStep('pattern-modal')}
-					>
-						{__('Choose a gallery', 'visual-portfolio')}
-					</Button>
-					<Button
-						variant="tertiary"
-						onClick={() =>
-							insert(
-								applyChoices(
-									blank(),
-									choices,
-									attributes.queryType
-								)
-							)
-						}
-					>
-						{__('Start blank', 'visual-portfolio')}
-					</Button>
-				</HStack>
-			</VStack>
+				setAttributes(made.attributes);
+				replaceInnerBlocks(clientId, made.blocks);
+			}}
+		/>
+	);
+}
 
-			{'pattern-modal' === step ? (
+/**
+ * Another layout for a gallery made from one, as core's "Change design" does
+ * for a Query block. The items stay; the blocks that show them are replaced.
+ *
+ * @param {Object}   props               - component props.
+ * @param {Object}   props.attributes    - block attributes.
+ * @param {Function} props.setAttributes - block attribute setter.
+ * @param {string}   props.clientId      - block client id.
+ * @return {Element} component.
+ */
+function ChangeLayout({ attributes, setAttributes, clientId }) {
+	const [isOpen, setIsOpen] = useState(false);
+	const { replaceInnerBlocks } = useDispatch(blockEditorStore);
+
+	return (
+		<>
+			<BlockControls group="other">
+				<ToolbarButton onClick={() => setIsOpen(true)}>
+					{__('Change layout', 'visual-portfolio')}
+				</ToolbarButton>
+			</BlockControls>
+			{isOpen ? (
 				<PatternSetup
 					attributes={attributes}
 					clientId={clientId}
-					onChoose={(blocks, metadata) => {
-						// Named after the pattern and derived from by core, the
-						// same as a block core inserted from a pattern itself.
-						setAttributes({ metadata });
-						insert(
-							applyChoices(blocks, choices, attributes.queryType)
-						);
+					onChoose={(layout) => {
+						const made = buildLayout(layout, attributes);
+
+						setIsOpen(false);
+						setAttributes(made.attributes);
+						replaceInnerBlocks(clientId, made.blocks);
 					}}
-					onCancel={() => setStep('pattern')}
+					onCancel={() => setIsOpen(false)}
 				/>
 			) : null}
-		</Placeholder>
+		</>
 	);
 }
 
@@ -755,6 +604,13 @@ export default function BlockEdit(props) {
 
 	return (
 		<div {...blockProps}>
+			{attributes.metadata?.patternName ? (
+				<ChangeLayout
+					attributes={attributes}
+					setAttributes={setAttributes}
+					clientId={clientId}
+				/>
+			) : null}
 			{/* The order is the one the core Query block uses, and it is an
 			    argument rather than a habit: what the gallery is made of,
 			    then how it is cut into pages, then what narrows it. */}
