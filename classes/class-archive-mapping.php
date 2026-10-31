@@ -609,6 +609,12 @@ class Visual_Portfolio_Archive_Mapping {
 			)
 		);
 
+		$portfolio_base = self::normalize_portfolio_base( $permalinks['portfolio_base'] );
+		if ( $portfolio_base !== $permalinks['portfolio_base'] ) {
+			$permalinks['portfolio_base'] = $portfolio_base;
+			visual_portfolio()->defer_flush_rewrite_rules();
+		}
+
 		if ( $saved_permalinks !== $permalinks ) {
 			update_option( 'portfolio_permalinks', $permalinks );
 		}
@@ -625,6 +631,16 @@ class Visual_Portfolio_Archive_Mapping {
 		$permalinks['tag_base']       = untrailingslashit( $permalinks['tag_base'] );
 
 		return $permalinks;
+	}
+
+	/**
+	 * Replace a full post-name structure with the portfolio archive base.
+	 *
+	 * @param string $portfolio_base - Portfolio permalink base.
+	 * @return string
+	 */
+	private static function normalize_portfolio_base( $portfolio_base ) {
+		return '%postname%' === trim( $portfolio_base, '/\\' ) ? '%portfolio_page_slug%' : $portfolio_base;
 	}
 
 	/**
@@ -739,12 +755,6 @@ class Visual_Portfolio_Archive_Mapping {
 			$permalinks['category_base'] = sanitize_text_field( wp_unslash( $_POST['vp_category_slug'] ) );
 			$permalinks['tag_base']      = sanitize_text_field( wp_unslash( $_POST['vp_tag_slug'] ) );
 
-			// Generate portfolio base.
-			// After WordPress update to 6.1 version we encountered an error saving permalinks.
-			// Thus, the data stored in permalinks is now checked for the presence of % symbols in their strings.
-			// When validating a 'custom' value, there is no percentage in this line, which generates an error.
-			// Text of error: A structure tag is required when using custom permalinks.
-			// This has now been fixed by adding a strict check on the 'custom' value.
 			$portfolio_base = isset( $_POST['portfolio_permalink'] ) &&
 							'custom' !== $_POST['portfolio_permalink'] ?
 							sanitize_option( 'permalink_structure', wp_unslash( $_POST['portfolio_permalink'] ) ) :
@@ -752,7 +762,8 @@ class Visual_Portfolio_Archive_Mapping {
 
 			if ( 'custom' === $portfolio_base ) {
 				if ( isset( $_POST['portfolio_permalink_structure'] ) ) {
-					$portfolio_base = preg_replace( '#/+#', '/', '/' . str_replace( '#', '', trim( sanitize_option( 'permalink_structure', wp_unslash( $_POST['portfolio_permalink_structure'] ) ) ) ) );
+					$portfolio_base = str_replace( 'http://', '', sanitize_url( wp_unslash( $_POST['portfolio_permalink_structure'] ) ) );
+					$portfolio_base = preg_replace( '#/+#', '/', '/' . str_replace( '#', '', trim( $portfolio_base ) ) );
 				} else {
 					$portfolio_base = '/';
 				}
@@ -765,7 +776,7 @@ class Visual_Portfolio_Archive_Mapping {
 				$portfolio_base = '/' . _x( 'portfolio', 'default-slug', 'visual-portfolio' );
 			}
 
-			$permalinks['portfolio_base'] = $portfolio_base;
+			$permalinks['portfolio_base'] = self::normalize_portfolio_base( $portfolio_base );
 
 			update_option( 'portfolio_permalinks', $permalinks );
 		}
