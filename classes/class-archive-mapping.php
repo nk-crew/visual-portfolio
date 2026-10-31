@@ -762,8 +762,8 @@ class Visual_Portfolio_Archive_Mapping {
 
 			if ( 'custom' === $portfolio_base ) {
 				if ( isset( $_POST['portfolio_permalink_structure'] ) ) {
-					$portfolio_base = sanitize_url( '/' . ltrim( wp_unslash( $_POST['portfolio_permalink_structure'] ), '/' ) );
-					$portfolio_base = preg_replace( '#/+#', '/', str_replace( '#', '', trim( $portfolio_base ) ) );
+					$portfolio_base = str_replace( 'http://', '', sanitize_url( wp_unslash( $_POST['portfolio_permalink_structure'] ) ) );
+					$portfolio_base = preg_replace( '#/+#', '/', '/' . str_replace( '#', '', trim( $portfolio_base ) ) );
 				} else {
 					$portfolio_base = '/';
 				}

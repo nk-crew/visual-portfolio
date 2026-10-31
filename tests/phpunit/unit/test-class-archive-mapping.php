@@ -178,6 +178,8 @@ class Test_Visual_Portfolio_Archive_Mapping extends WP_UnitTestCase {
 			'static base'    => array( 'work', '/work' ),
 			'archive base'   => array( '%portfolio_page_slug%/', '/%portfolio_page_slug%/' ),
 			'category base'  => array( '/%portfolio_category%/', '/%portfolio_page_slug%/%portfolio_category%/' ),
+			'leading space'  => array( ' work/%portfolio_category%/', '/work/%portfolio_category%/' ),
+			'http URL base'  => array( 'http://example.com/%portfolio_category%/', '/example.com/%portfolio_category%/' ),
 		);
 	}
 
