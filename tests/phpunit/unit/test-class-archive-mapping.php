@@ -58,6 +58,130 @@ class Test_Visual_Portfolio_Archive_Mapping extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Portfolio bases must keep ordinary pages and portfolio URLs reachable.
+	 *
+	 * @dataProvider portfolio_bases
+	 * @param string $base            - Stored portfolio base.
+	 * @param string $project_base    - Expected project URL base.
+	 * @param bool   $has_stale_rules - Whether conflicting rules already exist.
+	 * @return void
+	 */
+	public function test_portfolio_bases_keep_pages_and_projects_reachable( $base, $project_base, $has_stale_rules ) {
+		global $wp_rewrite;
+
+		$previous_rewrite = $wp_rewrite;
+		$wp_rewrite       = new WP_Rewrite();
+
+		try {
+			update_option( 'vp_general', array( 'register_portfolio_post_type' => 'on' ) );
+			update_option( 'portfolio_permalinks', array( 'portfolio_base' => $base ) );
+			$this->set_permalink_structure( '/%postname%/' );
+			delete_transient( 'vp_flush_rewrite_rules' );
+
+			$post_type = new Visual_Portfolio_Custom_Post_Type();
+			$post_type->add_custom_post_type();
+
+			$page = self::factory()->post->create(
+				array(
+					'post_type'   => 'page',
+					'post_name'   => 'about',
+					'post_status' => 'publish',
+				)
+			);
+			$project = self::factory()->post->create(
+				array(
+					'post_type'   => 'portfolio',
+					'post_name'   => 'sample-project',
+					'post_status' => 'publish',
+				)
+			);
+			$category = self::factory()->term->create( array( 'taxonomy' => 'portfolio_category', 'slug' => 'wildlife' ) );
+			wp_set_object_terms( $project, array( $category ), 'portfolio_category' );
+			if ( $has_stale_rules ) {
+				update_option( 'rewrite_rules', array( '([^/]+)(?:/([0-9]+))?/?$' => 'index.php?name=$matches[1]&page=$matches[2]' ) );
+				visual_portfolio()->run_deferred_rewrite_rules();
+			} else {
+				flush_rewrite_rules( false );
+			}
+
+			$this->go_to( home_url( '/about/' ) );
+			$this->assertSame( $page, get_queried_object_id() );
+			$this->assertTrue( is_page() );
+
+			$this->go_to( home_url( '/' . $project_base . '/sample-project/' ) );
+			$this->assertSame( $project, get_queried_object_id() );
+			$this->assertTrue( is_singular( 'portfolio' ) );
+
+			$this->go_to( home_url( '/portfolio-category/wildlife/' ) );
+			$this->assertSame( $category, get_queried_object_id() );
+			$this->assertTrue( is_tax( 'portfolio_category' ) );
+
+			Visual_Portfolio_Archive_Mapping::get_permalink_structure();
+			$this->assertFalse( get_transient( 'vp_flush_rewrite_rules' ) );
+		} finally {
+			$wp_rewrite = $previous_rewrite;
+		}
+	}
+
+	/**
+	 * Stored portfolio bases and their project URL paths.
+	 *
+	 * @return array
+	 */
+	public function portfolio_bases() {
+		return array(
+			'legacy post name base'     => array( '/%postname%/', 'portfolio', true ),
+			'post name without slashes' => array( '%postname%', 'portfolio', true ),
+			'custom category base'      => array( 'work/%portfolio_category%', 'work/wildlife', false ),
+			'default archive base'      => array( '%portfolio_page_slug%', 'portfolio', false ),
+		);
+	}
+
+	/**
+	 * Saving a portfolio base must preserve static paths and repair a post name base.
+	 *
+	 * @dataProvider saved_portfolio_bases
+	 * @param string $base     - Submitted portfolio base.
+	 * @param string $expected - Expected stored base.
+	 * @return void
+	 */
+	public function test_saving_portfolio_base( $base, $expected ) {
+		update_option( 'permalink_structure', '/%postname%/' );
+		set_current_screen( 'options-permalink' );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$_POST = array(
+			'permalink_structure'           => '/%postname%/',
+			'vp-permalinks-nonce'           => wp_create_nonce( 'vp-permalinks' ),
+			'vp_category_slug'              => 'portfolio-category',
+			'vp_tag_slug'                   => 'portfolio-tag',
+			'portfolio_permalink'           => 'custom',
+			'portfolio_permalink_structure' => $base,
+		);
+
+		$mapping = new Visual_Portfolio_Archive_Mapping();
+		try {
+			$mapping->permalink_settings_save();
+			$this->assertSame( $expected, get_option( 'portfolio_permalinks' )['portfolio_base'] );
+		} finally {
+			set_current_screen( 'front' );
+		}
+	}
+
+	/**
+	 * Bases accepted by the permalink form.
+	 *
+	 * @return array
+	 */
+	public function saved_portfolio_bases() {
+		return array(
+			'post name base' => array( '/%postname%/', '%portfolio_page_slug%' ),
+			'static base'    => array( 'work', '/work' ),
+			'archive base'   => array( '%portfolio_page_slug%/', '/%portfolio_page_slug%/' ),
+			'category base'  => array( '/%portfolio_category%/', '/%portfolio_page_slug%/%portfolio_category%/' ),
+		);
+	}
+
+	/**
 	 * Test that get_portfolio_slug returns default value when no archive page is set.
 	 */
 	public function test_get_portfolio_slug_returns_default_when_no_archive() {
