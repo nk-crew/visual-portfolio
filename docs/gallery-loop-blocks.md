@@ -277,7 +277,8 @@ jumping there. Switched off, the bar only says where the carousel is, and is a
 `progressbar` again. *Counter* is the pair of numbers, the slide
 on screen and how many there are, and is hidden from screen readers: the arrows
 and the dots already say the same thing. The editor shows it at the first slide,
-with the number of slides on the first page.
+with the number of slides on the first page. A carousel with no items shows none
+of its controls on the page, and the editor's counter says why.
 
 *Carousel Play and Pause* stops a carousel that moves on its own and starts it
 again, which is what WCAG 2.2.2 asks of any motion lasting more than five
