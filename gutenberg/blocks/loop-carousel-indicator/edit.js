@@ -60,6 +60,13 @@ function CounterPreview({ context }) {
 	const { items, isFirstLoad } = useLoopItems(query);
 	const slidesOnPage = items.length;
 
+	if (!isFirstLoad && !slidesOnPage) {
+		return __(
+			'The gallery is empty, so the page shows no count.',
+			'visual-portfolio'
+		);
+	}
+
 	return (
 		<>
 			<span className="vp-block-loop-carousel-counter-current">1</span>
