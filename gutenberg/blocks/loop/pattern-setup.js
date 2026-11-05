@@ -125,9 +125,7 @@ export function useLayouts(clientId, attributes) {
 
 	// A pattern is written as a whole loop block; what is inserted is its inner
 	// blocks, so the block the user already has keeps its id, its alignment and
-	// the source they picked. Its `metadata` is carried over separately: core
-	// wrote it onto the root block when it parsed the pattern, and derives the
-	// whole content-only behaviour of an inserted pattern from it.
+	// the source they picked.
 	const layouts = useMemo(() => {
 		const isPosts = 'posts' === queryType;
 		const lead = LEAD_LAYOUTS[isPosts ? 'posts' : 'images'];

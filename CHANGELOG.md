@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 * raised the minimum PHP requirement to 8.3
 * improved the experimental Gallery Loop blocks:
   * added Carousel Navigation, Previous, Next, Indicator, Autoplay and Thumbnails blocks, placed anywhere inside the loop
-  * added Gallery Search, Query Total and End of List blocks
+  * added Query Total and End of List blocks, and a Gallery Search block whose search comes with Pro
   * added the Fade carousel effect, and carousel effects in browsers without scroll-driven animations
   * added a pattern editor for the Tiles layout, with the old patterns kept as presets
   * added Sticky posts, Authors, Formats and excluded terms to the Posts source

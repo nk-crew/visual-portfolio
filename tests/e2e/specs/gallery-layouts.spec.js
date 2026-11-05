@@ -282,6 +282,36 @@ test.describe('Gallery Item Template layouts', () => {
 		return created.link;
 	}
 
+	test('thumbnails stay in the middle of a centred row', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - centred thumbnails',
+			blockId: 'e2e-thumbnails-centred',
+			images,
+			layout: { layoutType: 'carousel' },
+			carousel: ['loop-carousel-thumbnails'],
+		});
+
+		const row = page.locator(NAV);
+		const strip = page.locator('.vp-block-loop-carousel-thumbnails');
+
+		// The library the strip is handed to is what stretched it to the row.
+		await expect(strip).toHaveAttribute('blossom-carousel', 'true');
+
+		const [rowBox, stripBox] = await Promise.all([
+			row.boundingBox(),
+			strip.boundingBox(),
+		]);
+
+		expect(stripBox.width).toBeLessThan(rowBox.width);
+		expect(stripBox.x + stripBox.width / 2).toBeCloseTo(
+			rowBox.x + rowBox.width / 2,
+			0
+		);
+	});
+
 	test('tiles places every item the way the notation describes it', async ({
 		page,
 		requestUtils,

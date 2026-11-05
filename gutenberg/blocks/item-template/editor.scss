@@ -178,6 +178,28 @@ $gray-700: var(--wp-components-color-gray-700, var(--wpds-color-foreground-conte
 	opacity: 0.1;
 }
 
+// The shapes say which layout this is, in a preview with nothing else to show:
+// masonry columns of uneven heights, and rows as tall as the setting.
+.wp-block-visual-portfolio-item-template[aria-busy="true"].vp-layout-masonry > .wp-block-visual-portfolio-item-template__skeleton {
+	&:nth-child(3n + 1) {
+		aspect-ratio: 3 / 4;
+	}
+
+	&:nth-child(3n + 2) {
+		aspect-ratio: 4 / 3;
+	}
+}
+
+.wp-block-visual-portfolio-item-template[aria-busy="true"].vp-layout-justified > .wp-block-visual-portfolio-item-template__skeleton {
+	flex-basis: 30%;
+	height: var(--vp-layout-row-height, 200px);
+	aspect-ratio: auto;
+
+	&:nth-child(3n + 1) {
+		flex-basis: 40%;
+	}
+}
+
 // A tile is as tall as its pattern says, so a placeholder in one takes the
 // height of the cell rather than a square of its own.
 .vp-layout-tiles > .wp-block-visual-portfolio-item-template__skeleton {

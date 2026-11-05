@@ -4,6 +4,11 @@
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { useIsPreview } from '../../utils/use-is-preview';
+
 const TEMPLATE = [
 	[
 		'core/paragraph',
@@ -17,12 +22,14 @@ const TEMPLATE = [
 ];
 
 export default function LoopNoResultsEdit() {
+	const isPreview = useIsPreview();
+
 	// The block is always visible in the editor - the query it belongs to
 	// usually does find items, and content nobody can reach is content nobody
-	// can edit.
+	// can edit. A preview is a picture of the gallery, where nothing is edited.
 	const innerBlocksProps = useInnerBlocksProps(useBlockProps(), {
 		template: TEMPLATE,
 	});
 
-	return <div {...innerBlocksProps} />;
+	return isPreview ? null : <div {...innerBlocksProps} />;
 }

@@ -366,4 +366,52 @@ test.describe('Gallery Item Cover placement', () => {
 			expect(await readPanel(cover), `${state} hovered`).toEqual(hovered);
 		}
 	});
+
+	test('in a tall tile, the cover fills the tile on the page and in the editor', async ({
+		admin,
+		editor,
+		page,
+		requestUtils,
+	}) => {
+		// One column, twice as tall as it is wide, and a cover that asks to be
+		// a square: without the rule it stops halfway down the tile.
+		const tiles = { layoutType: 'tiles', layoutTiles: '1|1,2|' };
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Cover - tall tile',
+				status: 'publish',
+				content: getMarkup(images, { aspectRatio: '1' }).replace(
+					'{"layoutColumns":3}',
+					JSON.stringify(tiles)
+				),
+			},
+		});
+
+		pageIds.push(created.id);
+
+		const expectFilledTile = async (root) => {
+			const tile = root.locator(
+				'.wp-block-visual-portfolio-item-template__item'
+			);
+			const cover = tile.locator(COVER).first();
+
+			await expect(cover).toBeVisible();
+
+			const [tileBox, coverBox] = await Promise.all([
+				tile.first().boundingBox(),
+				cover.boundingBox(),
+			]);
+
+			expect(tileBox.height).toBeGreaterThan(tileBox.width * 1.5);
+			expect(coverBox.height).toBeCloseTo(tileBox.height, 0);
+		};
+
+		await page.goto(created.link, { waitUntil: 'load' });
+		await expectFilledTile(page);
+
+		await admin.editPost(created.id);
+		await expectFilledTile(editor.canvas);
+	});
 });

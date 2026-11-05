@@ -309,6 +309,13 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 			flex-direction: column;
 		}
 
+		// A cover is a picture too, and it asks for a shape of its own: the
+		// height it gets here decides, so a tall tile has no hole under it.
+		#{$item} .wp-block-visual-portfolio-item-cover {
+			flex: 1 1 auto;
+			min-height: 0;
+		}
+
 		#{$item} .wp-block-visual-portfolio-item-image {
 			flex: 1 1 auto;
 			min-height: 0;
