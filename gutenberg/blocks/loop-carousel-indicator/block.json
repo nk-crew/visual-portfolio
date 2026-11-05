@@ -19,7 +19,14 @@
 		"visual-portfolio/loop-carousel-nav"
 	],
 	"textdomain": "visual-portfolio",
-	"usesContext": ["vp/queryType"],
+	"usesContext": [
+		"vp/queryType",
+		"vp/baseQuery",
+		"vp/postsQuery",
+		"vp/imagesQuery",
+		"vp/sourceQuery",
+		"vp/previewQuery"
+	],
 	"attributes": {
 		"indicator": {
 			"type": "string",

@@ -276,7 +276,8 @@ that never moved travels to where it landed the way an arrow does, rather than
 jumping there. Switched off, the bar only says where the carousel is, and is a
 `progressbar` again. *Counter* is the pair of numbers, the slide
 on screen and how many there are, and is hidden from screen readers: the arrows
-and the dots already say the same thing.
+and the dots already say the same thing. The editor shows it at the first slide,
+with the number of slides on the first page.
 
 *Carousel Play and Pause* stops a carousel that moves on its own and starts it
 again, which is what WCAG 2.2.2 asks of any motion lasting more than five
