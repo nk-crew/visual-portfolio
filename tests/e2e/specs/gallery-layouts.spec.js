@@ -1918,6 +1918,125 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(current).toHaveText('1');
 	});
 
+	test('a carousel with no items shows none of its controls', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - empty carousel controls',
+			blockId: 'e2e-carousel-empty-controls',
+			images: [],
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+			carousel: [
+				'loop-carousel-previous',
+				['loop-carousel-indicator', { indicator: 'counter' }],
+				'loop-carousel-indicator',
+				['loop-carousel-indicator', { indicator: 'progress' }],
+				'loop-carousel-next',
+			],
+		});
+
+		const list = page.locator(LIST);
+		const row = page.locator(NAV);
+		const visibleControls = page.locator(
+			`${CAROUSEL} [data-vp-carousel-control]:visible`
+		);
+
+		// The server renders every control switched off, so nothing can be read
+		// from them until the module has run: it writes the dot count right
+		// after it has decided what to wake.
+		await expect
+			.poll(() =>
+				page
+					.locator(`${NAV} .vp-block-loop-carousel-indicator--dots`)
+					.evaluate((node) =>
+						node.style.getPropertyValue('--vp-carousel-dots-count')
+					)
+			)
+			.toBe('0');
+		await expect(visibleControls).toHaveCount(0);
+
+		// A region swap keeps the list and announces itself, so a search that
+		// finds something brings the controls back and one that finds nothing
+		// puts them away again.
+		const swapItems = (count) =>
+			list.evaluate(
+				(node, swap) => {
+					node.replaceChildren(
+						...Array.from({ length: swap.count }, () => {
+							const item = document.createElement('li');
+
+							item.className = swap.className;
+
+							return item;
+						})
+					);
+					node.dispatchEvent(new window.CustomEvent('vp-relayout'));
+				},
+				{ count, className: ITEM.slice(1) }
+			);
+
+		await swapItems(2);
+		await expect(row).toBeVisible();
+		await expect(
+			row.locator('.vp-block-loop-carousel-counter-total')
+		).toHaveText('2');
+
+		await swapItems(0);
+		await expect(visibleControls).toHaveCount(0);
+	});
+
+	test('a counter in the editor says why an empty carousel shows no count', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Layouts - empty editor counter',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'visual-portfolio/loop',
+			attributes: {
+				queryType: 'images',
+				imagesQuery: { images: [] },
+			},
+			innerBlocks: [
+				{
+					name: 'visual-portfolio/item-template',
+					attributes: { layoutType: 'carousel' },
+					innerBlocks: [{ name: 'visual-portfolio/item-image' }],
+				},
+				{
+					name: 'visual-portfolio/loop-carousel-nav',
+					innerBlocks: [
+						{
+							name: 'visual-portfolio/loop-carousel-indicator',
+							attributes: { indicator: 'counter' },
+						},
+					],
+				},
+			],
+		});
+
+		const counter = getEditorCanvas(page, editor).locator(
+			'.vp-block-loop-carousel-indicator--counter'
+		);
+
+		await expect(counter).toHaveText(
+			'The gallery is empty, so the page shows no count.',
+			{ timeout: 20000 }
+		);
+		await expect(counter).toBeVisible();
+	});
+
 	test('only the previous and destination dots change size on a distant jump', async ({
 		page,
 		requestUtils,

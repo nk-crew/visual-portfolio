@@ -2624,14 +2624,18 @@ function syncAutoplay(list, root = getControlsRoot(list)) {
  * Let the controls of a carousel be seen and used.
  *
  * They are rendered switched off, and until this runs nothing on the page could
- * have moved them - so a control beside a grid, or on a page whose module never
- * loaded, stays switched off and out of the way.
+ * have moved them - so a control beside a grid, beside a carousel with no items,
+ * or on a page whose module never loaded, stays switched off and out of the way.
  *
  * @param {HTMLElement} list Item template list.
  *
  * @return {Function} Teardown.
  */
 function wakeControls(list, hasAutoplay) {
+	if (!list.querySelector(ITEM_SELECTOR)) {
+		return noop;
+	}
+
 	// A carousel with no autoplay, and one a visitor asked less motion of,
 	// have nothing for a play and pause button to stop - so it is left
 	// switched off, the way an arrow beside a grid is.
