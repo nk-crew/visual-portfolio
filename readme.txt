@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 7.2
 * Requires PHP: 8.3
-* Stable tag: 3.9.0
+* Stable tag: 3.10.0
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -187,8 +187,8 @@ Automatically fetch posts from your social networks to display in gallery on you
 Communicate with your clients in a modern way:
 
   1. **Create Proofing Gallery** - Easily create a gallery with photos, as you did before. Change styling, layout, etc. if you want.
-  2. **Send to a Client** - Send photos collection to your client for proofing. The client will be able to leave comments on individual photos and communicate with you.
-  3. **Get Approval** - Once the client approves the selection, you will be able to see the selected photos and copy filenames for post-production.
+  2. **Send to Clients** - Share one gallery with one client or a hundred. Each client gets a personal link, their own selection and private notes on photos.
+  3. **Get Approval** - Once a client sends their selection, you will be able to compare the picks of all clients and copy filenames for Lightroom or Capture One.
 
 * **Advanced Click Actions**
 Manually configure how to open specific item types and filter clicking on title or on image.
@@ -335,6 +335,33 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.10.0 - Nov 9, 2026 =
+
+* improved the experimental Gallery Loop blocks:
+  * changed the start of a new gallery: add its images first, by upload, Media Library or a drop, then pick a layout from previews drawn with those images. Posts, Taxonomies and Social sit in an "Other sources" menu
+  * changed a new image gallery to show all its images on one page and open a picture larger
+  * changed "Change layout" in the toolbar to show on every loop with blocks. Picking a layout replaces the blocks, and undo works
+  * fixed a picked layout being locked behind "Edit pattern"
+  * fixed Item Cover leaving a gap on tall tiles
+  * fixed Query Total and the Carousel Indicator counter showing sample numbers in the editor
+  * fixed layout previews showing the No Results text, and nearly empty thumbnails in the inserter
+  * fixed Carousel Thumbnails ignoring a centered row on the page
+* fixed a custom portfolio base replaced with the site's post name structure, which returned 404 on ordinary pages. The first request after the update corrects a saved base
+* **Pro:**
+* added a separate selection for each client to Photo Proofing:
+  * one gallery gives every client a personal link, their own selection, private notes on photos and a status
+  * new galleries start in this mode, and existing galleries keep one shared selection
+  * clients register with a name on the shared link, or you add them and send invitations
+  * a review window shows clients by status, one client's picks, notes and history, and the votes of all who sent
+  * comments are hidden on these galleries, and notes replace them
+* added filename copying for Lightroom, Capture One or one per line, and a CSV download, to Photo Proofing
+* added an email for each submission or a daily digest, a copy for the client, and reminders that are each sent once, to Photo Proofing
+* added an expiry date to proofing galleries
+* changed the default of Copy Filenames on shared proofing galleries to the Lightroom format
+* changed a new proofing gallery to ask for photos first, and for the selection mode before publishing
+* removed the Activity tab from proofing galleries. Each client shows the moments that matter in one line
+* fixed classic Social galleries showing no items in the block editor
 
 = 3.9.0 - Oct 24, 2026 =
 
