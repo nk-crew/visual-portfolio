@@ -12,6 +12,7 @@
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 import { getEditorCanvas } from '../utils/editor-canvas';
 import { getFixturePath } from '../utils/fixture-path';
+import { openPublishedPage } from '../utils/open-published-page';
 import { getPluginSlug } from '../utils/plugin-slug';
 
 const LIST = 'ul.wp-block-visual-portfolio-item-template';
@@ -3554,6 +3555,63 @@ test.describe('Gallery Item Template layouts', () => {
 		// whole 320px slide.
 		expect(drawn[0]).toBeLessThan(320);
 		expect(drawn[0]).toBeGreaterThan(0);
+	});
+
+	test('a counter in the editor names as many slides as the page does', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		const perPage = 4;
+
+		await admin.createNewPost({
+			title: 'Layouts - editor counter',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock({
+			name: 'visual-portfolio/loop',
+			attributes: {
+				baseQuery: { perPage, maxPages: 1 },
+				queryType: 'images',
+				imagesQuery: { images },
+			},
+			innerBlocks: [
+				{
+					name: 'visual-portfolio/item-template',
+					attributes: { layoutType: 'carousel' },
+					innerBlocks: [{ name: 'visual-portfolio/item-image' }],
+				},
+				{
+					name: 'visual-portfolio/loop-carousel-nav',
+					innerBlocks: [
+						{
+							name: 'visual-portfolio/loop-carousel-indicator',
+							attributes: { indicator: 'counter' },
+						},
+					],
+				},
+			],
+		});
+
+		const total = '.vp-block-loop-carousel-counter-total';
+
+		// Fewer per page than the source holds, so the slides of the first page
+		// and the items the query found are two different numbers. The page
+		// counts the slides it drew, and the editor has to say the same.
+		await expect(getEditorCanvas(page, editor).locator(total)).toHaveText(
+			String(perPage),
+			{ timeout: 20000 }
+		);
+
+		await editor.publishPost();
+
+		const frontend = await openPublishedPage(page);
+
+		await expect(frontend.locator(total)).toHaveText(String(perPage));
 	});
 
 	test('the editor draws the layout the moment it is picked', async ({

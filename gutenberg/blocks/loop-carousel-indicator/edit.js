@@ -3,6 +3,7 @@
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { RangeControl, ToggleControl } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -15,6 +16,7 @@ import {
 	useControlPlacement,
 } from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
+import { useLoopItems } from '../../utils/use-loop-items';
 import metadata from './block.json';
 
 // A carousel in the editor is always at its first slide, and the number of
@@ -26,9 +28,48 @@ const PREVIEW_DOTS = 3;
 // and not so far that it reads as a full one.
 const PREVIEW_PROGRESS = 35;
 
-// The pair a counter is drawn with here, for the same reason: the shape of the
-// control, not the number of items the preview happens to hold.
-const PREVIEW_COUNT = 12;
+function CounterPreview({ context }) {
+	const {
+		'vp/queryType': queryType,
+		'vp/baseQuery': baseQuery,
+		'vp/postsQuery': postsQuery,
+		'vp/imagesQuery': imagesQuery,
+		'vp/sourceQuery': sourceQuery,
+		'vp/previewQuery': previewQuery,
+	} = context;
+
+	const query = useMemo(
+		() =>
+			previewQuery || {
+				queryType,
+				baseQuery: { perPage: baseQuery?.perPage },
+				postsQuery,
+				imagesQuery,
+				sourceQuery,
+			},
+		[
+			previewQuery,
+			queryType,
+			baseQuery?.perPage,
+			postsQuery,
+			imagesQuery,
+			sourceQuery,
+		]
+	);
+
+	const { items, isFirstLoad } = useLoopItems(query);
+	const slidesOnPage = items.length;
+
+	return (
+		<>
+			<span className="vp-block-loop-carousel-counter-current">1</span>
+			<span className="vp-block-loop-carousel-counter-separator">/</span>
+			<span className="vp-block-loop-carousel-counter-total">
+				{isFirstLoad ? '…' : slidesOnPage}
+			</span>
+		</>
+	);
+}
 
 export default function CarouselIndicatorEdit({
 	attributes,
@@ -109,19 +150,7 @@ export default function CarouselIndicatorEdit({
 				{isProgress ? (
 					<span className="vp-block-loop-carousel-progress-value" />
 				) : null}
-				{isCounter ? (
-					<>
-						<span className="vp-block-loop-carousel-counter-current">
-							1
-						</span>
-						<span className="vp-block-loop-carousel-counter-separator">
-							/
-						</span>
-						<span className="vp-block-loop-carousel-counter-total">
-							{PREVIEW_COUNT}
-						</span>
-					</>
-				) : null}
+				{isCounter ? <CounterPreview context={context} /> : null}
 				{isDots
 					? Array.from({ length: PREVIEW_DOTS }, (ignored, index) => (
 							<button
