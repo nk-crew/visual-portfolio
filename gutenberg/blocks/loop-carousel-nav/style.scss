@@ -332,6 +332,13 @@
 	}
 }
 
+// Blossom's stylesheet gives what it carries `inline-size: 100%`, which leaves a
+// row nothing to justify. Unlayered, this beats that layer, and with no weight it
+// leaves the width to anything a theme says about an aligned block.
+:where(.vp-block-loop-carousel-thumbnails) {
+	inline-size: auto;
+}
+
 .vp-block-loop-carousel-thumb {
 	flex: none;
 	width: calc(var(--vp-carousel-thumb-height, 72px) * var(--vp-carousel-thumb-ratio, 1));

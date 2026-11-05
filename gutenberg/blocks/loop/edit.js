@@ -76,6 +76,9 @@ const NOTICE_AFTER = NOTICE_LIMIT + 5;
 
 const PER_PAGE_ALL = -1;
 
+// The patterns this plugin ships, named the way their files register them.
+const LAYOUT_PREFIX = 'visual-portfolio/';
+
 /**
  * Keep `baseQuery.maxPages` in step with the query.
  *
@@ -461,6 +464,53 @@ function SourcePanel(props) {
 }
 
 /**
+ * Block metadata that core does not read as a locked pattern.
+ *
+ * Core puts every block with a `patternName` behind "Edit pattern", and has no
+ * way to opt one block out. A layout is a starting point, so the name is dropped
+ * and what else the metadata holds, the name in the List View first of all,
+ * stays.
+ *
+ * @param {Object} metadata - block metadata.
+ * @return {Object} the metadata without the pattern name.
+ */
+function withoutPatternName({ patternName, ...metadata } = {}) {
+	return metadata;
+}
+
+/**
+ * Keep a layout unlocked when core inserted it.
+ *
+ * The inserter names the pattern on the block it inserts, as core does for any
+ * pattern. The name of someone else's pattern stays, along with its lock.
+ *
+ * @param {Object}   props               - block props.
+ * @param {Object}   props.attributes    - block attributes.
+ * @param {Function} props.setAttributes - block attribute setter.
+ */
+function useUnlockedLayout({ attributes: { metadata }, setAttributes }) {
+	const isPreview = useIsPreview();
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch(blockEditorStore);
+	const isOwnLayout = metadata?.patternName?.startsWith(LAYOUT_PREFIX);
+
+	useEffect(() => {
+		if (isPreview || !isOwnLayout) {
+			return;
+		}
+
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes({ metadata: withoutPatternName(metadata) });
+	}, [
+		isPreview,
+		isOwnLayout,
+		metadata,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	]);
+}
+
+/**
  * The blocks and attributes a layout makes, for the loop's source.
  *
  * @param {Object} layout     - chosen layout, from `useLayouts`.
@@ -472,9 +522,7 @@ function buildLayout(layout, attributes) {
 		blocks: applyLayoutDefaults(layout.innerBlocks, attributes.queryType),
 		attributes: {
 			...getLayoutAttributes(attributes),
-			// Named after the pattern and derived from by core, the same as a
-			// block core inserted from a pattern itself.
-			metadata: layout.blocks[0].attributes.metadata,
+			metadata: withoutPatternName(layout.blocks[0].attributes.metadata),
 		},
 	};
 }
@@ -522,8 +570,8 @@ function LoopPlaceholder({ attributes, setAttributes, clientId }) {
 }
 
 /**
- * Another layout for a gallery made from one, as core's "Change design" does
- * for a Query block. The items stay; the blocks that show them are replaced.
+ * Another layout for a gallery, as core's "Change design" does for a Query
+ * block. The items stay; the blocks that show them are replaced.
  *
  * @param {Object}   props               - component props.
  * @param {Object}   props.attributes    - block attributes.
@@ -569,6 +617,7 @@ export default function BlockEdit(props) {
 	const { previewLayout, preview_image_example: previewExample } = attributes;
 
 	useMaxPages({ attributes, setAttributes });
+	useUnlockedLayout({ attributes, setAttributes });
 
 	const hasInnerBlocks = useSelect(
 		(select) => !!select(blockEditorStore).getBlocks(clientId).length,
@@ -604,13 +653,11 @@ export default function BlockEdit(props) {
 
 	return (
 		<div {...blockProps}>
-			{attributes.metadata?.patternName ? (
-				<ChangeLayout
-					attributes={attributes}
-					setAttributes={setAttributes}
-					clientId={clientId}
-				/>
-			) : null}
+			<ChangeLayout
+				attributes={attributes}
+				setAttributes={setAttributes}
+				clientId={clientId}
+			/>
 			{/* The order is the one the core Query block uses, and it is an
 			    argument rather than a habit: what the gallery is made of,
 			    then how it is cut into pages, then what narrows it. */}

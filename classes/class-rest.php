@@ -514,8 +514,9 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		remove_filter( 'vpf_extend_query_args', $restrict_statuses, PHP_INT_MAX );
 
 		$response = array(
-			'items'     => array(),
-			'max_pages' => 1,
+			'items'       => array(),
+			'max_pages'   => 1,
+			'found_items' => null,
 		);
 
 		if ( $result ) {
@@ -546,7 +547,8 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 				$response['items'][] = $item_data;
 			}
 
-			$response['max_pages'] = max( 1, (int) $result['max_pages'] );
+			$response['max_pages']   = max( 1, (int) $result['max_pages'] );
+			$response['found_items'] = $result['found_items'] ?? null;
 		}
 
 		set_transient( $cache_key, $response, MINUTE_IN_SECONDS );

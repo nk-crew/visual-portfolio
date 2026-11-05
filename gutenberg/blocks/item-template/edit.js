@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
 import {
 	BlockContextProvider,
 	BlockControls,
@@ -34,7 +33,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { memo, useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { memo, useMemo, useRef, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import {
@@ -58,6 +57,7 @@ import {
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
+import { useLoopItems } from '../../utils/use-loop-items';
 import { getColumnsProps, getViewportBreakpoints } from './columns';
 import {
 	countEffectTeasers,
@@ -710,8 +710,6 @@ export default function BlockEdit({
 
 	const isPreview = useIsPreview();
 
-	const [items, setItems] = useState([]);
-	const [isLoading, setIsLoading] = useState(true);
 	const [activeBlockContextId, setActiveBlockContextId] = useState();
 
 	// Everything the endpoint needs, and the only thing that should trigger it.
@@ -744,46 +742,7 @@ export default function BlockEdit({
 		]
 	);
 
-	// Items are resolved on the server for every source alike - titles, category
-	// links, ordering and the Pro sources are all query logic, and duplicating
-	// any of it here is what broke the first take on this block.
-	useEffect(() => {
-		let cancelled = false;
-
-		setIsLoading(true);
-
-		// Settings are usually changed in bursts - only ask once they settle.
-		const timeout = setTimeout(() => {
-			apiFetch({
-				path: '/visual-portfolio/v1/get_loop_items/',
-				method: 'POST',
-				data: query,
-			})
-				.then((response) => {
-					if (cancelled) {
-						return;
-					}
-
-					setItems(
-						response?.success ? response.response?.items || [] : []
-					);
-					setIsLoading(false);
-				})
-				.catch((error) => {
-					if (!cancelled) {
-						setIsLoading(false);
-					}
-
-					// eslint-disable-next-line no-console
-					console.error('Error fetching gallery items:', error);
-				});
-		}, 500);
-
-		return () => {
-			cancelled = true;
-			clearTimeout(timeout);
-		};
-	}, [query]);
+	const { items, isLoading } = useLoopItems(query);
 
 	// The read-only copies show the item and nothing else: a carousel control
 	// dropped in the template is drawn once, by the item being edited.
@@ -815,7 +774,9 @@ export default function BlockEdit({
 		blockContexts[activeIndexRef.current] ??
 		blockContexts[0])?.['vp/itemId'];
 
-	const isEmpty = !isLoading && !blockContexts.length;
+	// A preview has no one to tell about an empty source, and is what shows a
+	// layout: the inserter previews a pattern with no images of its own.
+	const isEmpty = !isLoading && !isPreview && !blockContexts.length;
 
 	// As many shapes as the gallery is about to hold, within reason.
 	const skeletonCount = Math.max(
@@ -1881,7 +1842,7 @@ export default function BlockEdit({
 	// A gallery that has not fetched its items yet is a list of nothing, and an
 	// empty list is what the editor would flash on every settings change. The
 	// shapes stand in until the items land.
-	if (isLoading && !blockContexts.length) {
+	if ((isLoading || isPreview) && !blockContexts.length) {
 		return (
 			<>
 				{blockControls}

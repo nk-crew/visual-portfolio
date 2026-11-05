@@ -327,9 +327,20 @@ test.describe('Gallery Loop blocks', () => {
 		);
 
 		await editor.insertBlock(loop);
-		await editor.publishPost();
 
 		const total = await getPublishedPostCount(requestUtils);
+
+		// The editor counts the query itself, instead of a sample, so what it
+		// shows is what the page shows.
+		await expect(
+			editor.canvas.locator('.vp-block-loop-query-total')
+		).toHaveText([
+			`${total} items`,
+			`Displaying 1 – ${PER_PAGE} of ${total}`,
+		]);
+
+		await editor.publishPost();
+
 		const [nature] = await requestUtils.rest({
 			path: '/wp/v2/categories',
 			params: { slug: 'loop-nature' },

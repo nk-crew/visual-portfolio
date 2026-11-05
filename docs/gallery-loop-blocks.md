@@ -134,10 +134,13 @@ Photo Wall, Carousel Showcase and Posts Cards. Six more take a shape and add one
 thing the blocks can do: Grid Rounded, Masonry Reveal, Filtered Portfolio Grid,
 Paged Posts Grid, Carousel Coverflow and Blog Roll. A pattern is a starting
 point and nothing more: everything in it is ordinary blocks, and it is inserted
-unlocked. Every pattern, and the blank start, comes with a **No Results** block
-that says so when the query finds nothing. The wizard's Load More and infinite
-scroll add an **End of List** block, which is shown once the last page is on
-screen.
+unlocked, from the chooser and from the inserter alike. *Change layout* in the
+toolbar of any loop opens the chooser again and replaces its blocks. A preview
+of a pattern draws the shapes of its layout when it has no items to show. Every
+pattern, and the blank start, comes with a **No Results** block that says so
+when the query finds nothing, and which a preview leaves out. The wizard's Load
+More and infinite scroll add an **End of List** block, which is shown once the
+last page is on screen.
 
 **Transforms.** A core Gallery block and a core Latest Posts block turn into a
 loop from the block switcher. A gallery becomes an images loop that shows every
@@ -287,6 +290,8 @@ of, stays switched off like an arrow beside a grid.
 *Carousel Thumbnails* is a strip of small pictures, one per slide, that presses
 through to its slide and lights the one on screen; the strip scrolls itself, so
 the current thumbnail is brought into the middle of it and the page never moves.
+In a navigation row it follows the justification of the row, and it is as wide
+as the place it sits in anywhere else.
 It carries a *Height* and an *Aspect ratio*, and two block styles: *Plain*, a
 ring around the current thumbnail, and *Dimmed*, where everything else steps
 back instead. A finger drags the strip because it is a scroll container; a
@@ -343,7 +348,9 @@ found, as *12 items*, or which of them are on screen, as *Displaying 1 – 6 of
 visitor chose, and is swapped with the loop. Load More stretches the range over
 the items it adds. It reads the count the query already made, so it costs no
 query of its own. A source that does not report how many items it has, which is
-the case of the social sources of Pro for now, shows no count.
+the case of the social sources of Pro for now, shows no count. The editor shows
+the same count for the first page, without a filter, a sort or a search, and
+says so where the page shows nothing.
 
 **Item date and categories.** The Item Date block can show the date an item was
 last modified, as the core Post Date block does. An item never edited after it
