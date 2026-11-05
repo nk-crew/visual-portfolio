@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-05T16:49:29+00:00\n"
+"POT-Creation-Date: 2026-11-05T17:34:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: visual-portfolio\n"
@@ -2702,7 +2702,7 @@ msgstr ""
 #. translators: %d: slide number.
 #: gutenberg/blocks/loop-carousel-indicator/index.php:112
 #: gutenberg/blocks/loop-carousel-thumbnails/index.php:64
-#: gutenberg/blocks/loop-carousel-indicator/edit.js:163
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:170
 #, php-format,js-format
 msgid "Go to slide %d"
 msgstr ""
@@ -3581,23 +3581,27 @@ msgstr ""
 msgid "Play and pause"
 msgstr ""
 
-#: gutenberg/blocks/loop-carousel-indicator/edit.js:109
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:64
+msgid "The gallery is empty, so the page shows no count."
+msgstr ""
+
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:116
 msgid "Indicator"
 msgstr ""
 
-#: gutenberg/blocks/loop-carousel-indicator/edit.js:112
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:119
 msgid "Dots at once"
 msgstr ""
 
-#: gutenberg/blocks/loop-carousel-indicator/edit.js:113
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:120
 msgid "How many dots the row shows before it starts sliding them under a window. Zero draws one dot per slide, however many there are."
 msgstr ""
 
-#: gutenberg/blocks/loop-carousel-indicator/edit.js:127
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:134
 msgid "Can be dragged"
 msgstr ""
 
-#: gutenberg/blocks/loop-carousel-indicator/edit.js:128
+#: gutenberg/blocks/loop-carousel-indicator/edit.js:135
 msgid "The bar answers a drag, and the arrow keys, Home and End when focused. Switched off it only says where the carousel is."
 msgstr ""
 

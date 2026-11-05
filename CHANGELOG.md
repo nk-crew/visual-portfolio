@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
   * fixed Query Total and the Carousel Indicator counter showing sample numbers in the editor
   * fixed layout previews showing the No Results text, and nearly empty thumbnails in the inserter
   * fixed Carousel Thumbnails ignoring a centered row on the page
+  * fixed an empty carousel showing its controls on the page
 * fixed a custom portfolio base replaced with the site's post name structure, which returned 404 on ordinary pages. The first request after the update corrects a saved base
 * **Pro:**
 * added a separate selection for each client to Photo Proofing:
