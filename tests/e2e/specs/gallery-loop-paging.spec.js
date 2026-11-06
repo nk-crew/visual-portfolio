@@ -341,7 +341,7 @@ test.describe('Gallery Loop paging', () => {
 			}
 
 			const response = await route.fetch();
-			const body = (await response.text()).replace(
+			const body = (await response.text()).replaceAll(
 				'data-wp-init="callbacks.observeInfinite"',
 				`data-wp-init="callbacks.observeInfinite" ${extra}`
 			);
@@ -448,53 +448,112 @@ test.describe('Gallery Loop paging', () => {
 			expect(requests).toBe(1);
 		});
 
+		/**
+		 * Hold every page a loop fetches, long enough for what the visitor does
+		 * meanwhile to matter.
+		 *
+		 * @param {Object} page  - Playwright page.
+		 * @param {number} delay - how long, in milliseconds.
+		 */
+		async function holdPages(page, delay) {
+			await page.route('**/*', async (route) => {
+				if ('fetch' !== route.request().resourceType()) {
+					return route.fallback();
+				}
+
+				await new Promise((resolve) => setTimeout(resolve, delay));
+
+				return route.fallback().catch(() => {});
+			});
+		}
+
 		test('a Load More beside the trigger shows every item once', async ({
 			page,
 			requestUtils,
 		}) => {
+			// Every page stays in range, so only a rearm can load the next one.
+			await setInfiniteData(page, {
+				'data-vp-infinite-threshold': 4000,
+			});
+			await holdPages(page, 800);
 			await publish(
 				requestUtils,
 				page,
 				'Paging - infinite beside a Load More',
-				SPACER +
-					getInfiniteLoop('e2e-paging-infinite-beside', [
-						INFINITE,
-						getBlock('loop-pagination-trigger'),
-					])
+				getInfiniteLoop('e2e-paging-infinite-beside', [
+					INFINITE,
+					getBlock('loop-pagination-trigger'),
+				])
 			);
 
-			const triggers = page.locator(TRIGGER);
-			const next = await triggers
-				.first()
-				.evaluate((trigger) => trigger.href);
-
-			await page.route(next, async (route) => {
-				await new Promise((resolve) => setTimeout(resolve, 800));
-				await route.continue().catch(() => {});
-			});
-
 			// The Load More takes over the page the infinite trigger asked for.
-			await triggers.first().evaluate((trigger) => {
-				trigger.scrollIntoView({ block: 'end' });
-			});
-			await page.waitForTimeout(200);
-			await triggers.last().evaluate((trigger) => trigger.click());
+			await page
+				.locator(TRIGGER)
+				.last()
+				.evaluate((trigger) => trigger.click());
 
 			await expect
-				.poll(
-					async () => {
-						await scrollToTrigger(page);
-
-						return page.locator(ITEM).count();
-					},
-					{ timeout: 30000 }
-				)
+				.poll(() => page.locator(ITEM).count(), { timeout: 30000 })
 				.toBeGreaterThanOrEqual(IMAGES_COUNT);
 
 			const titles = await getTitles(page);
 
 			expect(titles).toHaveLength(IMAGES_COUNT);
 			expect(new Set(titles).size).toBe(IMAGES_COUNT);
+		});
+
+		test('a trigger further down loads on after the first one', async ({
+			page,
+			requestUtils,
+		}) => {
+			const pagination = `<!-- wp:visual-portfolio/loop-pagination -->${INFINITE}<!-- /wp:visual-portfolio/loop-pagination -->`;
+
+			await publish(
+				requestUtils,
+				page,
+				'Paging - infinite above and below',
+				SPACER +
+					getLoopMarkup({
+						blockId: 'e2e-paging-infinite-above-below',
+						images,
+						perPage: 2,
+						withImage: true,
+						layout: {
+							layoutType: 'grid',
+							layoutColumnsMode: 'manual',
+							layoutColumnCount: 2,
+						},
+						before: [pagination],
+						pagination: [INFINITE],
+					}) +
+					SPACER
+			);
+			await holdPages(page, 1500);
+
+			const first = await page
+				.locator(TRIGGER)
+				.first()
+				.evaluate((trigger) => {
+					const { top, bottom } = trigger.getBoundingClientRect();
+
+					return {
+						top: top + window.scrollY,
+						bottom: bottom + window.scrollY,
+					};
+				});
+
+			// The first trigger comes into its 300px look-ahead alone, and the
+			// visitor goes on past it while its page is on the way.
+			await page.evaluate((y) => window.scrollTo(0, y), first.top - 1000);
+			await page.waitForTimeout(300);
+			await page.evaluate(
+				(y) => window.scrollTo(0, y),
+				first.bottom + 310
+			);
+
+			await expect
+				.poll(() => page.locator(ITEM).count(), { timeout: 15000 })
+				.toBeGreaterThan(4);
 		});
 
 		test('an extension can hold an automatic load', async ({
@@ -692,9 +751,15 @@ test.describe('Gallery Loop paging', () => {
 		 * @param {Object} requestUtils - REST utils.
 		 * @param {Object} page         - Playwright page.
 		 * @param {string} title        - page title.
+		 * @param {string[]} pagination - serialized blocks of the pagination.
 		 * @return {Promise<Object>} `{ titles, href }` of the first page.
 		 */
-		async function publishFiltered(requestUtils, page, title) {
+		async function publishFiltered(
+			requestUtils,
+			page,
+			title,
+			pagination = [getBlock('loop-pagination-trigger')]
+		) {
 			await publish(
 				requestUtils,
 				page,
@@ -704,7 +769,7 @@ test.describe('Gallery Loop paging', () => {
 					images,
 					perPage: 2,
 					before: [getBlock('loop-filter')],
-					pagination: [getBlock('loop-pagination-trigger')],
+					pagination,
 				})
 			);
 
@@ -712,7 +777,7 @@ test.describe('Gallery Loop paging', () => {
 
 			return {
 				titles: await getTitles(page),
-				href: await page.locator(TRIGGER).getAttribute('href'),
+				href: await page.locator(TRIGGER).first().getAttribute('href'),
 			};
 		}
 
@@ -759,6 +824,53 @@ test.describe('Gallery Loop paging', () => {
 			await page.goBack();
 
 			await expectFirstPage(page, first);
+		});
+
+		test('two Load More to the last page, a filter, then Back', async ({
+			page,
+			requestUtils,
+		}) => {
+			const errors = [];
+
+			page.on('pageerror', (error) => errors.push(error.message));
+
+			const first = await publishFiltered(
+				requestUtils,
+				page,
+				'Paging - back after the last page with two triggers',
+				[
+					getBlock('loop-pagination-trigger'),
+					getBlock('loop-pagination-trigger'),
+				]
+			);
+
+			for (let shown = 4; shown <= IMAGES_COUNT; shown += 2) {
+				await page.locator(TRIGGER).first().click();
+				await expect(page.locator(ITEM)).toHaveCount(shown);
+			}
+
+			await expect(page.locator(TRIGGER)).toHaveCount(0);
+
+			await page
+				.locator('a.vp-block-loop-filter-item', { hasText: 'Odd' })
+				.click();
+			await expect
+				.poll(() => getLoopParam(page.url(), 'filter'))
+				.not.toBe(null);
+
+			await page.goBack();
+
+			await expect
+				.poll(() => getLoopParam(page.url(), 'filter'))
+				.toBe(null);
+			await expect(page.locator(ITEM)).toHaveCount(2);
+			expect(await getTitles(page)).toEqual(first.titles);
+			await expect(page.locator(TRIGGER)).toHaveCount(2);
+			await expect(page.locator(TRIGGER).last()).toHaveAttribute(
+				'href',
+				first.href
+			);
+			expect(errors).toEqual([]);
 		});
 
 		test('a filter, then Load More, then Back', async ({
