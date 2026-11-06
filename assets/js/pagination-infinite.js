@@ -26,16 +26,30 @@ $(document).on('initEvents.vpf', (event, self) => {
 			rect.bottom > 0 &&
 			rect.bottom - scrollThreshold <= window.innerHeight
 		) {
-			self.loadNewItems(self.options.nextPageUrl, false, () => {
-				setTimeout(() => {
-					visibilityCheckBusy = false;
-					checkVisibilityAndLoad();
-				}, 300);
-			});
+			self.loadNewItems(self.options.nextPageUrl, false);
 		} else {
 			visibilityCheckBusy = false;
 		}
 	}
+
+	let resumeTimeout;
+
+	// Anything that loads after this wait began keeps the gallery to itself, as
+	// asking for the next page would abort it.
+	self.$item.on(`startLoadingNewItems${evp}`, () => {
+		clearTimeout(resumeTimeout);
+	});
+
+	// Whatever landed, as a click on the link may bring the page a failed request
+	// left behind. A request with no answer ends nothing, so it is not retried.
+	self.$item.on(`endLoadingNewItems${evp}`, () => {
+		clearTimeout(resumeTimeout);
+
+		resumeTimeout = setTimeout(() => {
+			visibilityCheckBusy = false;
+			checkVisibilityAndLoad();
+		}, 300);
+	});
 
 	checkVisibilityAndLoad();
 

@@ -159,6 +159,10 @@ class VP {
 
 		this.href = window.location.href;
 
+		// The address of the items on show. `href` already names a request that
+		// `complete` is settling, and that may be one that replaced nothing.
+		this.landedHref = this.href;
+
 		this.$items_wrap = $item.find('.vp-portfolio__items');
 		this.$slider_thumbnails_wrap = $item.find('.vp-portfolio__thumbnails');
 		this.$pagination = $item.find('.vp-portfolio__pagination-wrap');
@@ -540,6 +544,7 @@ class VP {
 						.removeClass('vp-filter__item-active');
 				}
 				self.loadNewItems($this.attr('href'), true);
+				self.followIfRefused($this.attr('href'));
 			}
 		);
 
@@ -555,6 +560,7 @@ class VP {
 					.removeClass('vp-sort__item-active');
 			}
 			self.loadNewItems($this.attr('href'), true);
+			self.followIfRefused($this.attr('href'));
 		});
 
 		// on filter/sort select change
@@ -572,6 +578,7 @@ class VP {
 
 					if ($option.length) {
 						self.loadNewItems($option.attr('data-vp-url'), true);
+						self.followIfRefused($option.attr('data-vp-url'));
 					}
 				}
 			);
@@ -635,6 +642,8 @@ class VP {
 					self.options.pagination === 'paged'
 				);
 
+				self.followIfRefused($this.attr('href'));
+
 				scrollToTop($pagination);
 			}
 		);
@@ -647,6 +656,7 @@ class VP {
 				e.preventDefault();
 				e.stopPropagation();
 				self.loadNewItems($(this).attr('href'), true);
+				self.followIfRefused($(this).attr('href'));
 			}
 		);
 
@@ -734,6 +744,23 @@ class VP {
 	}
 
 	/**
+	 * Never leave a control that does nothing behind: a visit to the address may
+	 * still work where the server turned the request down. A request nobody
+	 * answered is left alone. It may be a newer request taking over, or a visitor
+	 * leaving the page, as WebKit fails requests while it navigates, and following
+	 * the link then would replace where they were going.
+	 *
+	 * @param {string} url - address the control links to.
+	 */
+	followIfRefused(url) {
+		this.loading?.fail?.((xhr) => {
+			if (xhr.status) {
+				window.location.assign(url);
+			}
+		});
+	}
+
+	/**
 	 * AJAX Load New Items
 	 *
 	 * @param {string}   url            - url to request.
@@ -789,7 +816,13 @@ class VP {
 	 * @param {Function} cb             - callback.
 	 */
 	replaceItems(content, removeExisting, cb) {
+		// A request that failed or was aborted replaced nothing. Forget it, or the
+		// spinner stays and `loadNewItems()` refuses to ask for this URL again.
 		if (!content) {
+			this.href = this.landedHref;
+			this.$item.removeClass('vp-portfolio__loading');
+			this.loading = false;
+
 			return;
 		}
 
@@ -901,8 +934,10 @@ class VP {
 
 		// Nothing was replaced, so forget the request. `loadNewItems()` refuses a
 		// URL it has already loaded, and the pagination would stay dead.
-		if (!$newVP.length) {
-			this.href = false;
+		if ($newVP.length) {
+			this.landedHref = this.href;
+		} else {
+			this.href = this.landedHref;
 		}
 
 		this.$item.removeClass('vp-portfolio__loading');
