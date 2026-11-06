@@ -448,6 +448,55 @@ test.describe('Gallery Loop paging', () => {
 			expect(requests).toBe(1);
 		});
 
+		test('a Load More beside the trigger shows every item once', async ({
+			page,
+			requestUtils,
+		}) => {
+			await publish(
+				requestUtils,
+				page,
+				'Paging - infinite beside a Load More',
+				SPACER +
+					getInfiniteLoop('e2e-paging-infinite-beside', [
+						INFINITE,
+						getBlock('loop-pagination-trigger'),
+					])
+			);
+
+			const triggers = page.locator(TRIGGER);
+			const next = await triggers
+				.first()
+				.evaluate((trigger) => trigger.href);
+
+			await page.route(next, async (route) => {
+				await new Promise((resolve) => setTimeout(resolve, 800));
+				await route.continue().catch(() => {});
+			});
+
+			// The Load More takes over the page the infinite trigger asked for.
+			await triggers.first().evaluate((trigger) => {
+				trigger.scrollIntoView({ block: 'end' });
+			});
+			await page.waitForTimeout(200);
+			await triggers.last().evaluate((trigger) => trigger.click());
+
+			await expect
+				.poll(
+					async () => {
+						await scrollToTrigger(page);
+
+						return page.locator(ITEM).count();
+					},
+					{ timeout: 30000 }
+				)
+				.toBeGreaterThanOrEqual(IMAGES_COUNT);
+
+			const titles = await getTitles(page);
+
+			expect(titles).toHaveLength(IMAGES_COUNT);
+			expect(new Set(titles).size).toBe(IMAGES_COUNT);
+		});
+
 		test('an extension can hold an automatic load', async ({
 			page,
 			requestUtils,
