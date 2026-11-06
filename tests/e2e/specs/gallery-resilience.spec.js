@@ -526,3 +526,83 @@ test.describe('Gallery Loop resilience', () => {
 		).toBeUndefined();
 	});
 });
+
+test.describe('Classic gallery resilience', () => {
+	const GALLERY = '.vp-portfolio';
+	const CLASSIC_ITEM = '.vp-portfolio__items .vp-portfolio__item-wrap';
+	const CLASSIC_LOAD_MORE = 'a.vp-pagination__load-more';
+
+	let pageId = 0;
+
+	test.afterAll(async ({ requestUtils }) => {
+		await requestUtils.rest({
+			path: `/wp/v2/pages/${pageId}`,
+			method: 'DELETE',
+			params: { force: true },
+		});
+	});
+
+	test('a load more whose request failed can be pressed again', async ({
+		page,
+		requestUtils,
+	}) => {
+		const images = [];
+
+		for (let index = 0; index < 3; index += 1) {
+			const { id } = await requestUtils.uploadMedia(
+				getFixturePath('image-800x600.png')
+			);
+
+			images.push({ id });
+		}
+
+		const attributes = {
+			block_id: 'e2e-resilience-classic',
+			setup_wizard: 'false',
+			content_source: 'images',
+			images,
+			items_count: 1,
+			pagination: 'load-more',
+			layout_elements: {
+				top: { elements: [], align: 'center' },
+				items: { elements: ['items'] },
+				bottom: { elements: ['pagination'], align: 'center' },
+			},
+		};
+		const { id, link } = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Classic gallery, failed Load More',
+				status: 'publish',
+				content: `<!-- wp:visual-portfolio/block ${JSON.stringify(attributes)} /-->`,
+			},
+		});
+
+		pageId = id;
+
+		await page.goto(link, { waitUntil: 'load' });
+
+		const items = page.locator(CLASSIC_ITEM);
+		const loadMore = page.locator(CLASSIC_LOAD_MORE);
+
+		await expect(items).toHaveCount(1);
+
+		await page.route(/vp_page=2/, (route) => route.abort());
+
+		const failed = page.waitForEvent('requestfailed');
+
+		await loadMore.click();
+		await failed;
+
+		await expect(page.locator(GALLERY)).not.toHaveClass(
+			/vp-portfolio__loading/
+		);
+		await expect(items).toHaveCount(1);
+
+		await page.unroute(/vp_page=2/);
+		await loadMore.click();
+
+		await expect(items).toHaveCount(2);
+	});
+});

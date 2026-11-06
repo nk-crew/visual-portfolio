@@ -789,7 +789,13 @@ class VP {
 	 * @param {Function} cb             - callback.
 	 */
 	replaceItems(content, removeExisting, cb) {
+		// A request that failed or was aborted replaced nothing. Forget it, or the
+		// spinner stays and `loadNewItems()` refuses to ask for this URL again.
 		if (!content) {
+			this.href = false;
+			this.$item.removeClass('vp-portfolio__loading');
+			this.loading = false;
+
 			return;
 		}
 
