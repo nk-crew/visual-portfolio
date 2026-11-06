@@ -409,6 +409,45 @@ test.describe('Gallery Loop paging', () => {
 			await expect(page.locator(TRIGGER)).toHaveCount(0);
 		});
 
+		test('a trigger back in view keeps the load already running', async ({
+			page,
+			requestUtils,
+		}) => {
+			await publish(
+				requestUtils,
+				page,
+				'Paging - infinite back in view',
+				SPACER + getInfiniteLoop('e2e-paging-infinite-back', [INFINITE])
+			);
+
+			const next = await page
+				.locator(TRIGGER)
+				.evaluate((trigger) => trigger.href);
+			let requests = 0;
+
+			await page.route(next, async (route) => {
+				requests += 1;
+				await new Promise((resolve) => setTimeout(resolve, 1500));
+				await route.continue().catch(() => {});
+			});
+
+			// Past the trigger and back while its page is still on the way, which
+			// is what a fast scroll does on any site slower than a few frames.
+			for (let i = 0; i < 3; i += 1) {
+				await scrollToTrigger(page);
+				await page.waitForTimeout(100);
+				await page.evaluate(() => window.scrollTo(0, 0));
+				await page.waitForTimeout(100);
+			}
+
+			await scrollToTrigger(page);
+
+			await expect
+				.poll(() => page.locator(ITEM).count(), { timeout: 10000 })
+				.toBeGreaterThan(2);
+			expect(requests).toBe(1);
+		});
+
 		test('an extension can hold an automatic load', async ({
 			page,
 			requestUtils,
