@@ -532,37 +532,50 @@ test.describe('Classic gallery resilience', () => {
 	const CLASSIC_ITEM = '.vp-portfolio__items .vp-portfolio__item-wrap';
 	const CLASSIC_LOAD_MORE = 'a.vp-pagination__load-more';
 
-	let pageId = 0;
+	let classicImages = [];
+	let classicPageIds = [];
 
-	test.afterAll(async ({ requestUtils }) => {
-		await requestUtils.rest({
-			path: `/wp/v2/pages/${pageId}`,
-			method: 'DELETE',
-			params: { force: true },
-		});
-	});
-
-	test('a load more whose request failed can be pressed again', async ({
-		page,
-		requestUtils,
-	}) => {
-		const images = [];
+	test.beforeAll(async ({ requestUtils }) => {
+		classicImages = [];
 
 		for (let index = 0; index < 3; index += 1) {
 			const { id } = await requestUtils.uploadMedia(
 				getFixturePath('image-800x600.png')
 			);
 
-			images.push({ id });
+			classicImages.push({ id });
 		}
+	});
 
+	test.afterAll(async ({ requestUtils }) => {
+		await Promise.all(
+			classicPageIds.map((id) =>
+				requestUtils.rest({
+					path: `/wp/v2/pages/${id}`,
+					method: 'DELETE',
+					params: { force: true },
+				})
+			)
+		);
+
+		classicPageIds = [];
+	});
+
+	/**
+	 * Publish a classic gallery of one image to a page.
+	 *
+	 * @param {Object} requestUtils - REST utils.
+	 * @param {string} pagination   - pagination type.
+	 * @return {Promise<string>} address of the page.
+	 */
+	async function publishClassic(requestUtils, pagination) {
 		const attributes = {
-			block_id: 'e2e-resilience-classic',
+			block_id: `e2e-resilience-classic-${pagination}`,
 			setup_wizard: 'false',
 			content_source: 'images',
-			images,
+			images: classicImages,
 			items_count: 1,
-			pagination: 'load-more',
+			pagination,
 			layout_elements: {
 				top: { elements: [], align: 'center' },
 				items: { elements: ['items'] },
@@ -573,36 +586,141 @@ test.describe('Classic gallery resilience', () => {
 			path: '/wp/v2/pages',
 			method: 'POST',
 			data: {
-				title: 'Classic gallery, failed Load More',
+				title: `Classic gallery resilience ${pagination}`,
 				status: 'publish',
 				content: `<!-- wp:visual-portfolio/block ${JSON.stringify(attributes)} /-->`,
 			},
 		});
 
-		pageId = id;
+		classicPageIds.push(id);
 
+		return link;
+	}
+
+	/**
+	 * Fail every request a gallery sends for its second page, and leave a
+	 * browser that follows a link to that page alone.
+	 *
+	 * @param {Object} page - Playwright page.
+	 */
+	function failSecondPage(page) {
+		return page.route(/vp_page=2/, (route) =>
+			'POST' === route.request().method()
+				? route.abort()
+				: route.fallback()
+		);
+	}
+
+	test('a load more that cannot be fetched is followed by the browser', async ({
+		page,
+		requestUtils,
+	}) => {
+		const link = await publishClassic(requestUtils, 'load-more');
+
+		await failSecondPage(page);
 		await page.goto(link, { waitUntil: 'load' });
+		await expect(page.locator(CLASSIC_ITEM)).toHaveCount(1);
+		await page.evaluate(() => {
+			window.__vpSameDocument = true;
+		});
 
-		const items = page.locator(CLASSIC_ITEM);
-		const loadMore = page.locator(CLASSIC_LOAD_MORE);
+		await page.locator(CLASSIC_LOAD_MORE).click();
+		await page.waitForURL((url) => '2' === url.searchParams.get('vp_page'));
+		await page.waitForLoadState('domcontentloaded');
 
-		await expect(items).toHaveCount(1);
+		await expect(page.locator(CLASSIC_ITEM)).toHaveCount(1);
+		expect(
+			await page.evaluate(() => window.__vpSameDocument)
+		).toBeUndefined();
+	});
 
-		await page.route(/vp_page=2/, (route) => route.abort());
+	test('a request that failed leaves the gallery able to ask again', async ({
+		page,
+		requestUtils,
+	}) => {
+		const link = await publishClassic(requestUtils, 'load-more');
+
+		await failSecondPage(page);
+		await page.goto(link, { waitUntil: 'load' });
+		await expect(page.locator(CLASSIC_ITEM)).toHaveCount(1);
 
 		const failed = page.waitForEvent('requestfailed');
 
-		await loadMore.click();
+		await page.evaluate(() => {
+			const { vpf } = document.querySelector('.vp-portfolio');
+
+			vpf.loadNewItems(vpf.options.nextPageUrl, false);
+		});
 		await failed;
 
 		await expect(page.locator(GALLERY)).not.toHaveClass(
 			/vp-portfolio__loading/
 		);
-		await expect(items).toHaveCount(1);
+
+		// A search builds its address from this one.
+		expect(
+			await page.evaluate(
+				() => document.querySelector('.vp-portfolio').vpf.href
+			)
+		).toBe(link);
 
 		await page.unroute(/vp_page=2/);
-		await loadMore.click();
+		await page.evaluate(() => {
+			const { vpf } = document.querySelector('.vp-portfolio');
 
-		await expect(items).toHaveCount(2);
+			vpf.loadNewItems(vpf.options.nextPageUrl, false);
+		});
+
+		await expect(page.locator(CLASSIC_ITEM)).toHaveCount(2);
+	});
+
+	test('a request a newer one aborts keeps the address of the items on show', async ({
+		page,
+		requestUtils,
+	}) => {
+		const link = await publishClassic(requestUtils, 'load-more');
+
+		await page.route(/vp_page=2/, async (route) => {
+			await new Promise((resolve) => {
+				setTimeout(resolve, 1000);
+			});
+			await route.continue().catch(() => {});
+		});
+		await page.goto(link, { waitUntil: 'load' });
+		await expect(page.locator(CLASSIC_ITEM)).toHaveCount(1);
+
+		// Each request aborts the one before it, as a search does while the
+		// visitor types.
+		const href = await page.evaluate(() => {
+			const { vpf } = document.querySelector('.vp-portfolio');
+			const next = vpf.options.nextPageUrl;
+
+			vpf.loadNewItems(`${next}&first=1`, true);
+			vpf.loadNewItems(`${next}&second=1`, true);
+
+			return vpf.href;
+		});
+
+		expect(href).toBe(link);
+	});
+
+	test('an infinite scroll goes on after its link brings a failed page', async ({
+		page,
+		requestUtils,
+	}) => {
+		const link = await publishClassic(requestUtils, 'infinite');
+
+		await failSecondPage(page);
+
+		const failed = page.waitForEvent('requestfailed');
+
+		await page.goto(link, { waitUntil: 'load' });
+		await failed;
+		await expect(page.locator(CLASSIC_ITEM)).toHaveCount(1);
+
+		await page.unroute(/vp_page=2/);
+		await page.locator(CLASSIC_LOAD_MORE).click();
+
+		await expect(page.locator(CLASSIC_ITEM)).toHaveCount(3);
 	});
 });

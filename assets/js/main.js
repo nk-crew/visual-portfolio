@@ -159,6 +159,10 @@ class VP {
 
 		this.href = window.location.href;
 
+		// The address of the items on show. `href` already names a request that
+		// `complete` is settling, and that may be one that replaced nothing.
+		this.landedHref = this.href;
+
 		this.$items_wrap = $item.find('.vp-portfolio__items');
 		this.$slider_thumbnails_wrap = $item.find('.vp-portfolio__thumbnails');
 		this.$pagination = $item.find('.vp-portfolio__pagination-wrap');
@@ -635,6 +639,15 @@ class VP {
 					self.options.pagination === 'paged'
 				);
 
+				// Never leave a control that does nothing behind: the link still
+				// works where the request did not. An abort is a newer request
+				// taking over.
+				self.loading?.fail?.((xhr, status) => {
+					if ('abort' !== status) {
+						window.location.assign($this.attr('href'));
+					}
+				});
+
 				scrollToTop($pagination);
 			}
 		);
@@ -792,7 +805,7 @@ class VP {
 		// A request that failed or was aborted replaced nothing. Forget it, or the
 		// spinner stays and `loadNewItems()` refuses to ask for this URL again.
 		if (!content) {
-			this.href = false;
+			this.href = this.landedHref;
 			this.$item.removeClass('vp-portfolio__loading');
 			this.loading = false;
 
@@ -907,8 +920,10 @@ class VP {
 
 		// Nothing was replaced, so forget the request. `loadNewItems()` refuses a
 		// URL it has already loaded, and the pagination would stay dead.
-		if (!$newVP.length) {
-			this.href = false;
+		if ($newVP.length) {
+			this.landedHref = this.href;
+		} else {
+			this.href = this.landedHref;
 		}
 
 		this.$item.removeClass('vp-portfolio__loading');
