@@ -564,6 +564,19 @@ function getLoopTriggers(loop) {
 }
 
 /**
+ * Have the infinite triggers of a loop report where they are now. A load that
+ * ended moves none of those it leaves in view, and an observer reports a change
+ * only, whichever trigger asked for the load.
+ *
+ * @param {HTMLElement} loop Loop wrapper.
+ */
+function rearmInfiniteTriggers(loop) {
+	getLoopTriggers(loop).forEach((trigger) => {
+		infiniteRearms.get(trigger)?.();
+	});
+}
+
+/**
  * Point the trigger at the page after the one just loaded.
  *
  * The node is kept and only its href moves. Replacing it with the fetched one
@@ -1094,13 +1107,8 @@ store('visual-portfolio/loop', {
 			// of the next page, is not a visitor asking to leave for it.
 			yield loadNextPage(ref, getLoopContext(), event.isTrusted);
 
-			// The page a click loaded may leave an infinite trigger in view, which
-			// the observer does not report as a change. That trigger may be this
-			// one, or one beside it whose own load this click replaced.
 			if (loop) {
-				getLoopTriggers(loop).forEach((trigger) => {
-					infiniteRearms.get(trigger)?.();
-				});
+				rearmInfiniteTriggers(loop);
 			}
 		}),
 	},
@@ -1162,10 +1170,12 @@ store('visual-portfolio/loop', {
 						return;
 					}
 
-					// A page is on its way, and whoever asked for it rearms this
+					const loop = ref.closest(LOOP_SELECTOR);
+
+					// A page is on its way, and whatever asked for it rearms this
 					// once it lands. Asking again would abort it, and the abort
 					// rearms this too, so the two would go on for good.
-					if (pendingRequests.has(ref.closest(LOOP_SELECTOR))) {
+					if (pendingRequests.has(loop)) {
 						return;
 					}
 
@@ -1182,7 +1192,7 @@ store('visual-portfolio/loop', {
 
 					loadNextPage(ref, context, false).then((result) => {
 						if (STOP !== result) {
-							rearm();
+							rearmInfiniteTriggers(loop);
 						}
 					});
 				},
