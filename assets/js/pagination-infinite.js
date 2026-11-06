@@ -32,15 +32,23 @@ $(document).on('initEvents.vpf', (event, self) => {
 		}
 	}
 
-	// Any page that lands, as a click on the link may bring the one a failed
-	// request left behind. A failure lands nothing, so this asks only once.
-	self.$item.on(`endLoadingNewItems${evp}`, (e) => {
-		if (e.target === self.$item[0]) {
-			setTimeout(() => {
-				visibilityCheckBusy = false;
-				checkVisibilityAndLoad();
-			}, 300);
-		}
+	let resumeTimeout;
+
+	// Anything that loads after this wait began keeps the gallery to itself, as
+	// asking for the next page would abort it.
+	self.$item.on(`startLoadingNewItems${evp}`, () => {
+		clearTimeout(resumeTimeout);
+	});
+
+	// Whatever landed, as a click on the link may bring the page a failed request
+	// left behind. A request with no answer ends nothing, so it is not retried.
+	self.$item.on(`endLoadingNewItems${evp}`, () => {
+		clearTimeout(resumeTimeout);
+
+		resumeTimeout = setTimeout(() => {
+			visibilityCheckBusy = false;
+			checkVisibilityAndLoad();
+		}, 300);
 	});
 
 	checkVisibilityAndLoad();

@@ -544,6 +544,7 @@ class VP {
 						.removeClass('vp-filter__item-active');
 				}
 				self.loadNewItems($this.attr('href'), true);
+				self.followIfRefused($this.attr('href'));
 			}
 		);
 
@@ -559,6 +560,7 @@ class VP {
 					.removeClass('vp-sort__item-active');
 			}
 			self.loadNewItems($this.attr('href'), true);
+			self.followIfRefused($this.attr('href'));
 		});
 
 		// on filter/sort select change
@@ -576,6 +578,7 @@ class VP {
 
 					if ($option.length) {
 						self.loadNewItems($option.attr('data-vp-url'), true);
+						self.followIfRefused($option.attr('data-vp-url'));
 					}
 				}
 			);
@@ -639,14 +642,7 @@ class VP {
 					self.options.pagination === 'paged'
 				);
 
-				// Never leave a control that does nothing behind: the link still
-				// works where the request did not. An abort is a newer request
-				// taking over.
-				self.loading?.fail?.((xhr, status) => {
-					if ('abort' !== status) {
-						window.location.assign($this.attr('href'));
-					}
-				});
+				self.followIfRefused($this.attr('href'));
 
 				scrollToTop($pagination);
 			}
@@ -660,6 +656,7 @@ class VP {
 				e.preventDefault();
 				e.stopPropagation();
 				self.loadNewItems($(this).attr('href'), true);
+				self.followIfRefused($(this).attr('href'));
 			}
 		);
 
@@ -744,6 +741,23 @@ class VP {
 	 */
 	removeItems($items) {
 		this.emitEvent('removeItems', [$items]);
+	}
+
+	/**
+	 * Never leave a control that does nothing behind: a visit to the address may
+	 * still work where the server turned the request down. A request nobody
+	 * answered is left alone. It may be a newer request taking over, or a visitor
+	 * leaving the page, as WebKit fails requests while it navigates, and following
+	 * the link then would replace where they were going.
+	 *
+	 * @param {string} url - address the control links to.
+	 */
+	followIfRefused(url) {
+		this.loading?.fail?.((xhr) => {
+			if (xhr.status) {
+				window.location.assign(url);
+			}
+		});
 	}
 
 	/**

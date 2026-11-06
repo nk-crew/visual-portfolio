@@ -611,13 +611,17 @@ test.describe('Classic gallery resilience', () => {
 		);
 	}
 
-	test('a load more that cannot be fetched is followed by the browser', async ({
+	test('a load more the server turns down is followed by the browser', async ({
 		page,
 		requestUtils,
 	}) => {
 		const link = await publishClassic(requestUtils, 'load-more');
 
-		await failSecondPage(page);
+		await page.route(/vp_page=2/, (route) =>
+			'POST' === route.request().method()
+				? route.fulfill({ status: 403, body: 'Not this way' })
+				: route.fallback()
+		);
 		await page.goto(link, { waitUntil: 'load' });
 		await expect(page.locator(CLASSIC_ITEM)).toHaveCount(1);
 		await page.evaluate(() => {
@@ -632,6 +636,31 @@ test.describe('Classic gallery resilience', () => {
 		expect(
 			await page.evaluate(() => window.__vpSameDocument)
 		).toBeUndefined();
+	});
+
+	// WebKit fails the requests of a page it is leaving this way, and following
+	// the link then would replace where the visitor was going.
+	test('a load more nobody answered stays on the page @webkit', async ({
+		page,
+		requestUtils,
+	}) => {
+		const link = await publishClassic(requestUtils, 'load-more');
+
+		await failSecondPage(page);
+		await page.goto(link, { waitUntil: 'load' });
+		await expect(page.locator(CLASSIC_ITEM)).toHaveCount(1);
+
+		const failed = page.waitForEvent('requestfailed');
+
+		await page.locator(CLASSIC_LOAD_MORE).click();
+		await failed;
+
+		await expect(page.locator(GALLERY)).not.toHaveClass(
+			/vp-portfolio__loading/
+		);
+		await page.waitForTimeout(1000);
+
+		expect(page.url()).toBe(link);
 	});
 
 	test('a request that failed leaves the gallery able to ask again', async ({
@@ -702,6 +731,47 @@ test.describe('Classic gallery resilience', () => {
 		});
 
 		expect(href).toBe(link);
+	});
+
+	test('an infinite scroll leaves alone a request that starts as a page lands', async ({
+		page,
+		requestUtils,
+	}) => {
+		const link = await publishClassic(requestUtils, 'infinite');
+		const filterUrl = new URL(link);
+		const requests = [];
+		const aborted = [];
+
+		filterUrl.searchParams.set('filter', '1');
+
+		page.on('request', (request) => requests.push(request.url()));
+		page.on('requestfailed', (request) => aborted.push(request.url()));
+
+		await page.route(/vp_page=2|filter=1/, async (route) => {
+			await new Promise((resolve) => {
+				setTimeout(resolve, 1000);
+			});
+			await route.continue().catch(() => {});
+		});
+
+		await page.goto(link, { waitUntil: 'domcontentloaded' });
+		await page.waitForFunction(
+			() => document.querySelector('.vp-portfolio')?.vpf?.loading
+		);
+
+		// What a filter does, right as a page of the scroll lands.
+		await page.evaluate((url) => {
+			const { vpf } = document.querySelector('.vp-portfolio');
+
+			vpf.$item.one('endLoadingNewItems.vpf', () => {
+				vpf.loadNewItems(url, true);
+			});
+		}, filterUrl.href);
+
+		await expect.poll(() => requests.join()).toContain('filter=1');
+		await page.waitForTimeout(1500);
+
+		expect(aborted).toEqual([]);
 	});
 
 	test('an infinite scroll goes on after its link brings a failed page', async ({
