@@ -1135,6 +1135,13 @@ store('visual-portfolio/loop', {
 						return;
 					}
 
+					// A page is on its way, and whoever asked for it rearms this
+					// once it lands. Asking again would abort it, and the abort
+					// rearms this too, so the two would go on for good.
+					if (pendingRequests.has(ref.closest(LOOP_SELECTOR))) {
+						return;
+					}
+
 					if (
 						!ref.dispatchEvent(
 							new window.CustomEvent(INFINITE_LOAD_EVENT, {
