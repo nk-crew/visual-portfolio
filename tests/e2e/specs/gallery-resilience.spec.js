@@ -740,12 +740,13 @@ test.describe('Classic gallery resilience', () => {
 		const link = await publishClassic(requestUtils, 'infinite');
 		const filterUrl = new URL(link);
 		const requests = [];
-		const aborted = [];
 
 		filterUrl.searchParams.set('filter', '1');
 
 		page.on('request', (request) => requests.push(request.url()));
-		page.on('requestfailed', (request) => aborted.push(request.url()));
+
+		// The whole gallery in view, so the scroll wants its next page at once.
+		await page.setViewportSize({ width: 1280, height: 6000 });
 
 		await page.route(/vp_page=2|filter=1/, async (route) => {
 			await new Promise((resolve) => {
@@ -754,24 +755,33 @@ test.describe('Classic gallery resilience', () => {
 			await route.continue().catch(() => {});
 		});
 
-		await page.goto(link, { waitUntil: 'domcontentloaded' });
-		await page.waitForFunction(
-			() => document.querySelector('.vp-portfolio')?.vpf?.loading
-		);
+		// What a filter clicked right after a page of the scroll lands does. Set
+		// up in the page, as the test is not let in while that page is on its way.
+		await page.addInitScript((url) => {
+			const timer = setInterval(() => {
+				const vpf = document.querySelector('.vp-portfolio')?.vpf;
 
-		// What a filter does, right as a page of the scroll lands.
-		await page.evaluate((url) => {
-			const { vpf } = document.querySelector('.vp-portfolio');
-
-			vpf.$item.one('endLoadingNewItems.vpf', () => {
-				vpf.loadNewItems(url, true);
-			});
+				if (vpf) {
+					clearInterval(timer);
+					vpf.$item.one('endLoadingNewItems.vpf', () => {
+						setTimeout(() => {
+							vpf.loadNewItems(url, true);
+						}, 50);
+					});
+				}
+			}, 10);
 		}, filterUrl.href);
 
-		await expect.poll(() => requests.join()).toContain('filter=1');
-		await page.waitForTimeout(1500);
+		await page.goto(link, { waitUntil: 'commit' });
 
-		expect(aborted).toEqual([]);
+		await expect
+			.poll(() => requests.join(), { timeout: 15000 })
+			.toContain('filter=1');
+
+		// Past the scroll's 300 ms wait, with the filter still on its way.
+		await page.waitForTimeout(700);
+
+		expect(requests.join()).not.toContain('vp_page=3');
 	});
 
 	test('an infinite scroll goes on after its link brings a failed page', async ({
