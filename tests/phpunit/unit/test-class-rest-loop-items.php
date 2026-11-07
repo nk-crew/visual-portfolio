@@ -582,6 +582,33 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A refresh skips the cached answer and caches what it read instead, so a
+	 * source whose items changed on the server shows them at once.
+	 *
+	 * @return void
+	 */
+	public function test_a_fresh_request_skips_the_cached_answer() {
+		$this->factory->post->create_many( 2 );
+
+		$body = $this->get_body( 'posts', 6, array( 'source' => 'post' ) );
+
+		$this->assertCount( 2, $this->get_items( $this->dispatch( $body ) ) );
+
+		$this->factory->post->create();
+		$this->reset_loop_state();
+
+		$this->assertCount( 2, $this->get_items( $this->dispatch( $body ) ) );
+
+		$this->reset_loop_state();
+
+		$this->assertCount( 3, $this->get_items( $this->dispatch( $body + array( 'fresh' => true ) ) ) );
+
+		$this->reset_loop_state();
+
+		$this->assertCount( 3, $this->get_items( $this->dispatch( $body ) ) );
+	}
+
+	/**
 	 * A different body is not served the cached answer of an earlier one.
 	 *
 	 * @return void

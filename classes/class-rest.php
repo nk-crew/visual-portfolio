@@ -487,7 +487,10 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		}
 
 		$cache_key = 'vpf_loop_preview_' . md5( (string) wp_json_encode( array( $options, $query_id, $request_state, get_current_user_id() ) ) );
-		$cached    = get_transient( $cache_key );
+
+		// A refresh asks because the items changed on the server while the
+		// options stayed the same, so the cached answer is the one it replaces.
+		$cached = $request->get_param( 'fresh' ) ? false : get_transient( $cache_key );
 
 		if ( is_array( $cached ) ) {
 			return $this->success( $cached );
