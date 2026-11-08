@@ -365,8 +365,8 @@ test.describe('archive pages', () => {
 			.getByRole('link', { name: 'Settings' })
 			.click();
 		await page
-			.locator('.portfolio_archive_page .select2-container')
-			.click();
+			.getByRole('combobox', { name: 'Archive Page' })
+			.fill('Portfolio');
 		await page.getByRole('option', { name: 'Portfolio' }).first().click();
 		await page.getByLabel('Archive Page Items Per Page').fill('2');
 

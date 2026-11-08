@@ -186,16 +186,15 @@ async function setVendor(admin, page, vendor) {
 		'post_type=portfolio&page=visual-portfolio-settings'
 	);
 
-	// The field sits on a tab of its own, so it is set rather than clicked.
-	await page
-		.locator('select[name="vp_popup_gallery[vendor]"]')
-		.evaluate((node, value) => {
-			node.value = value;
-
-			// The form has a field named `submit`, which hides the method.
-			HTMLFormElement.prototype.submit.call(node.form);
-		}, vendor);
-
+	await page.locator('#vp_popup_gallery-tab').click();
+	const form = page.locator('#vp_popup_gallery form');
+	await form.locator('summary').filter({ hasText: 'Advanced' }).click();
+	const control = form.getByLabel('Vendor Script');
+	if ((await control.inputValue()) === vendor) {
+		return;
+	}
+	await control.selectOption(vendor);
+	await form.getByRole('button', { name: 'Save Changes' }).click();
 	await page.waitForURL(/settings-updated=true/);
 }
 
