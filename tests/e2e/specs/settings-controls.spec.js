@@ -297,9 +297,11 @@ test.describe('Contextual settings controls', () => {
 		});
 		await page.reload();
 		form = await openTab(admin, page, 'vp_general');
-		await expect(
-			form.locator('[name="vp_general[ajax_caching]"]')
-		).toHaveCount(0);
+		expect(
+			await form.evaluate((element) =>
+				new FormData(element).has('vp_general[ajax_caching]')
+			)
+		).toBe(false);
 		await form
 			.locator('summary')
 			.filter({ hasText: 'Custom taxonomies' })
@@ -309,9 +311,11 @@ test.describe('Contextual settings controls', () => {
 			.fill('preserve_absent_pro_default');
 		await save(page, form);
 		form = await openTab(admin, page, 'vp_general');
-		await expect(
-			form.locator('[name="vp_general[ajax_caching]"]')
-		).toHaveCount(0);
+		expect(
+			await form.evaluate((element) =>
+				new FormData(element).has('vp_general[ajax_caching]')
+			)
+		).toBe(false);
 		expect(
 			await page.evaluate(() =>
 				window.VPSettingsControls.storedFields.vp_general.includes(
@@ -372,7 +376,14 @@ test.describe('Contextual settings controls', () => {
 			const toggle = form.getByRole('checkbox', {
 				name: 'Register Portfolio Post Type',
 			});
-			await toggle.check();
+			await expect(toggle).toBeChecked();
+			await expect(form.locator('.extension-custom-row')).toBeVisible();
+			await expect(
+				form.locator('.extension_pro_condition')
+			).toBeVisible();
+			await expect(
+				page.locator('[type="checkbox"][name="vp_popup_gallery[loop]"]')
+			).toBeChecked();
 			for (const name of [
 				'extension_text',
 				'extension_callback',

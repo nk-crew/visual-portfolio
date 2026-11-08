@@ -45,6 +45,10 @@
 		}
 	}
 
+	.vpf-settings-subheading.vpf-setting-type-section_title::before {
+		display: none;
+	}
+
 	.vpf-settings-subheading h3 {
 		margin: 0;
 		font-size: 13px;

@@ -48,3 +48,17 @@ add_action(
 	},
 	100
 );
+
+add_filter( 'pre_option_vp_popup_gallery', function () { return array( 'loop' => 'on' ); } );
+add_filter(
+	'vpf_settings_fields',
+	function ( $fields ) {
+		$fields['vp_general'][] = array(
+			'name' => 'extension_pro_condition',
+			'label' => 'Pro-dependent extension field',
+			'type' => 'text',
+			'condition' => array( array( 'control' => '[type="checkbox"][name="vp_popup_gallery[loop]"]' ) ),
+		);
+		return $fields;
+	}
+);

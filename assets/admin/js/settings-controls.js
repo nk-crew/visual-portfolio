@@ -353,7 +353,7 @@ $(() => {
 			show(
 				'archive_page_items_per_page',
 				read('register_portfolio_post_type') === 'on' &&
-					!!read('portfolio_archive_page')
+					Number(read('portfolio_archive_page')) > 0
 			);
 			show('lazy_loading_excludes', !!read('lazy_loading'));
 			show(
@@ -387,9 +387,8 @@ $(() => {
 					revealedConditions.delete(row);
 				}
 			});
-			$(form)
-				.closest('.metabox-holder')
-				.conditionize('runCheck', $(form).find('[data-cond]'));
+			const metabox = $(form).closest('.metabox-holder');
+			metabox.conditionize('runCheck', metabox.find('[data-cond]'));
 			window.VPAdminSettingsForms?.refresh($(form));
 		};
 		const add = (parent, field) => {
@@ -423,7 +422,10 @@ $(() => {
 					'color',
 				].includes(field.type) &&
 				!field.callback &&
-				field.name !== 'portfolio_archive_page'
+				!(
+					field.name === 'portfolio_archive_page' &&
+					field.type === 'select'
+				)
 			) {
 				const initialValue =
 					field.type === 'toggle'
@@ -449,7 +451,7 @@ $(() => {
 				);
 				if (field.is_pro && !isPro) {
 					originals.querySelectorAll('[name]').forEach((original) => {
-						original.removeAttribute('name');
+						original.disabled = true;
 					});
 					if (storedFields[section].includes(field.name)) {
 						const retained = document.createElement('input');
@@ -481,7 +483,11 @@ $(() => {
 					container.append(...label.childNodes);
 				}
 				container.append(...row.querySelector('td').childNodes);
-				if (field.name === 'portfolio_archive_page') {
+				if (
+					field.name === 'portfolio_archive_page' &&
+					field.type === 'select' &&
+					!field.callback
+				) {
 					const picker = $(input);
 					picker.select2({
 						...picker.data('select2').options.options,
