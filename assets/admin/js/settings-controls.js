@@ -2,9 +2,7 @@ import {
 	BaseControl,
 	Button,
 	ColorPicker,
-	ComboboxControl,
 	Dropdown,
-	Notice,
 	SelectControl,
 	TextareaControl,
 	TextControl,
@@ -17,27 +15,25 @@ import {
 	useEffect,
 	useState,
 } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import $ from 'jquery';
 
 const { fields, isPro, storedFields } = window.VPSettingsControls;
 
-function Field({ field, section, initialValue, preview, upgrade, refresh }) {
+function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 	const [value, setValue] = useState(initialValue);
 	const [image, setImage] = useState(preview);
-	const [search, setSearch] = useState('');
-	const [requestError, setRequestError] = useState(false);
-	const [retry, setRetry] = useState(0);
-	const [options, setOptions] = useState(
-		Object.entries(field.options || {}).map(([optionValue, label]) => ({
+	const options = Object.entries(field.options || {}).map(
+		([optionValue, label]) => ({
 			value: optionValue,
-			label,
-		}))
+			label: decodeEntities(label),
+		})
 	);
 	const disabled = !!field.is_pro && !isPro;
 	const label = (
 		<>
-			{field.label}
+			{decodeEntities(field.label)}
 			{disabled && (
 				<RawHTML className="vpf-settings-upgrade">{upgrade}</RawHTML>
 			)}
@@ -53,51 +49,15 @@ function Field({ field, section, initialValue, preview, upgrade, refresh }) {
 		__next40pxDefaultSize: true,
 	};
 	useEffect(() => {
-		refresh();
-	}, [value, refresh]);
-
-	useEffect(() => {
-		if (field.name !== 'portfolio_archive_page') {
-			return;
+		if (field.type !== 'number') {
+			if (field.type === 'toggle') {
+				source.checked = value === 'on';
+			} else {
+				source.value = value;
+			}
 		}
-		const controller = new AbortController();
-		const query = new URLSearchParams({
-			action: 'vp_get_pages_list',
-			nonce: window.VPAdminVariables.nonce,
-			q: search,
-		});
-		setRequestError(false);
-		const timeout = setTimeout(() => {
-			fetch(`${window.ajaxurl}?${query}`, { signal: controller.signal })
-				.then((response) => {
-					if (!response.ok) throw new Error('Page search failed');
-					return response.json();
-				})
-				.then((pages) => {
-					setOptions((current) => {
-						const merged = new Map(
-							current.map((option) => [option.value, option])
-						);
-						pages.forEach(([id, title]) => {
-							merged.set(String(id), {
-								value: String(id),
-								label: title,
-							});
-						});
-						return [...merged.values()];
-					});
-				})
-				.catch((error) => {
-					if (error.name !== 'AbortError') {
-						setRequestError(true);
-					}
-				});
-		}, 250);
-		return () => {
-			clearTimeout(timeout);
-			controller.abort();
-		};
-	}, [field.name, search, retry]);
+		refresh();
+	}, [value, field.type, source, refresh]);
 
 	let control;
 	if (field.type === 'toggle') {
@@ -117,15 +77,6 @@ function Field({ field, section, initialValue, preview, upgrade, refresh }) {
 					}
 					setValue(checked ? 'on' : 'off');
 				}}
-			/>
-		);
-	} else if (field.name === 'portfolio_archive_page') {
-		control = (
-			<ComboboxControl
-				{...props}
-				onFilterValueChange={setSearch}
-				options={options}
-				onChange={(next) => setValue(next || '')}
 			/>
 		);
 	} else if (field.type === 'select') {
@@ -198,7 +149,7 @@ function Field({ field, section, initialValue, preview, upgrade, refresh }) {
 							frame.open();
 						}}
 					>
-						{field.options.button_label}
+						{decodeEntities(field.options.button_label)}
 					</Button>
 					{value && (
 						<Button
@@ -218,7 +169,23 @@ function Field({ field, section, initialValue, preview, upgrade, refresh }) {
 		control = (
 			<TextControl
 				{...props}
-				type={field.type === 'color' ? 'text' : field.type}
+				{...(field.type === 'number'
+					? {
+							value: undefined,
+							defaultValue: initialValue,
+							name: source.name,
+							id: source.id,
+						}
+					: {})}
+				ref={
+					field.type === 'number'
+						? (node) => {
+								if (node)
+									node.classList.add(...source.classList);
+							}
+						: undefined
+				}
+				type={field.type}
 				placeholder={field.placeholder}
 				min={field.min}
 				max={field.max}
@@ -226,26 +193,7 @@ function Field({ field, section, initialValue, preview, upgrade, refresh }) {
 			/>
 		);
 	}
-	return (
-		<>
-			{(!disabled || storedFields[section].includes(field.name)) && (
-				<input
-					type="hidden"
-					name={`${section}[${field.name}]`}
-					value={value}
-				/>
-			)}
-			{control}
-			{requestError && (
-				<Notice status="error" isDismissible={false}>
-					{__('Unable to load pages.', 'visual-portfolio')}{' '}
-					<Button variant="link" onClick={() => setRetry(retry + 1)}>
-						{__('Retry', 'visual-portfolio')}
-					</Button>
-				</Notice>
-			)}
-		</>
-	);
+	return control;
 }
 
 const groups = {
@@ -352,6 +300,24 @@ const groups = {
 	],
 };
 
+function revealInvalidField(field, conditions) {
+	const form = field.closest('form');
+	for (
+		let element = field;
+		element && element !== form;
+		element = element.parentElement
+	) {
+		element.hidden = false;
+		if (element.matches('details')) element.open = true;
+		if (element.hasAttribute('data-cond')) {
+			if (!conditions.has(element))
+				conditions.set(element, element.getAttribute('data-cond'));
+			element.setAttribute('data-cond', 'true');
+			element.style.display = '';
+		}
+	}
+}
+
 $(() => {
 	Object.entries(groups).forEach(([section, sectionGroups]) => {
 		const form = document.querySelector(`#${section} form`);
@@ -359,13 +325,23 @@ $(() => {
 		if (!table) {
 			return;
 		}
+		const invalidFields = new Set();
+		const revealedConditions = new Map();
 		const content = document.createElement('div');
 		content.className = 'vpf-settings-modern';
 		table.before(content);
 		const controls = new Map();
 		const refresh = () => {
-			const read = (name) =>
-				form.querySelector(`[name="${section}[${name}]"]`)?.value;
+			const read = (name) => {
+				const checkbox = form.querySelector(
+					`[type="checkbox"][name="${section}[${name}]"]`
+				);
+				return checkbox
+					? checkbox.checked
+						? 'on'
+						: 'off'
+					: form.querySelector(`[name="${section}[${name}]"]`)?.value;
+			};
 			const show = (name, visible) => {
 				const row = controls.get(name);
 				if (row) row.hidden = !visible;
@@ -394,13 +370,39 @@ $(() => {
 				);
 				if (thumbnails) thumbnails.hidden = !fancybox;
 			}
+			invalidFields.forEach((field) => {
+				if (
+					field.querySelector(':invalid') ||
+					field.contains(document.activeElement)
+				)
+					revealInvalidField(field, revealedConditions);
+				else invalidFields.delete(field);
+			});
+			revealedConditions.forEach((condition, row) => {
+				if (
+					!row.querySelector(':invalid') &&
+					!row.contains(document.activeElement)
+				) {
+					row.setAttribute('data-cond', condition);
+					revealedConditions.delete(row);
+				}
+			});
+			$(form)
+				.closest('.metabox-holder')
+				.conditionize('runCheck', $(form).find('[data-cond]'));
 			window.VPAdminSettingsForms?.refresh($(form));
 		};
 		const add = (parent, field) => {
 			const row = table.querySelector(`tr.${CSS.escape(field.name)}`);
 			if (!row) return;
 			const container = document.createElement('div');
-			container.className = `vpf-settings-field ${field.name}${field.is_pro && !isPro ? ' vpf-settings-control-pro' : ''}`;
+			container.className = `vpf-settings-field ${row.className}`;
+			if (row.hasAttribute('data-cond')) {
+				container.setAttribute(
+					'data-cond',
+					row.getAttribute('data-cond')
+				);
+			}
 			parent.append(container);
 			controls.set(field.name, container);
 			const input = row.querySelector(
@@ -420,7 +422,8 @@ $(() => {
 					'image',
 					'color',
 				].includes(field.type) &&
-				!field.callback
+				!field.callback &&
+				field.name !== 'portfolio_archive_page'
 			) {
 				const initialValue =
 					field.type === 'toggle'
@@ -428,31 +431,65 @@ $(() => {
 							? 'on'
 							: 'off'
 						: input.value;
+				const source =
+					field.type === 'toggle'
+						? row.querySelector('[type="checkbox"]')
+						: input;
+				const preview =
+					row.querySelector('img')?.getAttribute('src') || '';
+				const upgrade =
+					row.querySelector('.vpf-settings-control-pro-label')
+						?.outerHTML || '';
+				const originals = document.createElement('div');
+				originals.hidden = true;
+				originals.append(
+					...row.querySelectorAll(
+						'input[name], select[name], textarea[name]'
+					)
+				);
+				if (field.is_pro && !isPro) {
+					originals.querySelectorAll('[name]').forEach((original) => {
+						original.removeAttribute('name');
+					});
+					if (storedFields[section].includes(field.name)) {
+						const retained = document.createElement('input');
+						retained.type = 'hidden';
+						retained.name = `${section}[${field.name}]`;
+						retained.value = initialValue;
+						originals.append(retained);
+					}
+				}
 				flushSync(() => {
 					createRoot(container).render(
 						<Field
 							field={field}
-							section={section}
+							source={source}
 							initialValue={initialValue}
-							preview={
-								row.querySelector('img')?.getAttribute('src') ||
-								''
-							}
-							upgrade={
-								row.querySelector(
-									'.vpf-settings-control-pro-label'
-								)?.outerHTML || ''
-							}
+							preview={preview}
+							upgrade={upgrade}
 							refresh={refresh}
 						/>
 					);
 				});
+				if (field.type === 'number') {
+					source.remove();
+				}
+				container.append(originals);
 			} else {
 				const label = row.querySelector('th');
 				if (label?.textContent.trim()) {
 					container.append(...label.childNodes);
 				}
 				container.append(...row.querySelector('td').childNodes);
+				if (field.name === 'portfolio_archive_page') {
+					const picker = $(input);
+					picker.select2({
+						...picker.data('select2').options.options,
+						selectionAdapter: undefined,
+						allowClear: true,
+						placeholder: input.options[0].text,
+					});
+				}
 			}
 			row.remove();
 		};
@@ -514,7 +551,24 @@ $(() => {
 			.forEach((field) => {
 				add(content, field);
 			});
-		table.remove();
+		replacedHeadings.forEach((name) => {
+			table.querySelector(`tr.${name}`)?.remove();
+		});
+		if (!table.querySelector('tr')) table.remove();
+		$(form).on('change', 'select', refresh);
+		form.addEventListener(
+			'invalid',
+			(event) => {
+				const field = event.target.closest('.vpf-settings-field');
+				if (!field) return;
+				invalidFields.add(field);
+				revealInvalidField(field, revealedConditions);
+			},
+			true
+		);
+		form.addEventListener('focusout', () => {
+			if (invalidFields.size) requestAnimationFrame(refresh);
+		});
 		requestAnimationFrame(() => {
 			refresh();
 			window.VPAdminSettingsForms?.persist($(form));
