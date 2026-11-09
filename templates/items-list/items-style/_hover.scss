@@ -1,0 +1,11 @@
+@mixin item-hover {
+	@media (hover: hover) {
+		.vp-portfolio__item:hover {
+			@content;
+		}
+	}
+
+	.vp-portfolio__item-focus-visible {
+		@content;
+	}
+}
