@@ -41,9 +41,16 @@ async function publish(requestUtils, style) {
 async function settle(item) {
 	await item.evaluate(async (node) => {
 		await Promise.all(
-			node
-				.getAnimations({ subtree: true })
-				.map((animation) => animation.finished)
+			node.getAnimations({ subtree: true }).map((animation) =>
+				animation.finished.catch((error) => {
+					if (
+						error.name !== 'AbortError' ||
+						animation.playState !== 'idle'
+					) {
+						throw error;
+					}
+				})
+			)
 		);
 	});
 }

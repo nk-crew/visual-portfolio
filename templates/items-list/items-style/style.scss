@@ -1,4 +1,5 @@
 @import "./variables";
+@import "./hover";
 
 /**
  * Default items style
@@ -64,18 +65,18 @@
 		transform: var(--vp-items-style-default--image__transform);
 	}
 
-	.vp-portfolio__item:hover,
-	.vp-portfolio__item-focus-visible {
+	@include item-hover {
 		.vp-portfolio__item-img :where(img, video, iframe) {
 			transform: var(--vp-items-style-default--image-hover__transform);
 		}
 	}
 
 	// Overlay
-	&.vp-portfolio__items-show-overlay-hover .vp-portfolio__item:hover,
-	&.vp-portfolio__items-show-overlay-hover .vp-portfolio__item-focus-visible {
-		.vp-portfolio__item-overlay {
-			opacity: 1;
+	&.vp-portfolio__items-show-overlay-hover {
+		@include item-hover {
+			.vp-portfolio__item-overlay {
+				opacity: 1;
+			}
 		}
 	}
 
@@ -84,8 +85,7 @@
 			opacity: 1;
 		}
 
-		.vp-portfolio__item:hover,
-		.vp-portfolio__item-focus-visible {
+		@include item-hover {
 			.vp-portfolio__item-overlay {
 				opacity: 0;
 			}

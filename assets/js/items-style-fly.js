@@ -28,6 +28,10 @@ $(document).on('initEvents.vpf', (event, self) => {
 		`mouseenter${evp} mouseleave${evp}`,
 		'.vp-portfolio__item',
 		function (e) {
+			if (!window.matchMedia('(hover: hover)').matches) {
+				return;
+			}
+
 			const $this = $(this);
 			const $overlay = $this.find('.vp-portfolio__item-overlay');
 			const enter = e.type === 'mouseenter';
