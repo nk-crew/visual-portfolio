@@ -550,6 +550,33 @@ function appendItems(list, nextList) {
 }
 
 /**
+ * The Load More and infinite triggers of a loop, leaving out those of a loop
+ * nested in one of its items. A loop may hold several, all leading to one page.
+ *
+ * @param {HTMLElement} loop Loop wrapper.
+ *
+ * @return {HTMLElement[]} Triggers.
+ */
+function getLoopTriggers(loop) {
+	return Array.from(loop.querySelectorAll(TRIGGER_SELECTOR)).filter(
+		(trigger) => trigger.closest(LOOP_SELECTOR) === loop
+	);
+}
+
+/**
+ * Have the infinite triggers of a loop report where they are now. A load that
+ * ended moves none of those it leaves in view, and an observer reports a change
+ * only, whichever trigger asked for the load.
+ *
+ * @param {HTMLElement} loop Loop wrapper.
+ */
+function rearmInfiniteTriggers(loop) {
+	getLoopTriggers(loop).forEach((trigger) => {
+		infiniteRearms.get(trigger)?.();
+	});
+}
+
+/**
  * Point the trigger at the page after the one just loaded.
  *
  * The node is kept and only its href moves. Replacing it with the fetched one
@@ -793,7 +820,13 @@ async function loadNextPage(trigger, context, byClick) {
 		const hadFocus =
 			byClick && trigger.contains(window.document.activeElement);
 
-		advanceTrigger(trigger, nextLoop, loop);
+		getLoopTriggers(loop).forEach((loopTrigger) => {
+			// On the last page, the pagination of an earlier one may have taken
+			// this one with it.
+			if (loopTrigger.isConnected) {
+				advanceTrigger(loopTrigger, nextLoop, loop);
+			}
+		});
 		advanceRanges(loop, nextLoop);
 		advanceThumbnails(loop, nextLoop);
 		refreshLayout(list, added);
@@ -1068,13 +1101,15 @@ store('visual-portfolio/loop', {
 
 			event.preventDefault();
 
+			const loop = ref.closest(LOOP_SELECTOR);
+
 			// A click from a script, such as a lightbox asking for the slides
 			// of the next page, is not a visitor asking to leave for it.
 			yield loadNextPage(ref, getLoopContext(), event.isTrusted);
 
-			// The page a click on an infinite trigger loaded may leave the
-			// trigger in view, which the observer does not report as a change.
-			infiniteRearms.get(ref)?.();
+			if (loop) {
+				rearmInfiniteTriggers(loop);
+			}
 		}),
 	},
 	callbacks: {
@@ -1135,6 +1170,15 @@ store('visual-portfolio/loop', {
 						return;
 					}
 
+					const loop = ref.closest(LOOP_SELECTOR);
+
+					// A page is on its way, and whatever asked for it rearms this
+					// once it lands. Asking again would abort it, and the abort
+					// rearms this too, so the two would go on for good.
+					if (pendingRequests.has(loop)) {
+						return;
+					}
+
 					if (
 						!ref.dispatchEvent(
 							new window.CustomEvent(INFINITE_LOAD_EVENT, {
@@ -1148,7 +1192,7 @@ store('visual-portfolio/loop', {
 
 					loadNextPage(ref, context, false).then((result) => {
 						if (STOP !== result) {
-							rearm();
+							rearmInfiniteTriggers(loop);
 						}
 					});
 				},

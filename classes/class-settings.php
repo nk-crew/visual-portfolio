@@ -184,6 +184,22 @@ class Visual_Portfolio_Settings {
 
 			wp_localize_script( 'visual-portfolio-archive-page-selector', 'VPAdminVariables', $data_init );
 
+			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-settings-controls', 'build/assets/admin/js/settings-controls', array( 'visual-portfolio-admin' ) );
+			Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-settings-controls', 'build/assets/admin/css/settings-controls', array( 'wp-components' ) );
+			wp_localize_script(
+				'visual-portfolio-settings-controls',
+				'VPSettingsControls',
+				array(
+					'fields'       => array_intersect_key( self::get_settings_fields(), array_flip( array( 'vp_general', 'vp_images', 'vp_popup_gallery' ) ) ),
+					'isPro'        => visual_portfolio()->is_pro(),
+					'storedFields' => array(
+						'vp_general'       => array_keys( (array) get_option( 'vp_general', array() ) ),
+						'vp_images'        => array_keys( (array) get_option( 'vp_images', array() ) ),
+						'vp_popup_gallery' => array_keys( (array) get_option( 'vp_popup_gallery', array() ) ),
+					),
+				)
+			);
+
 		}
 	}
 
@@ -971,6 +987,9 @@ class Visual_Portfolio_Settings {
 			(function( $ ) {
 				// Don't allow adding input number values that > then max attribute and < min attribute.
 				$('form').on('input', '[type="number"]', function(e) {
+					if ( jQuery(this).closest('.vpf-settings-modern').length ) {
+						return;
+					}
 					var current = parseFloat( this.value );
 					var min = parseFloat(this.min);
 					var max = parseFloat(this.max);

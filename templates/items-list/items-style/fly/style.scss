@@ -1,4 +1,5 @@
 @import "./variables";
+@import "../hover";
 
 /**
  * Fly items style
@@ -190,8 +191,7 @@
 		transform: var(--vp-items-style-fly--image__transform);
 	}
 
-	.vp-portfolio__item:hover,
-	.vp-portfolio__item-focus-visible {
+	@include item-hover {
 		.vp-portfolio__item-img :where(img, video, iframe) {
 			transform: var(--vp-items-style-fly--image-hover__transform);
 		}

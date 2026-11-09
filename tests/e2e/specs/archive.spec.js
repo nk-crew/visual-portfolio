@@ -365,9 +365,13 @@ test.describe('archive pages', () => {
 			.getByRole('link', { name: 'Settings' })
 			.click();
 		await page
-			.locator('.portfolio_archive_page .select2-container')
+			.locator('#vp_general .portfolio_archive_page .select2-selection')
 			.click();
-		await page.getByRole('option', { name: 'Portfolio' }).first().click();
+		await page.locator('.select2-search__field').fill('Portfolio');
+		await page
+			.getByRole('option', { name: 'Portfolio', exact: true })
+			.first()
+			.click();
 		await page.getByLabel('Archive Page Items Per Page').fill('2');
 
 		const saveChangesButton = page.getByRole('button', {

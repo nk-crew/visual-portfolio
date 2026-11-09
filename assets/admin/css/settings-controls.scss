@@ -1,0 +1,146 @@
+.vpf-settings-modern {
+	max-width: 780px;
+	padding: 8px 0 20px;
+
+	[hidden] {
+		display: none !important;
+	}
+
+	.vpf-settings-section {
+		padding: 20px 0;
+		border-bottom: 1px solid #d7dbde;
+
+		&:first-child {
+			padding-top: 0;
+		}
+
+		> h2,
+		> summary {
+			margin: 0 0 20px;
+			font-size: 15px;
+			font-weight: 600;
+		}
+
+		> summary {
+			margin: 0;
+			cursor: pointer;
+		}
+
+		&[open] > summary {
+			margin-bottom: 20px;
+		}
+	}
+
+	.vpf-settings-fields {
+		display: grid;
+		gap: 24px;
+	}
+
+	.vpf-settings-size-grid {
+		grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+
+		.vpf-settings-subheading,
+		.images_sizes_note {
+			grid-column: 1 / -1;
+		}
+	}
+
+	.vpf-settings-subheading.vpf-setting-type-section_title::before {
+		display: none;
+	}
+
+	.vpf-settings-subheading h3 {
+		margin: 0;
+		font-size: 13px;
+	}
+
+	.components-base-control__help {
+		max-width: 640px;
+		margin-bottom: 0;
+	}
+
+	.components-base-control__field {
+		margin-bottom: 0;
+	}
+
+	.components-text-control__input,
+	.components-select-control__input {
+		max-width: 420px;
+	}
+
+	.portfolio_archive_page {
+		min-width: 0;
+
+		> label {
+			display: block;
+			margin-bottom: 8px;
+		}
+
+		.select2-container {
+			width: 100% !important;
+			max-width: 420px;
+		}
+
+		.select2-selection--single {
+			width: 100%;
+			height: 40px;
+			border-color: #757575;
+			border-radius: 2px;
+		}
+
+		.select2-selection__rendered {
+			line-height: 38px;
+		}
+
+		.select2-selection__arrow {
+			height: 38px;
+		}
+	}
+
+	.vpf-settings-upgrade {
+		display: inline;
+	}
+
+	.vpf-settings-control-pro-label {
+		display: inline-flex;
+		margin-left: 8px;
+		font-size: 12px;
+	}
+
+	.vpf-settings-image {
+		display: block;
+		max-width: 150px;
+		max-height: 150px;
+		margin-bottom: 12px;
+	}
+
+	.vpf-settings-image-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.vpf-settings-color {
+		display: flex;
+		gap: 8px;
+		align-items: flex-end;
+	}
+
+	.vpf-settings-color-swatch {
+		width: 24px;
+		height: 24px;
+		border: 1px solid #757575;
+	}
+
+	@media (min-width: 1100px) {
+		[data-group="enable_on_wordpress_images"] > .vpf-settings-fields,
+		[data-group="show_arrows"] > .vpf-settings-fields {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.enable_on_wordpress_images,
+		.deep_linking_url_to_share_images {
+			grid-column: 1 / -1;
+		}
+	}
+}
