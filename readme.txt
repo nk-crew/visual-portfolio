@@ -369,7 +369,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed Copy Filenames copying only part of a selection when clicked before every photo had loaded
 * fixed saving a proofing gallery from an editor opened earlier bringing back the client's previous selection and status
 * improved Watermarks:
-  * added the Text source, for a watermark made of your own text, font and color
+  * added the Text source, for a watermark made of your own text in the color you pick
   * added the Tiled layout, which repeats the watermark over the whole image with an angle and gaps
   * added a preview on photos from your Media Library that follows every change before you save
   * added the progress of watermark generation to Settings, with Pause and Resume, and the status of each image to the Media Library and the gallery editor
