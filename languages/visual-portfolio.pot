@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-05T17:34:44+00:00\n"
+"POT-Creation-Date: 2026-11-09T18:52:38+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: visual-portfolio\n"
@@ -43,7 +43,7 @@ msgstr ""
 
 #: classes/3rd/plugins/class-elementor-widget.php:182
 #: classes/class-admin.php:2155
-#: classes/class-settings.php:199
+#: classes/class-settings.php:215
 msgid "General"
 msgstr ""
 
@@ -75,7 +75,7 @@ msgstr ""
 #: classes/class-admin.php:246
 #: classes/class-admin.php:295
 #: classes/class-custom-post-type.php:1133
-#: classes/class-settings.php:392
+#: classes/class-settings.php:408
 #: gutenberg/components/pro-note/index.js:45
 #: gutenberg/components/pro-teaser/index.js:63
 msgid "Go Pro"
@@ -270,7 +270,7 @@ msgid "Centered Slides"
 msgstr ""
 
 #: classes/class-admin.php:754
-#: classes/class-settings.php:689
+#: classes/class-settings.php:705
 msgid "Loop"
 msgstr ""
 
@@ -284,7 +284,7 @@ msgstr ""
 
 #: classes/class-admin.php:782
 #: classes/class-admin.php:3579
-#: classes/class-settings.php:730
+#: classes/class-settings.php:746
 msgid "Display Arrows"
 msgstr ""
 
@@ -301,7 +301,7 @@ msgid "Mousewheel Control"
 msgstr ""
 
 #: classes/class-admin.php:814
-#: classes/class-settings.php:776
+#: classes/class-settings.php:792
 msgid "Display Thumbnails"
 msgstr ""
 
@@ -379,7 +379,7 @@ msgid "Protection"
 msgstr ""
 
 #: classes/class-admin.php:1287
-#: classes/class-settings.php:908
+#: classes/class-settings.php:924
 #: gutenberg/components/controls-render/index.js:584
 msgid "Custom CSS"
 msgstr ""
@@ -657,6 +657,7 @@ msgstr ""
 #: classes/class-admin.php:1752
 #: classes/class-admin.php:2833
 #: classes/class-admin.php:2979
+#: assets/admin/js/settings-controls.js:299
 msgid "Advanced"
 msgstr ""
 
@@ -778,12 +779,12 @@ msgid "Image Uploaded"
 msgstr ""
 
 #: classes/class-admin.php:1863
-#: classes/class-settings.php:214
+#: classes/class-settings.php:230
 msgid "Watermarks"
 msgstr ""
 
 #: classes/class-admin.php:1864
-#: classes/class-settings.php:289
+#: classes/class-settings.php:305
 msgid "Protect your works using watermarks"
 msgstr ""
 
@@ -813,7 +814,7 @@ msgid "Display taxonomy archives such as categories, tags, and custom taxonomies
 msgstr ""
 
 #: classes/class-admin.php:1913
-#: classes/class-settings.php:219
+#: classes/class-settings.php:235
 msgid "Social Feeds"
 msgstr ""
 
@@ -1095,7 +1096,7 @@ msgid "Items Gap"
 msgstr ""
 
 #: classes/class-admin.php:2818
-#: classes/class-settings.php:551
+#: classes/class-settings.php:567
 msgid "Disabled"
 msgstr ""
 
@@ -1504,7 +1505,7 @@ msgid "Share on Facebook"
 msgstr ""
 
 #: classes/class-assets.php:747
-#: classes/class-settings.php:263
+#: classes/class-settings.php:279
 msgid "X"
 msgstr ""
 
@@ -1935,26 +1936,26 @@ msgstr ""
 msgid "Sorry, you are not allowed to get gallery items."
 msgstr ""
 
-#: classes/class-rest.php:569
+#: classes/class-rest.php:572
 msgid "Sorry, you are not allowed to get list of saved layouts."
 msgstr ""
 
-#: classes/class-rest.php:615
+#: classes/class-rest.php:618
 msgid "Post ID is required for this request."
 msgstr ""
 
-#: classes/class-rest.php:620
+#: classes/class-rest.php:623
 msgid "Sorry, you are not allowed to edit saved layouts data."
 msgstr ""
 
-#: classes/class-rest.php:676
-#: classes/class-rest.php:680
+#: classes/class-rest.php:679
+#: classes/class-rest.php:683
 msgid "User don't have permissions to change options."
 msgstr ""
 
 #: classes/class-settings.php:128
 #: classes/class-settings.php:129
-#: classes/class-settings.php:962
+#: classes/class-settings.php:978
 #: gutenberg/blocks/item-author/edit.js:95
 #: gutenberg/blocks/item-categories/edit.js:117
 #: gutenberg/blocks/item-cover/edit.js:374
@@ -1978,453 +1979,456 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: classes/class-settings.php:204
+#: classes/class-settings.php:220
 #: gutenberg/loop-sources/images.js:111
 msgid "Images"
 msgstr ""
 
-#: classes/class-settings.php:209
+#: classes/class-settings.php:225
 msgid "Popup & Lightbox"
 msgstr ""
 
-#: classes/class-settings.php:224
+#: classes/class-settings.php:240
 msgid "White Label"
 msgstr ""
 
-#: classes/class-settings.php:259
+#: classes/class-settings.php:275
 msgid "Instagram"
 msgstr ""
 
-#: classes/class-settings.php:260
+#: classes/class-settings.php:276
 msgid "YouTube"
 msgstr ""
 
-#: classes/class-settings.php:261
+#: classes/class-settings.php:277
 msgid "Vimeo"
 msgstr ""
 
-#: classes/class-settings.php:262
+#: classes/class-settings.php:278
 msgid "Unsplash"
 msgstr ""
 
-#: classes/class-settings.php:264
+#: classes/class-settings.php:280
 msgid "Flickr"
 msgstr ""
 
-#: classes/class-settings.php:265
+#: classes/class-settings.php:281
 msgid "Dribbble"
 msgstr ""
 
-#: classes/class-settings.php:266
+#: classes/class-settings.php:282
 msgid "Twitch"
 msgstr ""
 
-#: classes/class-settings.php:267
+#: classes/class-settings.php:283
 msgid "VK"
 msgstr ""
 
-#: classes/class-settings.php:268
+#: classes/class-settings.php:284
 msgid "RSS"
 msgstr ""
 
-#: classes/class-settings.php:283
+#: classes/class-settings.php:299
 msgid "+ Connect"
 msgstr ""
 
-#: classes/class-settings.php:285
+#: classes/class-settings.php:301
 msgid "No accounts connected yet."
 msgstr ""
 
-#: classes/class-settings.php:295
+#: classes/class-settings.php:311
 msgid "Add your logo as a watermark on top of your images to make them recognizable and harder to steal."
 msgstr ""
 
-#: classes/class-settings.php:296
+#: classes/class-settings.php:312
 msgid "All your media library images will not be touched, we place watermarked images in another safe place and use them only on demand."
 msgstr ""
 
-#: classes/class-settings.php:301
+#: classes/class-settings.php:317
 msgid "Add Watermark"
 msgstr ""
 
-#: classes/class-settings.php:306
+#: classes/class-settings.php:322
 msgid "Social feeds such as Instagram, Youtube, Flickr, X, etc..."
 msgstr ""
 
-#: classes/class-settings.php:317
+#: classes/class-settings.php:333
 msgid "Remove our plugin brand and logos from Front and Admin areas"
 msgstr ""
 
-#: classes/class-settings.php:322
+#: classes/class-settings.php:338
 msgid "Enable White Label"
 msgstr ""
 
-#: classes/class-settings.php:324
+#: classes/class-settings.php:340
 msgid "Change the plugin name and logos to your brand."
 msgstr ""
 
 #. translators: %s: name of a settings tab, such as "White Label".
-#: classes/class-settings.php:385
+#: classes/class-settings.php:401
 #, php-format
 msgid "%s comes with Visual Portfolio Pro."
 msgstr ""
 
-#: classes/class-settings.php:393
+#: classes/class-settings.php:409
 msgid "(opens in a new tab)"
 msgstr ""
 
-#: classes/class-settings.php:415
+#: classes/class-settings.php:431
 msgid "Register Portfolio Post Type"
 msgstr ""
 
-#: classes/class-settings.php:416
+#: classes/class-settings.php:432
 msgid "Add custom post type `portfolio` to showcase your works."
 msgstr ""
 
-#: classes/class-settings.php:422
+#: classes/class-settings.php:438
 msgid "Archive Page"
 msgstr ""
 
-#: classes/class-settings.php:423
+#: classes/class-settings.php:439
 msgid "Base page of your portfolio, where will be placed your works archive."
 msgstr ""
 
-#: classes/class-settings.php:435
+#: classes/class-settings.php:451
 msgid "Archive Page Items Per Page"
 msgstr ""
 
-#: classes/class-settings.php:448
+#: classes/class-settings.php:464
 msgid "Filter Taxonomies"
 msgstr ""
 
-#: classes/class-settings.php:449
+#: classes/class-settings.php:465
 msgid "You can show custom taxonomies in the portfolio Filter. Enter some taxonomies by \",\" separating values. Example: \"product_cat,product_tag\""
 msgstr ""
 
-#: classes/class-settings.php:455
+#: classes/class-settings.php:471
 msgid "Placeholder Image"
 msgstr ""
 
-#: classes/class-settings.php:456
+#: classes/class-settings.php:472
 msgid "This image used on items in layouts where image is not specified."
 msgstr ""
 
-#: classes/class-settings.php:460
+#: classes/class-settings.php:476
 msgid "Choose image"
 msgstr ""
 
-#: classes/class-settings.php:467
+#: classes/class-settings.php:483
 msgid "AJAX Cache and Preload"
 msgstr ""
 
-#: classes/class-settings.php:468
+#: classes/class-settings.php:484
 msgid "Reduce AJAX calls request time."
 msgstr ""
 
-#: classes/class-settings.php:477
+#: classes/class-settings.php:493
+#: assets/admin/js/settings-controls.js:217
 msgid "Responsive Breakpoints"
 msgstr ""
 
-#: classes/class-settings.php:483
-#: classes/class-settings.php:601
+#: classes/class-settings.php:499
+#: classes/class-settings.php:617
 msgid "Extra Large"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:490
+#: classes/class-settings.php:506
 #, php-format
 msgid "Sets the breakpoint on extra large screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:495
-#: classes/class-settings.php:594
-#: classes/class-settings.php:628
+#: classes/class-settings.php:511
+#: classes/class-settings.php:610
+#: classes/class-settings.php:644
 msgid "Large"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:502
+#: classes/class-settings.php:518
 #, php-format
 msgid "Sets the breakpoint on large screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:507
-#: classes/class-settings.php:587
-#: classes/class-settings.php:621
+#: classes/class-settings.php:523
+#: classes/class-settings.php:603
+#: classes/class-settings.php:637
 msgid "Medium"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:514
+#: classes/class-settings.php:530
 #, php-format
 msgid "Sets the breakpoint on medium screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:519
-#: classes/class-settings.php:580
-#: classes/class-settings.php:614
+#: classes/class-settings.php:535
+#: classes/class-settings.php:596
+#: classes/class-settings.php:630
 msgid "Small"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:526
+#: classes/class-settings.php:542
 #, php-format
 msgid "Sets the breakpoint on small screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:531
+#: classes/class-settings.php:547
 msgid "Extra Small"
 msgstr ""
 
 #. translators: %1$s - default breakpoint.
-#: classes/class-settings.php:538
+#: classes/class-settings.php:554
 #, php-format
 msgid "Sets the breakpoint on extra small screen sizes (Default: %1$spx)."
 msgstr ""
 
-#: classes/class-settings.php:545
+#: classes/class-settings.php:561
 msgid "Lazy Loading"
 msgstr ""
 
 #. translators: %s - plugin brand name.
-#: classes/class-settings.php:547
+#: classes/class-settings.php:563
 #, php-format
 msgid "Enable lazy loading for %s layouts only or for the whole website."
 msgstr ""
 
 #. translators: %s - plugin brand name.
-#: classes/class-settings.php:553
+#: classes/class-settings.php:569
 #, php-format
 msgid "%s Only"
 msgstr ""
 
-#: classes/class-settings.php:554
+#: classes/class-settings.php:570
 msgid "All images"
 msgstr ""
 
-#: classes/class-settings.php:559
+#: classes/class-settings.php:575
 msgid "Lazy Loading Excludes"
 msgstr ""
 
 #. translators: %s - link text.
-#: classes/class-settings.php:562
+#: classes/class-settings.php:578
 #, php-format
 msgid "Listed images will not be lazy loaded. Both full URLs and partial strings can be used. One per line. <a href=\"%1$s\">%2$s</a>"
 msgstr ""
 
 #. translators: %s - link text.
-#: classes/class-settings.php:562
+#: classes/class-settings.php:578
 msgid "More info"
 msgstr ""
 
-#: classes/class-settings.php:574
+#: classes/class-settings.php:590
 msgid "Layouts Image Sizes"
 msgstr ""
 
-#: classes/class-settings.php:575
+#: classes/class-settings.php:591
 msgid "Image sizes used in portfolio layouts."
 msgstr ""
 
-#: classes/class-settings.php:608
+#: classes/class-settings.php:624
 msgid "Lightbox Image Sizes"
 msgstr ""
 
-#: classes/class-settings.php:609
+#: classes/class-settings.php:625
 msgid "Image sizes used in lightbox images."
 msgstr ""
 
 #. translators: %s: regenerate thumbnails url.
-#: classes/class-settings.php:636
+#: classes/class-settings.php:652
 #, php-format
 msgid "After publishing your changes, new image sizes may not be shown until you <a href=\"%s\" target=\"_blank\">Regenerate Thumbnails</a>."
 msgstr ""
 
-#: classes/class-settings.php:644
+#: classes/class-settings.php:660
 msgid "Vendor Script"
 msgstr ""
 
-#: classes/class-settings.php:647
+#: classes/class-settings.php:663
 msgid "Fancybox"
 msgstr ""
 
-#: classes/class-settings.php:648
+#: classes/class-settings.php:664
 msgid "PhotoSwipe"
 msgstr ""
 
-#: classes/class-settings.php:656
+#: classes/class-settings.php:672
 msgid "Lightbox for WordPress Images"
 msgstr ""
 
-#: classes/class-settings.php:657
+#: classes/class-settings.php:673
 msgid "Enable lightbox for WordPress native galleries and images."
 msgstr ""
 
-#: classes/class-settings.php:671
+#: classes/class-settings.php:687
 msgid "Deep Linking"
 msgstr ""
 
-#: classes/class-settings.php:672
+#: classes/class-settings.php:688
 msgid "Makes URL automatically change to reflect the current opened popup, and you can easily link directly to that image or video."
 msgstr ""
 
-#: classes/class-settings.php:679
+#: classes/class-settings.php:695
 msgid "Use Deep Linking URL to Share Images"
 msgstr ""
 
-#: classes/class-settings.php:680
+#: classes/class-settings.php:696
 msgid "Check to share Deep Linking URLs when sharing images. When disabled, all galleries will share direct links to image files."
 msgstr ""
 
-#: classes/class-settings.php:698
+#: classes/class-settings.php:714
 msgid "Load Next Pages"
 msgstr ""
 
-#: classes/class-settings.php:699
+#: classes/class-settings.php:715
 msgid "Automatically load the next page of items while browsing the gallery when Load More or Infinite pagination is used."
 msgstr ""
 
-#: classes/class-settings.php:708
+#: classes/class-settings.php:724
 msgid "Click to Zoom"
 msgstr ""
 
-#: classes/class-settings.php:716
+#: classes/class-settings.php:732
 msgid "Restore Focus"
 msgstr ""
 
-#: classes/class-settings.php:717
+#: classes/class-settings.php:733
 msgid "Restore focus on the last active item after Popup is closed."
 msgstr ""
 
-#: classes/class-settings.php:725
+#: classes/class-settings.php:741
 msgid "UI Elements"
 msgstr ""
 
-#: classes/class-settings.php:731
+#: classes/class-settings.php:747
 msgid "Arrows to navigate between images."
 msgstr ""
 
-#: classes/class-settings.php:737
+#: classes/class-settings.php:753
 msgid "Display Images Counter"
 msgstr ""
 
-#: classes/class-settings.php:738
+#: classes/class-settings.php:754
 msgid "On the top left corner will be showed images counter."
 msgstr ""
 
-#: classes/class-settings.php:744
+#: classes/class-settings.php:760
 msgid "Display Zoom Button"
 msgstr ""
 
-#: classes/class-settings.php:750
+#: classes/class-settings.php:766
 msgid "Display Fullscreen Button"
 msgstr ""
 
-#: classes/class-settings.php:756
+#: classes/class-settings.php:772
 msgid "Display Share Button"
 msgstr ""
 
-#: classes/class-settings.php:762
+#: classes/class-settings.php:778
 msgid "Display Download Button"
 msgstr ""
 
-#: classes/class-settings.php:768
+#: classes/class-settings.php:784
 msgid "Display Close Button"
 msgstr ""
 
-#: classes/class-settings.php:789
+#: classes/class-settings.php:805
 msgid "Thumbnails Opened At Startup"
 msgstr ""
 
-#: classes/class-settings.php:806
+#: classes/class-settings.php:822
 msgid "Thumbnails Position"
 msgstr ""
 
-#: classes/class-settings.php:810
+#: classes/class-settings.php:826
 msgid "Vertical"
 msgstr ""
 
-#: classes/class-settings.php:811
+#: classes/class-settings.php:827
 msgid "Horizontal"
 msgstr ""
 
-#: classes/class-settings.php:827
+#: classes/class-settings.php:843
 msgid "Display Slideshow"
 msgstr ""
 
-#: classes/class-settings.php:842
+#: classes/class-settings.php:858
+#: assets/admin/js/settings-controls.js:285
 msgid "Albums"
 msgstr ""
 
-#: classes/class-settings.php:848
+#: classes/class-settings.php:864
 msgid "Isolated Album Popup"
 msgstr ""
 
-#: classes/class-settings.php:849
+#: classes/class-settings.php:865
 msgid "When enabled, clicking an album opens a popup with only that album's images. Navigation to other items is disabled."
 msgstr ""
 
-#: classes/class-settings.php:856
+#: classes/class-settings.php:872
 msgid "Album Lazy Load Threshold"
 msgstr ""
 
-#: classes/class-settings.php:857
+#: classes/class-settings.php:873
 msgid "Number of album images to render inline. Additional images are loaded via REST API when the popup opens."
 msgstr ""
 
-#: classes/class-settings.php:868
+#: classes/class-settings.php:884
+#: assets/admin/js/settings-controls.js:290
 #: gutenberg/utils/click-actions.js:44
 msgid "Quick View"
 msgstr ""
 
-#: classes/class-settings.php:874
+#: classes/class-settings.php:890
 msgid "Display URL Button"
 msgstr ""
 
-#: classes/class-settings.php:875
+#: classes/class-settings.php:891
 msgid "Button with page URL will be placed in the popup toolbar."
 msgstr ""
 
-#: classes/class-settings.php:882
+#: classes/class-settings.php:898
 msgid "Internal Links"
 msgstr ""
 
-#: classes/class-settings.php:886
-#: classes/class-settings.php:899
+#: classes/class-settings.php:902
+#: classes/class-settings.php:915
 msgid "Open in New Tab"
 msgstr ""
 
-#: classes/class-settings.php:887
-#: classes/class-settings.php:900
+#: classes/class-settings.php:903
+#: classes/class-settings.php:916
 msgid "Open in Current Tab"
 msgstr ""
 
-#: classes/class-settings.php:888
-#: classes/class-settings.php:901
+#: classes/class-settings.php:904
+#: classes/class-settings.php:917
 msgid "Open in Frame (not recommended)"
 msgstr ""
 
-#: classes/class-settings.php:889
-#: classes/class-settings.php:902
+#: classes/class-settings.php:905
+#: classes/class-settings.php:918
 msgid "Prevent Click"
 msgstr ""
 
-#: classes/class-settings.php:895
+#: classes/class-settings.php:911
 msgid "External Links"
 msgstr ""
 
-#: classes/class-settings.php:909
+#: classes/class-settings.php:925
 msgid "When you display posts and pages in popup iframe, you may not need some page elements like header and footer. Hide it using custom CSS with classname `.vp-popup-iframe`."
 msgstr ""
 
-#: classes/class-settings.php:931
+#: classes/class-settings.php:947
 msgid "Misc"
 msgstr ""
 
-#: classes/class-settings.php:936
+#: classes/class-settings.php:952
 msgid "Background Color"
 msgstr ""
 
-#: classes/class-settings.php:1009
+#: classes/class-settings.php:1028
 msgid "-- Select Page --"
 msgstr ""
 
@@ -2827,6 +2831,42 @@ msgstr ""
 
 #: templates/items-list/layouts/slider/arrows.php:20
 msgid "Next Slide"
+msgstr ""
+
+#: assets/admin/js/settings-controls.js:94
+msgid "Choose background color"
+msgstr ""
+
+#: assets/admin/js/settings-controls.js:162
+msgid "Remove Image"
+msgstr ""
+
+#: assets/admin/js/settings-controls.js:211
+msgid "Custom taxonomies"
+msgstr ""
+
+#: assets/admin/js/settings-controls.js:215
+msgid "Performance"
+msgstr ""
+
+#: assets/admin/js/settings-controls.js:232
+msgid "Image sizes"
+msgstr ""
+
+#: assets/admin/js/settings-controls.js:251
+msgid "Behavior"
+msgstr ""
+
+#: assets/admin/js/settings-controls.js:262
+msgid "Controls"
+msgstr ""
+
+#: assets/admin/js/settings-controls.js:273
+msgid "Appearance"
+msgstr ""
+
+#: assets/admin/js/settings-controls.js:275
+msgid "Thumbnails and slideshow"
 msgstr ""
 
 #: gutenberg/block-saved/edit.js:36
