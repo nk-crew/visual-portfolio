@@ -2,6 +2,60 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.10.0 - Nov 9, 2026 =
+
+* improved the experimental Gallery Loop blocks:
+  * changed the start of a new gallery: add its images first, by upload, Media Library or a drop, then pick a layout from previews drawn with those images. Posts, Taxonomies and Social sit in an "Other sources" menu
+  * changed a new image gallery to show all its images on one page and open a picture larger
+  * changed "Change layout" in the toolbar to show on every loop with blocks. Picking a layout replaces the blocks, and undo works
+  * fixed a picked layout being locked behind "Edit pattern"
+  * fixed Item Cover leaving a gap on tall tiles
+  * fixed Query Total and the Carousel Indicator counter showing sample numbers in the editor
+  * fixed layout previews showing the No Results text, and nearly empty thumbnails in the inserter
+  * fixed Carousel Thumbnails ignoring a centered row on the page
+  * fixed an empty carousel showing its controls on the page
+  * fixed Infinite Scroll reloading without end and never adding a page, and a Load More beside it adding items already shown
+* changed the General, Images and Popup & Lightbox settings to WordPress controls, with rarely changed settings in collapsed groups
+* fixed Load More doing nothing after one failed request until the page was reloaded
+* fixed the Fade, Fly and Emerge item styles taking two taps to open an item on iPhone and iPad
+* fixed a custom portfolio base replaced with the site's post name structure, which returned 404 on ordinary pages. The first request after the update corrects a saved base
+* **Pro:**
+* added a separate selection for each client to Photo Proofing:
+  * one gallery gives every client a personal link, their own selection, private notes on photos and a status
+  * new galleries start in this mode, and existing galleries keep one shared selection
+  * clients register with a name on the shared link, or you add them and send invitations
+  * a review window shows clients by status, one client's picks, notes and history, and the votes of all who sent
+  * comments are hidden on these galleries, and notes replace them
+* added filename copying for Lightroom, Capture One or one per line, and a CSV download, to Photo Proofing
+* added an email for each submission or a daily digest, a copy for the client, and reminders that are each sent once, to Photo Proofing
+* added an expiry date to proofing galleries
+* changed the default of Copy Filenames on shared proofing galleries to the Lightroom format
+* changed a new proofing gallery to ask for photos first, and for the selection mode before publishing
+* removed the Activity tab from proofing galleries. Each client shows the moments that matter in one line
+* fixed Copy Filenames copying only part of a selection when clicked before every photo had loaded
+* fixed saving a proofing gallery from an editor opened earlier bringing back the client's previous selection and status
+* improved Watermarks:
+  * added the Text source, for a watermark made of your own text in the color you pick
+  * added the Tiled layout, which repeats the watermark over the whole image with an angle and gaps
+  * added a preview on photos from your Media Library that follows every change before you save
+  * added the progress of watermark generation to Settings, with Pause and Resume, and the status of each image to the Media Library and the gallery editor
+  * fixed watermarks not being generated in the background, including on hosts that block requests a site makes to itself
+  * fixed galleries showing incomplete watermarked copies while images were regenerated or after a failed run
+  * fixed the Opacity setting being ignored for a JPEG logo
+  * fixed watermarked copies saved in the wrong format on sites where WordPress converts image sizes to WebP
+  * fixed Remove Watermark in the Media Library reporting success while the copies stayed, and the Media Library buttons staying stuck after an error
+* added the sync status of each social feed, with its item count and last sync, to the gallery editor and to the account cards in Settings
+* changed the White Label, Updates and Social Feeds settings to WordPress controls, matching the free settings
+* fixed Sync Now reporting success when a feed failed
+* fixed social feeds syncing every 4 hours instead of every 2
+* fixed Reconnect on Instagram filling a different account, and added Reconnect to Unsplash and Dribbble
+* fixed classic Social galleries showing no items in the block editor
+* fixed a deep link to a lightbox slide on a later page of a classic gallery opening the first slide or nothing
+* fixed pagination refusing every later page after one page failed to preload, and a login or error page loading in place of gallery items
+* fixed the Pause every setting of Infinite Scroll in the Gallery Loop counting pages loaded by a Load More beside it
+* fixed the license link on the Updates page and other Pro settings links on sites with the Portfolio post type turned off
+* fixed tilt, image effects and other Pro hover effects taking two taps to open an item on iPhone and iPad
+
 = 3.9.0 - Oct 24, 2026 =
 
 * added WordPress 7.2 compatibility

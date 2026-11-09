@@ -1175,31 +1175,40 @@
          "YouTube": [
             ""
          ],
+         "Vimeo": [
+            ""
+         ],
+         "Unsplash": [
+            ""
+         ],
          "Flickr": [
+            ""
+         ],
+         "Dribbble": [
+            ""
+         ],
+         "Twitch": [
+            ""
+         ],
+         "VK": [
+            ""
+         ],
+         "RSS": [
             ""
          ],
          "+ Connect": [
             ""
          ],
-         "Watermark": [
+         "No accounts connected yet.": [
+            ""
+         ],
+         "Add your logo as a watermark on top of your images to make them recognizable and harder to steal.": [
+            ""
+         ],
+         "All your media library images will not be touched, we place watermarked images in another safe place and use them only on demand.": [
             ""
          ],
          "Add Watermark": [
-            ""
-         ],
-         "Size": [
-            ""
-         ],
-         "Watermark will be scaled to the chosen percentage of the original image size": [
-            ""
-         ],
-         "Opacity": [
-            ""
-         ],
-         "Autogenerate": [
-            ""
-         ],
-         "Automatically apply watermark during image upload": [
             ""
          ],
          "Social feeds such as Instagram, Youtube, Flickr, X, etc...": [
@@ -1212,18 +1221,6 @@
             ""
          ],
          "Change the plugin name and logos to your brand.": [
-            ""
-         ],
-         "Brand Name": [
-            ""
-         ],
-         "Logo Dark": [
-            ""
-         ],
-         "Use circle image 100x100 in PNG format.": [
-            ""
-         ],
-         "Logo White": [
             ""
          ],
          "%s comes with Visual Portfolio Pro.": [
@@ -1728,6 +1725,33 @@
          "Next Slide": [
             ""
          ],
+         "Choose background color": [
+            ""
+         ],
+         "Remove Image": [
+            ""
+         ],
+         "Custom taxonomies": [
+            ""
+         ],
+         "Performance": [
+            ""
+         ],
+         "Image sizes": [
+            ""
+         ],
+         "Behavior": [
+            ""
+         ],
+         "Controls": [
+            ""
+         ],
+         "Appearance": [
+            ""
+         ],
+         "Thumbnails and slideshow": [
+            ""
+         ],
          "--- Select Layout ---": [
             ""
          ],
@@ -1897,6 +1921,9 @@
             ""
          ],
          "Max number of words": [
+            ""
+         ],
+         "Watermark": [
             ""
          ],
          "Serve the watermarked copy of the picture instead of the original one.": [
@@ -2211,6 +2238,9 @@
          "Play and pause": [
             ""
          ],
+         "The gallery is empty, so the page shows no count.": [
+            ""
+         ],
          "Indicator": [
             ""
          ],
@@ -2346,6 +2376,12 @@
          "Displays an infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution.": [
             ""
          ],
+         "This source does not report a count, so the page shows none.": [
+            ""
+         ],
+         "The gallery is empty, so the page shows no range.": [
+            ""
+         ],
          "Display type": [
             ""
          ],
@@ -2421,37 +2457,7 @@
          "This source is set up and working. Editing it here arrives in the next update.": [
             ""
          ],
-         "Gallery Loop": [
-            ""
-         ],
-         "Choose where the gallery takes its items from.": [
-            ""
-         ],
-         "Add the images of the gallery.": [
-            ""
-         ],
-         "Continue": [
-            ""
-         ],
-         "Start blank": [
-            ""
-         ],
-         "Choose what the gallery carries, then pick a shape for it.": [
-            ""
-         ],
-         "Links above the gallery, one per category.": [
-            ""
-         ],
-         "Open in a lightbox": [
-            ""
-         ],
-         "A click on a picture opens it over the page.": [
-            ""
-         ],
-         "How a visitor reaches the items past the first page.": [
-            ""
-         ],
-         "Choose a gallery": [
+         "Change layout": [
             ""
          ],
          "What the lightbox shows as the title of a slide.": [
@@ -2463,19 +2469,67 @@
          "Lightbox": [
             ""
          ],
-         "Search for a gallery": [
+         "Gallery layouts": [
             ""
          ],
-         "Gallery patterns": [
+         "Choose a layout": [
             ""
          ],
-         "Page numbers": [
+         "Search for a layout": [
             ""
          ],
-         "Load more": [
+         "Posts, pages, portfolio items or any other post type.": [
             ""
          ],
-         "Infinite scroll": [
+         "Categories, tags or other terms, each with its image.": [
+            ""
+         ],
+         "A feed from Instagram, YouTube, Flickr and more.": [
+            ""
+         ],
+         "%s Comes with Visual Portfolio Pro.": [
+            ""
+         ],
+         "Get Pro": [
+            ""
+         ],
+         "Back": [
+            ""
+         ],
+         "Gallery Loop": [
+            ""
+         ],
+         "Choose where the gallery takes its items from.": [
+            ""
+         ],
+         "Add images": [
+            ""
+         ],
+         "Upload images, choose them from the Media Library, or drop them here.": [
+            ""
+         ],
+         "Upload": [
+            ""
+         ],
+         "Media Library": [
+            ""
+         ],
+         "Other sources": [
+            ""
+         ],
+         "Show instead": [
+            ""
+         ],
+         "Pro": [
+            ""
+         ],
+         "Drop images to add them": [
+            ""
+         ],
+         "Your %d images in each layout. You can change it later.": [
+            ""
+         ],
+         "Your items in each layout. You can change it later.": [
             ""
          ],
          "Wide 16:9": [
@@ -2598,9 +2652,6 @@
          "Less": [
             ""
          ],
-         "Pro": [
-            ""
-         ],
          "This comes with Visual Portfolio Pro.": [
             "",
             ""
@@ -2636,6 +2687,9 @@
             ""
          ],
          "Previous Step": [
+            ""
+         ],
+         "Continue": [
             ""
          ],
          "Edit Tiles": [
