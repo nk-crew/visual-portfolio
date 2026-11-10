@@ -8,7 +8,10 @@ const config = defineConfig(
 		globalSetup: fileURLToPath(
 			new URL('./config/global-setup.js', `file:${__filename}`).href
 		),
-		reporters: ['./config/flaky-tests-reporter.js'],
+		reporters: [
+			'./config/flaky-tests-reporter.js',
+			...(process.env.PLAYWRIGHT_JSON_OUTPUT_FILE ? ['json'] : []),
+		],
 	})
 );
 
