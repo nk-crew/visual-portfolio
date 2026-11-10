@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   playwright:
-    name: Playwright (WP ${{ matrix.wp.name }})
+    name: Playwright (WP ${{ matrix.wp.name }}, ${{ matrix.shard }})
     # 2 vCPU, not 4. `workers: 1` does not make this job single-threaded -- the
     # browser and the wp-env stack use the other cores, and measuring the switch
     # showed `playwright test` getting 40-70% slower. It still wins: Blacksmith
@@ -26,6 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        shard: ['1/3', '2/3', '3/3']
         wp:
           # The core .wp-env.json resolves to: the latest release, which
           # carries the Gallery Loop (WordPress 7.1 and above).
@@ -78,21 +79,25 @@ jobs:
           npm run wp-env start
 
       - name: Run the tests
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: artifacts/playwright.json
         run: |
-          xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- --shard=${{ matrix.shard }}
 
       - name: Archive debug artifacts (screenshots, traces)
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
-        if: ${{ failure() && !cancelled() }}
+        if: ${{ always() && !cancelled() }}
         with:
-          name: failures-artifacts-wp-${{ matrix.wp.name }}
-          path: artifacts/test-results
+          name: playwright-wp-${{ matrix.wp.name }}-${{ strategy.job-index }}
+          path: |
+            artifacts/test-results
+            artifacts/playwright.json
           if-no-files-found: ignore
 
       - name: Archive flaky tests report
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         if: ${{ !cancelled() }}
         with:
-          name: flaky-tests-report-wp-${{ matrix.wp.name }}
+          name: flaky-tests-report-wp-${{ matrix.wp.name }}-${{ strategy.job-index }}
           path: flaky-tests
           if-no-files-found: ignore
