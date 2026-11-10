@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 7.2
 * Requires PHP: 8.3
-* Stable tag: 3.10.0
+* Stable tag: 3.10.1
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -335,6 +335,14 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.10.1 - Nov 10, 2026 =
+
+* changed the WordPress.org changelog to show recent releases with a link to the full history
+* **Pro:**
+* fixed a critical error that could stop the plugin from loading when other plugins are active
+* fixed text watermark previews having different dimensions from saved copies in some browsers
+* fixed galleries added after page load not preloading their next page
 
 = 3.10.0 - Nov 9, 2026 =
 
@@ -738,237 +746,5 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 * fixed Pro plugin path and url detection - now it should work correctly when Free plugin is removed
 * fixed sitemap fatal error
-
-= 3.2.0 - Nov 25, 2023 =
-
-* added support for proper SEO meta URLs in Portfolio archives and Filtered pages in Yoast SEO, AIOSEO, Rank Math
-* added Skin option to change item title tag
-* added `vpf_extend_posts_source` filter
-* added check for image existence when resave the gallery from the popup
-* added check for caption is empty and don't print the figcaption
-* added support for new Ghost Kit extensions
-* updated blocks apiVersion to 3 to allow iframe usage in editor
-* fixed PHP 8.* warning
-* fixed lazy loading script styles added event when 3rd-party lazy loading used
-* fixed lazy loading without srcset
-* fixed lazy loading placeholder displaying when used Hover image
-* fixed width calculation for lazy loading and picture tag
-* fixed lazysizes script version number
-* fixed lazy loading conflict with WP Rocket Delay JS setting
-* fixed typo in `DONOTCACHEOBJECT` constant
-* fixed featured image focal point control conflict in WP 6.3
-* fixed Grid layout preview JS error in editor
-* simplified lazy loading placeholder animation
-* changed lazy loading styles to use modern :has() CSS (with fallback for old browsers)
-* removed jQuery usage from lazy loading script
-* **Pro:**
-* IMPORTANT: changed the Pro plugin to standalone, which is not requires the Free version installed anymore
-* added Setup Wizard support to all Social Account controls
-* fixed Share URL and paged gallery wrong URL
-* fixed mime detection for images in Flickr social feeds
-* fixed init conditionize script once opened Social settings panel
-
-= 3.1.3 - Jul 1, 2023 =
-
-* improved PhotoSwipe popup zoom for large vertical images
-* changed 'Projects' CPT label to portfolio page name
-* changed images and overlay border-radius to clip-path (better performance)
-* fixed unexpected JS error when Sortable control have an undefined value (happens in Advanced Click Action for a single user after migration from older plugin version)
-
-= 3.1.2 - Jun 6, 2023 =
-
-* renamed `Portfolio Items` to `Projects`
-* fixed playing videos in background in PhotoSwipe
-* fixed portfolio archive hidden pagination in some cases
-* fixed portfolio archive friendly URL in load more button
-* fixed portfolio archive filter and sort paged URLs
-
-= 3.1.1 - May 17, 2023 =
-
-* fixed Archive mapping PHP notice when no Archive Page ID available
-* renamed `Carousel` to `Slider`
-
-= 3.1.0 - May 12, 2023 =
-
-* added support for gradients in overlay backgrounds
-* added `Restore Focus` setting to the Popup gallery
-* added support for GET variables `vp_page`, `vp_filter`, `vp_sort`, `vp_search` in canonical and short links
-* added PHP filter `vpf_global_data`
-* changed CSS to use Gap instead of hack with margins
-* changed popup data `<div>` to `<template>`. We need this change for 3 reasons:
-  * prevent popup data from indexing
-  * prevent a lot of not needed content rendering
-  * in some cases this content causes bugs with layout styles
-* changed default popup title and description source for Posts content. Use Image title and description, and not the post title and content
-* changed overlay displaying from `focus` to `focus-visible`
-* fixed Popup data displaying even when Click Action is URL
-* fixed transition caption transition CSS variable name in the Classic skin
-* fixed Skin editor error on WP 6.0 because of using `NavigatorToParentButton` component
-* fixed Select control dropdown is not visible in editor when opened popup
-
-> v3 Migration Guide – <https://www.visualportfolio.com/docs/troubleshooting/migration-to-v3/>
-
-= 3.0.0 - Apr 13, 2023 =
-
-* completely reworked Skin options and some UI elements of block controls this helped us to structure deep Skin customizations such as:
-  * Typography control
-  * Dimensions control (overlay padding, caption items gap, etc)
-  * Blend Mode for overlay
-  * Image transform for normal and hover states
-  * Image border radius for normal and hover states
-* changed the structure of Skin templates - use classes and CSS variables with `overlay` and `caption` names where appropriate
-* added caption support for popup in video items
-* improved controls dynamic CSS rendering - merge all styles with same selector with better formatting
-* improved filter and pagination URLs to friendly on portfolio archive page (good for SEO)
-* updated Swiper to v8.4.7
-* changed template styles version - use dynamic value based on `filemtime` function return
-* fixed portfolio category archives redirect when portfolio archive set as Front Page
-* fixed pagination on portfolio taxonomy archive pages
-* fixed canonical tags usage on portfolio category archives (fixes problems with SEO)
-* fixed wrong Current Query generated when changed Portfolio on Front Page setting
-* fixed Slider dynamic items height with Classic Style wrong items width
-* fixed Slider dynamic items height with FireFox wrong items width
-* fixed Slider items height incorrect size when used Items Height and Minimal Height options
-* fixed conflict with Elementor new Swiper library (added in Elementor v3.11.0)
-* fixed Elementor double lightbox on the pages, which does not use the Elementor page builder
-* removed hardcoded CSS for popup top position based on admin bar height, use `--wp-admin--admin-bar--height` variable instead
-* fixed error when using an array in control `sanitize_callback` (only in custom user controls)
-* renamed `Items Style` → `Skin`
-* renamed `Items Click Action` → `Click Action`
-* new hooks for developers:
-  * added more data to `vpf.editor.controls-render-inner-data` JS filter
-  * PHP `vpf_register_block_attribute_data`
-  * PHP `vpf_register_block_attributes`
-  * PHP `vpf_items_style_builtin_controls`
-  * PHP `vpf_pagination_item_data`
-  * PHP `vpf_controls_dynamic_css_value`
-  * PHP `vpf_controls_dynamic_css_styles_array`
-  * JS `vpf.editor.controls-dynamic-css-value`
-  * JS `vpf.editor.controls-dynamic-css-styles-object`
-  * jQuery `afterShowFancybox`
-* minor changes
-
-= 2.22.0 - Feb 12, 2023 =
-
-* added support for Youtube Shorts in popup
-* added possibility to start AJAX loading when already in loading state (fixes the Search module conflict with concurrent requests)
-* added support for displaying Portfolio Categories and Portfolio Tags in the `post-terms` block
-* fixed filter, sort and pagination URLs to display absolute URLs
-* fixed creating notices over on over again if no items found after AJAX requests
-* fixed deprecated Elementor warnings
-* fixed saving permalink error in WordPress 6.1
-* fixed src `data:` escaping in lazy load images
-* fixed minimal pagination active item wrong circle size
-* fixed Fly overlay z-index when add Hover Image from Pro plugin
-* fixed block crash in the Widgets and Templates editor
-* fixed go pro link error when no Visual Portfolio admin menu exists
-* changed defaults for popup title and description sources
-* removed white background from Fancybox popup for better support vertical videos
-* removed `clipboard-polyfill` and use native `navigator.clipboard.writeText` instead
-* minor changes
-
-= 2.21.2 - Nov 25, 2022 =
-
-* fixed JS error when open WordPress images in Lightbox
-* fixed JS error when changing gallery image data
-
-= 2.21.0 - Nov 24, 2022 =
-
-* added templates for popup data in `/templates/popup/`, so developers can override it now in the theme templates
-* added auto height to filter/sort dropdown
-* added support for HTML tags in the popup title
-* added groups for controls for better UI
-* added more steps in the block Setup Wizard
-* added Wide alignment to newly added blocks by default
-* added a notice for large galleries to use Infinite pagination for better performance
-* added Items Per Page limit and Infinite pagination to the gallery when user adds more than 40 images in the Setup Wizard
-* added support for align option in Filter and Sort shortcodes
-* added `text_all` attribute to Filter shortcode
-* improved shortcodes UI in Saved Layouts
-* changed default Infinite pagination threshold from 250px to 400px
-* fixed wrong popup image displaying when custom URL used
-* fixed post featured image focal point save error
-* fixed Elementor widget in Safari can't select layout
-* fixed Jetpack lazy loading re-layout Masonry conflict
-* fixed displaying popup data in HTML when click action disabled
-* fixed duplicated portfolio page in Archive settings
-* fixed PHP warning when Editors open admin screen or when plugin first time active
-* fixed multiple select controls sanitize
-* fixed Go Pro link style conflict with 3rd-party URLs
-* minor changes and fixes
-
-= 2.20.3 - Oct 3, 2022 =
-
-* fixed error when close popup gallery opened from the native gallery block
-* fixed focus current item in the native gallery block when closing popup gallery
-
-= 2.20.2 - Sep 29, 2022 =
-
-* improved accessibility - focus gallery item in after closing popup
-* fixed images displaying in Slider with Classic style on Apple devices
-* fixed Jetpack lazy loading when new items loaded in Visual Portfolio gallery using pagination or filters
-* fixed displaying Read More button in Classic style, when all other meta disabled
-
-= 2.20.1 - Sep 15, 2022 =
-
-* fixed 3rd-party lazy loading scripts add lazy attributes to noscript img tags
-* fixed noscript styles loading when used optimization plugins
-* fixed conflict with Elementor lightbox when used optimization plugins
-* fixed undefined author field usage
-
-= 2.20.0 - Sep 6, 2022 =
-
-* !important - this update contains a lot of code rewrites regarding the security improvements, and some parts may not work as expected. Please, let us know as soon as possible, if something stopped working after this update. We have tested it in all our sites, but some rare cases may still stop working.
-* added code for data sanitization in places, where we missed it
-* added nonces usage to prevent possible hacker attacks
-* added support for Swiper duplicates images lazy loading in 3rd-party carousels
-* added Author to the Popup Title and Description sources
-* improved lazy loading script
-  * prevent adding noscript when image does not have vp-lazyload class after processing (for example, when skipped from adding lazy loading)
-  * prevent processing earlier if setting is disabled - faster code execution
-  * restored missing noscript for lazy images inside Visual Portfolio galleries
-* fixed Settings tab URL if Portfolio Post Type disabled
-
-= 2.19.1 =
-
-* fixed Classic style image displaying bug in slider with dynamic height option
-* fixed Color Picker error in custom Skins
-* fixed Swiper slides displaying conflicts, which comes from some 3rd-party plugins
-* minor changes
-
-= 2.19.0 =
-
-* added stricter permission check for rest route `update_layout`
-* allow to call rest route `get_layouts` to all users, who can edit posts
-* added settings to exclude images from lazy loading by attribute <https://www.visualportfolio.com/docs/settings/images/>
-* improved Gallery images selection - you can now select images without holding Ctrl/Shift keys
-* improved Gallery control - added pagination to prevent overwhelming block settings
-* improved Gallery control - added additional info to selected image popup (such as source file URL, file size, etc...)
-* improved Visual Portfolio admin menu styles by adding dividers
-* updated Swiper to the latest version 8.3.2
-* fixed popup gallery open if default prevented already (fixed conflict with slider Free Scroll)
-* fixed Slider text selection when trying to drag in the gap
-* fixed Slider displaying images in a row before Swiper init
-* fixed wrong popup gallery items parsing when Slider layout used
-* fixed images little "blink" effect when swipe Slider to the left
-* fixed Saved Layouts editor block control 'NaN' value when select an empty value
-* fixed Saved Layouts API reset meta data if you don't provided all available attributes in your request
-* minor changes
-
-= 2.18.0 =
-
-* added possibility to change items count on Portfolio archive page in the plugin settings
-* added portfolio archive page classes to the `<body>` tag
-* improved Gallery sortable component in block settings
-* improved Gallery component image popup in block settings to display Title and Description loaded dynamically from the Source settings
-* changed Gallery component `Add Images` button to `Edit Gallery` button. You are not allowed to insert duplicate photos in a single gallery
-* prevent closing multiple posts block option dropdown when selected value. Easier to select multiple posts from dropdown
-* fixed security vulnerability - rest call wrong permission check
-* fixed Taxonomy selector error with empty taxonomy
-* fixed displaying posts when empty Taxonomy selected in the query options
-* fixed some JS errors and warnings in the Gutenberg editor
-* removed custom meta settings from non-viewable post types
-* removed `will-change` styles usage
-* minor changes
 
 Further changelog entries can be found in the [CHANGELOG.md](https://github.com/nk-crew/visual-portfolio/blob/master/CHANGELOG.md) file.

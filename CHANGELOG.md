@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.10.1 - Nov 10, 2026 =
+
+* changed the WordPress.org changelog to show recent releases with a link to the full history
+* **Pro:**
+* fixed a critical error that could stop the plugin from loading when other plugins are active
+* fixed text watermark previews having different dimensions from saved copies in some browsers
+* fixed galleries added after page load not preloading their next page
+
 = 3.10.0 - Nov 9, 2026 =
 
 * improved the experimental Gallery Loop blocks:
