@@ -52,6 +52,12 @@ test.describe('archive pages', () => {
 		await setPermalinkSettings(admin, page, 'Post name');
 		const pluginName = getPluginSlug();
 		await requestUtils.activatePlugin(pluginName);
+		await requestUtils.setupRest();
+		// The SDK caches pretty REST URLs, which Plain permalinks can invalidate.
+		requestUtils.storageState.rootURL = new URL(
+			'/?rest_route=/',
+			requestUtils.baseURL
+		).href;
 	});
 
 	test.afterEach(async ({ requestUtils }) => {
