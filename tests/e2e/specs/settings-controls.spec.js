@@ -450,7 +450,7 @@ test.describe('Contextual settings controls', () => {
 		await page
 			.getByRole('link', { name: 'Watermarks', exact: true })
 			.click();
-		await expect(page.locator('#vp_watermarks .form-table')).toBeVisible();
+		await expect(page.locator('#vp_watermarks form')).toBeVisible();
 		await expect(
 			page.locator('#vp_watermarks .vpf-settings-modern')
 		).toHaveCount(0);
