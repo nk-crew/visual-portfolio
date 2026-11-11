@@ -1028,7 +1028,9 @@ class Visual_Portfolio_Assets {
 					'visual-portfolio/saved' === $block['blockName'] ||
 					'nk/visual-portfolio' === $block['blockName']
 				) &&
-				isset( $block['attrs']['id'] )
+				isset( $block['attrs']['id'] ) &&
+				// A layout built from blocks brings its assets when it renders.
+				! Visual_Portfolio_Saved_Layouts::is_block_layout( (int) $block['attrs']['id'] )
 			) {
 				self::enqueue( $block['attrs'] );
 			}

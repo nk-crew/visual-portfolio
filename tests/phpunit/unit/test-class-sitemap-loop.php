@@ -106,6 +106,37 @@ class ClassSitemapLoop extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A Saved Layout built from blocks lists the images of its loop.
+	 *
+	 * @return void
+	 */
+	public function test_block_saved_layout_is_listed() {
+		if ( ! post_type_exists( 'vp_lists' ) ) {
+			register_post_type( 'vp_lists' );
+		}
+
+		$layout = self::factory()->post->create(
+			array(
+				'post_type'    => 'vp_lists',
+				'post_status'  => 'publish',
+				'post_content' => $this->get_loop_markup(
+					array(
+						'block_id'    => 'sitemap-layout',
+						'queryType'   => 'images',
+						'imagesQuery' => array( 'images' => $this->get_images( 2 ) ),
+					),
+					array( 'visual-portfolio/item-image' )
+				),
+			)
+		);
+
+		$entries = $this->get_sitemap_images( '<!-- wp:visual-portfolio/saved {"id":"' . $layout . '"} /-->' );
+
+		$this->assertCount( 2, $entries );
+		$this->assertSame( 'Loop alt 1', $entries[0]['alt'] );
+	}
+
+	/**
 	 * A loop nested inside another block is found as well.
 	 *
 	 * @return void
