@@ -140,7 +140,6 @@ export default function SavedLayoutPanel({ clientId, attributes }) {
 	const { record, locked, isResolving } = useLayout(id);
 	const changes = countOverrides(reference?.overrides);
 
-	// A layout does not sync with another layout.
 	if (currentPostType === LAYOUT_POST_TYPE) {
 		return null;
 	}

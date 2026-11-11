@@ -196,7 +196,6 @@ function SavedLayoutPanels({ postId, isSaving, locked }) {
 
 	useSyncKeys();
 
-	// Say what a save reached once it is done.
 	const wasSaving = useRef(false);
 
 	useEffect(() => {

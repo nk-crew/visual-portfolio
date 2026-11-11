@@ -4,14 +4,14 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 
 import LayoutPreview from './preview';
 
-export const SOURCES = [
+const SOURCES = [
 	{ value: 'posts', label: __('Posts', 'visual-portfolio') },
 	{ value: 'images', label: __('Images', 'visual-portfolio') },
 	{ value: 'social', label: __('Social Feeds', 'visual-portfolio') },
 	{ value: 'taxonomies', label: __('Taxonomies', 'visual-portfolio') },
 ];
 
-export const LAYOUTS = [
+const LAYOUTS = [
 	{ value: 'grid', label: __('Grid', 'visual-portfolio') },
 	{ value: 'masonry', label: __('Masonry', 'visual-portfolio') },
 	{ value: 'justified', label: __('Justified', 'visual-portfolio') },
@@ -70,7 +70,7 @@ function getLabel(elements, value) {
  * @param {Object} layout - `vpf_layout` field.
  * @return {string} usage.
  */
-export function getUsageText(layout) {
+function getUsageText(layout) {
 	if (!layout?.usageReady && !layout?.usage?.posts) {
 		return __('Counting…', 'visual-portfolio');
 	}

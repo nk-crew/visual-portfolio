@@ -90,10 +90,6 @@ export function useIsInSyncedTemplate(clientId) {
 				getBlockAttributes,
 			} = select(blockEditorStore);
 
-			if (!clientId) {
-				return false;
-			}
-
 			const isTemplate = getBlockName(clientId) === TEMPLATE_BLOCK;
 
 			if (

@@ -7,7 +7,6 @@ export const TEMPLATE_BLOCK = 'visual-portfolio/item-template';
 // `Visual_Portfolio_Saved_Layouts::LOOP_KEY`.
 export const LOOP_KEY = 'loop';
 
-// Attributes of the loop that come from the layout.
 export const LOOP_SYNCED_ATTRIBUTES = ['lightbox'];
 
 // Attributes that describe a block rather than set it up.
