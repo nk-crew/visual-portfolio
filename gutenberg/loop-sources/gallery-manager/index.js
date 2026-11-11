@@ -26,6 +26,13 @@ import { plus } from '@wordpress/icons';
 import { getProtocol, prependHTTPS } from '@wordpress/url';
 
 import { usePreviewUrls } from '../../utils/use-preview-urls';
+import {
+	ACCEPTED_FILES,
+	ImportMenu,
+	ImportProgress,
+	useDropImport,
+	useGalleryImport,
+} from '../gallery-import';
 import GalleryImage from './gallery-image';
 import ImageSettingsModal from './image-settings-modal';
 import InsertFromUrl from './insert-from-url';
@@ -35,13 +42,6 @@ import {
 	mergeSelection,
 	prepareUrlImage,
 } from './prepare-images';
-
-// The file chooser of an empty gallery takes MIME patterns rather than the
-// media types beside it, and offering fewer there than the gallery accepts is
-// what kept a video out of it until an image had been added first.
-const ACCEPTED_MIME_TYPES = ALLOWED_MEDIA_TYPES.map((type) => `${type}/*`).join(
-	','
-);
 
 /**
  * Spoken feedback of the drag and drop, in the user's language.
@@ -125,6 +125,10 @@ export function getUsedCategories(images) {
 	return Array.from(categories);
 }
 
+function isFile(item) {
+	return 'function' === typeof item?.arrayBuffer;
+}
+
 /**
  * The gallery of the images source: add, reorder and edit images.
  *
@@ -206,6 +210,9 @@ export default function GalleryManager({ images, onChange, clientId }) {
 		}
 	};
 
+	const galleryImport = useGalleryImport(clientId);
+	const drop = useDropImport(galleryImport);
+
 	const onSelect = (selection) =>
 		onChange(mergeSelection(selection, imagesRef.current));
 
@@ -230,21 +237,29 @@ export default function GalleryManager({ images, onChange, clientId }) {
 	if (!images.length) {
 		return (
 			<MediaUploadCheck>
-				<MediaPlaceholder
-					className="vpf-gallery-manager__placeholder"
-					labels={{
-						title: __('Gallery', 'visual-portfolio'),
-						instructions: __(
-							'Drag images, upload new ones or pick from your media library.',
-							'visual-portfolio'
-						),
-					}}
-					accept={ACCEPTED_MIME_TYPES}
-					allowedTypes={ALLOWED_MEDIA_TYPES}
-					multiple
-					onSelect={onSelect}
-					onSelectURL={onSelectURL}
-				/>
+				<div onDropCapture={drop.onDropCapture}>
+					<MediaPlaceholder
+						className="vpf-gallery-manager__placeholder"
+						labels={{
+							title: __('Gallery', 'visual-portfolio'),
+							instructions: __(
+								'Drag images, a folder or a ZIP archive, upload new ones or pick from your media library.',
+								'visual-portfolio'
+							),
+						}}
+						accept={ACCEPTED_FILES}
+						allowedTypes={ALLOWED_MEDIA_TYPES}
+						multiple
+						handleUpload={false}
+						onSelect={(selection) =>
+							Array.from(selection).some(isFile)
+								? drop.onFilesDrop(selection)
+								: onSelect(selection)
+						}
+						onSelectURL={onSelectURL}
+					/>
+				</div>
+				<ImportProgress galleryImport={galleryImport} />
 			</MediaUploadCheck>
 		);
 	}
@@ -294,10 +309,26 @@ export default function GalleryManager({ images, onChange, clientId }) {
 								/>
 							</MediaUploadCheck>
 							<InsertFromUrl onSelectURL={onSelectURL} />
+							<MediaUploadCheck>
+								<ImportMenu
+									clientId={clientId}
+									galleryImport={galleryImport}
+									toggleProps={{
+										className:
+											'vpf-gallery-manager__add vpf-component-media-picker-button',
+										children: __(
+											'Import',
+											'visual-portfolio'
+										),
+									}}
+								/>
+							</MediaUploadCheck>
 						</div>
 					</div>
 				</SortableContext>
 			</DndContext>
+
+			<ImportProgress galleryImport={galleryImport} />
 
 			<span className="vpf-gallery-manager__count">
 				{sprintf(

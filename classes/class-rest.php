@@ -97,6 +97,34 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			);
 		}
 
+		register_rest_route(
+			$namespace,
+			'/gallery_file_matches/',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'get_gallery_file_matches' ),
+				'permission_callback' => array( $this, 'get_gallery_file_matches_permission' ),
+				'args'                => array(
+					'ids'   => array(
+						'type'    => 'array',
+						'items'   => array( 'type' => 'integer' ),
+						'default' => array(),
+					),
+					'files' => array(
+						'type'    => 'array',
+						'items'   => array(
+							'type'       => 'object',
+							'properties' => array(
+								'name' => array( 'type' => 'string' ),
+								'size' => array( 'type' => 'integer' ),
+							),
+						),
+						'default' => array(),
+					),
+				),
+			)
+		);
+
 		// Get max pages.
 		$max_pages_route = array(
 			'methods'             => array( WP_REST_Server::READABLE, WP_REST_Server::CREATABLE ),
@@ -697,6 +725,75 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		update_option( 'visual_portfolio_items_count_notice_state', $request->get_param( 'notice_state' ) );
 
 		return $this->success( true );
+	}
+
+	/**
+	 * Check permission for matching the files of a bulk import.
+	 *
+	 * @return bool Whether the current user has permission.
+	 */
+	public function get_gallery_file_matches_permission() {
+		return current_user_can( 'upload_files' );
+	}
+
+	/**
+	 * The files of a bulk import a gallery already holds.
+	 *
+	 * A file matches an attachment when its sanitized name and its size are
+	 * those of the file the attachment was uploaded as, the original one
+	 * before WordPress scaled or rotated it. The `-1` WordPress adds to a name
+	 * already taken in the uploads folder is not part of it: cameras number
+	 * every shoot from IMG_0001 again.
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 * @return WP_REST_Response `matches`: indexes into `files`.
+	 */
+	public function get_gallery_file_matches( $request ) {
+		$known = array();
+
+		foreach ( array_unique( array_map( 'absint', $request->get_param( 'ids' ) ) ) as $id ) {
+			if ( 'attachment' !== get_post_type( $id ) || ! current_user_can( 'read_post', $id ) ) {
+				continue;
+			}
+
+			$path = wp_get_original_image_path( $id );
+
+			if ( ! $path ) {
+				$path = get_attached_file( $id );
+			}
+
+			if ( $path && is_file( $path ) ) {
+				$name = $this->get_file_key( wp_basename( $path ) );
+				$size = filesize( $path );
+
+				$known[ $name . '|' . $size ] = true;
+				$known[ preg_replace( '/-\d+(\.[^.]+)$/', '$1', $name ) . '|' . $size ] = true;
+			}
+		}
+
+		$matches = array();
+
+		foreach ( $request->get_param( 'files' ) as $index => $file ) {
+			$key = $this->get_file_key( sanitize_file_name( (string) ( $file['name'] ?? '' ) ) ) . '|' . absint( $file['size'] ?? 0 );
+
+			if ( isset( $known[ $key ] ) ) {
+				$matches[] = $index;
+			}
+		}
+
+		return $this->success( array( 'matches' => $matches ) );
+	}
+
+	/**
+	 * A file name with its extension in lower case, the way WordPress saves it.
+	 *
+	 * @param string $name File name.
+	 * @return string
+	 */
+	private function get_file_key( $name ) {
+		$extension = pathinfo( $name, PATHINFO_EXTENSION );
+
+		return $extension ? substr( $name, 0, -strlen( $extension ) ) . strtolower( $extension ) : $name;
 	}
 
 	/**

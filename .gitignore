@@ -55,6 +55,7 @@ node_modules
 
 # Output of `wp-scripts plugin-zip`
 *.zip
+!tests/fixtures/**/*.zip
 
 # dotenv environment variables file
 .env
