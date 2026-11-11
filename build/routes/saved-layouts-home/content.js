@@ -52682,7 +52682,10 @@ function useUsage(id) {
 	const [usage, setUsage] = (0, import_element.useState)(null);
 	(0, import_element.useEffect)(() => {
 		let cancelled = false;
-		(0, import_api_fetch.default)({ path: `/visual-portfolio/v1/saved-layouts/${id}/usage` }).then((result) => !cancelled && setUsage(result)).catch(() => !cancelled && setUsage([]));
+		(0, import_api_fetch.default)({ path: `/visual-portfolio/v1/saved-layouts/${id}/usage` }).then((result) => !cancelled && setUsage(result)).catch(() => !cancelled && setUsage({
+			total: 0,
+			items: []
+		}));
 		return () => {
 			cancelled = true;
 		};
@@ -53113,7 +53116,7 @@ function SavedLayoutsLibrary() {
 	const isTrash = useSearch({ strict: false })?.status === "trash";
 	const [view, setView] = useStoredView();
 	const [selection, setSelection] = (0, import_element.useState)([]);
-	const { invalidateResolutionForStoreSelector, saveEntityRecord } = (0, import_data.useDispatch)(import_core_data.store);
+	const { invalidateResolutionForStoreSelector } = (0, import_data.useDispatch)(import_core_data.store);
 	const { createSuccessNotice, createErrorNotice } = (0, import_data.useDispatch)(import_notices.store);
 	const { records, isResolving } = (0, import_core_data.useEntityRecords)("postType", POST_TYPE, {
 		per_page: -1,
@@ -53132,9 +53135,9 @@ function SavedLayoutsLibrary() {
 		onChange: refresh,
 		notify: (message) => createSuccessNotice(message, { type: "snackbar" }),
 		notifyError: (message) => createErrorNotice(message, { type: "snackbar" }),
-		restore: (item) => saveEntityRecord("postType", POST_TYPE, {
-			id: item.id,
-			status: item.vpf_layout?.restoreAs || "draft"
+		restore: (item) => (0, import_api_fetch.default)({
+			path: `/visual-portfolio/v1/saved-layouts/${item.id}/restore`,
+			method: "POST"
 		})
 	});
 	const { data, paginationInfo } = (0, import_element.useMemo)(() => filterSortAndPaginate(records || [], view, fields), [records, view]);
