@@ -428,7 +428,24 @@ export default function BlockEdit({
 					}
 				});
 
-				const sortedBlocks = sortItems(updatedBlocks, termOrder);
+				// An item allows moves by default, which overrides the lock of its
+				// parent, so a sorted list locks its items one by one.
+				const move = 'manual' !== termOrder;
+				const sortedBlocks = sortItems(updatedBlocks, termOrder).map(
+					(block) =>
+						move === !!block.attributes.lock?.move
+							? block
+							: {
+									...block,
+									attributes: {
+										...block.attributes,
+										lock: {
+											...block.attributes.lock,
+											move,
+										},
+									},
+								}
+				);
 
 				// Untouched items are returned by identity, so this also tells
 				// us whether anything is worth writing to the editor store.
@@ -517,8 +534,7 @@ export default function BlockEdit({
 		{
 			orientation: 'horizontal',
 			renderAppender: false,
-			// A sorted list is arranged by its order, not by hand.
-			templateLock: 'manual' === termOrder ? false : 'all',
+			templateLock: false,
 		}
 	);
 

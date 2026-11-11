@@ -179,8 +179,11 @@ class Visual_Portfolio_Block_Loop_Filter {
 			return (int) $collator->compare( $a, $b );
 		}
 
-		// Without the intl extension, case and accents are folded by hand.
-		return strnatcmp( remove_accents( mb_strtolower( $a ) ), remove_accents( mb_strtolower( $b ) ) );
+		// Without the intl extension, case and accents are folded by hand, and
+		// without mbstring only the ASCII case.
+		$lower = function_exists( 'mb_strtolower' ) ? 'mb_strtolower' : 'strtolower';
+
+		return strnatcmp( remove_accents( $lower( $a ) ), remove_accents( $lower( $b ) ) );
 	}
 
 	/**

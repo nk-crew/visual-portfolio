@@ -104,6 +104,31 @@ test.describe('Gallery Filter settings', () => {
 		);
 	});
 
+	test('a filter sorted by name keeps its items where the order puts them', async ({
+		editor,
+		page,
+	}) => {
+		await editor.insertBlock(getLoopBlock({ order: 'name' }));
+
+		const filterItems = editor.canvas.locator(
+			'[data-type="visual-portfolio/loop-filter-item"]'
+		);
+
+		await expect(filterItems.first()).toBeVisible();
+
+		const movable = await page.evaluate(() => {
+			const { getBlocksByName, canMoveBlock } =
+				window.wp.data.select('core/block-editor');
+
+			return getBlocksByName('visual-portfolio/loop-filter-item').map(
+				(clientId) => canMoveBlock(clientId)
+			);
+		});
+
+		expect(movable.length).toBeGreaterThan(0);
+		expect(movable).not.toContain(true);
+	});
+
 	test('a filter set up in Pro shows a note in the editor and nothing on the page', async ({
 		editor,
 		page,
