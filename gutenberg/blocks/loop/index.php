@@ -97,7 +97,18 @@ class Visual_Portfolio_Block_Loop {
 
 		$processor->set_attribute( 'data-wp-interactive', self::STORE );
 		$processor->set_attribute( 'data-wp-router-region', 'vp-loop-' . $block_id );
-		$processor->set_attribute( 'data-wp-context', wp_json_encode( array( 'loopId' => $block_id ) ) );
+		// The keys the store writes while it loads, declared here so a write from
+		// a control with a context of its own lands on the loop.
+		$processor->set_attribute(
+			'data-wp-context',
+			wp_json_encode(
+				array(
+					'loopId'          => $block_id,
+					'isLoading'       => false,
+					'ariaLiveMessage' => '',
+				)
+			)
+		);
 		$processor->set_attribute( 'data-wp-class--vp-is-loading', 'state.isLoading' );
 
 		return $processor->get_updated_html();
