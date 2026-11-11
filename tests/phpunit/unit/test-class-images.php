@@ -335,6 +335,81 @@ class ClassImages extends WP_UnitTestCase {
     }
 
     /**
+     * The largest lightbox size registered at upload against the 1544x500 fixture,
+     * uploaded with the "big image" threshold below its width.
+     *
+     * @return array
+     */
+    public function lightbox_size_provider() {
+        return array(
+            'upload fits in the size'     => array( 1920, 9999, 1544, 500 ),
+            // As a 1920x10000 screenshot against the default 1920x9999 size.
+            'upload 1px over, a rounding' => array( 1543, 9999, 1544, 500 ),
+            // The lightbox gets a size of its own, made from the original.
+            'upload larger than the size' => array( 1200, 9999, 1000, 324 ),
+        );
+    }
+
+    /**
+     * WordPress keeps an upload the largest lightbox size shows whole at its own
+     * size, so the lightbox, falling back to the full size, does not open a
+     * smaller "-scaled" copy.
+     *
+     * @dataProvider lightbox_size_provider
+     *
+     * @param int $width           - lightbox size width.
+     * @param int $height          - lightbox size height.
+     * @param int $expected_width  - width of the full size.
+     * @param int $expected_height - height of the full size.
+     */
+    public function test_upload_the_lightbox_shows_whole_keeps_its_size( $width, $height, $expected_width, $expected_height ) {
+        // Earlier than the plugin, as a site that lowers the threshold does.
+        add_filter(
+            'big_image_size_threshold',
+            function () {
+                return 1000;
+            },
+            9
+        );
+        add_image_size( 'vp_xl_popup', $width, $height );
+
+        $attachment_id = self::factory()->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png' );
+
+        Visual_Portfolio_Images::add_image_sizes();
+
+        $this->assertSame( array( $expected_width, $expected_height ), array_slice( wp_get_attachment_image_src( $attachment_id, 'full' ), 1, 2 ) );
+    }
+
+    /**
+     * A caller asking for the site-wide threshold, with no image, gets it unchanged.
+     */
+    public function test_threshold_without_an_image_is_unchanged() {
+        $this->assertSame( 2560, apply_filters( 'big_image_size_threshold', 2560, array( 0, 0 ), '', 0 ) );
+        $this->assertSame( 2560, apply_filters( 'big_image_size_threshold', 2560, array() ) );
+    }
+
+    /**
+     * Regenerating an upload scaled before keeps it scaled, so the attached
+     * "-scaled" file and the metadata still describe the same image.
+     */
+    public function test_regenerating_a_scaled_upload_keeps_it_scaled() {
+        $threshold = function () {
+            return 1000;
+        };
+
+        add_filter( 'big_image_size_threshold', $threshold, 11 );
+        $attachment_id = self::factory()->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png' );
+        remove_filter( 'big_image_size_threshold', $threshold, 11 );
+        add_filter( 'big_image_size_threshold', $threshold, 9 );
+
+        wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, wp_get_original_image_path( $attachment_id ) ) );
+
+        $full = wp_get_attachment_image_src( $attachment_id, 'full' );
+
+        $this->assertSame( array( 1000, 324 ), array( $full[1], $full[2] ) );
+    }
+
+    /**
      * Added Image to WordPress.
      *
      * @param string $image_url - Absolutely path to Image.
