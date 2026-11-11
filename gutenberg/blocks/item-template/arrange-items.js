@@ -125,11 +125,20 @@ export function arrangeItems({ items, answeredQuery, query }) {
 	} else if ('rand' === orderBy) {
 		// A shuffle seeded by the session deals a smaller gallery anew.
 		return null;
+	} else if (keys.length === answeredImages.length) {
+		// A sort breaks ties by the gallery's order, so a reorder may move them.
+		return null;
 	} else {
 		const remaining = new Set(keys);
 
 		shown = Array.from(known.keys()).filter((key) => remaining.has(key));
 	}
 
-	return shown.filter((key) => known.has(key)).map((key) => known.get(key));
+	const arranged = shown
+		.filter((key) => known.has(key))
+		.map((key) => known.get(key));
+
+	// Nothing known left to show is not an empty gallery: the answer brings
+	// what comes next, and until then the items in hand stay.
+	return arranged.length ? arranged : null;
 }

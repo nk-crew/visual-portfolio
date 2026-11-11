@@ -234,7 +234,15 @@ export function useGalleryOrder(clientId, itemKey) {
 				(image) => getImageEntryKey(image) === itemKey
 			);
 
-			if (-1 === index) {
+			// An image the gallery holds twice does not say which entry the
+			// item is, so neither is touched.
+			if (
+				-1 === index ||
+				images.some(
+					(image, current) =>
+						current > index && getImageEntryKey(image) === itemKey
+				)
+			) {
 				return null;
 			}
 

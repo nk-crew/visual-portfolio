@@ -490,6 +490,153 @@ test.describe('Gallery Item Image toolbar', () => {
 			.toBe(1);
 	});
 
+	test('leaves an image the gallery holds twice alone', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Item Image toolbar - repeated',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock(
+			getLoopBlock({
+				queryType: 'images',
+				imagesQuery: {
+					images: [
+						{ id: image.id, title: 'First' },
+						{ id: spare.id },
+						{ id: image.id, title: 'Second' },
+					],
+				},
+			})
+		);
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await expect
+			.poll(() => getShownOrder(canvas, [image, spare]))
+			.toEqual([image.id, spare.id, image.id]);
+
+		await selectItemImage(editor, canvas, 2);
+
+		const toolbar = page.getByRole('toolbar', { name: 'Block tools' });
+
+		// Either entry could be the one the item shows, and the wrong one
+		// would lose what was typed into it.
+		await expect(
+			toolbar.getByRole('button', { name: 'On click' })
+		).toBeVisible();
+		await expect(
+			toolbar.getByRole('button', { name: 'Move left' })
+		).toHaveCount(0);
+
+		await toolbar.getByRole('button', { name: 'Options' }).click();
+
+		await expect(
+			page.getByRole('menuitem', { name: 'Remove from gallery' })
+		).toHaveCount(0);
+	});
+
+	test.describe('with motion allowed', () => {
+		test.use({ contextOptions: { reducedMotion: 'no-preference' } });
+
+		test('lays a justified gallery out again and slides the moved items', async ({
+			page,
+			admin,
+			editor,
+		}) => {
+			await admin.createNewPost({
+				title: 'Gallery Item Image toolbar - justified',
+				postType: 'page',
+				showWelcomeGuide: false,
+				legacyCanvas: true,
+			});
+
+			const attachments = [image, fourth, third, spare];
+			const loop = getLoopBlock({
+				queryType: 'images',
+				imagesQuery: {
+					images: attachments.map(({ id }) => ({ id })),
+				},
+			});
+
+			loop.innerBlocks[0].attributes.layoutType = 'justified';
+			loop.innerBlocks[0].innerBlocks[0].attributes = {};
+
+			await editor.insertBlock(loop);
+
+			const canvas = getEditorCanvas(page, editor);
+
+			await expect
+				.poll(() => getShownOrder(canvas, attachments))
+				.toEqual(attachments.map(({ id }) => id));
+
+			await selectItemImage(editor, canvas, 0);
+
+			const getBox = () =>
+				canvas.locator(`${EDITED_ITEM}`).evaluate((item) => {
+					const { left, top } = item.getBoundingClientRect();
+
+					return { left: Math.round(left), top: Math.round(top) };
+				});
+			const before = await getBox();
+
+			// Every inline transform an item is given on the way, which the
+			// slide sets and clears within a few frames.
+			await canvas
+				.locator(ITEM)
+				.first()
+				.evaluate((item) => {
+					const list = item.parentElement;
+
+					list.dataset.e2eSlides = '0';
+					new list.ownerDocument.defaultView.MutationObserver(
+						(records) => {
+							if (
+								records.some((record) =>
+									record.target.style?.transform?.includes(
+										'translate'
+									)
+								)
+							) {
+								list.dataset.e2eSlides = String(
+									Number(list.dataset.e2eSlides) + 1
+								);
+							}
+						}
+					).observe(list, {
+						attributes: true,
+						attributeFilter: ['style'],
+						subtree: true,
+					});
+				});
+
+			const release = await holdLoopItems(page);
+
+			await page
+				.getByRole('toolbar', { name: 'Block tools' })
+				.getByRole('button', { name: 'Move right' })
+				.click();
+
+			await expect
+				.poll(() => getShownOrder(canvas, attachments))
+				.toEqual([fourth.id, image.id, third.id, spare.id]);
+
+			// The measured layout places the item where its new turn is, not
+			// where the node stood, before the server has said anything.
+			await expect.poll(getBox).not.toEqual(before);
+			await expect(
+				canvas.locator('[data-e2e-slides]')
+			).not.toHaveAttribute('data-e2e-slides', '0');
+
+			await release();
+		});
+	});
+
 	test('moves the image of an Item Cover too', async ({
 		page,
 		admin,
