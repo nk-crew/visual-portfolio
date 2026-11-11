@@ -55,3 +55,46 @@ function visual_portfolio_get_block_gap( $gap, $axis = 'left' ) {
 
 	return $gap;
 }
+
+/**
+ * Block spacing a block was given for the narrower screens, as CSS lengths.
+ *
+ * With Responsive editing on, the editor keeps a screen's styles under
+ * `style['@tablet']` and `style['@mobile']`. Core prints a screen's block gap
+ * through the layout support alone, which these blocks do not have, so it is
+ * read here the way the base value is.
+ *
+ * An axis the screen leaves unset keeps the base value. The other screen's
+ * value never applies: the editor's screens are ranges, not steps.
+ *
+ * @param mixed $style - `style` attribute of a block.
+ *
+ * @return array Screen name to `[ 'left' => length, 'top' => length ]`, for
+ *               the screens that have a gap of their own. A length is empty
+ *               where the theme decides.
+ */
+function visual_portfolio_get_screen_block_gaps( $style ) {
+	$gaps = array();
+
+	if ( ! is_array( $style ) ) {
+		return $gaps;
+	}
+
+	$base = $style['spacing']['blockGap'] ?? '';
+
+	foreach ( array( 'tablet', 'mobile' ) as $screen ) {
+		$gap = $style[ '@' . $screen ]['spacing']['blockGap'] ?? null;
+
+		if ( null === $gap || '' === $gap || array() === $gap ) {
+			continue;
+		}
+
+		foreach ( array( 'left', 'top' ) as $axis ) {
+			$gaps[ $screen ][ $axis ] = is_array( $gap ) && ! isset( $gap[ $axis ] )
+				? visual_portfolio_get_block_gap( $base, $axis )
+				: visual_portfolio_get_block_gap( $gap, $axis );
+		}
+	}
+
+	return $gaps;
+}

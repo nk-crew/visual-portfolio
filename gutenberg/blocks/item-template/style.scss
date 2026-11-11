@@ -61,10 +61,16 @@ $edge-ramp: (0 0, 0.013 0.081, 0.049 0.155, 0.104 0.225, 0.175 0.29, 0.259 0.353
 	@return $stops;
 }
 
-// How far a named column count may go at each of the plugin's breakpoints, the
-// ones `Visual_Portfolio_Breakpoints` carries. Widest first: on a phone every
-// step matches and the last one wins.
-$narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
+// How far a named column count may go on a narrowing desktop. Widest first:
+// the narrower step matches too, and the last one wins. The tablet and phone
+// steps are printed after these by `get_screen_rules()`, at the breakpoints
+// the editor previews those screens at, which a theme sets.
+$narrow-steps: (1200px: 4, 992px: 3);
+
+// The edge of the next slide a carousel shows, never more than a quarter of the
+// frame: the peek is set once in pixels, and 200px of a 360px phone would leave
+// the slide itself a sliver.
+$carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 
 // Registered so that the count stays a number. The steps cap it with `min()`,
 // and an unregistered custom property hands that straight back to
@@ -188,9 +194,8 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 
 	// A named count steps down as the screen narrows rather than holding on:
 	// four columns at 375px are unreadable, and the legacy gallery has always
-	// stacked them. Capping walks the same ladder that one walked for up to
-	// five columns and takes one step more at six, so a phone gets a single
-	// column whatever the desktop was set to. Auto mode is left out - fitting
+	// stacked them. Capping ends at two columns on a tablet and one on a
+	// phone, whatever the desktop was set to. Auto mode is left out - fitting
 	// the container is already what it does.
 	&:not(.vp-layout-auto-columns) {
 		@each $width, $columns in $narrow-steps {
@@ -205,7 +210,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 	// and `vp-has-mobile-columns`, with the count in `--vp-layout-columns-*`.
 	// Those rules are not here: they apply at the breakpoints the editor
 	// previews a tablet and a phone at, which a theme sets, so Pro prints
-	// them after this stylesheet, at the same weight as the ladder.
+	// them after the ladder's own screen steps, at the same weight.
 
 	&.vp-layout-grid {
 		display: grid;
@@ -376,7 +381,7 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		// carousel that repeats is padded by half its width at each end - that
 		// is how the library carries the loop - and a slide sized against what
 		// the padding leaves came out at nothing at all.
-		--vp-carousel-slide-width: calc((100cqw - var(--vp-carousel-inset, 0px) * 2 - var(--vp-carousel-peek, 0px) - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
+		--vp-carousel-slide-width: calc((100cqw - var(--vp-carousel-inset, 0px) * 2 - #{$carousel-peek} - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
 
 		// Which way the next slide comes from. A view timeline runs towards
 		// the inline end, which is the left under RTL, and the effects move
@@ -408,8 +413,8 @@ $narrow-steps: (1200px: 4, 992px: 3, 768px: 2, 576px: 1);
 		// scroll on, and beside it the room a container keeps: the list still
 		// scrolls the whole width, the slides only come to rest inside it.
 		padding-inline-start: var(--vp-carousel-inset, 0);
-		padding-inline-end: calc(var(--vp-carousel-inset, 0px) + var(--vp-carousel-peek, 0px));
-		scroll-padding-inline: calc(var(--vp-carousel-inset, 0px) + var(--vp-carousel-peek, 0px));
+		padding-inline-end: calc(var(--vp-carousel-inset, 0px) + #{$carousel-peek});
+		scroll-padding-inline: calc(var(--vp-carousel-inset, 0px) + #{$carousel-peek});
 
 		> #{$item} {
 			flex: 0 0 auto;
