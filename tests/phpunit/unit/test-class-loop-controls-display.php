@@ -319,4 +319,18 @@ class ClassLoopControlsDisplay extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'vp-block-loop-filter', $this->render_loop( '<!-- wp:visual-portfolio/loop-filter {"extensions":{"facet":[]}} /-->' ) );
 	}
+
+	/**
+	 * Labels sort by letters first, as the editor sorts them: case and accents
+	 * do not move a label past Z, and numbers sort by value.
+	 *
+	 * @return void
+	 */
+	public function test_labels_sort_by_letters_case_and_accents_aside() {
+		$labels = array( 'Mango', 'Éclair', 'apple', 'абрикос', 'Банан', 'Item 10', 'Item 9' );
+
+		usort( $labels, array( 'Visual_Portfolio_Block_Loop_Filter', 'compare_labels' ) );
+
+		$this->assertSame( array( 'apple', 'Éclair', 'Item 9', 'Item 10', 'Mango', 'абрикос', 'Банан' ), $labels );
+	}
 }

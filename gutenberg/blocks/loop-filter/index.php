@@ -150,11 +150,37 @@ class Visual_Portfolio_Block_Loop_Filter {
 					}
 				}
 
-				return strnatcasecmp( wp_strip_all_tags( (string) ( $a['attrs']['text'] ?? '' ) ), wp_strip_all_tags( (string) ( $b['attrs']['text'] ?? '' ) ) );
+				return self::compare_labels( wp_strip_all_tags( (string) ( $a['attrs']['text'] ?? '' ) ), wp_strip_all_tags( (string) ( $b['attrs']['text'] ?? '' ) ) );
 			}
 		);
 
 		return array_merge( $all, $terms );
+	}
+
+	/**
+	 * Order of two labels the way the editor sorts them: letters before case
+	 * and accents, digits by their value.
+	 *
+	 * @param string $a - label.
+	 * @param string $b - label.
+	 *
+	 * @return int
+	 */
+	public static function compare_labels( $a, $b ) {
+		static $collator = null;
+
+		if ( null === $collator && class_exists( 'Collator' ) ) {
+			$collator = new Collator( get_locale() );
+			$collator->setStrength( Collator::PRIMARY );
+			$collator->setAttribute( Collator::NUMERIC_COLLATION, Collator::ON );
+		}
+
+		if ( $collator ) {
+			return (int) $collator->compare( $a, $b );
+		}
+
+		// Without the intl extension, case and accents are folded by hand.
+		return strnatcmp( remove_accents( mb_strtolower( $a ) ), remove_accents( mb_strtolower( $b ) ) );
 	}
 
 	/**

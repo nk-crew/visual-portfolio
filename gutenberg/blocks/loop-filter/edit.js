@@ -314,7 +314,9 @@ export default function BlockEdit({
 	});
 
 	useEffect(() => {
-		if (syncedQueryRef.current === queryKey) {
+		// Without Pro nothing lists this filter's terms, and the default ones
+		// would be saved into it.
+		if (syncedQueryRef.current === queryKey || (hasFacet && !isProPlugin)) {
 			return undefined;
 		}
 
@@ -476,6 +478,7 @@ export default function BlockEdit({
 		showAllItem,
 		termOrder,
 		extensions,
+		hasFacet,
 		postId,
 		clientId,
 		getBlocks,
@@ -514,7 +517,8 @@ export default function BlockEdit({
 		{
 			orientation: 'horizontal',
 			renderAppender: false,
-			templateLock: false,
+			// A sorted list is arranged by its order, not by hand.
+			templateLock: 'manual' === termOrder ? false : 'all',
 		}
 	);
 
