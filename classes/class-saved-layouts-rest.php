@@ -77,6 +77,8 @@ class Visual_Portfolio_Saved_Layouts_REST {
 	 */
 	public function prime_counts( $posts, $query ) {
 		if ( defined( 'REST_REQUEST' ) && REST_REQUEST && Visual_Portfolio_Saved_Layouts::POST_TYPE === $query->get( 'post_type' ) && $posts ) {
+			Visual_Portfolio_Saved_Layout_Usage::backfill_step();
+
 			self::$counts += Visual_Portfolio_Saved_Layout_Usage::get_counts( wp_list_pluck( $posts, 'ID' ) );
 		}
 

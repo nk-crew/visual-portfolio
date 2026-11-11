@@ -200,8 +200,8 @@ class ClassSavedLayoutUsage extends WP_UnitTestCase {
 
 		$usage = new Visual_Portfolio_Saved_Layout_Usage();
 
-		$this->assertSame( 0, $usage->run_backfill( 0 ) );
-		$this->assertSame( 0, $usage->run_backfill( 0 ) );
+		$this->assertFalse( $usage->run_backfill() );
+		$this->assertFalse( $usage->run_backfill() );
 		$this->assertSame( array( (string) $layout ), get_post_meta( $page, Visual_Portfolio_Saved_Layout_Usage::SYNCED_META ) );
 		$this->assertTrue( (bool) get_option( Visual_Portfolio_Saved_Layout_Usage::INDEXED_OPTION ) );
 	}

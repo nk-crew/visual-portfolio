@@ -37,6 +37,11 @@ class Visual_Portfolio_Saved_Layout_Usage {
 	const INDEXED_OPTION = 'vpf_saved_layout_usage_indexed';
 
 	/**
+	 * Id of the last post the index of old content reached.
+	 */
+	const CURSOR_OPTION = 'vpf_saved_layout_usage_cursor';
+
+	/**
 	 * Background job that indexes old content.
 	 */
 	const BACKFILL_HOOK = 'vpf_saved_layout_usage_backfill';
@@ -360,20 +365,33 @@ class Visual_Portfolio_Saved_Layout_Usage {
 			return;
 		}
 
-		wp_schedule_single_event( time(), self::BACKFILL_HOOK, array( 0 ) );
+		wp_schedule_single_event( time(), self::BACKFILL_HOOK );
 	}
 
 	/**
-	 * Index one batch of posts with content that may use a layout, then
-	 * schedule the next batch. Indexing replaces a post's rows, so a batch run
-	 * twice leaves the same rows.
+	 * Index one batch of old content, unless it is all indexed already.
 	 *
-	 * @param int $after - id of the last post the previous batch indexed.
-	 *
-	 * @return int Id of the last post this batch indexed, 0 when done.
+	 * Runs from the background job and from every library request, so the
+	 * counts arrive even where WP-Cron does not run.
 	 */
-	public function run_backfill( $after = 0 ) {
+	public static function backfill_step() {
+		if ( ! get_option( self::INDEXED_OPTION ) ) {
+			( new self() )->run_backfill();
+		}
+	}
+
+	/**
+	 * Index one batch of posts with content that may use a layout, after the
+	 * post the previous batch stopped at, and schedule the next batch.
+	 * Indexing replaces a post's rows, so a batch run twice leaves the same
+	 * rows.
+	 *
+	 * @return bool Whether posts are left for another batch.
+	 */
+	public function run_backfill() {
 		global $wpdb;
+
+		$after = (int) get_option( self::CURSOR_OPTION, 0 );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$ids = $wpdb->get_col(
@@ -384,7 +402,7 @@ class Visual_Portfolio_Saved_Layout_Usage {
 				AND ( post_content LIKE %s OR post_content LIKE %s OR post_content LIKE %s )
 				ORDER BY ID ASC
 				LIMIT %d",
-				(int) $after,
+				$after,
 				'%' . $wpdb->esc_like( 'wp:visual-portfolio/saved' ) . '%',
 				'%' . $wpdb->esc_like( '"savedLayout"' ) . '%',
 				'%' . $wpdb->esc_like( '[visual_portfolio' ) . '%',
@@ -398,15 +416,18 @@ class Visual_Portfolio_Saved_Layout_Usage {
 
 		if ( count( $ids ) < self::BATCH ) {
 			update_option( self::INDEXED_OPTION, true, false );
+			delete_option( self::CURSOR_OPTION );
 
-			return 0;
+			return false;
 		}
 
-		$last = (int) end( $ids );
+		update_option( self::CURSOR_OPTION, (int) end( $ids ), false );
 
-		wp_schedule_single_event( time(), self::BACKFILL_HOOK, array( $last ) );
+		if ( ! wp_next_scheduled( self::BACKFILL_HOOK ) ) {
+			wp_schedule_single_event( time(), self::BACKFILL_HOOK );
+		}
 
-		return $last;
+		return true;
 	}
 
 	/**
