@@ -351,6 +351,8 @@ test.describe('Gallery Loop from the legacy block', () => {
 	test('a skin the free plugin does not style keeps the cover overlay', async ({
 		page,
 	}) => {
+		test.skip(!!process.env.CORE, 'Pro maps Caption Move itself');
+
 		const loop = await switchLegacy(page, {
 			block_id: 'legacycaptionmove',
 			content_source: 'post-based',
@@ -360,6 +362,32 @@ test.describe('Gallery Loop from the legacy block', () => {
 
 		expect(cover.effect).toBe('caption-move');
 		expect(cover.customHoverOverlayColor).toBeUndefined();
+	});
+
+	test('filter, sort and search share the row above the items', async ({
+		page,
+	}) => {
+		const loop = await switchLegacy(page, {
+			block_id: 'legacytoprow',
+			content_source: 'post-based',
+			layout_elements: {
+				top: {
+					elements: ['filter', 'sort', 'search'],
+					align: 'between',
+				},
+				items: { elements: ['items'] },
+				bottom: { elements: [], align: 'center' },
+			},
+		});
+		const [row] = loop.innerBlocks;
+
+		expect(row.name).toBe('core/group');
+		expect(row.attributes.layout.justifyContent).toBe('space-between');
+		expect(row.innerBlocks.map(({ name }) => name)).toEqual([
+			'visual-portfolio/loop-filter',
+			'visual-portfolio/loop-sort',
+			'visual-portfolio/loop-search',
+		]);
 	});
 
 	test('a filter with no label for All has no All item', async ({ page }) => {

@@ -389,7 +389,7 @@ Query Loop does: *Gallery Loop* in the list of blocks to transform to, with a
 preview of the result. The loop keeps the source and its query, the number of
 items per page, the layout with its columns, tiles pattern or carousel
 settings, the gap, the skin, the click action and the lightbox captions, the
-filter and the sort above the items, the pagination below them, the notice
+filter, the sort and the search above the items, the pagination below them, the notice
 for no results and the custom CSS. The Classic skin becomes an Item Image with
 the caption blocks below it; Fade, Fly and Emerge become an Item Cover with
 the effect of the same name and the caption blocks inside. A Saved Layout is
@@ -401,7 +401,7 @@ is not offered the transform. These settings have no Gallery Loop equivalent
 and are left behind: the mouse wheel, speed, dynamic dots, sticky free mode,
 pause on hover and minimum height of a slider, the horizontal order of a
 masonry, the scroll to the top of a paged pagination, the pagination style,
-the icon and the hover overlay of the Classic skin, the tint Emerge puts over
+the icon, the hover overlay and the hover zoom of the Classic skin (Pro keeps the zoom), the tint Emerge puts over
 the picture, the hover color of links, and *Stretch*. A Read More shown only for posts
 with a More tag becomes one shown on every item. Custom CSS becomes the loop's
 own custom CSS, with `selector` written as `&`; rules that name the classes of

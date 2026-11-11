@@ -720,9 +720,14 @@ function getTopBlocks(legacy) {
 				})
 			);
 		}
+
+		// Search is Pro's, which fills in the field's settings.
+		if ('search' === element) {
+			blocks.push(createBlock('visual-portfolio/loop-search'));
+		}
 	});
 
-	// Filter and sort shared one row.
+	// The elements shared one row.
 	return 1 < blocks.length
 		? [
 				createBlock(
