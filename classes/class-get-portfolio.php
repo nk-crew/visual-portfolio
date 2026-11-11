@@ -1376,6 +1376,10 @@ class Visual_Portfolio_Get {
 	 * @return string
 	 */
 	public static function get( $atts = array() ) {
+		if ( ! empty( $atts['id'] ) && empty( $atts['block_id'] ) && Visual_Portfolio_Saved_Layouts::is_block_layout( (int) $atts['id'] ) ) {
+			return Visual_Portfolio_Saved_Layouts::render( $atts['id'], $atts['class'] ?? '' );
+		}
+
 		$config = self::get_output_config( $atts );
 
 		if ( ! $config ) {

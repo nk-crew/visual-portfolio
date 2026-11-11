@@ -945,7 +945,7 @@ class Visual_Portfolio_Custom_Post_Type {
 	 * @return array
 	 */
 	public function vp_lists_allowed_block_types_all( $allowed_block_types, $editor_context ) {
-		if ( empty( $editor_context->post ) || 'vp_lists' !== $editor_context->post->post_type ) {
+		if ( empty( $editor_context->post ) || 'vp_lists' !== $editor_context->post->post_type || ! Visual_Portfolio_Saved_Layouts::is_legacy_editor() ) {
 			return $allowed_block_types;
 		}
 

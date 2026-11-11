@@ -676,8 +676,17 @@ const moduleOutputFiles = moduleEntryNames.flatMap((name) => [
 	`${name}.asset.php`,
 ]);
 
+// `wp-build` writes the admin pages and their routes, see `wpPlugin` in
+// `package.json`.
+const WP_BUILD_OUTPUT =
+	/^(?:(?:modules|pages|routes|scripts|styles)\/|(?:build|constants|modules|pages|routes|scripts|styles)\.php$)/;
+
 function shouldKeepOnClean(asset) {
-	return /^(fonts|images)\//.test(asset) || moduleOutputFiles.includes(asset);
+	return (
+		/^(fonts|images)\//.test(asset) ||
+		WP_BUILD_OUTPUT.test(asset) ||
+		moduleOutputFiles.includes(asset)
+	);
 }
 
 const defaultRules = patchPostCssLoaderOptions(

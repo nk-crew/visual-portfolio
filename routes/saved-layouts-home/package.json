@@ -1,0 +1,8 @@
+{
+	"name": "@visual-portfolio/route-saved-layouts-home",
+	"private": true,
+	"route": {
+		"path": "/",
+		"page": "vpf-saved-layouts"
+	}
+}

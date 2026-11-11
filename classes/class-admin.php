@@ -81,7 +81,7 @@ class Visual_Portfolio_Admin {
 			return;
 		}
 
-		if ( 'vp_lists' === get_post_type() ) {
+		if ( 'vp_lists' === get_post_type() && Visual_Portfolio_Saved_Layouts::is_legacy_editor() ) {
 			// The style is enqueued on both passes of this hook: WordPress runs
 			// it a second time to collect what the editor canvas iframe needs,
 			// and the saved layout is drawn in there. The script is editor
