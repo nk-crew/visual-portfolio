@@ -99,6 +99,22 @@ class ClassSavedLayoutsRest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A block-based layout offers no legacy settings to convert from.
+	 */
+	public function test_get_layout_has_no_legacy_settings_for_block_layouts() {
+		$image  = self::factory()->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png' );
+		$layout = self::factory()->post->create(
+			array(
+				'post_type'    => 'vp_lists',
+				'post_status'  => 'publish',
+				'post_content' => $this->layout_content( $image ),
+			)
+		);
+
+		$this->assertFalse( $this->request( 'GET', '/visual-portfolio/v1/get_layout', array( 'id' => $layout ) )->get_data()['response'] );
+	}
+
+	/**
 	 * A copy carries the content and the layout meta under a new title.
 	 */
 	public function test_duplicate_copies_content_and_meta() {
