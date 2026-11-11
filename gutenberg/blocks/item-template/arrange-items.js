@@ -125,8 +125,9 @@ export function arrangeItems({ items, answeredQuery, query }) {
 	} else if ('rand' === orderBy) {
 		// A shuffle seeded by the session deals a smaller gallery anew.
 		return null;
-	} else if (keys.length === answeredImages.length) {
-		// A sort breaks ties by the gallery's order, so a reorder may move them.
+	} else if (keys.length === answeredImages.length || 'asc' !== order) {
+		// A sort breaks ties by the gallery's order, so a reorder may move
+		// them, and a descending one compares that order as text.
 		return null;
 	} else {
 		const remaining = new Set(keys);

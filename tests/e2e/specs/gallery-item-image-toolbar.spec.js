@@ -521,12 +521,13 @@ test.describe('Gallery Item Image toolbar', () => {
 			.poll(() => getShownOrder(canvas, [image, spare]))
 			.toEqual([image.id, spare.id, image.id]);
 
-		await selectItemImage(editor, canvas, 2);
+		// Not the repeated image itself: a repeat anywhere keys the preview
+		// by the server's ids, which follow the index, so no item could be
+		// followed through a move.
+		await selectItemImage(editor, canvas, 1);
 
 		const toolbar = page.getByRole('toolbar', { name: 'Block tools' });
 
-		// Either entry could be the one the item shows, and the wrong one
-		// would lose what was typed into it.
 		await expect(
 			toolbar.getByRole('button', { name: 'On click' })
 		).toBeVisible();
@@ -635,6 +636,104 @@ test.describe('Gallery Item Image toolbar', () => {
 
 			await release();
 		});
+	});
+
+	test('keeps the shown image until the next one arrives', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Item Image toolbar - last shown',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		const loop = getLoopBlock({
+			queryType: 'images',
+			imagesQuery: { images: [{ id: image.id }, { id: spare.id }] },
+		});
+
+		loop.attributes.baseQuery = { perPage: 1, maxPages: 1 };
+
+		await editor.insertBlock(loop);
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await expect
+			.poll(() => getShownOrder(canvas, [image, spare]))
+			.toEqual([image.id]);
+
+		await selectItemImage(editor, canvas, 0);
+
+		const release = await holdLoopItems(page);
+
+		await editor.clickBlockOptionsMenuItem('Remove from gallery');
+
+		// The page has nothing known left to show, which is not an empty
+		// gallery: the removed item stays until the answer brings the next.
+		await expect(canvas.getByText('No results found.')).toHaveCount(0);
+		expect(await getShownOrder(canvas, [image, spare])).toEqual([image.id]);
+
+		await release();
+
+		await expect
+			.poll(() => getShownOrder(canvas, [image, spare]))
+			.toEqual([spare.id]);
+	});
+
+	test('waits for the server when a sorted gallery is reordered', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Item Image toolbar - sorted reorder',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock(
+			getLoopBlock({
+				queryType: 'images',
+				imagesQuery: {
+					images: [{ id: image.id }, { id: spare.id }],
+					orderBy: 'title',
+				},
+			})
+		);
+
+		const canvas = getEditorCanvas(page, editor);
+		const list = canvas.locator(`ul:has(> ${ITEM})`);
+
+		await expect(canvas.locator(`${ITEM}:visible img`)).toHaveCount(2);
+		await expect(list).not.toHaveAttribute('aria-busy', 'true');
+
+		const release = await holdLoopItems(page);
+
+		// What the gallery manager's drag writes.
+		await page.evaluate(() => {
+			const { select, dispatch } = window.wp.data;
+			const [loop] = select('core/block-editor').getBlocks();
+			const { imagesQuery } = loop.attributes;
+
+			dispatch('core/block-editor').updateBlockAttributes(loop.clientId, {
+				imagesQuery: {
+					...imagesQuery,
+					images: [...imagesQuery.images].reverse(),
+				},
+			});
+		});
+
+		// A sort breaks ties by the gallery's order, so the preview cannot
+		// tell what the server will show and says it is waiting.
+		await expect(list).toHaveAttribute('aria-busy', 'true');
+
+		await release();
+
+		await expect(list).not.toHaveAttribute('aria-busy', 'true');
 	});
 
 	test('moves the image of an Item Cover too', async ({

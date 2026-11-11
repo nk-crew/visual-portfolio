@@ -230,19 +230,13 @@ export function useGalleryOrder(clientId, itemKey) {
 				select,
 				clientId
 			);
-			const index = images.findIndex(
-				(image) => getImageEntryKey(image) === itemKey
-			);
+			const keys = images.map(getImageEntryKey);
+			const index = keys.indexOf(itemKey);
 
-			// An image the gallery holds twice does not say which entry the
-			// item is, so neither is touched.
-			if (
-				-1 === index ||
-				images.some(
-					(image, current) =>
-						current > index && getImageEntryKey(image) === itemKey
-				)
-			) {
+			// A gallery holding an image twice keys its preview by the
+			// server's ids, which follow the index, so neither the entry nor
+			// the edited item could be told apart after a move.
+			if (-1 === index || new Set(keys).size !== keys.length) {
 				return null;
 			}
 
