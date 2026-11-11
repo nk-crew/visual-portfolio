@@ -90,6 +90,8 @@ sets one of its own. With only Vertical set, the columns keep the default gap.
 A carousel has one row, so it reads Horizontal alone. With *Responsive styles*
 on, a gap set in the *Tablet* or *Mobile* view applies to that screen alone, on
 the item template and on the item cover, and so does the cover's padding.
+The blocks inside one item are spaced the way a Group spaces its blocks: the
+theme's block gap between each two, unless a block sets a margin of its own.
 
 A grid row is as tall as its tallest item, and the other items of the row
 stretch to its height. The block toolbar of a grid aligns them to the top, the
