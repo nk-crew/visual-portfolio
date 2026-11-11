@@ -928,8 +928,9 @@ that user's capabilities.
 | `visual-portfolio/update-gallery` | `edit_post` | Changes the layout, source, settings or images of a loop. |
 
 A gallery is addressed by `post_id` and `gallery_id`, the loop's `block_id`. A
-loop saved without one is `loop-<n>`, its position in the post, until its first
-change gives it an id.
+loop saved without one, or with one an earlier loop of the post already holds,
+is `loop-<n>`, its position in the post. Its first change gives it an id of its
+own, and a gallery created at the start of the post moves the positions.
 
 The abilities speak a vocabulary of their own rather than block attributes:
 `layout` is a pattern slug, `source` is `{ type, ... }` (`images` with

@@ -389,14 +389,14 @@ class Visual_Portfolio_Abilities {
 
 			$post = get_post( (int) $post_id );
 
-			foreach ( Visual_Portfolio_Loop_Gallery::find_loops( parse_blocks( $post->post_content ) ) as $index => $found ) {
+			foreach ( Visual_Portfolio_Loop_Gallery::find_loops( parse_blocks( $post->post_content ) ) as $found ) {
 				$described = Visual_Portfolio_Loop_Gallery::describe( $found['block'] );
 				$images    = $described['source']['images'] ?? null;
 
 				$galleries[] = array_merge(
 					$this->get_post_fields( $post ),
 					array(
-						'gallery_id'  => Visual_Portfolio_Loop_Gallery::get_gallery_id( $found['block'], $index ),
+						'gallery_id'  => $found['gallery_id'],
 						'source_type' => $described['source']['type'],
 						'layout_type' => $described['layout_type'],
 						'image_count' => null === $images ? null : count( $images ),
@@ -432,7 +432,7 @@ class Visual_Portfolio_Abilities {
 			return $this->gallery_not_found( $post, $input['gallery_id'] );
 		}
 
-		return $this->get_gallery_output( $post, $found['block'], $found['index'] );
+		return $this->get_gallery_output( $post, $found['block'], $found['gallery_id'] );
 	}
 
 	/**
@@ -537,7 +537,7 @@ class Visual_Portfolio_Abilities {
 					return $loop;
 				}
 
-				$content = Visual_Portfolio_Loop_Gallery::replace_in_content( $content, $found['index'], $loop );
+				$content = Visual_Portfolio_Loop_Gallery::replace_in_content( $content, $found['index'], $found['block'], $loop );
 
 				if ( null === $content ) {
 					return $this->gallery_not_found( $post, $input['gallery_id'] );
@@ -596,8 +596,11 @@ class Visual_Portfolio_Abilities {
 		$fresh = (string) $wpdb->get_var( $wpdb->prepare( "SELECT post_content FROM {$wpdb->posts} WHERE ID = %d", $post->ID ) );
 
 		if ( $fresh !== $post->post_content ) {
-			$post->post_content = $fresh;
-			$built              = $build( $fresh );
+			// `wp_update_post()` writes back every field of the cached post.
+			clean_post_cache( $post->ID );
+
+			$post  = get_post( $post->ID );
+			$built = $build( $post->post_content );
 
 			if ( is_wp_error( $built ) ) {
 				return $built;
@@ -753,7 +756,7 @@ class Visual_Portfolio_Abilities {
 			return $this->gallery_not_found( $post, $block_id );
 		}
 
-		return $this->get_gallery_output( $post, $found['block'], $found['index'] );
+		return $this->get_gallery_output( $post, $found['block'], $found['gallery_id'] );
 	}
 
 	/**
@@ -761,14 +764,14 @@ class Visual_Portfolio_Abilities {
 	 *
 	 * @param WP_Post $post - post.
 	 * @param array   $loop - loop block.
-	 * @param int     $index - 0-based position of the loop in the post.
+	 * @param string  $gallery_id - gallery id.
 	 *
 	 * @return array
 	 */
-	private function get_gallery_output( $post, $loop, $index ) {
+	private function get_gallery_output( $post, $loop, $gallery_id ) {
 		return array_merge(
 			$this->get_post_fields( $post ),
-			array( 'gallery_id' => Visual_Portfolio_Loop_Gallery::get_gallery_id( $loop, $index ) ),
+			array( 'gallery_id' => $gallery_id ),
 			Visual_Portfolio_Loop_Gallery::describe( $loop )
 		);
 	}
@@ -804,8 +807,8 @@ class Visual_Portfolio_Abilities {
 	private function gallery_not_found( $post, $gallery_id ) {
 		$ids = array();
 
-		foreach ( Visual_Portfolio_Loop_Gallery::find_loops( parse_blocks( $post->post_content ) ) as $index => $found ) {
-			$ids[] = Visual_Portfolio_Loop_Gallery::get_gallery_id( $found['block'], $index );
+		foreach ( Visual_Portfolio_Loop_Gallery::find_loops( parse_blocks( $post->post_content ) ) as $found ) {
+			$ids[] = $found['gallery_id'];
 		}
 
 		return new WP_Error(
@@ -842,7 +845,7 @@ class Visual_Portfolio_Abilities {
 	private function get_gallery_id_schema() {
 		return array(
 			'type'        => 'string',
-			'description' => __( 'Gallery id from list-galleries.', 'visual-portfolio' ),
+			'description' => __( 'Gallery id from list-galleries. An id of the form `loop-<n>` is a position in the post, and a gallery created at its start moves it.', 'visual-portfolio' ),
 			'minLength'   => 1,
 		);
 	}

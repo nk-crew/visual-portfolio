@@ -150,14 +150,40 @@ class Visual_Portfolio_Loop_Gallery {
 	}
 
 	/**
-	 * Every loop in a block tree, with the path of indexes that leads to it.
+	 * Every loop of a post in document order, with the path of indexes that
+	 * leads to it and the id the abilities name it by.
+	 *
+	 * The id is the loop's `block_id`. A loop without one, or holding one an
+	 * earlier loop already holds, is `loop-<n>`, its 1-based position; a
+	 * gallery created at the start of the post moves those numbers.
+	 *
+	 * @param array $blocks - parsed blocks of the post.
+	 *
+	 * @return array list of array( path, block, gallery_id ).
+	 */
+	public static function find_loops( $blocks ) {
+		$found = self::collect_loops( $blocks, array() );
+		$seen  = array();
+
+		foreach ( $found as $index => $loop ) {
+			$block_id = (string) ( $loop['block']['attrs']['block_id'] ?? '' );
+
+			$found[ $index ]['gallery_id'] = '' === $block_id || isset( $seen[ $block_id ] ) ? 'loop-' . ( $index + 1 ) : $block_id;
+			$seen[ $block_id ]             = true;
+		}
+
+		return $found;
+	}
+
+	/**
+	 * The loops of a block tree, depth first.
 	 *
 	 * @param array $blocks - parsed blocks.
 	 * @param array $path - path of the blocks given.
 	 *
 	 * @return array list of array( path, block ).
 	 */
-	public static function find_loops( $blocks, $path = array() ) {
+	private static function collect_loops( $blocks, $path ) {
 		$found = array();
 
 		foreach ( $blocks as $index => $block ) {
@@ -171,7 +197,7 @@ class Visual_Portfolio_Loop_Gallery {
 			}
 
 			if ( ! empty( $block['innerBlocks'] ) ) {
-				$found = array_merge( $found, self::find_loops( $block['innerBlocks'], $block_path ) );
+				$found = array_merge( $found, self::collect_loops( $block['innerBlocks'], $block_path ) );
 			}
 		}
 
@@ -179,42 +205,16 @@ class Visual_Portfolio_Loop_Gallery {
 	}
 
 	/**
-	 * Id of the n-th loop of a post: its `block_id`, or its position when it
-	 * was saved without one.
-	 *
-	 * @param array $loop - loop block.
-	 * @param int   $index - 0-based position among the loops of the post.
-	 *
-	 * @return string
-	 */
-	public static function get_gallery_id( $loop, $index ) {
-		$block_id = $loop['attrs']['block_id'] ?? '';
-
-		return '' !== $block_id ? (string) $block_id : 'loop-' . ( $index + 1 );
-	}
-
-	/**
 	 * The loop a gallery id names.
-	 *
-	 * A `loop-<n>` id names the n-th loop only while it has no `block_id`,
-	 * so an id read before other loops moved never reaches another gallery.
 	 *
 	 * @param array  $blocks - parsed blocks of the post.
 	 * @param string $gallery_id - gallery id.
 	 *
-	 * @return array|null array( path, block, index ).
+	 * @return array|null array( path, block, gallery_id, index ).
 	 */
 	public static function find_loop( $blocks, $gallery_id ) {
-		$loops = self::find_loops( $blocks );
-
-		foreach ( $loops as $index => $found ) {
-			if ( (string) ( $found['block']['attrs']['block_id'] ?? '' ) === (string) $gallery_id ) {
-				return $found + array( 'index' => $index );
-			}
-		}
-
-		foreach ( $loops as $index => $found ) {
-			if ( self::get_gallery_id( $found['block'], $index ) === (string) $gallery_id ) {
+		foreach ( self::find_loops( $blocks ) as $index => $found ) {
+			if ( $found['gallery_id'] === (string) $gallery_id ) {
 				return $found + array( 'index' => $index );
 			}
 		}
@@ -245,7 +245,8 @@ class Visual_Portfolio_Loop_Gallery {
 
 			$source[ in_array( $selector, self::POSTS_SELECTORS, true ) ? 'query' : 'post_type' ] = $selector;
 
-			$source['ids']      = array_map( 'intval', $posts_query['ids'] ?? array() );
+			// Ids left from a manual selection do nothing once a post type is picked.
+			$source['ids']      = 'ids' === $selector ? array_map( 'intval', $posts_query['ids'] ?? array() ) : array();
 			$source['terms']    = array_map( 'intval', $posts_query['taxonomies'] ?? array() );
 			$source['order_by'] = $posts_query['orderBy'] ?? 'post_date';
 			$source['order']    = $posts_query['order'] ?? 'desc';
@@ -364,7 +365,7 @@ class Visual_Portfolio_Loop_Gallery {
 				unset( $carried['lightbox'] );
 
 				$input['settings'] = array_merge( $carried, $input['settings'] ?? array() );
-				$click_action      = self::get_click_action( $loop['innerBlocks'] );
+				$click_action      = self::has_lightbox( $loop['innerBlocks'] ) ? 'popup' : self::get_click_action( $loop['innerBlocks'] );
 			}
 
 			$loop = self::set_inner_blocks( $loop, $layouts[ $input['layout'] ]['loop']['innerBlocks'] );
@@ -399,7 +400,7 @@ class Visual_Portfolio_Loop_Gallery {
 		$previous = $loop['attrs']['queryType'] ?? 'posts';
 
 		if ( $source ) {
-			$loop = self::apply_source( $loop, $source, $previous );
+			$loop = self::apply_source( $loop, $source, 'update' === $action && 'posts' === $previous ? 'portfolio' : 'post' );
 
 			if ( is_wp_error( $loop ) ) {
 				return $loop;
@@ -446,11 +447,11 @@ class Visual_Portfolio_Loop_Gallery {
 	 *
 	 * @param array  $loop - loop block.
 	 * @param array  $source - source input.
-	 * @param string $previous - source type of the loop before the change.
+	 * @param string $default_type - post type of a posts source that names none.
 	 *
 	 * @return array|WP_Error
 	 */
-	private static function apply_source( $loop, $source, $previous ) {
+	private static function apply_source( $loop, $source, $default_type ) {
 		$type    = $source['type'];
 		$sources = self::get_vocabulary()['sources'];
 
@@ -495,7 +496,7 @@ class Visual_Portfolio_Loop_Gallery {
 		} elseif ( 'posts' === $type ) {
 			// A loop that already shows posts without a stored post type shows
 			// the block's default, which a partial update keeps.
-			$attrs['postsQuery'] = self::merge_posts_query( $attrs['postsQuery'] ?? array(), $source, 'posts' === $previous ? 'portfolio' : 'post' );
+			$attrs['postsQuery'] = self::merge_posts_query( $attrs['postsQuery'] ?? array(), $source, $default_type );
 		} elseif ( isset( $source['settings'] ) ) {
 			$attrs['sourceQuery'] = array_merge( $attrs['sourceQuery'] ?? array(), $source['settings'] );
 		}
@@ -984,11 +985,12 @@ class Visual_Portfolio_Loop_Gallery {
 	 *
 	 * @param string $content - post content.
 	 * @param int    $index - 0-based position of the loop among the loops of the post.
+	 * @param array  $old - the loop as `parse_blocks()` found it.
 	 * @param array  $loop - new loop block.
 	 *
 	 * @return string|null null when the loop is not where the parser found it.
 	 */
-	public static function replace_in_content( $content, $index, $loop ) {
+	public static function replace_in_content( $content, $index, $old, $loop ) {
 		$processor = new WP_Block_Processor( $content );
 		$openers   = 0;
 		$depth     = 0;
@@ -1012,7 +1014,7 @@ class Visual_Portfolio_Loop_Gallery {
 				$start = $span->start;
 
 				if ( WP_Block_Processor::VOID === $type ) {
-					return substr_replace( $content, serialize_block( $loop ), $start, $span->length );
+					return self::splice( $content, $start, $span->length, $old, $loop );
 				}
 
 				$depth = 1;
@@ -1022,11 +1024,37 @@ class Visual_Portfolio_Loop_Gallery {
 			if ( WP_Block_Processor::OPENER === $type ) {
 				++$depth;
 			} elseif ( WP_Block_Processor::CLOSER === $type && 0 === --$depth ) {
-				return substr_replace( $content, serialize_block( $loop ), $start, $span->start + $span->length - $start );
+				return self::splice( $content, $start, $span->start + $span->length - $start, $old, $loop );
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Content with a span replaced by a loop, if the span holds the loop the
+	 * block parser found.
+	 *
+	 * The delimiter scanner and the block parser read hand-written markup
+	 * differently, such as `-->` inside a loop's attributes, and then count
+	 * the loops differently.
+	 *
+	 * @param string $content - post content.
+	 * @param int    $start - span start.
+	 * @param int    $length - span length.
+	 * @param array  $old - the loop as `parse_blocks()` found it.
+	 * @param array  $loop - new loop block.
+	 *
+	 * @return string|null
+	 */
+	private static function splice( $content, $start, $length, $old, $loop ) {
+		$parsed = parse_blocks( substr( $content, $start, $length ) );
+
+		if ( 1 !== count( $parsed ) || $parsed[0]['attrs'] !== $old['attrs'] || $parsed[0]['innerBlocks'] !== $old['innerBlocks'] ) {
+			return null;
+		}
+
+		return substr_replace( $content, serialize_block( $loop ), $start, $length );
 	}
 
 	/**

@@ -103,8 +103,8 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 
 		$this->assertCount( 2, $found );
 		$this->assertSame( array( 1, 0, 0, 0 ), $found[1]['path'] );
-		$this->assertSame( 'first', Visual_Portfolio_Loop_Gallery::get_gallery_id( $found[0]['block'], 0 ) );
-		$this->assertSame( 'loop-2', Visual_Portfolio_Loop_Gallery::get_gallery_id( $found[1]['block'], 1 ) );
+		$this->assertSame( 'first', $found[0]['gallery_id'] );
+		$this->assertSame( 'loop-2', $found[1]['gallery_id'] );
 		$this->assertSame( 'posts', Visual_Portfolio_Loop_Gallery::find_loop( $blocks, 'loop-2' )['block']['attrs']['queryType'] );
 		$this->assertNull( Visual_Portfolio_Loop_Gallery::find_loop( $blocks, 'loop-3' ) );
 	}
@@ -175,6 +175,10 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 
 		$this->assertSame( 'posts', $loop['attrs']['queryType'] );
 		$this->assertSame( 'ids', $loop['attrs']['postsQuery']['source'] );
+
+		// A posts layout given no post type starts on posts, like any other.
+		$classic = Visual_Portfolio_Loop_Gallery::create( 'visual-portfolio/gallery-posts-classic', array( 'source' => array( 'type' => 'posts' ) ), array() );
+		$this->assertSame( 'post', $classic['attrs']['postsQuery']['source'] );
 		$this->assertSame( array( 12, 7 ), $loop['attrs']['postsQuery']['ids'] );
 		$this->assertSame( array( 3 ), $loop['attrs']['postsQuery']['taxonomies'] );
 		$this->assertSame( 'post__in', $loop['attrs']['postsQuery']['orderBy'] );
@@ -351,12 +355,15 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 		$this->assertSame( 'same', $kept['attrs']['block_id'] );
 		$this->assertSame( 1, $kept['attrs']['queryId'] );
 
-		$second  = Visual_Portfolio_Loop_Gallery::find_loops( $blocks )[1];
+		// The second holder is reached by its position.
+		$second = Visual_Portfolio_Loop_Gallery::find_loop( $blocks, 'loop-2' );
+		$this->assertSame( 1, $second['index'] );
+
 		$renamed = Visual_Portfolio_Loop_Gallery::update( $second['block'], array( 'settings' => array( 'per_page' => 3 ) ), $blocks, 1 );
 		$this->assertNotSame( 'same', $renamed['attrs']['block_id'] );
 		$this->assertSame( 2, $renamed['attrs']['queryId'] );
 
-		$content = Visual_Portfolio_Loop_Gallery::replace_in_content( $markup . $markup, 1, $renamed );
+		$content = Visual_Portfolio_Loop_Gallery::replace_in_content( $markup . $markup, 1, $second['block'], $renamed );
 		$this->assertStringStartsWith( $markup, $content );
 	}
 
@@ -387,15 +394,22 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 			Visual_Portfolio_Loop_Gallery::describe( $updated )['settings']
 		);
 
-		$written = Visual_Portfolio_Loop_Gallery::replace_in_content( $content, $found['index'], $updated );
+		$written = Visual_Portfolio_Loop_Gallery::replace_in_content( $content, $found['index'], $found['block'], $updated );
 		$this->assertStringEndsWith( "\n\n" . $third, $written );
 		$this->assertSame( 1, substr_count( $written, '<p>Tail</p>' ) );
 
 		// The last loop is the third one, not the one nested in the first.
 		$found   = Visual_Portfolio_Loop_Gallery::find_loop( $blocks, 'third' );
 		$updated = Visual_Portfolio_Loop_Gallery::update( $found['block'], array( 'settings' => array( 'per_page' => 2 ) ), $blocks, $found['index'] );
-		$written = Visual_Portfolio_Loop_Gallery::replace_in_content( $content, $found['index'], $updated );
+		$written = Visual_Portfolio_Loop_Gallery::replace_in_content( $content, $found['index'], $found['block'], $updated );
 		$this->assertStringStartsWith( $outer . "\n\n", $written );
+
+		// Where the delimiter scanner and the parser disagree, nothing is written.
+		$odd     = '<!-- wp:visual-portfolio/loop {"block_id":"odd","note":"a --> b"} --><div class="vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->' . $third;
+		$blocks  = parse_blocks( $odd );
+		$found   = Visual_Portfolio_Loop_Gallery::find_loop( $blocks, 'third' );
+		$updated = Visual_Portfolio_Loop_Gallery::update( $found['block'], array( 'settings' => array( 'per_page' => 2 ) ), $blocks, $found['index'] );
+		$this->assertNull( Visual_Portfolio_Loop_Gallery::replace_in_content( $odd, $found['index'], $found['block'], $updated ) );
 
 		// A partial posts update keeps the block's default post type.
 		$updated = Visual_Portfolio_Loop_Gallery::update(
@@ -410,6 +424,11 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 			2
 		);
 		$this->assertSame( 'portfolio', $updated['attrs']['postsQuery']['source'] );
+
+		// Pictures that open the lightbox keep it over a layout change, whichever comes first.
+		$mixed   = parse_blocks( '<!-- wp:visual-portfolio/loop {"block_id":"mixed","queryType":"images"} --><div class="vp-block-loop"><!-- wp:visual-portfolio/item-template --><!-- wp:visual-portfolio/item-image /--><!-- wp:visual-portfolio/item-cover {"clickAction":"popup"} /--><!-- /wp:visual-portfolio/item-template --></div><!-- /wp:visual-portfolio/loop -->' );
+		$relaid  = Visual_Portfolio_Loop_Gallery::update( $mixed[0], array( 'layout' => 'visual-portfolio/gallery-grid-classic' ), $mixed );
+		$this->assertTrue( Visual_Portfolio_Loop_Gallery::describe( $relaid )['settings']['lightbox'] );
 	}
 
 	/**
@@ -502,7 +521,7 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 			return $vocabulary;
 		};
 		$apply      = function ( $loop, $input ) {
-			if ( 'acme' === ( $input['source']['type'] ?? '' ) ) {
+			if ( isset( $input['source']['feed'] ) ) {
 				$loop['attrs']['sourceQuery'] = array( 'feed' => $input['source']['feed'] );
 			}
 
@@ -523,8 +542,21 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 			array()
 		);
 
+		$changed = Visual_Portfolio_Loop_Gallery::update(
+			$loop,
+			array(
+				'source' => array(
+					'type'     => 'acme',
+					'settings' => array( 'feed' => 'sport' ),
+				),
+			),
+			array( $loop )
+		);
+
 		remove_filter( 'vpf_gallery_ability_vocabulary', $vocabulary );
 		remove_filter( 'vpf_gallery_ability_apply', $apply );
+
+		$this->assertSame( array( 'feed' => 'sport' ), $changed['attrs']['sourceQuery'] );
 
 		$this->assertSame( 'acme', $loop['attrs']['queryType'] );
 		$this->assertSame( array( 'feed' => 'news' ), $loop['attrs']['sourceQuery'] );
