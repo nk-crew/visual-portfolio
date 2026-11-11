@@ -51,6 +51,7 @@ class Visual_Portfolio_Images {
 
 		add_action( 'after_setup_theme', 'Visual_Portfolio_Images::add_image_sizes' );
 		add_filter( 'image_size_names_choose', 'Visual_Portfolio_Images::image_size_names_choose' );
+		add_filter( 'big_image_size_threshold', 'Visual_Portfolio_Images::keep_image_the_popup_shows_whole', 10, 4 );
 
 		/**
 		 * Allow `data:` inside image src attribute.
@@ -81,6 +82,36 @@ class Visual_Portfolio_Images {
 		add_image_size( 'vp_sm_popup', $sm_popup, 9999 );
 		add_image_size( 'vp_md_popup', $md_popup, 9999 );
 		add_image_size( 'vp_xl_popup', $xl_popup, 9999 );
+	}
+
+	/**
+	 * Keep an upload at its own size when the largest lightbox size shows it whole.
+	 *
+	 * WordPress makes no lightbox size for such an upload and opens the full
+	 * size, which over the threshold is a smaller "-scaled" copy: a 1920x10000
+	 * screenshot opened at 492x2560.
+	 *
+	 * @param int|false $threshold     - the threshold value in pixels, false disables scaling.
+	 * @param array     $imagesize     - width and height of the upload.
+	 * @param string    $file          - path of the upload.
+	 * @param int       $attachment_id - attachment ID.
+	 *
+	 * @return int|false
+	 */
+	public static function keep_image_the_popup_shows_whole( $threshold, $imagesize, $file = '', $attachment_id = 0 ) {
+		$popup = wp_get_registered_image_subsizes()['vp_xl_popup'] ?? false;
+
+		// The REST index and the editor's client-side processing ask for the site-wide threshold with no image.
+		if ( ! $threshold || ! $popup || empty( $imagesize[0] ) || empty( $imagesize[1] ) ) {
+			return $threshold;
+		}
+
+		// Core points the attachment at a new file only when it scales or rotates, so a regenerated "-scaled", rotated or edited upload keeps the threshold.
+		if ( wp_normalize_path( (string) get_attached_file( $attachment_id, true ) ) !== wp_normalize_path( $file ) ) {
+			return $threshold;
+		}
+
+		return image_resize_dimensions( $imagesize[0], $imagesize[1], $popup['width'], $popup['height'], $popup['crop'] ) ? $threshold : false;
 	}
 
 	/**
