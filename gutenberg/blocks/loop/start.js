@@ -249,17 +249,19 @@ export function SourceStart({ attributes, setAttributes, clientId, onSource }) {
 					>
 						{__('Upload', 'visual-portfolio')}
 					</FormFileUpload>
-					<ImportMenu
-						clientId={clientId}
-						galleryImport={galleryImport}
-						withFiles={false}
-						icon={null}
-						toggleProps={{
-							children: __('Import', 'visual-portfolio'),
-							variant: 'secondary',
-							__next40pxDefaultSize: true,
-						}}
-					/>
+					<MediaUploadCheck>
+						<ImportMenu
+							clientId={clientId}
+							galleryImport={galleryImport}
+							withFiles={false}
+							icon={null}
+							toggleProps={{
+								children: __('Import', 'visual-portfolio'),
+								variant: 'secondary',
+								__next40pxDefaultSize: true,
+							}}
+						/>
+					</MediaUploadCheck>
 					<MediaUploadCheck>
 						<MediaUpload
 							multiple="add"

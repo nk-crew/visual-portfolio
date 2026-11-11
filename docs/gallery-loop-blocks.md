@@ -42,9 +42,10 @@ the shortcode and the Saved block read; an import or a command run without a
 user is left alone. The editor previews such a user's query the same way.
 
 **Bulk import.** A gallery of images takes a whole folder or a ZIP archive at
-once: *Upload* on the first step of a loop and the drop zone take files,
-folders and archives, and *Import* — on that step and beside *Add media* in the
-sidebar — offers *Upload files or ZIP* and *Upload folder*. An archive is
+once. The drop zone takes files, folders and archives, and *Upload* on the
+first step of a loop takes files and archives. *Import* offers *Upload folder*
+on that step, and *Upload files or ZIP* and *Upload folder* beside *Add media*
+in the sidebar. An archive is
 unpacked in the browser, so its size is not bound by the site's upload limit;
 the files inside it and inside nested folders are uploaded one by one, three at
 a time, and join the gallery in the natural order of their paths (`IMG_2`

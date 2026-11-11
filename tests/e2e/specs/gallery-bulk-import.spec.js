@@ -307,6 +307,7 @@ test.describe('Gallery Loop bulk import', () => {
 
 		await expect(status).toContainText('1 file failed:');
 		await expect(status).toContainText('shoot/IMG_1.png');
+		await expect(status).toContainText('exceeds the maximum upload size');
 		expect(await getGalleryTitles(editor)).toEqual(SHOOT_TITLES.slice(1));
 
 		await setUploadLimit(0);

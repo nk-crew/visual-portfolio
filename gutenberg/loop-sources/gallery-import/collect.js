@@ -132,23 +132,32 @@ async function readChildren(directory) {
 	}
 }
 
-async function walk(entry, files) {
+async function walk(entry, files, unreadable) {
 	const path = entry.fullPath.replace(/^\//, '');
 
 	if (isSystemPath(path)) {
 		return;
 	}
 
-	if (entry.isDirectory) {
-		for (const child of await readChildren(entry)) {
-			await walk(child, files);
+	try {
+		if (entry.isDirectory) {
+			for (const child of await readChildren(entry)) {
+				await walk(child, files, unreadable);
+			}
+		} else if (entry.isFile) {
+			files.push({
+				file: await new Promise((resolve, reject) =>
+					entry.file(resolve, reject)
+				),
+				path,
+			});
 		}
-	} else if (entry.isFile) {
-		files.push({
-			file: await new Promise((resolve, reject) =>
-				entry.file(resolve, reject)
-			),
+	} catch (error) {
+		unreadable.push({
+			name: entry.name,
+			size: 0,
 			path,
+			error: error?.message || '',
 		});
 	}
 }
@@ -161,10 +170,11 @@ async function walk(entry, files) {
  */
 export async function collectFromEntries(entries) {
 	const files = [];
+	const unreadable = [];
 
 	for (const entry of entries) {
-		await walk(entry, files);
+		await walk(entry, files, unreadable);
 	}
 
-	return toItems(files);
+	return [...(await toItems(files)), ...unreadable];
 }

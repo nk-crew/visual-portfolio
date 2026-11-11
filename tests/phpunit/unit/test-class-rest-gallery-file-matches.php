@@ -142,6 +142,35 @@ class ClassRestGalleryFileMatches extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A camera's upper-case extension matches the lower-case one WordPress saves.
+	 *
+	 * @return void
+	 */
+	public function test_matches_an_upper_case_extension() {
+		$camera = get_temp_dir() . 'Camera.PNG';
+
+		copy( $this->fixture, $camera );
+
+		$upload = self::factory()->attachment->create_upload_object( $camera );
+
+		unlink( $camera );
+
+		$response = $this->match(
+			array( $upload ),
+			array(
+				array(
+					'name' => 'Camera.PNG',
+					'size' => filesize( $this->fixture ),
+				),
+			)
+		);
+
+		wp_delete_attachment( $upload, true );
+
+		$this->assertSame( array( 0 ), $response->get_data()['response']['matches'] );
+	}
+
+	/**
 	 * A second upload of a name WordPress saved with `-1` still matches it.
 	 *
 	 * @return void

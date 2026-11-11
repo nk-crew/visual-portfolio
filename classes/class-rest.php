@@ -763,7 +763,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			}
 
 			if ( $path && is_file( $path ) ) {
-				$name = wp_basename( $path );
+				$name = $this->get_file_key( wp_basename( $path ) );
 				$size = filesize( $path );
 
 				$known[ $name . '|' . $size ] = true;
@@ -774,7 +774,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		$matches = array();
 
 		foreach ( $request->get_param( 'files' ) as $index => $file ) {
-			$key = sanitize_file_name( (string) ( $file['name'] ?? '' ) ) . '|' . absint( $file['size'] ?? 0 );
+			$key = $this->get_file_key( sanitize_file_name( (string) ( $file['name'] ?? '' ) ) ) . '|' . absint( $file['size'] ?? 0 );
 
 			if ( isset( $known[ $key ] ) ) {
 				$matches[] = $index;
@@ -782,6 +782,18 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		}
 
 		return $this->success( array( 'matches' => $matches ) );
+	}
+
+	/**
+	 * A file name with its extension in lower case, the way WordPress saves it.
+	 *
+	 * @param string $name File name.
+	 * @return string
+	 */
+	private function get_file_key( $name ) {
+		$extension = pathinfo( $name, PATHINFO_EXTENSION );
+
+		return $extension ? substr( $name, 0, -strlen( $extension ) ) . strtolower( $extension ) : $name;
 	}
 
 	/**

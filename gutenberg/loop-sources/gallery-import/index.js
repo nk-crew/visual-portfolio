@@ -88,7 +88,6 @@ export function useGalleryImport(clientId) {
 	return useMemo(
 		() => ({
 			state,
-			canUpload: !!mediaUpload,
 			importItems: start,
 			importFiles: (files) => start(collectFromFiles(files)),
 			importEntries: (entries) => start(collectFromEntries(entries)),
@@ -354,7 +353,18 @@ export function ImportProgress({ galleryImport }) {
 	].filter(Boolean);
 
 	if (!notes.length && !failed.length) {
-		return null;
+		return state.items.length ? null : (
+			<div className="vpf-gallery-import" role="status">
+				<p className="vpf-gallery-import__line">
+					{__('No images or videos found.', 'visual-portfolio')}
+				</p>
+				<div className="vpf-gallery-import__actions">
+					<Button variant="tertiary" size="small" onClick={dismiss}>
+						{__('Dismiss', 'visual-portfolio')}
+					</Button>
+				</div>
+			</div>
+		);
 	}
 
 	return (

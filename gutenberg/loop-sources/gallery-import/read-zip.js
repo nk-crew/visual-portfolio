@@ -55,7 +55,8 @@ function decodeName(bytes) {
  * Where the central directory is and how many entries it holds.
  *
  * @param {File} file - the archive.
- * @return {Promise<Object>} `{ count, offset, size }`.
+ * @return {Promise<Object>} `{ offset, size, end }`, `end` where the
+ *                           directory stops.
  */
 async function readEndOfDirectory(file) {
 	// The record is 22 bytes, followed by a comment of up to 64 KB.
@@ -75,13 +76,13 @@ async function readEndOfDirectory(file) {
 	}
 
 	const end = {
-		count: tail.getUint16(at + 10, true),
 		size: tail.getUint32(at + 12, true),
 		offset: tail.getUint32(at + 16, true),
+		end: tailStart + at,
 	};
 
 	const isZip64 =
-		0xffff === end.count ||
+		0xffff === tail.getUint16(at + 10, true) ||
 		0xffffffff === end.size ||
 		0xffffffff === end.offset;
 
@@ -97,9 +98,9 @@ async function readEndOfDirectory(file) {
 			throw new ZipError();
 		}
 
-		end.count = getUint64(record, 32);
 		end.size = getUint64(record, 40);
 		end.offset = getUint64(record, 48);
+		end.end = recordOffset;
 	}
 
 	return end;
@@ -144,17 +145,38 @@ function readZip64Extra(view, start, length, entry) {
  * @return {Promise<Blob>} entry data.
  */
 async function readEntry(file, entry) {
-	const header = await readView(file, entry.offset, entry.offset + 30);
+	const offsets = [entry.offset, entry.offset + entry.shift];
 
-	if (LOCAL_HEADER !== header.getUint32(0, true)) {
+	for (
+		let offset = entry.offset + 2 ** 32;
+		offset < file.size;
+		offset += 2 ** 32
+	) {
+		offsets.push(offset);
+	}
+
+	let header;
+	let offset;
+
+	for (offset of offsets) {
+		header = await readView(file, offset, offset + 30);
+
+		if (
+			header.byteLength === 30 &&
+			LOCAL_HEADER === header.getUint32(0, true)
+		) {
+			break;
+		}
+
+		header = null;
+	}
+
+	if (!header) {
 		throw new ZipError();
 	}
 
 	const start =
-		entry.offset +
-		30 +
-		header.getUint16(26, true) +
-		header.getUint16(28, true);
+		offset + 30 + header.getUint16(26, true) + header.getUint16(28, true);
 	const data = file.slice(start, start + entry.compressedSize);
 
 	if (STORED === entry.method) {
@@ -175,15 +197,33 @@ async function readEntry(file, entry) {
  */
 export async function readZip(file) {
 	const end = await readEndOfDirectory(file);
-	const view = await readView(file, end.offset, end.offset + end.size);
+	let view = await readView(file, end.offset, end.offset + end.size);
+	let shift = 0;
+
+	// macOS Archive Utility writes no ZIP64 records past 4 GB, so its offsets
+	// wrap around 2^32. The directory then sits right before its end record,
+	// and each entry's offset is off by a multiple of 2^32.
+	if (view.byteLength < 4 || DIRECTORY_ENTRY !== view.getUint32(0, true)) {
+		shift = end.end - end.size - end.offset;
+		view = await readView(file, end.end - end.size, end.end);
+
+		if (
+			view.byteLength < 4 ||
+			DIRECTORY_ENTRY !== view.getUint32(0, true)
+		) {
+			throw new ZipError();
+		}
+	}
+
 	const entries = [];
 	let at = 0;
 
-	for (let i = 0; i < end.count; i++) {
-		if (DIRECTORY_ENTRY !== view.getUint32(at, true)) {
-			throw new ZipError();
-		}
-
+	// The entry count wraps past 65,535 the same way, so the directory is read
+	// to its last record instead.
+	while (
+		at + 46 <= view.byteLength &&
+		DIRECTORY_ENTRY === view.getUint32(at, true)
+	) {
 		const flags = view.getUint16(at + 8, true);
 		const nameLength = view.getUint16(at + 28, true);
 		const extraLength = view.getUint16(at + 30, true);
@@ -194,14 +234,16 @@ export async function readZip(file) {
 			nameLength
 		);
 		const entry = {
-			path:
-				flags & 0x800
-					? new TextDecoder().decode(nameBytes)
-					: decodeName(nameBytes),
+			// Windows PowerShell 5 writes `\` between folders.
+			path: (flags & 0x800
+				? new TextDecoder().decode(nameBytes)
+				: decodeName(nameBytes)
+			).replaceAll('\\', '/'),
 			method: view.getUint16(at + 10, true),
 			compressedSize: view.getUint32(at + 20, true),
 			size: view.getUint32(at + 24, true),
 			offset: view.getUint32(at + 42, true),
+			shift,
 			isEncrypted: !!(flags & 0x1),
 		};
 

@@ -6,6 +6,7 @@ import {
 	prepareImage,
 } from '../gallery-manager/prepare-images';
 import { isSystemPath } from './collect';
+import { isZipError } from './read-zip';
 
 /**
  * The editor's `mediaUpload` sends every file of a selection at once, which a
@@ -40,7 +41,8 @@ export function subscribe(listener) {
  * The import of a loop.
  *
  * @param {string} clientId - loop client id.
- * @return {Object|null} `{ items, preparing, duplicates, unsupported }`, each
+ * @return {Object|null} `{ items, preparing, duplicates, unsupported, cancels,
+ *                       queryType }`, each
  *                       item `{ key, name, path, status, error }`, status one
  *                       of `queued`, `uploading`, `done`, `failed`, `canceled`.
  */
@@ -228,8 +230,12 @@ function placeImages(clientId) {
 		);
 	});
 
+	// A loop the user moved to another source meanwhile keeps it.
+	const isFirstImage =
+		!original.length && attributes.queryType === state.queryType;
+
 	registry.dispatch(blockEditorStore).updateBlockAttributes(clientId, {
-		...(original.length ? {} : { queryType: 'images' }),
+		...(isFirstImage ? { queryType: 'images' } : {}),
 		imagesQuery: { ...attributes.imagesQuery, images },
 	});
 }
@@ -276,6 +282,15 @@ function uploadFile(mediaUpload, file) {
 	);
 }
 
+// The editor's `mediaUpload` reports a refused file with a plain string.
+function getErrorMessage(error) {
+	if ('string' === typeof error) {
+		return error;
+	}
+
+	return isZipError(error) ? 'archive' : error?.message || '';
+}
+
 async function run(clientId, key) {
 	const job = jobs.get(key);
 
@@ -302,7 +317,7 @@ async function run(clientId, key) {
 		queueImage(clientId, job, media);
 		change = { status: 'done' };
 	} catch (error) {
-		change = { status: 'failed', error: error?.message || '' };
+		change = { status: 'failed', error: getErrorMessage(error) };
 	}
 
 	updateItems(clientId, (item) =>
@@ -369,32 +384,50 @@ export async function importItems(clientId, items, context) {
 		clientId,
 		isActive(previous)
 			? { ...previous, preparing: previous.preparing + 1 }
-			: { items: [], preparing: 1, duplicates: 0, unsupported: 0 }
+			: {
+					items: [],
+					preparing: 1,
+					duplicates: 0,
+					unsupported: 0,
+					cancels: 0,
+					queryType: context.registry
+						.select(blockEditorStore)
+						.getBlockAttributes(clientId)?.queryType,
+				}
 	);
 
-	let collected = [];
+	const { cancels } = imports.get(clientId);
+	let collected;
 
 	try {
 		collected = await items;
-	} catch {}
+	} catch (error) {
+		collected = [{ name: '', path: '', error: getErrorMessage(error) }];
+	}
 
 	if (!imports.has(clientId)) {
 		return;
 	}
 
-	const signatures = new Set(
-		imports
-			.get(clientId)
-			.items.filter(({ status }) => 'canceled' !== status)
-			.map(({ key }) => jobs.get(key).signature)
-	);
+	const getSignatures = () =>
+		new Set(
+			imports
+				.get(clientId)
+				.items.filter(({ status }) => 'canceled' !== status)
+				.map(({ key }) => jobs.get(key).signature)
+		);
+	const signatures = getSignatures();
 	const failed = [];
 	const candidates = [];
 	let duplicates = 0;
 	let unsupported = 0;
 
 	[...collected]
-		.map((item) => ({ ...item, path: item.path || item.name }))
+		.map((item) => ({
+			...item,
+			name: item.name || '',
+			path: item.path || item.name || '',
+		}))
 		.filter(({ path }) => !isSystemPath(path))
 		.sort((a, b) => compare(a.path, b.path))
 		.forEach((item) => {
@@ -420,7 +453,18 @@ export async function importItems(clientId, items, context) {
 		.filter(({ id }) => id)
 		.map(({ id }) => id);
 	const held = await findInGallery(ids, candidates);
-	const added = [...failed, ...candidates.filter((_, i) => !held.has(i))]
+
+	if (!imports.has(clientId)) {
+		return;
+	}
+
+	// Another import of the same files may have been queued during the lookup.
+	const queued = getSignatures();
+	const fresh = candidates.filter(
+		({ signature }, i) => !held.has(i) && !queued.has(signature)
+	);
+	const isCanceled = imports.get(clientId).cancels !== cancels;
+	const added = [...failed, ...fresh]
 		.sort((a, b) => compare(a.path, b.path))
 		.map((item) => {
 			const key = `${clientId}:${++sequence}`;
@@ -431,25 +475,30 @@ export async function importItems(clientId, items, context) {
 				key,
 				name: item.name,
 				path: item.path,
-				status: item.error ? 'failed' : 'queued',
+				status: item.error
+					? 'failed'
+					: isCanceled
+						? 'canceled'
+						: 'queued',
 				error: item.error || '',
 			};
 		});
 
 	const state = imports.get(clientId);
 
-	if (!state) {
-		return;
-	}
-
 	setImport(clientId, {
 		...state,
 		preparing: state.preparing - 1,
 		items: [...state.items, ...added],
-		duplicates: state.duplicates + duplicates + held.size,
+		duplicates:
+			state.duplicates + duplicates + candidates.length - fresh.length,
 		unsupported: state.unsupported + unsupported,
 	});
 	pump(clientId);
+
+	if (!isActive(imports.get(clientId))) {
+		placeImages(clientId);
+	}
 }
 
 /**
@@ -458,6 +507,12 @@ export async function importItems(clientId, items, context) {
  * @param {string} clientId - loop client id.
  */
 export function cancelImport(clientId) {
+	const state = imports.get(clientId);
+
+	if (state) {
+		setImport(clientId, { ...state, cancels: state.cancels + 1 });
+	}
+
 	updateItems(clientId, (item) =>
 		'queued' === item.status ? { ...item, status: 'canceled' } : null
 	);
@@ -490,6 +545,8 @@ export function dismissImport(clientId) {
 	const state = imports.get(clientId);
 
 	if (state && !isActive(state)) {
+		placeImages(clientId);
+
 		for (const { key } of state.items) {
 			jobs.delete(key);
 		}
