@@ -7,7 +7,8 @@ import { ReactComponent as ElementIcon } from '../../assets/admin/images/icon-gu
 import IframePreview from '../components/iframe-preview';
 import SelectControl from '../components/select-control';
 
-const { plugin_name: pluginName } = window.VPGutenbergVariables;
+const { plugin_name: pluginName, loop_blocks: loopBlocks } =
+	window.VPGutenbergVariables;
 
 /**
  * Block Edit Class.
@@ -15,7 +16,7 @@ const { plugin_name: pluginName } = window.VPGutenbergVariables;
  * @param props
  */
 export default function BlockEdit(props) {
-	const { clientId, setAttributes, attributes } = props;
+	const { clientId, setAttributes, attributes, isSelected } = props;
 
 	const { id } = attributes;
 
@@ -24,6 +25,17 @@ export default function BlockEdit(props) {
 			portfolioLayouts: select('visual-portfolio').getPortfolioLayouts(),
 		}),
 		[]
+	);
+
+	// The Gallery Loop transform reads the layout's settings, which have to
+	// be in the store by the time the block switcher asks for them.
+	useSelect(
+		(select) => {
+			if (loopBlocks && isSelected && id) {
+				select('visual-portfolio').getLayoutOptions(id);
+			}
+		},
+		[isSelected, id]
 	);
 
 	function getSelector() {
