@@ -509,8 +509,13 @@ export async function importItems(clientId, items, context) {
 export function cancelImport(clientId) {
 	const state = imports.get(clientId);
 
+	// A canceled import no longer decides the loop's source.
 	if (state) {
-		setImport(clientId, { ...state, cancels: state.cancels + 1 });
+		setImport(clientId, {
+			...state,
+			cancels: state.cancels + 1,
+			queryType: null,
+		});
 	}
 
 	updateItems(clientId, (item) =>

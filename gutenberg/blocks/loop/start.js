@@ -197,6 +197,8 @@ export function SourceStart({ attributes, setAttributes, clientId, onSource }) {
 			return;
 		}
 
+		// The files still on their way would make the loop a gallery again.
+		galleryImport.cancel();
 		setAttributes({ queryType: source.name });
 		onSource();
 	};

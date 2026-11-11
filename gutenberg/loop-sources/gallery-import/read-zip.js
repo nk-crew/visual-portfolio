@@ -55,8 +55,8 @@ function decodeName(bytes) {
  * Where the central directory is and how many entries it holds.
  *
  * @param {File} file - the archive.
- * @return {Promise<Object>} `{ offset, size, end }`, `end` where the
- *                           directory stops.
+ * @return {Promise<Object>} `{ count, offset, size, end, isZip64 }`, `end`
+ *                           where the directory stops.
  */
 async function readEndOfDirectory(file) {
 	// The record is 22 bytes, followed by a comment of up to 64 KB.
@@ -76,18 +76,17 @@ async function readEndOfDirectory(file) {
 	}
 
 	const end = {
+		count: tail.getUint16(at + 10, true),
 		size: tail.getUint32(at + 12, true),
 		offset: tail.getUint32(at + 16, true),
 		end: tailStart + at,
+		isZip64: false,
 	};
 
-	const isZip64 =
-		0xffff === tail.getUint16(at + 10, true) ||
-		0xffffffff === end.size ||
-		0xffffffff === end.offset;
-
 	if (
-		isZip64 &&
+		(0xffff === end.count ||
+			0xffffffff === end.size ||
+			0xffffffff === end.offset) &&
 		at >= 20 &&
 		ZIP64_LOCATOR === tail.getUint32(at - 20, true)
 	) {
@@ -98,9 +97,11 @@ async function readEndOfDirectory(file) {
 			throw new ZipError();
 		}
 
+		end.count = getUint64(record, 32);
 		end.size = getUint64(record, 40);
 		end.offset = getUint64(record, 48);
 		end.end = recordOffset;
+		end.isZip64 = true;
 	}
 
 	return end;
@@ -158,14 +159,25 @@ async function readEntry(file, entry) {
 	let header;
 	let offset;
 
+	// A wrapped offset can land on another entry's header, so a candidate
+	// counts only when it carries this entry's name.
 	for (offset of offsets) {
 		header = await readView(file, offset, offset + 30);
 
 		if (
-			header.byteLength === 30 &&
-			LOCAL_HEADER === header.getUint32(0, true)
+			30 === header.byteLength &&
+			LOCAL_HEADER === header.getUint32(0, true) &&
+			entry.name.length === header.getUint16(26, true)
 		) {
-			break;
+			const name = new Uint8Array(
+				await file
+					.slice(offset + 30, offset + 30 + entry.name.length)
+					.arrayBuffer()
+			);
+
+			if (name.every((byte, i) => byte === entry.name[i])) {
+				break;
+			}
 		}
 
 		header = null;
@@ -197,6 +209,11 @@ async function readEntry(file, entry) {
  */
 export async function readZip(file) {
 	const end = await readEndOfDirectory(file);
+
+	if (!end.size) {
+		return [];
+	}
+
 	let view = await readView(file, end.offset, end.offset + end.size);
 	let shift = 0;
 
@@ -217,9 +234,10 @@ export async function readZip(file) {
 
 	const entries = [];
 	let at = 0;
+	let records = 0;
 
 	// The entry count wraps past 65,535 the same way, so the directory is read
-	// to its last record instead.
+	// to its last record and only the count's low 16 bits are compared.
 	while (
 		at + 46 <= view.byteLength &&
 		DIRECTORY_ENTRY === view.getUint32(at, true)
@@ -233,7 +251,10 @@ export async function readZip(file) {
 			view.byteOffset + at + 46,
 			nameLength
 		);
+		records++;
+
 		const entry = {
+			name: nameBytes.slice(),
 			// Windows PowerShell 5 writes `\` between folders.
 			path: (flags & 0x800
 				? new TextDecoder().decode(nameBytes)
@@ -254,6 +275,10 @@ export async function readZip(file) {
 		if (!entry.path.endsWith('/')) {
 			entries.push(entry);
 		}
+	}
+
+	if (end.isZip64 ? records !== end.count : records % 0x10000 !== end.count) {
+		throw new ZipError();
 	}
 
 	return entries.map((entry) => {
