@@ -89,6 +89,8 @@ function getShownImageUrl(canvas) {
 test.describe('Gallery Item Image toolbar', () => {
 	let image;
 	let spare;
+	let third;
+	let fourth;
 	let postIds = [];
 
 	test.beforeAll(async ({ requestUtils }) => {
@@ -101,6 +103,12 @@ test.describe('Gallery Item Image toolbar', () => {
 		);
 		spare = await requestUtils.uploadMedia(
 			getFixturePath('image-300x200.jpeg')
+		);
+		third = await requestUtils.uploadMedia(
+			getFixturePath('image-1600x1200.jpeg')
+		);
+		fourth = await requestUtils.uploadMedia(
+			getFixturePath('image-800x1200.webp')
 		);
 		postIds = await createRegularPosts({ requestUtils, count: 1 });
 	});
@@ -132,6 +140,357 @@ test.describe('Gallery Item Image toolbar', () => {
 
 		return loop?.attributes?.imagesQuery?.images ?? [];
 	}
+
+	/**
+	 * The attachments the preview shows, in the order it shows them.
+	 *
+	 * @param {import('@playwright/test').FrameLocator} canvas      - editor canvas.
+	 * @param {Array}                                   attachments - REST attachments the gallery holds.
+	 * @return {Promise<Array>} attachment ids.
+	 */
+	async function getShownOrder(canvas, attachments) {
+		const sources = await canvas
+			.locator(`${ITEM}:visible ${ITEM_IMAGE} img`)
+			.evaluateAll((images) =>
+				images.map((img) => img.getAttribute('src'))
+			);
+
+		return sources.map(
+			(source) =>
+				attachments.find((attachment) =>
+					getAttachmentUrls(attachment).includes(source)
+				)?.id
+		);
+	}
+
+	/**
+	 * Hold every request for the items of a loop until released, so what the
+	 * preview shows meanwhile is its own doing.
+	 *
+	 * @param {import('@playwright/test').Page} page - page.
+	 * @return {Promise<Function>} releases the held requests and stops holding.
+	 */
+	async function holdLoopItems(page) {
+		const held = [];
+		const matcher = (url) => url.href.includes('get_loop_items');
+		const handler = (route) => held.push(route);
+
+		await page.route(matcher, handler);
+
+		return async () => {
+			await page.unroute(matcher, handler);
+			await Promise.all(held.map((route) => route.continue()));
+		};
+	}
+
+	/**
+	 * Make the item at `index` the edited one and select its image block.
+	 *
+	 * @param {Object}                                  editor - editor fixture.
+	 * @param {import('@playwright/test').FrameLocator} canvas - editor canvas.
+	 * @param {number}                                  index  - place of the item.
+	 */
+	async function selectItemImage(editor, canvas, index) {
+		const item = canvas.locator(`${ITEM}:visible`).nth(index);
+
+		if ((await item.locator(PREVIEW).count()) > 0) {
+			await item.locator(PREVIEW).click();
+		}
+
+		await editor.selectBlocks(
+			canvas.locator(`${EDITED_ITEM} ${ITEM_IMAGE}`)
+		);
+	}
+
+	test('moves a Media image from the toolbar before the server answers, one undo step a click', async ({
+		page,
+		admin,
+		editor,
+		pageUtils,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Item Image toolbar - move',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		const attachments = [image, spare, third, fourth];
+
+		await editor.insertBlock(
+			getLoopBlock({
+				queryType: 'images',
+				imagesQuery: {
+					images: attachments.map(({ id }) => ({ id })),
+				},
+			})
+		);
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await expect
+			.poll(() => getShownOrder(canvas, attachments))
+			.toEqual([image.id, spare.id, third.id, fourth.id]);
+
+		await selectItemImage(editor, canvas, 1);
+
+		const toolbar = page.getByRole('toolbar', { name: 'Block tools' });
+
+		// The edited item is the node that has to survive the server's answer.
+		await canvas.locator(EDITED_ITEM).evaluate((item) => {
+			item.dataset.e2eMoved = 'true';
+		});
+
+		const release = await holdLoopItems(page);
+
+		await toolbar.getByRole('button', { name: 'Move right' }).click();
+
+		expect((await getGallery(editor)).map(({ id }) => id)).toEqual([
+			image.id,
+			third.id,
+			spare.id,
+			fourth.id,
+		]);
+		await expect
+			.poll(() => getShownOrder(canvas, attachments))
+			.toEqual([image.id, third.id, spare.id, fourth.id]);
+
+		// Two more, both read off the gallery the click before left.
+		await toolbar.getByRole('button', { name: 'Move right' }).click();
+		await expect(
+			toolbar.getByRole('button', { name: 'Move right' })
+		).toBeDisabled();
+		await toolbar.getByRole('button', { name: 'Move left' }).click();
+
+		await expect
+			.poll(() => getShownOrder(canvas, attachments))
+			.toEqual([image.id, third.id, spare.id, fourth.id]);
+
+		const answered = page.waitForResponse(
+			(response) =>
+				response.url().includes('get_loop_items') &&
+				JSON.stringify([image.id, third.id, spare.id, fourth.id]) ===
+					JSON.stringify(
+						response
+							.request()
+							.postDataJSON()
+							.imagesQuery.images.map(({ id }) => id)
+					)
+		);
+
+		await release();
+		await answered;
+
+		// The answer confirms the order rather than redrawing it.
+		await expect
+			.poll(() => getShownOrder(canvas, attachments))
+			.toEqual([image.id, third.id, spare.id, fourth.id]);
+		await expect(canvas.locator('[data-e2e-moved]')).toHaveCount(1);
+		expect(getAttachmentUrls(spare)).toContain(
+			await canvas
+				.locator(`[data-e2e-moved] ${ITEM_IMAGE} img`)
+				.getAttribute('src')
+		);
+
+		// Every click is its own step.
+		await pageUtils.pressKeys('primary+z');
+
+		await expect
+			.poll(async () => (await getGallery(editor)).map(({ id }) => id))
+			.toEqual([image.id, third.id, fourth.id, spare.id]);
+	});
+
+	test('moves along a descending gallery the way it is shown', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Item Image toolbar - descending',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		const attachments = [image, spare, third];
+
+		await editor.insertBlock(
+			getLoopBlock({
+				queryType: 'images',
+				imagesQuery: {
+					images: attachments.map(({ id }) => ({ id })),
+					order: 'desc',
+				},
+			})
+		);
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await expect
+			.poll(() => getShownOrder(canvas, attachments))
+			.toEqual([third.id, spare.id, image.id]);
+
+		await selectItemImage(editor, canvas, 0);
+
+		const toolbar = page.getByRole('toolbar', { name: 'Block tools' });
+
+		await expect(
+			toolbar.getByRole('button', { name: 'Move left' })
+		).toBeDisabled();
+
+		await toolbar.getByRole('button', { name: 'Move right' }).click();
+
+		expect((await getGallery(editor)).map(({ id }) => id)).toEqual([
+			image.id,
+			third.id,
+			spare.id,
+		]);
+		await expect
+			.poll(() => getShownOrder(canvas, attachments))
+			.toEqual([spare.id, third.id, image.id]);
+	});
+
+	test('removes a Media image from the gallery from the options menu', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Item Image toolbar - remove',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		const attachments = [image, spare, third];
+
+		await editor.insertBlock(
+			getLoopBlock({
+				queryType: 'images',
+				imagesQuery: {
+					images: attachments.map(({ id }) => ({
+						id,
+						title: `${TITLE} ${id}`,
+					})),
+				},
+			})
+		);
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await expect
+			.poll(() => getShownOrder(canvas, attachments))
+			.toEqual([image.id, spare.id, third.id]);
+
+		await selectItemImage(editor, canvas, 1);
+
+		const release = await holdLoopItems(page);
+
+		await editor.clickBlockOptionsMenuItem('Remove from gallery');
+
+		// The other entries keep everything typed into them.
+		expect(await getGallery(editor)).toEqual([
+			{ id: image.id, title: `${TITLE} ${image.id}` },
+			{ id: third.id, title: `${TITLE} ${third.id}` },
+		]);
+		await expect
+			.poll(() => getShownOrder(canvas, attachments))
+			.toEqual([image.id, third.id]);
+
+		await release();
+	});
+
+	test('offers no arrows for a sorted gallery, and the removal still', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Item Image toolbar - sorted',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock(
+			getLoopBlock({
+				queryType: 'images',
+				imagesQuery: {
+					images: [{ id: image.id }, { id: spare.id }],
+					orderBy: 'title',
+				},
+			})
+		);
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await expect(canvas.locator(`${ITEM}:visible`)).toHaveCount(2);
+
+		await selectItemImage(editor, canvas, 0);
+
+		const toolbar = page.getByRole('toolbar', { name: 'Block tools' });
+
+		await expect(
+			toolbar.getByRole('button', { name: 'On click' })
+		).toBeVisible();
+		await expect(
+			toolbar.getByRole('button', { name: 'Move right' })
+		).toHaveCount(0);
+
+		await editor.clickBlockOptionsMenuItem('Remove from gallery');
+
+		await expect
+			.poll(async () => (await getGallery(editor)).length)
+			.toBe(1);
+	});
+
+	test('moves the image of an Item Cover too', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Item Image toolbar - cover',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		const loop = getLoopBlock({
+			queryType: 'images',
+			imagesQuery: {
+				images: [{ id: image.id }, { id: spare.id }],
+			},
+		});
+
+		loop.innerBlocks[0].innerBlocks = [
+			{ name: 'visual-portfolio/item-cover' },
+		];
+
+		await editor.insertBlock(loop);
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await expect(canvas.locator(`${ITEM}:visible`)).toHaveCount(2);
+
+		await editor.selectBlocks(
+			canvas
+				.locator(
+					`${EDITED_ITEM} [data-type="visual-portfolio/item-cover"]`
+				)
+				.first()
+		);
+
+		await page
+			.getByRole('toolbar', { name: 'Block tools' })
+			.getByRole('button', { name: 'Move right' })
+			.click();
+
+		expect((await getGallery(editor)).map(({ id }) => id)).toEqual([
+			spare.id,
+			image.id,
+		]);
+	});
 
 	test('crops the image of a Media item into a new attachment, and undoes it', async ({
 		page,
@@ -406,6 +765,15 @@ test.describe('Gallery Item Image toolbar', () => {
 		);
 		await expect(
 			toolbar.getByRole('button', { name: 'Replace' })
+		).toHaveCount(0);
+		await expect(
+			toolbar.getByRole('button', { name: 'Move right' })
+		).toHaveCount(0);
+
+		await toolbar.getByRole('button', { name: 'Options' }).click();
+
+		await expect(
+			page.getByRole('menuitem', { name: 'Remove from gallery' })
 		).toHaveCount(0);
 	});
 });

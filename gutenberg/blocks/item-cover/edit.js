@@ -58,6 +58,7 @@ import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
+import GalleryOrderControls from '../item-image/gallery-order-controls';
 import {
 	getDrawnEffect,
 	getEffectSelectOptions,
@@ -281,6 +282,10 @@ export default function ItemCoverEdit({
 		<>
 			{blockEditingMode === 'default' && (
 				<>
+					<GalleryOrderControls
+						clientId={clientId}
+						context={context}
+					/>
 					<BlockControls group="block">
 						<BlockAlignmentMatrixControl
 							label={__('Content position', 'visual-portfolio')}

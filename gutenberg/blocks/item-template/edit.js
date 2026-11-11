@@ -58,6 +58,7 @@ import {
 } from '../../utils/tools-panel';
 import { useIsPreview } from '../../utils/use-is-preview';
 import { useLoopItems } from '../../utils/use-loop-items';
+import { arrangeItems, getItemKey } from './arrange-items';
 import { getColumnsProps, getViewportBreakpoints } from './columns';
 import {
 	countEffectTeasers,
@@ -70,6 +71,7 @@ import {
 import { getTileStyles, getTilesColumns } from './tiles';
 import { TilesPresetsSelect, TilesPresetsToolbarButton } from './tiles-presets';
 import useEditorLayout from './use-editor-layout';
+import useMoveAnimation from './use-move-animation';
 import variations from './variations';
 
 const { pro: isProPlugin, site_rtl: isSiteRtl } = window.VPGutenbergVariables;
@@ -519,12 +521,13 @@ function getItemContext(item) {
  * The one item whose inner blocks are editable.
  *
  * @param {Object}  props        - component props.
- * @param {Object}  props.style  - placement of the item, when the layout gives it one.
- * @param {boolean} props.effect - whether a carousel effect is playing.
- * @param {number}  props.index  - place of the item in the list.
+ * @param {Object}  props.style   - placement of the item, when the layout gives it one.
+ * @param {boolean} props.effect  - whether a carousel effect is playing.
+ * @param {number}  props.index   - place of the item in the list.
+ * @param {string}  props.itemKey - key of the item, see `getItemKey()`.
  * @return {Element} component.
  */
-function ItemTemplateInnerBlocks({ style, effect, index }) {
+function ItemTemplateInnerBlocks({ style, effect, index, itemKey }) {
 	const innerBlocksProps = useInnerBlocksProps(
 		effect
 			? { className: CARD_CLASS_NAME }
@@ -533,13 +536,14 @@ function ItemTemplateInnerBlocks({ style, effect, index }) {
 	);
 
 	if (!effect) {
-		return <li {...innerBlocksProps} />;
+		return <li {...innerBlocksProps} data-vp-item-key={itemKey} />;
 	}
 
 	return (
 		<li
 			className={ITEM_CLASS_NAME}
 			style={{ ...style, '--vp-slide-index': index }}
+			data-vp-item-key={itemKey}
 		>
 			<div className={SLIDE_CLASS_NAME}>
 				<div {...innerBlocksProps} />
@@ -583,7 +587,7 @@ function CarouselFrame({ children, inset }) {
  *
  * @param {Object}   props                         - component props.
  * @param {Array}    props.blocks                  - inner blocks of the template.
- * @param {string}   props.blockContextId          - id of the item this copy shows.
+ * @param {string}   props.blockContextId          - key of the item this copy shows, see `getItemKey()`.
  * @param {Function} props.setActiveBlockContextId - makes this item the editable one.
  * @param {boolean}  props.isHidden                - whether the editable item took its place.
  * @param {Object}   props.style                   - placement of the item, when the layout gives it one.
@@ -632,6 +636,7 @@ function ItemTemplateBlockPreview({
 				display: isHidden ? 'none' : undefined,
 				...(effect ? { '--vp-slide-index': index } : null),
 			}}
+			data-vp-item-key={blockContextId}
 		>
 			{effect ? (
 				<div className={SLIDE_CLASS_NAME}>{preview}</div>
@@ -742,7 +747,7 @@ export default function BlockEdit({
 		]
 	);
 
-	const { items, isLoading } = useLoopItems(query);
+	const { items, isLoading, answeredQuery } = useLoopItems(query);
 
 	// The read-only copies show the item and nothing else: a carousel control
 	// dropped in the template is drawn once, by the item being edited.
@@ -754,7 +759,27 @@ export default function BlockEdit({
 		[clientId]
 	);
 
-	const blockContexts = useMemo(() => items.map(getItemContext), [items]);
+	const answeredContexts = useMemo(() => items.map(getItemContext), [items]);
+
+	const arrangedContexts = useMemo(
+		() => arrangeItems({ items: answeredContexts, answeredQuery, query }),
+		[answeredContexts, answeredQuery, query]
+	);
+	const blockContexts = arrangedContexts || answeredContexts;
+	const isWaiting = isLoading && !arrangedContexts;
+
+	const isImages = 'images' === query.queryType;
+	const itemKeys = useMemo(() => {
+		const keys = blockContexts.map((blockContext) =>
+			getItemKey(blockContext, isImages)
+		);
+
+		return new Set(keys).size === keys.length
+			? keys
+			: blockContexts.map((blockContext) =>
+					getItemKey(blockContext, false)
+				);
+	}, [blockContexts, isImages]);
 
 	// The selected item can disappear when the query changes, and an id nothing
 	// matches would leave the template without an editable item. The item that
@@ -762,17 +787,16 @@ export default function BlockEdit({
 	// is a new item to the endpoint, standing exactly where the old one stood,
 	// and the block being edited must not jump away from it.
 	const activeIndexRef = useRef(0);
-	const activeIndex = blockContexts.findIndex(
-		(blockContext) => blockContext['vp/itemId'] === activeBlockContextId
-	);
+	const activeIndex = itemKeys.indexOf(activeBlockContextId);
 
 	if (-1 !== activeIndex) {
 		activeIndexRef.current = activeIndex;
 	}
 
-	const activeContextId = (blockContexts[activeIndex] ??
-		blockContexts[activeIndexRef.current] ??
-		blockContexts[0])?.['vp/itemId'];
+	const activeContextId =
+		itemKeys[activeIndex] ??
+		itemKeys[activeIndexRef.current] ??
+		itemKeys[0];
 
 	// A preview has no one to tell about an empty source, and is what shows a
 	// layout: the inserter previews a pattern with no images of its own.
@@ -975,8 +999,10 @@ export default function BlockEdit({
 			lastRow: justifiedLastRow,
 		},
 		itemsCount: blockContexts.length,
-		signature: `${columnsProps.className}|${JSON.stringify(columnsProps.style)}|${justifiedRowHeight}|${justifiedRowHeightTolerance}|${justifiedMaxRowsCount}|${justifiedLastRow}|${carouselEffect}`,
+		signature: `${columnsProps.className}|${JSON.stringify(columnsProps.style)}|${justifiedRowHeight}|${justifiedRowHeightTolerance}|${justifiedMaxRowsCount}|${justifiedLastRow}|${carouselEffect}|${itemKeys.join(',')}`,
 	});
+
+	useMoveAnimation(listRef, itemKeys, !slideEffect);
 
 	// The layout describes a list of items; the empty state is a single notice
 	// and would be laid out into the first column of a grid.
@@ -1878,13 +1904,13 @@ export default function BlockEdit({
 			{blockControls}
 			{inspectorControls}
 			{withChrome(
-				<ul {...blockProps} aria-busy={isLoading || undefined}>
+				<ul {...blockProps} aria-busy={isWaiting || undefined}>
 					{/* Out of the flow, so a settings change never moves the
 				    gallery under the pointer that is still changing it. A
 				    list item rather than a sibling: the list is the block
 				    element, and neither layout library looks at a node
 				    without the item class. */}
-					{isLoading ? (
+					{isWaiting ? (
 						<li
 							className="wp-block-visual-portfolio-item-template__editor-spinner"
 							aria-hidden="true"
@@ -1894,11 +1920,11 @@ export default function BlockEdit({
 					) : null}
 
 					{blockContexts.map((blockContext, index) => {
+						const itemKey = itemKeys[index];
 						// Nothing is edited inside a block preview, so no item
 						// there is the editable one.
 						const isActive =
-							!isPreview &&
-							blockContext['vp/itemId'] === activeContextId;
+							!isPreview && itemKey === activeContextId;
 
 						// The tiles pattern repeats over the items, so an item is
 						// placed by where it falls inside one repetition.
@@ -1908,7 +1934,7 @@ export default function BlockEdit({
 
 						return (
 							<BlockContextProvider
-								key={blockContext['vp/itemId']}
+								key={itemKey}
 								value={blockContext}
 							>
 								{isActive ? (
@@ -1916,6 +1942,7 @@ export default function BlockEdit({
 										style={style}
 										effect={slideEffect}
 										index={index}
+										itemKey={itemKey}
 									/>
 								) : null}
 
@@ -1923,7 +1950,7 @@ export default function BlockEdit({
 							    what the next item reuses when the selection moves. */}
 								<MemoizedItemTemplateBlockPreview
 									blocks={blocks}
-									blockContextId={blockContext['vp/itemId']}
+									blockContextId={itemKey}
 									setActiveBlockContextId={
 										setActiveBlockContextId
 									}

@@ -52,6 +52,17 @@ aspect ratio and the rotation in the toolbar. Replace offers the media library
 and an upload. A posts loop shows neither: its image is the featured image of
 the post, and belongs to it.
 
+The same toolbar moves the image along the gallery, the way the core Gallery
+moves one of its images: *Move left* and *Move right* swap it with its
+neighbour in the order the gallery is shown, and *Remove from gallery* in the
+options menu takes it out of the gallery and leaves the attachment in the media
+library. The Item Cover block carries the same controls. A gallery sorted by
+date, title or at random has no order of its own, so it offers the removal
+alone. The preview redraws the items it already holds at once, sliding each to
+its new place, and the server's answer confirms the order when it arrives. An
+image moved past the last item of the preview leaves it, and the next one
+comes in once the answer lands.
+
 **Format badge.** The Item Image and Item Cover blocks can mark an item that is
 not a still picture. *Format badge* puts the video, audio or gallery icon of the
 classic gallery in a corner of the picture, and *Badge position* picks the

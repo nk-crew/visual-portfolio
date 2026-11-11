@@ -56,6 +56,7 @@ import {
 } from '../../utils/tools-panel';
 import { IMAGE_EFFECT_TEASERS } from '../item-cover/effects';
 import { getGalleryImageId, useGalleryImage } from './gallery-image';
+import GalleryOrderControls from './gallery-order-controls';
 
 // The image settings Pro adds, for an install without them.
 const PRO_SETTINGS = IMAGE_EFFECT_TEASERS;
@@ -283,6 +284,12 @@ export default function ItemImageEdit({
 			{blockEditingMode === 'default' && (
 				<>
 					{/* The cropper brings a toolbar of its own, and nothing else belongs beside it. */}
+					{!isCropping && (
+						<GalleryOrderControls
+							clientId={clientId}
+							context={context}
+						/>
+					)}
 					{!isCropping && (
 						<BlockControls group="block">
 							<ToolbarDropdownMenu
