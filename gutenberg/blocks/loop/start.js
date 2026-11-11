@@ -15,8 +15,8 @@ import {
 	MenuItem,
 	Placeholder,
 } from '@wordpress/components';
-import { useRegistry, useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, gallery } from '@wordpress/icons';
@@ -25,6 +25,13 @@ import { chevronDown, gallery } from '@wordpress/icons';
  * Internal dependencies
  */
 import { getProUrl } from '../../components/pro-teaser';
+import {
+	ACCEPTED_FILES,
+	ImportMenu,
+	ImportProgress,
+	useDropImport,
+	useGalleryImport,
+} from '../../loop-sources/gallery-import';
 import {
 	ALLOWED_MEDIA_TYPES,
 	prepareImage,
@@ -147,13 +154,16 @@ export function SourceStart({ attributes, setAttributes, clientId, onSource }) {
 	const [proSource, setProSource] = useState(null);
 	const registry = useRegistry();
 	const sources = useSources(attributes.queryType);
-	const mediaUpload = useSelect(
-		(select) => select(blockEditorStore).getSettings().mediaUpload,
-		[]
-	);
+	const galleryImport = useGalleryImport(clientId);
+	const drop = useDropImport(galleryImport);
+	const imageCount = attributes.imagesQuery?.images?.length || 0;
 
-	// An upload reports each file on its own, the last ones after this step
-	// has given way to the next, so the gallery is read when a file arrives.
+	useEffect(() => {
+		if (imageCount && 'images' === attributes.queryType) {
+			onSource();
+		}
+	}, [imageCount, attributes.queryType, onSource]);
+
 	const addImages = (media) => {
 		const { getBlockAttributes } = registry.select(blockEditorStore);
 		const { imagesQuery } = getBlockAttributes(clientId);
@@ -181,21 +191,14 @@ export function SourceStart({ attributes, setAttributes, clientId, onSource }) {
 		}
 	};
 
-	// A file is reported as a blob preview first, without an id, then as the
-	// saved attachment - only that one is added.
-	const upload = (filesList) =>
-		mediaUpload({
-			filesList,
-			allowedTypes: ALLOWED_MEDIA_TYPES,
-			onFileChange: addImages,
-		});
-
 	const choose = (source) => {
 		if (source.isPro && !isProPlugin) {
 			setProSource(source);
 			return;
 		}
 
+		// The files still on their way would make the loop a gallery again.
+		galleryImport.cancel();
 		setAttributes({ queryType: source.name });
 		onSource();
 	};
@@ -232,22 +235,35 @@ export function SourceStart({ attributes, setAttributes, clientId, onSource }) {
 				icon={gallery}
 				label={__('Add images', 'visual-portfolio')}
 				instructions={__(
-					'Upload images, choose them from the Media Library, or drop them here.',
+					'Upload images, a folder or a ZIP archive, choose them from the Media Library, or drop them here.',
 					'visual-portfolio'
 				)}
 			>
 				<div className="vpf-loop-start__actions">
 					<FormFileUpload
 						variant="primary"
-						accept={ALLOWED_MEDIA_TYPES.map(
-							(type) => `${type}/*`
-						).join(',')}
+						accept={ACCEPTED_FILES}
 						multiple
-						onChange={(event) => upload(event.currentTarget.files)}
+						onChange={(event) =>
+							galleryImport.importFiles(event.currentTarget.files)
+						}
 						__next40pxDefaultSize
 					>
 						{__('Upload', 'visual-portfolio')}
 					</FormFileUpload>
+					<MediaUploadCheck>
+						<ImportMenu
+							clientId={clientId}
+							galleryImport={galleryImport}
+							withFiles={false}
+							icon={null}
+							toggleProps={{
+								children: __('Import', 'visual-portfolio'),
+								variant: 'secondary',
+								__next40pxDefaultSize: true,
+							}}
+						/>
+					</MediaUploadCheck>
 					<MediaUploadCheck>
 						<MediaUpload
 							multiple="add"
@@ -320,13 +336,16 @@ export function SourceStart({ attributes, setAttributes, clientId, onSource }) {
 	}
 
 	return (
-		<div className="vpf-loop-start">
+		<div className="vpf-loop-start" onDropCapture={drop.onDropCapture}>
 			<DropZone
 				label={__('Drop images to add them', 'visual-portfolio')}
-				onFilesDrop={upload}
+				onFilesDrop={drop.onFilesDrop}
 			/>
 			<Shapes />
-			<div className="vpf-loop-start__card">{card}</div>
+			<div className="vpf-loop-start__card">
+				{card}
+				<ImportProgress galleryImport={galleryImport} />
+			</div>
 		</div>
 	);
 }
@@ -344,9 +363,11 @@ export function LayoutStart({ attributes, clientId, onChoose }) {
 	const [isAllOpen, setIsAllOpen] = useState(false);
 	const { layouts, context } = useLayouts(clientId, attributes);
 	const count = attributes.imagesQuery?.images?.length || 0;
+	const galleryImport = useGalleryImport(clientId);
 
 	return (
 		<div className="vpf-loop-layouts">
+			<ImportProgress galleryImport={galleryImport} />
 			<div className="vpf-loop-layouts__head">
 				<div>
 					<h2>{__('Choose a layout', 'visual-portfolio')}</h2>

@@ -306,7 +306,20 @@ export function getJustifiedOptions(list) {
  */
 export function startLayout(list, layout) {
 	const view = list.ownerDocument.defaultView || window;
-	const update = () => layout(list);
+	const observed = new WeakSet();
+
+	// Items too: an editor cover takes its ratio in a render after `load`.
+	const observer = new view.ResizeObserver(() => update());
+	const update = () => {
+		layout(list);
+
+		list.querySelectorAll(ITEM_SELECTOR).forEach((item) => {
+			if (!observed.has(item)) {
+				observed.add(item);
+				observer.observe(item);
+			}
+		});
+	};
 
 	// A layout whose columns follow the container needs the count before it can
 	// place anything, and it has to be placed again when the count changes.
@@ -319,8 +332,6 @@ export function startLayout(list, layout) {
 	// device preview alike. `load` does not bubble, so it is caught on the way
 	// down.
 	list.addEventListener('load', update, true);
-
-	const observer = new view.ResizeObserver(update);
 
 	observer.observe(list);
 

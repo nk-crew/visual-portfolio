@@ -124,6 +124,11 @@
 }
 
 // Side by side when both fit, one per row when they do not.
+.vpf-gallery-manager__actions .vpf-gallery-import__menu {
+	display: flex;
+	flex: 1 1 auto;
+}
+
 .vpf-gallery-manager__actions .components-button.vpf-gallery-manager__add {
 	flex: 1 1 auto;
 	justify-content: center;

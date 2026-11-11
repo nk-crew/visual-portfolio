@@ -41,6 +41,22 @@ and whenever a user writes the `vp_posts_custom_query` meta that Saved Layouts,
 the shortcode and the Saved block read; an import or a command run without a
 user is left alone. The editor previews such a user's query the same way.
 
+**Bulk import.** A gallery of images takes a whole folder or a ZIP archive at
+once. The drop zone takes files, folders and archives, and *Upload* on the
+first step of a loop takes files and archives. *Import* offers *Upload folder*
+on that step, and *Upload files or ZIP* and *Upload folder* beside *Add media*
+in the sidebar. An archive is
+unpacked in the browser, so its size is not bound by the site's upload limit;
+the files inside it and inside nested folders are uploaded one by one, three at
+a time, and join the gallery in the natural order of their paths (`IMG_2`
+before `IMG_10`), whatever order the uploads finish in. System files
+(`.DS_Store`, `__MACOSX`, hidden files) are left out, files of another type are
+counted and skipped, and so is a file whose name and size match an image the
+gallery already holds, so importing the same folder twice adds nothing. The
+progress shows under the actions until the last file is in, and leaving the
+page meanwhile asks first. A failed file is listed with its reason and *Retry
+failed* sends it again.
+
 **Item image.** On a gallery of images the toolbar of the item image carries
 the two media tools the core Image block has: *Crop* and *Replace*. Both act on
 the entry of the item in the loop's gallery — the same entry the gallery
@@ -51,6 +67,17 @@ the inline cropper the block editor still ships for plugins, with the zoom, the
 aspect ratio and the rotation in the toolbar. Replace offers the media library
 and an upload. A posts loop shows neither: its image is the featured image of
 the post, and belongs to it.
+
+The same toolbar moves the image along the gallery, the way the core Gallery
+moves one of its images: *Move left* and *Move right* swap it with its
+neighbour in the order the gallery is shown, and *Remove from gallery* in the
+options menu takes it out of the gallery and leaves the attachment in the media
+library. The Item Cover block carries the same controls. A gallery sorted by
+date, title or at random has no order of its own, so it offers the removal
+alone. The preview redraws the items it already holds at once, sliding each to
+its new place, and the server's answer confirms the order when it arrives. The
+arrows stop at the last image the preview shows, so the image being edited
+stays in sight; the gallery manager in the sidebar moves an image further.
 
 **Format badge.** The Item Image and Item Cover blocks can mark an item that is
 not a still picture. *Format badge* puts the video, audio or gallery icon of the
@@ -921,6 +948,19 @@ is measured by Fancybox and PhotoSwipe. Upload to Media Library in its Image
 Settings asks the server to fetch the file (`POST /wp/v2/media` with `url`) and
 moves the entry to the new attachment, keeping everything typed into it. An
 entry whose attachment was deleted keeps its `id` and stays a No Image item.
+
+**Import sources.** The *Import* menu of a gallery lists the sources of the
+`vpf.galleryImportSources` JavaScript filter after its own items. It is given an
+empty array and `{ clientId }`, and returns `{ name, label, icon, render }`
+entries. Once one is picked the menu mounts `render` as a component with
+`{ clientId, importItems, onClose }`. `importItems( items )` hands files to the
+gallery's queue, which skips, orders, uploads and reports them as it does a
+folder. An item is `{ name, size, path }` plus one of `getFile()`, resolving to
+the file's data the editor uploads, or `run()`, resolving to an attachment as
+`/wp/v2/media` answers one, for a file the source puts in the library itself.
+`POST /visual-portfolio/v1/gallery_file_matches` with `{ ids, files }` answers
+the indexes of `files` (`{ name, size }`) the attachments `ids` were uploaded
+from; the queue asks it before every import.
 
 Per-image fields in the gallery manager are added through the
 `VP.LoopImageSettings` slot. The formats its Format list offers come from the
