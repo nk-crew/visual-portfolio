@@ -213,8 +213,6 @@ class Visual_Portfolio_Block_Loop_Filter {
 			return '';
 		}
 
-		// A filter set up by an extension lists what only that extension knows
-		// how to read. Without it there is nothing honest to print.
 		if ( ! empty( $attributes['extensions']['facet'] ) && is_array( $attributes['extensions']['facet'] ) ) {
 			return '';
 		}

@@ -300,8 +300,6 @@ class ClassLoopControlsDisplay extends WP_UnitTestCase {
 		$this->assertSame( array( 'All', 'Zoo', 'Alps' ), $labels( 'manual' ) );
 		$this->assertSame( array( 'All', 'Alps', 'Zoo' ), $labels( 'name' ) );
 
-		// Nature holds three images, City two, so by count Nature leads even
-		// when its label sorts last.
 		$swapped = str_replace( array( '"city"', '"nature"' ), array( '"tmp"', '"city"' ), $filter );
 		$swapped = str_replace( '"tmp"', '"nature"', $swapped );
 
@@ -319,7 +317,6 @@ class ClassLoopControlsDisplay extends WP_UnitTestCase {
 
 		$this->assertStringNotContainsString( 'vp-block-loop-filter', $html );
 
-		// An empty set of extension settings is no setup at all.
 		$this->assertStringContainsString( 'vp-block-loop-filter', $this->render_loop( '<!-- wp:visual-portfolio/loop-filter {"extensions":{"facet":[]}} /-->' ) );
 	}
 }

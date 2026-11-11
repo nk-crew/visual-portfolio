@@ -82,8 +82,6 @@ class ClassSeoOptimization extends WP_UnitTestCase {
 		// One loop paged past its first page is enough.
 		$this->assertTrue( $this->has_noindex( 'vp-1-page=1&vp-2-page=2' ) );
 
-		// Parameters an extension adds to a loop narrow it too, a form's list
-		// included.
 		$this->assertTrue( $this->has_noindex( 'vp-1-year=2024' ) );
 		$this->assertTrue( $this->has_noindex( 'vp-1-field-country=norway' ) );
 		$this->assertTrue( $this->has_noindex( 'vp-1-category%5B%5D=web' ) );

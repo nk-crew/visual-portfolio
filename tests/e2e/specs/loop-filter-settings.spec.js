@@ -150,7 +150,6 @@ test.describe('Gallery Filter settings', () => {
 
 		const sidebar = page.getByRole('region', { name: 'Editor settings' });
 
-		// None of them is drawn as a control.
 		await expect(sidebar.getByText('Filter by (Pro)')).toHaveCount(0);
 
 		await sidebar.getByRole('button', { name: 'Settings options' }).click();

@@ -40,8 +40,6 @@ const ITEM_BLOCK = 'visual-portfolio/loop-filter-item';
 
 const { pro: isProPlugin } = window.VPGutenbergVariables || {};
 
-// The ways the filter shows its items. An extension adds its own through
-// `vpf.loopFilterDisplayOptions`, keeping its value where it likes.
 const DISPLAY_OPTIONS = [
 	{
 		value: 'buttons',
@@ -57,8 +55,6 @@ const DISPLAY_OPTIONS = [
 	},
 ];
 
-// The settings Pro adds to the filter, for an install without them, shown in
-// the menu of the panel.
 const PRO_SETTINGS = [
 	{
 		name: 'filterBy',
@@ -313,7 +309,6 @@ export default function BlockEdit({
 		queryType,
 		source: postsQuery?.source,
 		postTypesSet: postsQuery?.postTypesSet,
-		// Another taxonomy, or another set of categories, is another set of terms.
 		facetBy: hasFacet ? facet.by : null,
 		facetChosen: hasFacet ? facet.chosen : null,
 	});
@@ -431,8 +426,6 @@ export default function BlockEdit({
 					}
 				});
 
-				// Sorted the way the page sorts them, so the editor shows the
-				// order visitors get.
 				const sortedBlocks = sortItems(updatedBlocks, termOrder);
 
 				// Untouched items are returned by identity, so this also tells
@@ -535,7 +528,6 @@ export default function BlockEdit({
 
 	let content = <div {...innerBlocksProps} />;
 
-	// The page prints nothing for a filter only Pro knows how to read.
 	if (hasFacet && !isProPlugin) {
 		content = (
 			<div {...blockProps}>
@@ -590,8 +582,6 @@ export default function BlockEdit({
 		{ attributes }
 	);
 
-	// The last option that claims the attributes wins, so an option an
-	// extension adds over a free one shows as chosen.
 	const displayValue =
 		[...displayOptions]
 			.reverse()
@@ -773,7 +763,6 @@ export default function BlockEdit({
 						/>
 					))}
 
-					{/* After the settings there are, so the menu leads with those. */}
 					{teasers.map(({ name, Item }) => (
 						<Item key={name} clientId={clientId} />
 					))}

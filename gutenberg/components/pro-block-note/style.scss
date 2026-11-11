@@ -1,5 +1,3 @@
-// A block set up in Pro, in an editor without it. Drawn in the editor's own
-// type and colors, since it speaks to the editor, not to visitors.
 .vpf-pro-block-note {
 	display: grid;
 	gap: 4px;
@@ -26,7 +24,6 @@
 		font-weight: 600;
 	}
 
-	// The badge of the Pro settings in the inspector.
 	&__badge {
 		flex: none;
 		padding: 0 4px;
