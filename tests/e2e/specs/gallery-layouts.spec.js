@@ -301,13 +301,20 @@ test.describe('Gallery Item Template layouts', () => {
 		const [image, title, gap] = await Promise.all([
 			item.locator('.wp-block-visual-portfolio-item-image').boundingBox(),
 			item.locator('.wp-block-visual-portfolio-item-title').boundingBox(),
-			page.evaluate(() =>
-				parseFloat(
-					getComputedStyle(document.body).getPropertyValue(
-						'--wp--style--block-gap'
-					)
-				)
-			),
+			// The theme may write the gap in any unit; a box of that height
+			// says what it comes to.
+			page.evaluate(() => {
+				const probe = document.createElement('div');
+
+				probe.style.height = 'var(--wp--style--block-gap)';
+				document.body.append(probe);
+
+				const height = probe.getBoundingClientRect().height;
+
+				probe.remove();
+
+				return height;
+			}),
 		]);
 
 		expect(gap).toBeGreaterThan(0);
