@@ -408,6 +408,9 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 
 				// Reads the context keys of the item template, so it follows it.
 				require_once $this->plugin_path . 'classes/class-block-bindings.php';
+
+				require_once $this->plugin_path . 'classes/class-loop-gallery.php';
+				require_once $this->plugin_path . 'classes/class-abilities.php';
 			}
 
 			require_once $this->plugin_path . 'classes/class-shortcode.php';

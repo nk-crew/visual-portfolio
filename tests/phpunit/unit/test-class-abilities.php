@@ -1,0 +1,360 @@
+<?php
+/**
+ * Tests for the gallery abilities AI agents call.
+ *
+ * @package Visual Portfolio
+ */
+
+require_once dirname( __DIR__ ) . '/trait-loop-blocks.php';
+
+/**
+ * Test case for Visual_Portfolio_Abilities.
+ */
+class Test_Class_Abilities extends WP_UnitTestCase {
+	use Visual_Portfolio_Loop_Blocks_Trait;
+
+	/**
+	 * Users by role.
+	 *
+	 * @var array
+	 */
+	private static $users = array();
+
+	/**
+	 * Image attachments.
+	 *
+	 * @var array
+	 */
+	private static $image_ids = array();
+
+	/**
+	 * Content around a gallery that a write must leave alone.
+	 *
+	 * @var string
+	 */
+	const SURROUNDINGS = "<!-- wp:paragraph -->\n<p>Before &amp; <em>after</em></p>\n<!-- /wp:paragraph -->\n\n<!-- wp:group {\"layout\":{\"type\":\"constrained\"}} -->\n<div class=\"wp-block-group\"><!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Work</h2>\n<!-- /wp:heading --></div>\n<!-- /wp:group -->";
+
+	/**
+	 * Create users and images once.
+	 *
+	 * @param WP_UnitTest_Factory $factory - factory.
+	 */
+	public static function wpSetUpBeforeClass( $factory ) {
+		foreach ( array( 'administrator', 'author', 'contributor', 'subscriber' ) as $role ) {
+			self::$users[ $role ] = $factory->user->create( array( 'role' => $role ) );
+		}
+
+		for ( $i = 0; $i < 3; $i++ ) {
+			self::$image_ids[] = $factory->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png' );
+		}
+	}
+
+	/**
+	 * Skip without the loop family.
+	 */
+	public function set_up() {
+		parent::set_up();
+		$this->skip_without_loop_blocks();
+	}
+
+	/**
+	 * Run an ability as a user.
+	 *
+	 * @param string $name - ability name without the namespace.
+	 * @param array  $input - input.
+	 * @param string $role - role of the user.
+	 *
+	 * @return mixed
+	 */
+	private function run_ability( $name, $input = null, $role = 'administrator' ) {
+		wp_set_current_user( self::$users[ $role ] );
+
+		return wp_get_ability( 'visual-portfolio/' . $name )->execute( $input );
+	}
+
+	/**
+	 * An images source of the images given by index.
+	 *
+	 * @param array $indexes - indexes into the images.
+	 *
+	 * @return array
+	 */
+	private function images_source( $indexes ) {
+		return array(
+			'type'   => 'images',
+			'images' => array_map(
+				function ( $index ) {
+					return array( 'id' => self::$image_ids[ $index ] );
+				},
+				$indexes
+			),
+		);
+	}
+
+	/**
+	 * Every ability is registered, public to clients and the MCP Adapter,
+	 * and in the plugin's category.
+	 */
+	public function test_abilities_are_public() {
+		foreach ( array( 'get-gallery-options', 'list-galleries', 'get-gallery', 'create-gallery', 'update-gallery' ) as $name ) {
+			$ability = wp_get_ability( 'visual-portfolio/' . $name );
+
+			$this->assertNotNull( $ability, $name );
+			$this->assertSame( 'visual-portfolio', $ability->get_category(), $name );
+			$this->assertTrue( $ability->get_meta_item( 'public' ), $name );
+			$this->assertTrue( $ability->get_meta_item( 'show_in_rest' ), $name );
+			$this->assertSame( array( 'public' => true ), $ability->get_meta_item( 'mcp' ), $name );
+		}
+
+		$this->assertTrue( wp_get_ability( 'visual-portfolio/get-gallery' )->get_meta_item( 'annotations' )['readonly'] );
+		$this->assertTrue( wp_get_ability( 'visual-portfolio/update-gallery' )->get_meta_item( 'annotations' )['idempotent'] );
+	}
+
+	/**
+	 * A gallery added to a post lands after its content, which stays as it
+	 * was, and reads back in the vocabulary it was written in.
+	 */
+	public function test_create_gallery_in_a_post() {
+		$post_id = self::factory()->post->create( array( 'post_content' => self::SURROUNDINGS ) );
+		$gallery = $this->run_ability(
+			'create-gallery',
+			array(
+				'post_id'  => $post_id,
+				'layout'   => 'visual-portfolio/gallery-masonry-classic',
+				'source'   => $this->images_source( array( 2, 0 ) ),
+				'settings' => array( 'columns' => 2 ),
+			)
+		);
+
+		$this->assertIsArray( $gallery );
+		$this->assertSame( $post_id, $gallery['post_id'] );
+		$this->assertSame( 'masonry', $gallery['layout_type'] );
+		$this->assertSame( array( self::$image_ids[2], self::$image_ids[0] ), array_column( $gallery['source']['images'], 'id' ) );
+		$this->assertSame( 2, $gallery['settings']['columns'] );
+		$this->assertTrue( $gallery['settings']['lightbox'] );
+
+		$content = get_post( $post_id )->post_content;
+		$this->assertStringStartsWith( self::SURROUNDINGS . "\n\n<!-- wp:visual-portfolio/loop ", $content );
+		$this->assertSame( $gallery, $this->run_ability( 'get-gallery', array( 'post_id' => $post_id, 'gallery_id' => $gallery['gallery_id'] ) ) );
+	}
+
+	/**
+	 * Without a post, the gallery goes into a new draft page, for a user who
+	 * may create pages.
+	 */
+	public function test_create_gallery_makes_a_draft_page() {
+		$input = array(
+			'title'  => 'Lisbon',
+			'layout' => 'visual-portfolio/gallery-grid-classic',
+			'source' => $this->images_source( array( 0 ) ),
+		);
+
+		$this->assertWPError( $this->run_ability( 'create-gallery', $input, 'author' ) );
+
+		$gallery = $this->run_ability( 'create-gallery', $input );
+
+		$this->assertIsArray( $gallery );
+		$this->assertSame( 'page', $gallery['post_type'] );
+		$this->assertSame( 'draft', $gallery['post_status'] );
+		$this->assertSame( 'Lisbon', $gallery['post_title'] );
+	}
+
+	/**
+	 * A contributor may not put a gallery into someone else's post, and the
+	 * post is left as it was.
+	 */
+	public function test_create_gallery_respects_edit_rights() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_author'  => self::$users['administrator'],
+				'post_content' => self::SURROUNDINGS,
+			)
+		);
+		$result  = $this->run_ability(
+			'create-gallery',
+			array(
+				'post_id' => $post_id,
+				'layout'  => 'visual-portfolio/gallery-grid-classic',
+				'source'  => $this->images_source( array( 0 ) ),
+			),
+			'contributor'
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( self::SURROUNDINGS, get_post( $post_id )->post_content );
+	}
+
+	/**
+	 * An image the user cannot read, or an attachment that is not an image,
+	 * is refused, and the post is left as it was.
+	 */
+	public function test_create_gallery_refuses_images_the_user_cannot_read() {
+		$private_post = self::factory()->post->create(
+			array(
+				'post_author' => self::$users['administrator'],
+				'post_status' => 'private',
+			)
+		);
+		$hidden       = self::factory()->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png', $private_post );
+		$document     = self::factory()->attachment->create_object(
+			array(
+				'file'           => 'notes.pdf',
+				'post_mime_type' => 'application/pdf',
+			)
+		);
+		$post_id      = self::factory()->post->create(
+			array(
+				'post_author'  => self::$users['author'],
+				'post_content' => self::SURROUNDINGS,
+			)
+		);
+
+		foreach ( array( $hidden, $document, 999999 ) as $id ) {
+			$result = $this->run_ability(
+				'create-gallery',
+				array(
+					'post_id' => $post_id,
+					'layout'  => 'visual-portfolio/gallery-grid-classic',
+					'source'  => array(
+						'type'   => 'images',
+						'images' => array( array( 'id' => $id ) ),
+					),
+				),
+				'author'
+			);
+
+			$this->assertWPError( $result, (string) $id );
+			$this->assertSame( 'vpf_invalid_image', $result->get_error_code(), (string) $id );
+		}
+
+		$this->assertSame( self::SURROUNDINGS, get_post( $post_id )->post_content );
+	}
+
+	/**
+	 * A subscriber sees no options; an unknown layout is named in the error.
+	 */
+	public function test_errors_an_agent_can_act_on() {
+		$this->assertWPError( $this->run_ability( 'get-gallery-options', null, 'subscriber' ) );
+
+		$post_id = self::factory()->post->create();
+		$result  = Visual_Portfolio_Loop_Gallery::create( 'visual-portfolio/nope', array(), array() );
+
+		$this->assertSame( 'vpf_unknown_layout', $result->get_error_code() );
+		$this->assertStringContainsString( 'visual-portfolio/gallery-grid-classic', $result->get_error_message() );
+
+		$result = $this->run_ability(
+			'get-gallery',
+			array(
+				'post_id'    => $post_id,
+				'gallery_id' => 'nope',
+			)
+		);
+
+		$this->assertSame( 'vpf_gallery_not_found', $result->get_error_code() );
+	}
+
+	/**
+	 * Without Pro, the options list its sources as requiring it.
+	 */
+	public function test_options_mark_pro_sources() {
+		if ( visual_portfolio()->is_pro() ) {
+			$this->markTestSkipped( 'Pro describes its own sources.' );
+		}
+
+		$options = $this->run_ability( 'get-gallery-options', null, 'author' );
+		$sources = array_column( $options['sources'], null, 'type' );
+
+		$this->assertTrue( $sources['taxonomies']['requires_pro'] );
+		$this->assertStringContainsString( 'utm_medium=abilities', $sources['taxonomies']['pro_url'] );
+		$this->assertTrue( $sources['images']['available'] );
+		$this->assertContains( 'visual-portfolio/gallery-tiles-mosaic', array_column( $options['layouts'], 'slug' ) );
+	}
+
+	/**
+	 * The list holds galleries nested in other blocks, and only of posts the
+	 * user can edit.
+	 */
+	public function test_list_galleries_follows_edit_rights() {
+		$loop   = serialize_block( Visual_Portfolio_Loop_Gallery::create( 'visual-portfolio/gallery-grid-classic', array( 'source' => $this->images_source( array( 0, 1 ) ) ), array() ) );
+		$own    = self::factory()->post->create(
+			array(
+				'post_author'  => self::$users['contributor'],
+				'post_status'  => 'draft',
+				'post_title'   => 'Own gallery',
+				'post_content' => '<!-- wp:group --><div class="wp-block-group">' . $loop . '</div><!-- /wp:group -->',
+			)
+		);
+		$others = self::factory()->post->create(
+			array(
+				'post_author'  => self::$users['administrator'],
+				'post_title'   => 'Admin gallery',
+				'post_content' => $loop,
+			)
+		);
+
+		$listed = $this->run_ability( 'list-galleries', array(), 'contributor' );
+
+		$this->assertSame( array( $own ), array_column( $listed['galleries'], 'post_id' ) );
+		$this->assertSame( 2, $listed['galleries'][0]['image_count'] );
+
+		$listed = $this->run_ability( 'list-galleries', array( 'search' => 'Admin' ) );
+
+		$this->assertSame( array( $others ), array_column( $listed['galleries'], 'post_id' ) );
+	}
+
+	/**
+	 * An update changes the addressed gallery only; the same update a second
+	 * time saves nothing.
+	 */
+	public function test_update_gallery_is_repeatable_and_local() {
+		$other   = '<!-- wp:visual-portfolio/loop {"block_id":"other","queryType":"posts","queryId":1} --><div class="vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->';
+		$post_id = self::factory()->post->create( array( 'post_content' => self::SURROUNDINGS . "\n\n" . $other ) );
+		$gallery = $this->run_ability(
+			'create-gallery',
+			array(
+				'post_id'  => $post_id,
+				'position' => 'start',
+				'layout'   => 'visual-portfolio/gallery-grid-classic',
+				'source'   => $this->images_source( array( 0, 1 ) ),
+			)
+		);
+		$input   = array(
+			'post_id'    => $post_id,
+			'gallery_id' => $gallery['gallery_id'],
+			'add_images' => array( array( 'id' => self::$image_ids[2] ) ),
+			'order'      => array( self::$image_ids[2] ),
+		);
+
+		$updated   = $this->run_ability( 'update-gallery', $input );
+		$content   = get_post( $post_id )->post_content;
+		$revisions = count( wp_get_post_revisions( $post_id ) );
+
+		$this->assertSame( array( self::$image_ids[2], self::$image_ids[0], self::$image_ids[1] ), array_column( $updated['source']['images'], 'id' ) );
+		$this->assertStringEndsWith( self::SURROUNDINGS . "\n\n" . $other, $content );
+
+		$this->run_ability( 'update-gallery', $input );
+
+		$this->assertSame( $content, get_post( $post_id )->post_content );
+		$this->assertSame( $revisions, count( wp_get_post_revisions( $post_id ) ) );
+	}
+
+	/**
+	 * A gallery saved without an id is reached by its position and gets an
+	 * id with its first change.
+	 */
+	public function test_update_gives_an_unnamed_gallery_an_id() {
+		$post_id = self::factory()->post->create( array( 'post_content' => '<!-- wp:visual-portfolio/loop {"queryType":"posts"} --><div class="vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->' ) );
+		$updated = $this->run_ability(
+			'update-gallery',
+			array(
+				'post_id'    => $post_id,
+				'gallery_id' => 'loop-1',
+				'layout'     => 'visual-portfolio/gallery-posts-classic',
+			)
+		);
+
+		$this->assertIsArray( $updated );
+		$this->assertNotSame( 'loop-1', $updated['gallery_id'] );
+		$this->assertSame( 'grid', $updated['layout_type'] );
+	}
+}
