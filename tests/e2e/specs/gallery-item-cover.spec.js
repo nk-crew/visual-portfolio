@@ -180,6 +180,57 @@ test.describe('Gallery Item Cover placement', () => {
 		expect(boxes.cover.height).toBe(boxes.cover.width);
 	});
 
+	test('padding and gap set for a phone land on the panel on a phone', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publish(requestUtils, page, 'Cover - phone spacing', {
+			showContent: 'always',
+			style: {
+				spacing: { padding: { top: '8px', left: '8px' } },
+				'@mobile': {
+					spacing: {
+						padding: { top: '24px', left: '24px' },
+						blockGap: '30px',
+					},
+				},
+			},
+		});
+
+		const read = () =>
+			page
+				.locator(COVER)
+				.first()
+				.evaluate((node, inner) => {
+					const panel = window.getComputedStyle(
+						node.querySelector(inner)
+					);
+					const card = window.getComputedStyle(node);
+
+					return {
+						panel: [
+							panel.paddingTop,
+							panel.paddingLeft,
+							panel.rowGap,
+						],
+						card: [card.paddingTop, card.paddingLeft],
+					};
+				}, INNER);
+
+		const desktop = await read();
+
+		expect(desktop.panel.slice(0, 2)).toEqual(['8px', '8px']);
+		expect(desktop.panel[2]).not.toBe('30px');
+		expect(desktop.card).toEqual(['0px', '0px']);
+
+		// The card keeps no padding of its own: on it, the padding would inset
+		// the overlay and leave an unshaded frame round the picture.
+		await page.setViewportSize({ width: 390, height: 900 });
+		await expect
+			.poll(read, { timeout: 10000 })
+			.toEqual({ panel: ['24px', '24px', '30px'], card: ['0px', '0px'] });
+	});
+
 	test('emerge puts the panel at the foot of the card, overlay and all', async ({
 		page,
 		requestUtils,

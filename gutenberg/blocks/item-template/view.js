@@ -1839,8 +1839,9 @@ function getNextSlide(targets, from, direction) {
  * How many slides an arrow moves at a press.
  *
  * One by default, which is what a carousel has always done. A number is that
- * many. Zero is a whole screen, which has to be measured: a carousel whose
- * slides are their own width has no count of slides that means a screenful.
+ * many, and never more than a screenful: the columns step down as the screen
+ * narrows, and three slides a press on a phone that shows one would skip two
+ * nobody saw. Zero is a whole screen.
  *
  * @param {HTMLElement} list    Item template list.
  * @param {number[]}    targets Resting places of the slides.
@@ -1851,14 +1852,59 @@ function getNextSlide(targets, from, direction) {
 function getGroupSize(list, targets, from) {
 	const asked = parseInt(list.dataset.vpCarouselGroup, 10);
 
-	if (asked >= 1) {
-		return asked;
-	}
-
 	if (!Number.isInteger(asked)) {
 		return 1;
 	}
 
+	if (asked >= 1) {
+		return Math.min(asked, getSlidesOnScreen(list, targets));
+	}
+
+	return getScreenful(list, targets, from);
+}
+
+/**
+ * How many whole slides the frame shows.
+ *
+ * The column count where there is one: the slide next to the peek is only
+ * partly on screen, and measuring would count it. Slides of their own width
+ * have no count, so those are measured from the first slide, the way the snap
+ * groups are.
+ *
+ * @param {HTMLElement} list    Item template list.
+ * @param {number[]}    targets Resting places of the slides.
+ *
+ * @return {number} Slides, at least one.
+ */
+function getSlidesOnScreen(list, targets) {
+	if (list.classList.contains('vp-carousel-auto-width')) {
+		return getScreenful(list, targets, 0);
+	}
+
+	const view = list.ownerDocument.defaultView || window;
+	const columns = parseInt(
+		view
+			.getComputedStyle(list)
+			.getPropertyValue('--vp-layout-current-columns'),
+		10
+	);
+
+	return Math.max(1, columns || 1);
+}
+
+/**
+ * How many slides fill the frame.
+ *
+ * Measured rather than counted: a carousel whose slides are their own width
+ * has no count of slides that means a screenful.
+ *
+ * @param {HTMLElement} list    Item template list.
+ * @param {number[]}    targets Resting places of the slides.
+ * @param {number}      from    Slide the screen starts at.
+ *
+ * @return {number} Slides on the screen, at least one.
+ */
+function getScreenful(list, targets, from) {
 	const width = list.clientWidth;
 
 	// A repeating carousel has no targets to walk: every slide is a step of

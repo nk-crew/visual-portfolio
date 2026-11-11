@@ -49,7 +49,7 @@ import ProNote from '../../components/pro-note';
  * Internal dependencies
  */
 import { getProLabel, ProLine } from '../../components/pro-teaser';
-import getBlockGapValue from '../../utils/block-gap';
+import getBlockGapValue, { getScreenBlockGaps } from '../../utils/block-gap';
 import { CONTROL_BLOCKS } from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import {
@@ -884,14 +884,15 @@ export default function BlockEdit({
 						: previewColumns.layoutColumnCountMobile,
 				},
 				getBlockGapValue(attributes.style?.spacing?.blockGap),
-				getBlockGapValue(attributes.style?.spacing?.blockGap, 'top')
+				getBlockGapValue(attributes.style?.spacing?.blockGap, 'top'),
+				getScreenBlockGaps(attributes.style)
 			),
 		[
 			layoutType,
 			previewColumns,
 			tilesColumns,
 			singleSlide,
-			attributes.style?.spacing?.blockGap,
+			attributes.style,
 		]
 	);
 
@@ -1555,7 +1556,7 @@ export default function BlockEdit({
 					help={
 						peekable
 							? __(
-									'How much of the next slide shows at the edge, as an invitation to scroll.',
+									'How much of the next slide shows at the edge, as an invitation to scroll. Never more than a quarter of the carousel, so a phone keeps most of the slide.',
 									'visual-portfolio'
 								)
 							: __(
@@ -1579,7 +1580,7 @@ export default function BlockEdit({
 				<RangeControl
 					label={__('Slides per step', 'visual-portfolio')}
 					help={__(
-						'How many slides an arrow moves at a press. Zero moves a whole screen at a time, however many slides that is.',
+						'How many slides an arrow moves at a press, never more than the screen shows. Zero moves a whole screen at a time, however many slides that is.',
 						'visual-portfolio'
 					)}
 					value={carouselSlidesPerGroup}
