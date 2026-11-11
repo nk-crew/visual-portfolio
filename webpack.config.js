@@ -350,6 +350,87 @@ function retargetBabelForModules(rules) {
 	});
 }
 
+// The editor mounts one block icon in several places at once, some of them
+// hidden, such as the drag chip. An id repeated across those copies makes every
+// `url(#id)` resolve to the first copy in the document, and a gradient in a
+// `display: none` copy paints nothing. So an SVG that defines ids gets a prefix
+// unique to each rendered instance. `useInstanceId` counts per component, so the
+// prefix also carries the file name to keep two icons apart.
+function svgComponentTemplate(variables, { options, tpl }) {
+	const attributes = [];
+
+	(function collectAttributes(node) {
+		if ('JSXElement' !== node.type) {
+			return;
+		}
+
+		node.openingElement.attributes.forEach((attribute) => {
+			if (
+				'JSXAttribute' === attribute.type &&
+				'StringLiteral' === attribute.value?.type
+			) {
+				attributes.push(attribute);
+			}
+		});
+		node.children.forEach(collectAttributes);
+	})(variables.jsx);
+
+	const ids = attributes
+		.filter((attribute) => 'id' === attribute.name.name)
+		.map((attribute) => attribute.value.value);
+
+	if (!ids.length) {
+		return tpl`
+${variables.imports};
+
+${variables.interfaces};
+
+const ${variables.componentName} = (${variables.props}) => (
+	${variables.jsx}
+);
+
+${variables.exports};
+`;
+	}
+
+	attributes.forEach((attribute) => {
+		const value = attribute.value.value;
+		const prefixed =
+			'id' === attribute.name.name
+				? `\${idPrefix}${value}`
+				: value.replace(/url\(#([^)]+)\)/g, (match, id) =>
+						ids.includes(id) ? `url(#\${idPrefix}${id})` : match
+					);
+
+		if (prefixed !== value) {
+			attribute.value = {
+				type: 'JSXExpressionContainer',
+				expression: tpl(`\`${prefixed}\`;`).expression,
+			};
+		}
+	});
+
+	const fileName = path
+		.basename(options.state.filePath, '.svg')
+		.replace(/[^\w-]/g, '-');
+	const instancePrefix = tpl(`'vpf-${fileName}';`).expression;
+
+	return tpl`
+${variables.imports};
+import { useInstanceId } from '@wordpress/compose';
+
+${variables.interfaces};
+
+const ${variables.componentName} = (${variables.props}) => {
+	const idPrefix = useInstanceId(${variables.componentName}, ${instancePrefix}) + '-';
+
+	return ${variables.jsx};
+};
+
+${variables.exports};
+`;
+}
+
 function createSvgRules() {
 	return [
 		{
@@ -359,6 +440,7 @@ function createSvgRules() {
 				{
 					loader: '@svgr/webpack',
 					options: {
+						template: svgComponentTemplate,
 						svgoConfig: {
 							plugins: [
 								{
