@@ -11,3 +11,11 @@ export function setPortfolioLayouts(layouts) {
 		layouts,
 	};
 }
+
+export function setLayoutOptions(id, options) {
+	return {
+		type: 'SET_LAYOUT_OPTIONS',
+		id,
+		options,
+	};
+}

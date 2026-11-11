@@ -117,6 +117,8 @@ sets one of its own. With only Vertical set, the columns keep the default gap.
 A carousel has one row, so it reads Horizontal alone. With *Responsive styles*
 on, a gap set in the *Tablet* or *Mobile* view applies to that screen alone, on
 the item template and on the item cover, and so does the cover's padding.
+The blocks inside one item are spaced the way a Group spaces its blocks: the
+theme's block gap between each two, unless a block sets a margin of its own.
 
 A grid row is as tall as its tallest item, and the other items of the row
 stretch to its height. The block toolbar of a grid aligns them to the top, the
@@ -408,6 +410,31 @@ the focus moves to the first link of the first item that arrived, or to that
 item itself when it holds none. A last page the infinite scroll loads by itself
 leaves the focus where it is.
 
+**From the legacy block.** A Visual Portfolio block and a Saved Layout block
+turn into a Gallery Loop from the block switcher, the way a core Gallery or
+Query Loop does: *Gallery Loop* in the list of blocks to transform to, with a
+preview of the result. The loop keeps the source and its query, the number of
+items per page, the layout with its columns, tiles pattern or carousel
+settings, the gap, the skin, the click action and the lightbox captions, the
+filter, the sort and the search above the items, the pagination below them, the notice
+for no results and the custom CSS. The Classic skin becomes an Item Image with
+the caption blocks below it; Fade, Fly and Emerge become an Item Cover with
+the effect of the same name and the caption blocks inside. A Saved Layout is
+copied into the post, so the loop no longer follows later edits of the layout.
+Undo brings the legacy block back.
+
+A block whose setup is not finished, or whose source the loop does not have,
+is not offered the transform. These settings have no Gallery Loop equivalent
+and are left behind: the mouse wheel, speed, dynamic dots, sticky free mode,
+pause on hover and minimum height of a slider, the horizontal order of a
+masonry, the scroll to the top of a paged pagination, the pagination style,
+the icon, the hover overlay and the hover zoom of the Classic skin (Pro keeps the zoom), the tint Emerge puts over
+the picture, the hover color of links, and *Stretch*. A Read More shown only for posts
+with a More tag becomes one shown on every item. Custom CSS becomes the loop's
+own custom CSS, with `selector` written as `&`; rules that name the classes of
+the legacy markup match nothing in the loop, and WordPress removes the CSS when
+a user who may not edit CSS (`unfiltered_html`) saves the post.
+
 ## Anatomy
 
 ```
@@ -693,6 +720,16 @@ password, age gate and right-click protection. The item image has a Protection
 panel for the watermark. A trigger set to infinite scroll has an Infinite Scroll
 panel for loading on startup, pausing every few pages and the threshold
 distance.
+
+### The legacy block transform
+
+`vpf.loopLegacyTransform` filters the Gallery Loop a Visual Portfolio or Saved
+Layout block turns into. It is given the converted block (or blocks) and every
+attribute of the legacy block with the defaults resolved, and what it returns
+is inserted. An extension maps there the settings it added to the legacy
+block. A legacy source the loop offers through `registerLoopSource()` is
+offered the transform. The settings of a Saved Layout come from the
+`visual-portfolio/v1/get_layout` REST route.
 
 ### Item meta types
 

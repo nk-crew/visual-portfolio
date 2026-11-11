@@ -711,6 +711,18 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 	min-width: 0;
 }
 
+// The blocks of an item are spaced the way core's flow layout spaces a group,
+// at the theme's block gap, with the specificity of core's rule: a margin a
+// block sets for itself still wins. The editor draws the items it is not
+// editing inside a preview box of their own.
+:root :where(#{$item}, #{$card}, .wp-block-visual-portfolio-item-template__preview) > * {
+	margin-block: 0;
+}
+
+:root :where(#{$item}, #{$card}, .wp-block-visual-portfolio-item-template__preview) > * + * {
+	margin-block-start: var(--wp--style--block-gap, 1.5rem);
+}
+
 // The one box of a carousel that stays put while the list inside it scrolls.
 //
 // It clips: dragging past the last slide pulls the whole scroll

@@ -51,6 +51,24 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			)
 		);
 
+		// Get the settings of one layout.
+		register_rest_route(
+			$namespace,
+			'/get_layout/',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_layout' ),
+				'permission_callback' => array( $this, 'get_layout_permission' ),
+				'args'                => array(
+					'id' => array(
+						'required'          => true,
+						'type'              => 'integer',
+						'sanitize_callback' => 'absint',
+					),
+				),
+			)
+		);
+
 		// Update layout data.
 		register_rest_route(
 			$namespace,
@@ -630,6 +648,42 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		// which made the editor log a console error on every load and told any other client
 		// that the request was unauthenticated when it was not.
 		return $this->success( $layouts );
+	}
+
+	/**
+	 * Get layout settings permission.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function get_layout_permission( $request ) {
+		$post_id = (int) $request['id'];
+
+		if ( ! Visual_Portfolio_Security::current_user_can_edit_content() ) {
+			return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get saved layouts data.', 'visual-portfolio' ), true );
+		}
+
+		if ( 'vp_lists' !== get_post_type( $post_id ) ) {
+			return new WP_Error( 'not_found', esc_html__( 'Saved layout not found.', 'visual-portfolio' ), array( 'status' => 404 ) );
+		}
+
+		if ( ! current_user_can( 'read_post', $post_id ) ) {
+			return $this->error( 'not_allowed', esc_html__( 'Sorry, you are not allowed to get saved layouts data.', 'visual-portfolio' ), true );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get the settings of a layout, every registered control resolved.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function get_layout( $request ) {
+		return $this->success( Visual_Portfolio_Get::get_options( array( 'id' => (int) $request['id'] ) ) );
 	}
 
 	/**
