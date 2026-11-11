@@ -356,6 +356,8 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 			require_once $this->plugin_path . 'classes/class-rest.php';
 			require_once $this->plugin_path . 'classes/class-get-portfolio.php';
 			require_once $this->plugin_path . 'classes/class-saved-layouts.php';
+			require_once $this->plugin_path . 'classes/class-saved-layout-usage.php';
+			require_once $this->plugin_path . 'classes/class-saved-layouts-rest.php';
 			require_once $this->plugin_path . 'classes/class-custom-query-guard.php';
 			require_once $this->plugin_path . 'classes/class-tiles-parser.php';
 

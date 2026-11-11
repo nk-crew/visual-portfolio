@@ -257,20 +257,26 @@ class Visual_Portfolio_Saved_Layouts {
 	 * when the loop's block no longer carries it. A locked layout ignores the
 	 * overrides. A layout that no longer exists leaves the loop as it is.
 	 *
-	 * @param array $loop - parsed loop block.
+	 * @param array      $loop - parsed loop block.
+	 * @param array|null $layout - the layout's loop block, read from the layout when omitted.
+	 * @param bool|null  $locked - whether the layout is locked, read from the layout when omitted.
 	 *
 	 * @return array
 	 */
-	public static function apply_layout( $loop ) {
+	public static function apply_layout( $loop, $layout = null, $locked = null ) {
 		$reference = $loop['attrs']['savedLayout'] ?? array();
 		$id        = (int) ( $reference['id'] ?? 0 );
-		$layout    = $id && ! in_array( $id, self::$render_stack, true ) ? self::get_layout_loop( $id ) : null;
+
+		if ( null === $layout ) {
+			$layout = $id && ! in_array( $id, self::$render_stack, true ) ? self::get_layout_loop( $id ) : null;
+		}
 
 		if ( ! $layout ) {
 			return $loop;
 		}
 
-		$overrides = self::is_locked( $id ) ? array() : self::sanitize_overrides( $reference['overrides'] ?? array() );
+		$locked    = null === $locked ? self::is_locked( $id ) : $locked;
+		$overrides = $locked ? array() : self::sanitize_overrides( $reference['overrides'] ?? array() );
 
 		foreach ( self::LOOP_SYNCED_ATTRIBUTES as $name ) {
 			if ( in_array( $name, $overrides[ self::LOOP_KEY ] ?? array(), true ) ) {
