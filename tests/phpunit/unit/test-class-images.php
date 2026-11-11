@@ -335,6 +335,52 @@ class ClassImages extends WP_UnitTestCase {
     }
 
     /**
+     * The largest lightbox size registered at upload against the 1544x500 fixture,
+     * uploaded with the "big image" threshold below its width.
+     *
+     * @return array
+     */
+    public function lightbox_size_provider() {
+        return array(
+            'upload fits in the size'     => array( 1920, 9999, 1544, 500 ),
+            // As a 1920x10000 screenshot against the default 1920x9999 size.
+            'upload 1px over, a rounding' => array( 1543, 9999, 1544, 500 ),
+            // The lightbox gets a size of its own, made from the original.
+            'upload larger than the size' => array( 1200, 9999, 1000, 324 ),
+        );
+    }
+
+    /**
+     * WordPress keeps an upload the largest lightbox size shows whole at its own
+     * size, so the lightbox, falling back to the full size, does not open a
+     * smaller "-scaled" copy.
+     *
+     * @dataProvider lightbox_size_provider
+     *
+     * @param int $width           - lightbox size width.
+     * @param int $height          - lightbox size height.
+     * @param int $expected_width  - width of the full size.
+     * @param int $expected_height - height of the full size.
+     */
+    public function test_upload_the_lightbox_shows_whole_keeps_its_size( $width, $height, $expected_width, $expected_height ) {
+        // Earlier than the plugin, as a site that lowers the threshold does.
+        add_filter(
+            'big_image_size_threshold',
+            function () {
+                return 1000;
+            },
+            9
+        );
+        add_image_size( 'vp_xl_popup', $width, $height );
+
+        $attachment_id = self::factory()->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png' );
+
+        Visual_Portfolio_Images::add_image_sizes();
+
+        $this->assertSame( array( $expected_width, $expected_height ), array_slice( wp_get_attachment_image_src( $attachment_id, 'full' ), 1, 2 ) );
+    }
+
+    /**
      * Added Image to WordPress.
      *
      * @param string $image_url - Absolutely path to Image.
