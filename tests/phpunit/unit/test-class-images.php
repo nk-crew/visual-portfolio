@@ -381,6 +381,37 @@ class ClassImages extends WP_UnitTestCase {
     }
 
     /**
+     * A caller asking for the site-wide threshold, with no image, gets it unchanged.
+     */
+    public function test_threshold_without_an_image_is_unchanged() {
+        $this->assertSame( 2560, apply_filters( 'big_image_size_threshold', 2560, array( 0, 0 ), '', 0 ) );
+        $this->assertSame( 2560, apply_filters( 'big_image_size_threshold', 2560, array() ) );
+    }
+
+    /**
+     * Regenerating an upload scaled before keeps it scaled, so the attached
+     * "-scaled" file and the metadata still describe the same image.
+     */
+    public function test_regenerating_a_scaled_upload_keeps_it_scaled() {
+        $threshold = function () {
+            return 1000;
+        };
+
+        add_filter( 'big_image_size_threshold', $threshold, 11 );
+        $attachment_id = self::factory()->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png' );
+        remove_filter( 'big_image_size_threshold', $threshold, 11 );
+        add_filter( 'big_image_size_threshold', $threshold, 9 );
+
+        wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, wp_get_original_image_path( $attachment_id ) ) );
+
+        $full = wp_get_attachment_image_src( $attachment_id, 'full' );
+        $file = wp_getimagesize( get_attached_file( $attachment_id ) );
+
+        $this->assertSame( array( 1000, 324 ), array( $full[1], $full[2] ) );
+        $this->assertSame( array( 1000, 324 ), array( $file[0], $file[1] ) );
+    }
+
+    /**
      * Added Image to WordPress.
      *
      * @param string $image_url - Absolutely path to Image.
