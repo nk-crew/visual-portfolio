@@ -34,6 +34,13 @@ class Visual_Portfolio_Loop_Gallery {
 	const NO_COLUMNS = array( 'tiles', 'justified' );
 
 	/**
+	 * Values of `postsQuery.source` that are not a post type.
+	 *
+	 * @var array
+	 */
+	const POSTS_SELECTORS = array( 'ids', 'current_query', 'custom_query', 'post_types_set' );
+
+	/**
 	 * Sources and settings the abilities accept.
 	 *
 	 * @return array
@@ -84,14 +91,9 @@ class Visual_Portfolio_Loop_Gallery {
 				'per_page' => array(
 					'description' => __( 'Items per page, or -1 for all of them on one page. An images gallery made by these abilities has no pagination, so there it is how many images show.', 'visual-portfolio' ),
 					'schema'      => array(
-						'type'  => 'integer',
-						'oneOf' => array(
-							array( 'enum' => array( -1 ) ),
-							array(
-								'minimum' => 1,
-								'maximum' => 100,
-							),
-						),
+						'type'    => 'integer',
+						'minimum' => -1,
+						'maximum' => 100,
 					),
 				),
 				'lightbox' => array(
@@ -166,7 +168,6 @@ class Visual_Portfolio_Loop_Gallery {
 					'path'  => $block_path,
 					'block' => $block,
 				);
-				continue;
 			}
 
 			if ( ! empty( $block['innerBlocks'] ) ) {
@@ -195,8 +196,8 @@ class Visual_Portfolio_Loop_Gallery {
 	/**
 	 * The loop a gallery id names.
 	 *
-	 * A `loop-<n>` id keeps naming the n-th loop after a write gave it a
-	 * `block_id`, so a retried call finds the gallery it already changed.
+	 * A `loop-<n>` id names the n-th loop only while it has no `block_id`,
+	 * so an id read before other loops moved never reaches another gallery.
 	 *
 	 * @param array  $blocks - parsed blocks of the post.
 	 * @param string $gallery_id - gallery id.
@@ -213,7 +214,7 @@ class Visual_Portfolio_Loop_Gallery {
 		}
 
 		foreach ( $loops as $index => $found ) {
-			if ( 'loop-' . ( $index + 1 ) === (string) $gallery_id ) {
+			if ( self::get_gallery_id( $found['block'], $index ) === (string) $gallery_id ) {
 				return $found + array( 'index' => $index );
 			}
 		}
@@ -242,9 +243,7 @@ class Visual_Portfolio_Loop_Gallery {
 			$posts_query = $attrs['postsQuery'] ?? array();
 			$selector    = $posts_query['source'] ?? 'portfolio';
 
-			// The other selectors (`ids`, `current_query`, `custom_query`,
-			// `post_types_set`) are not post types.
-			$source[ post_type_exists( $selector ) ? 'post_type' : 'query' ] = $selector;
+			$source[ in_array( $selector, self::POSTS_SELECTORS, true ) ? 'query' : 'post_type' ] = $selector;
 
 			$source['ids']      = array_map( 'intval', $posts_query['ids'] ?? array() );
 			$source['terms']    = array_map( 'intval', $posts_query['taxonomies'] ?? array() );
@@ -330,21 +329,25 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @param array $loop - loop block.
 	 * @param array $input - `layout`, `source`, `settings` and the image operations.
 	 * @param array $blocks - parsed blocks of the post it is in.
+	 * @param int   $index - 0-based position of the loop among the loops of the post.
 	 *
 	 * @return array|WP_Error loop block.
 	 */
-	public static function update( $loop, $input, $blocks ) {
-		$block_ids = array_count_values( array_map( 'strval', self::collect_attribute( $blocks, 'block_id' ) ) );
-		$query_ids = array_count_values( array_map( 'intval', self::collect_attribute( $blocks, 'queryId', self::LOOP ) ) );
-
+	public static function update( $loop, $input, $blocks, $index = 0 ) {
 		// Content written outside the editor can hold two loops with one id.
-		if ( empty( $loop['attrs']['block_id'] ) || ( $block_ids[ (string) $loop['attrs']['block_id'] ] ?? 0 ) > 1 ) {
+		// As in the editor, the first holder keeps it and a later one gets
+		// its own, so the id keeps naming the same gallery on a retry.
+		$earlier = array_column( array_column( array_slice( self::find_loops( $blocks ), 0, $index ), 'block' ), 'attrs' );
+
+		if ( empty( $loop['attrs']['block_id'] ) || in_array( (string) $loop['attrs']['block_id'], array_map( 'strval', array_column( $earlier, 'block_id' ) ), true ) ) {
 			$loop['attrs']['block_id'] = self::get_free_block_id( $blocks );
 		}
 
-		if ( empty( $loop['attrs']['queryId'] ) || ( $query_ids[ (int) $loop['attrs']['queryId'] ] ?? 0 ) > 1 ) {
+		if ( empty( $loop['attrs']['queryId'] ) || in_array( (int) $loop['attrs']['queryId'], array_map( 'intval', array_column( $earlier, 'queryId' ) ), true ) ) {
 			$loop['attrs']['queryId'] = self::get_free_query_id( $blocks );
 		}
+
+		$click_action = null;
 
 		if ( isset( $input['layout'] ) ) {
 			$layouts = self::get_layouts();
@@ -356,7 +359,12 @@ class Visual_Portfolio_Loop_Gallery {
 			// The columns and the click action live in the blocks the layout
 			// replaces, so they are carried over unless the call sets them.
 			if ( ! isset( $input['source']['type'] ) || ( $loop['attrs']['queryType'] ?? 'posts' ) === $input['source']['type'] ) {
-				$input['settings'] = array_merge( self::describe( $loop )['settings'], $input['settings'] ?? array() );
+				$carried = self::describe( $loop )['settings'];
+
+				unset( $carried['lightbox'] );
+
+				$input['settings'] = array_merge( $carried, $input['settings'] ?? array() );
+				$click_action      = self::get_click_action( $loop['innerBlocks'] );
 			}
 
 			$loop = self::set_inner_blocks( $loop, $layouts[ $input['layout'] ]['loop']['innerBlocks'] );
@@ -373,32 +381,42 @@ class Visual_Portfolio_Loop_Gallery {
 			}
 		}
 
-		return self::apply( $loop, $input, 'update' );
+		return self::apply( $loop, $input, 'update', $click_action );
 	}
 
 	/**
 	 * Apply a source, the layout defaults, settings and image operations.
 	 *
-	 * @param array  $loop - loop block.
-	 * @param array  $input - ability input.
-	 * @param string $action - `create` or `update`.
+	 * @param array       $loop - loop block.
+	 * @param array       $input - ability input.
+	 * @param string      $action - `create` or `update`.
+	 * @param string|null $click_action - click action to keep over the layout's.
 	 *
 	 * @return array|WP_Error loop block.
 	 */
-	private static function apply( $loop, $input, $action ) {
+	private static function apply( $loop, $input, $action, $click_action = null ) {
 		$source   = $input['source'] ?? null;
 		$previous = $loop['attrs']['queryType'] ?? 'posts';
 
 		if ( $source ) {
-			$loop = self::apply_source( $loop, $source );
+			$loop = self::apply_source( $loop, $source, $previous );
 
 			if ( is_wp_error( $loop ) ) {
 				return $loop;
 			}
 		}
 
-		if ( 'create' === $action || isset( $input['layout'] ) || $previous !== $loop['attrs']['queryType'] ) {
+		if ( 'create' === $action || isset( $input['layout'] ) || ( $loop['attrs']['queryType'] ?? 'posts' ) !== $previous ) {
 			$loop = self::apply_layout_defaults( $loop );
+		}
+
+		if ( $click_action ) {
+			$loop = self::set_click_action(
+				$loop,
+				function () use ( $click_action ) {
+					return $click_action;
+				}
+			);
 		}
 
 		$loop = self::apply_images( $loop, $input );
@@ -426,12 +444,13 @@ class Visual_Portfolio_Loop_Gallery {
 	 * The data of the other sources stays where it is, as it does when the
 	 * source is switched in the editor.
 	 *
-	 * @param array $loop - loop block.
-	 * @param array $source - source input.
+	 * @param array  $loop - loop block.
+	 * @param array  $source - source input.
+	 * @param string $previous - source type of the loop before the change.
 	 *
 	 * @return array|WP_Error
 	 */
-	private static function apply_source( $loop, $source ) {
+	private static function apply_source( $loop, $source, $previous ) {
 		$type    = $source['type'];
 		$sources = self::get_vocabulary()['sources'];
 
@@ -474,7 +493,11 @@ class Visual_Portfolio_Loop_Gallery {
 			$attrs['imagesQuery']           = $attrs['imagesQuery'] ?? array();
 			$attrs['imagesQuery']['images'] = array_map( array( __CLASS__, 'prepare_image' ), $source['images'] );
 		} elseif ( 'posts' === $type ) {
-			$attrs['postsQuery'] = self::merge_posts_query( $attrs['postsQuery'] ?? array(), $source );
+			// A loop that already shows posts without a stored post type shows
+			// the block's default, which a partial update keeps.
+			$attrs['postsQuery'] = self::merge_posts_query( $attrs['postsQuery'] ?? array(), $source, 'posts' === $previous ? 'portfolio' : 'post' );
+		} elseif ( isset( $source['settings'] ) ) {
+			$attrs['sourceQuery'] = array_merge( $attrs['sourceQuery'] ?? array(), $source['settings'] );
 		}
 
 		$loop['attrs'] = $attrs;
@@ -485,12 +508,22 @@ class Visual_Portfolio_Loop_Gallery {
 	/**
 	 * A posts query with the fields a source input gives; the rest stay.
 	 *
-	 * @param array $posts_query - stored `postsQuery`.
-	 * @param array $source - source input.
+	 * @param array  $posts_query - stored `postsQuery`.
+	 * @param array  $source - source input.
+	 * @param string $default_type - post type when none is stored or given.
 	 *
 	 * @return array
 	 */
-	private static function merge_posts_query( $posts_query, $source ) {
+	private static function merge_posts_query( $posts_query, $source, $default_type ) {
+		// A post type given alone leaves a manual selection.
+		if ( isset( $source['post_type'] ) && empty( $source['ids'] ) && 'ids' === ( $posts_query['source'] ?? '' ) ) {
+			$posts_query['ids'] = array();
+
+			if ( 'post__in' === ( $posts_query['orderBy'] ?? '' ) ) {
+				$posts_query['orderBy'] = 'post_date';
+			}
+		}
+
 		if ( isset( $source['post_type'] ) ) {
 			$posts_query['source'] = $source['post_type'];
 		}
@@ -502,13 +535,12 @@ class Visual_Portfolio_Loop_Gallery {
 				$posts_query['source']  = 'ids';
 				$posts_query['orderBy'] = 'post__in';
 			} elseif ( 'ids' === ( $posts_query['source'] ?? '' ) ) {
-				$posts_query['source'] = $source['post_type'] ?? 'post';
+				$posts_query['source'] = $source['post_type'] ?? $default_type;
 			}
 		}
 
-		// A loop that never had a posts query starts on posts.
 		if ( empty( $posts_query['source'] ) ) {
-			$posts_query['source'] = 'post';
+			$posts_query['source'] = $default_type;
 		}
 
 		if ( isset( $source['terms'] ) ) {
@@ -792,6 +824,29 @@ class Visual_Portfolio_Loop_Gallery {
 	}
 
 	/**
+	 * The click action of the first item picture of a tree.
+	 *
+	 * @param array $blocks - blocks.
+	 *
+	 * @return string|null
+	 */
+	private static function get_click_action( $blocks ) {
+		foreach ( $blocks as $block ) {
+			if ( in_array( $block['blockName'], self::CLICKABLE, true ) ) {
+				return $block['attrs']['clickAction'] ?? 'none';
+			}
+
+			$found = empty( $block['innerBlocks'] ) ? null : self::get_click_action( $block['innerBlocks'] );
+
+			if ( $found ) {
+				return $found;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Whether the pictures of a loop open in the lightbox.
 	 *
 	 * @param array $blocks - inner blocks.
@@ -934,25 +989,44 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @return string|null null when the loop is not where the parser found it.
 	 */
 	public static function replace_in_content( $content, $index, $loop ) {
-		// Loops never nest, so the n-th opener and the closer after it span the n-th loop.
-		if ( ! preg_match_all( '#<!--\s+wp:visual-portfolio/loop(?:\s+\{.*?\})?\s+(/)?-->#s', $content, $openers, PREG_OFFSET_CAPTURE | PREG_SET_ORDER ) || ! isset( $openers[ $index ] ) ) {
-			return null;
-		}
+		$processor = new WP_Block_Processor( $content );
+		$openers   = 0;
+		$depth     = 0;
+		$start     = null;
 
-		$start = $openers[ $index ][0][1];
-		$end   = $start + strlen( $openers[ $index ][0][0] );
+		// The delimiters of loops in document order, the order `find_loops()`
+		// counts them in, with the nesting `parse_blocks()` gives them.
+		while ( $processor->next_delimiter( self::LOOP ) ) {
+			$type = $processor->get_delimiter_type();
+			$span = $processor->get_span();
 
-		$is_void = isset( $openers[ $index ][1] ) && '/' === $openers[ $index ][1][0];
+			if ( null === $start ) {
+				if ( WP_Block_Processor::CLOSER === $type ) {
+					continue;
+				}
 
-		if ( ! $is_void ) {
-			if ( ! preg_match( '#<!--\s+/wp:visual-portfolio/loop\s+-->#', $content, $closer, PREG_OFFSET_CAPTURE, $end ) ) {
-				return null;
+				if ( $openers++ !== $index ) {
+					continue;
+				}
+
+				$start = $span->start;
+
+				if ( WP_Block_Processor::VOID === $type ) {
+					return substr_replace( $content, serialize_block( $loop ), $start, $span->length );
+				}
+
+				$depth = 1;
+				continue;
 			}
 
-			$end = $closer[0][1] + strlen( $closer[0][0] );
+			if ( WP_Block_Processor::OPENER === $type ) {
+				++$depth;
+			} elseif ( WP_Block_Processor::CLOSER === $type && 0 === --$depth ) {
+				return substr_replace( $content, serialize_block( $loop ), $start, $span->start + $span->length - $start );
+			}
 		}
 
-		return substr( $content, 0, $start ) . serialize_block( $loop ) . substr( $content, $end );
+		return null;
 	}
 
 	/**

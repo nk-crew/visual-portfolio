@@ -369,18 +369,18 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 		$this->assertNotSame( 'loop-1', $updated['gallery_id'] );
 		$this->assertSame( 'grid', $updated['layout_type'] );
 
-		// A retry with the same id finds the gallery it already changed.
-		$this->assertSame(
-			$updated,
-			$this->run_ability(
-				'update-gallery',
-				array(
-					'post_id'    => $post_id,
-					'gallery_id' => 'loop-1',
-					'layout'     => 'visual-portfolio/gallery-posts-classic',
-				)
+		// The position no longer names it, and the error lists its new id.
+		$retry = $this->run_ability(
+			'update-gallery',
+			array(
+				'post_id'    => $post_id,
+				'gallery_id' => 'loop-1',
+				'layout'     => 'visual-portfolio/gallery-posts-classic',
 			)
 		);
+
+		$this->assertSame( 'vpf_gallery_not_found', $retry->get_error_code() );
+		$this->assertStringContainsString( $updated['gallery_id'], $retry->get_error_message() );
 	}
 
 	/**
@@ -428,7 +428,7 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 		);
 
 		$this->assertWPError( $result );
-		$this->assertSame( 'ability_invalid_input', $result->get_error_code() );
+		$this->assertSame( 'vpf_invalid_per_page', $result->get_error_code() );
 		$this->assertSame( self::SURROUNDINGS, get_post( $post_id )->post_content );
 	}
 
@@ -452,5 +452,19 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 		$this->assertWPError( $result );
 		$this->assertSame( 'vpf_post_locked', $result->get_error_code() );
 		$this->assertSame( self::SURROUNDINGS, get_post( $post_id )->post_content );
+
+		// The caller's own open editor is written past, with a warning.
+		update_post_meta( $post_id, '_edit_lock', time() . ':' . self::$users['administrator'] );
+
+		$gallery = $this->run_ability(
+			'create-gallery',
+			array(
+				'post_id' => $post_id,
+				'layout'  => 'visual-portfolio/gallery-grid-classic',
+				'source'  => $this->images_source( array( 0 ) ),
+			)
+		);
+
+		$this->assertCount( 1, $gallery['warnings'] );
 	}
 }

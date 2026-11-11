@@ -972,9 +972,14 @@ add_filter(
 );
 ```
 
+A source of another type reads and writes its fields as `source.settings`,
+which the plugin merges into the loop's `sourceQuery`. `get-gallery` reports
+them the same way, so an agent can send a gallery back unchanged.
+
 `vpf_gallery_ability_apply` filters the parsed loop after the plugin applied
 what it knows, with the ability input and the action, `create` or `update`.
-A source type or setting added above is turned into attributes here.
+Fields declared at the top level of the source, and settings added above, are
+turned into attributes here.
 
 ```php
 add_filter(

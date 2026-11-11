@@ -531,7 +531,7 @@ class Visual_Portfolio_Abilities {
 					return $this->gallery_not_found( $post, $input['gallery_id'] );
 				}
 
-				$loop = Visual_Portfolio_Loop_Gallery::update( $found['block'], $input, $blocks );
+				$loop = Visual_Portfolio_Loop_Gallery::update( $found['block'], $input, $blocks, $found['index'] );
 
 				if ( is_wp_error( $loop ) ) {
 					return $loop;
@@ -589,8 +589,11 @@ class Visual_Portfolio_Abilities {
 			return $built;
 		}
 
-		clean_post_cache( $post->ID );
-		$fresh = get_post_field( 'post_content', $post->ID, 'raw' );
+		global $wpdb;
+
+		// Read past the object cache, which another request's write does not reach.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$fresh = (string) $wpdb->get_var( $wpdb->prepare( "SELECT post_content FROM {$wpdb->posts} WHERE ID = %d", $post->ID ) );
 
 		if ( $fresh !== $post->post_content ) {
 			$post->post_content = $fresh;
@@ -619,7 +622,34 @@ class Visual_Portfolio_Abilities {
 			}
 		}
 
-		return $this->get_saved_gallery( $post->ID, $built['block_id'] );
+		$gallery = $this->get_saved_gallery( $post->ID, $built['block_id'] );
+
+		if ( is_array( $gallery ) && $this->is_open_by_current_user( $post->ID ) ) {
+			$gallery['warnings'] = array(
+				__( 'The post is open in your editor. Reload it there before saving, or the editor will save its own copy over this change.', 'visual-portfolio' ),
+			);
+		}
+
+		return $gallery;
+	}
+
+	/**
+	 * Whether the current user has the post open in the editor right now.
+	 *
+	 * `wp_check_post_lock()` answers only about other users.
+	 *
+	 * @param int $post_id - post id.
+	 *
+	 * @return bool
+	 */
+	private function is_open_by_current_user( $post_id ) {
+		$lock = explode( ':', (string) get_post_meta( $post_id, '_edit_lock', true ) );
+
+		/** This filter is documented in wp-admin/includes/ajax-actions.php */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$window = apply_filters( 'wp_check_post_lock_window', 150 );
+
+		return 2 === count( $lock ) && get_current_user_id() === (int) $lock[1] && (int) $lock[0] > time() - $window;
 	}
 
 	/**
@@ -643,6 +673,14 @@ class Visual_Portfolio_Abilities {
 					sprintf( __( 'Image %d is not an image attachment the current user can read.', 'visual-portfolio' ), $id )
 				);
 			}
+		}
+
+		// Zero items per page divides by zero when the gallery is drawn.
+		if ( isset( $input['settings']['per_page'] ) && 0 === (int) $input['settings']['per_page'] ) {
+			return new WP_Error(
+				'vpf_invalid_per_page',
+				__( '`per_page` must be -1 for all items, or 1 to 100.', 'visual-portfolio' )
+			);
 		}
 
 		if ( 'posts' === ( $input['source']['type'] ?? '' ) && isset( $input['source']['post_type'] ) ) {
@@ -879,8 +917,11 @@ class Visual_Portfolio_Abilities {
 			),
 			'query'     => array(
 				'type'        => 'string',
-				'description' => __( 'Read only: how get-gallery reports a `posts` source that is not one post type. Sent back, it changes nothing.', 'visual-portfolio' ),
-				'enum'        => array( 'ids', 'current_query', 'custom_query', 'post_types_set' ),
+				'description' => __( 'Read only: how get-gallery reports a `posts` source that is not one post type (`ids`, `current_query`, `custom_query`, `post_types_set`). Sent back, it changes nothing.', 'visual-portfolio' ),
+			),
+			'settings'  => array(
+				'type'        => 'object',
+				'description' => __( 'Fields of a source that is neither `images` nor `posts`, as get-gallery reports them.', 'visual-portfolio' ),
 			),
 		);
 
@@ -968,6 +1009,10 @@ class Visual_Portfolio_Abilities {
 					'layout_type' => array( 'type' => 'string' ),
 					'source'      => array( 'type' => 'object' ),
 					'settings'    => array( 'type' => 'object' ),
+					'warnings'    => array(
+						'type'  => 'array',
+						'items' => array( 'type' => 'string' ),
+					),
 				)
 			),
 		);

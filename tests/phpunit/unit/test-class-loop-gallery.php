@@ -205,6 +205,22 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 			array_merge( $loop['attrs']['postsQuery'], array( 'order' => 'asc' ) ),
 			$updated['attrs']['postsQuery']
 		);
+
+		// A post type given alone leaves the manual selection.
+		$typed = Visual_Portfolio_Loop_Gallery::update(
+			$loop,
+			array(
+				'source' => array(
+					'type'      => 'posts',
+					'post_type' => 'page',
+				),
+			),
+			array( $loop )
+		);
+
+		$this->assertSame( 'page', $typed['attrs']['postsQuery']['source'] );
+		$this->assertSame( array(), $typed['attrs']['postsQuery']['ids'] );
+		$this->assertSame( 'post_date', $typed['attrs']['postsQuery']['orderBy'] );
 	}
 
 	/**
@@ -238,6 +254,16 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 		);
 		$updated = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'layout' => 'visual-portfolio/gallery-tiles-mosaic' ), array( $loop ) );
 		$grid    = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'layout' => 'visual-portfolio/gallery-grid-classic' ), array( $loop ) );
+
+		// Pictures that open their own link keep doing so.
+		$linked = Visual_Portfolio_Loop_Gallery::update(
+			Visual_Portfolio_Loop_Gallery::update( $loop, array(), array( $loop ) ),
+			array( 'layout' => 'visual-portfolio/gallery-grid-classic' ),
+			array( $loop )
+		);
+		$linked['innerBlocks'][0]['innerBlocks'][0]['attrs']['clickAction'] = 'url';
+		$relaid = Visual_Portfolio_Loop_Gallery::update( $linked, array( 'layout' => 'visual-portfolio/gallery-masonry-classic' ), array( $linked ) );
+		$this->assertSame( 'url', $relaid['innerBlocks'][0]['innerBlocks'][0]['attrs']['clickAction'] );
 
 		$this->assertSame(
 			array(
@@ -310,25 +336,80 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A write gives a loop that shares its ids with another loop ids of its
-	 * own; `loop-<n>` keeps naming the loop after that.
+	 * Of two loops sharing ids, the first keeps them and a later one gets its
+	 * own when written, as the editor does; the shared id keeps naming the
+	 * first loop, so a retry changes the same gallery.
 	 */
-	public function test_update_repairs_duplicate_ids() {
+	public function test_shared_ids_stay_with_the_first_loop() {
 		$markup = '<!-- wp:visual-portfolio/loop {"block_id":"same","queryId":1,"queryType":"posts"} --><div class="vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->';
 		$blocks = parse_blocks( $markup . $markup );
-		$found  = Visual_Portfolio_Loop_Gallery::find_loop( $blocks, 'loop-2' );
 
-		$this->assertSame( 1, $found['index'] );
+		$first = Visual_Portfolio_Loop_Gallery::find_loop( $blocks, 'same' );
+		$this->assertSame( 0, $first['index'] );
 
-		$updated = Visual_Portfolio_Loop_Gallery::update( $found['block'], array( 'settings' => array( 'per_page' => 3 ) ), $blocks );
+		$kept = Visual_Portfolio_Loop_Gallery::update( $first['block'], array( 'settings' => array( 'per_page' => 3 ) ), $blocks, 0 );
+		$this->assertSame( 'same', $kept['attrs']['block_id'] );
+		$this->assertSame( 1, $kept['attrs']['queryId'] );
 
-		$this->assertNotSame( 'same', $updated['attrs']['block_id'] );
-		$this->assertSame( 2, $updated['attrs']['queryId'] );
+		$second  = Visual_Portfolio_Loop_Gallery::find_loops( $blocks )[1];
+		$renamed = Visual_Portfolio_Loop_Gallery::update( $second['block'], array( 'settings' => array( 'per_page' => 3 ) ), $blocks, 1 );
+		$this->assertNotSame( 'same', $renamed['attrs']['block_id'] );
+		$this->assertSame( 2, $renamed['attrs']['queryId'] );
 
-		$content = Visual_Portfolio_Loop_Gallery::replace_in_content( $markup . $markup, 1, $updated );
-
+		$content = Visual_Portfolio_Loop_Gallery::replace_in_content( $markup . $markup, 1, $renamed );
 		$this->assertStringStartsWith( $markup, $content );
-		$this->assertSame( 1, Visual_Portfolio_Loop_Gallery::find_loop( parse_blocks( $content ), 'loop-2' )['index'] );
+	}
+
+	/**
+	 * Loops saved the way the editor saves them: attributes at their default
+	 * left out, and a loop inside another loop.
+	 */
+	public function test_editor_shaped_markup() {
+		$inner   = '<!-- wp:visual-portfolio/loop {"block_id":"inner"} --><div class="wp-block-visual-portfolio-loop vp-block-loop"><!-- wp:visual-portfolio/item-template --><!-- wp:visual-portfolio/item-image {"clickAction":"popup"} /--><!-- /wp:visual-portfolio/item-template --></div><!-- /wp:visual-portfolio/loop -->';
+		$outer   = '<!-- wp:visual-portfolio/loop {"block_id":"outer","baseQuery":{"perPage":-1}} --><div class="wp-block-visual-portfolio-loop vp-block-loop"><!-- wp:visual-portfolio/item-template --><!-- wp:visual-portfolio/item-image {"clickAction":"popup"} /--><!-- /wp:visual-portfolio/item-template -->' . $inner . '<!-- wp:paragraph --><p>Tail</p><!-- /wp:paragraph --></div><!-- /wp:visual-portfolio/loop -->';
+		$third   = '<!-- wp:visual-portfolio/loop {"block_id":"third"} --><div class="wp-block-visual-portfolio-loop vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->';
+		$content = $outer . "\n\n" . $third;
+		$blocks  = parse_blocks( $content );
+		$loops   = Visual_Portfolio_Loop_Gallery::find_loops( $blocks );
+
+		$this->assertSame( array( 'outer', 'inner', 'third' ), array_map( function ( $found ) { return $found['block']['attrs']['block_id']; }, $loops ) );
+
+		// A settings-only change leaves what it does not name: the lightbox
+		// and every item on one page of a posts loop with no stored source.
+		$found   = Visual_Portfolio_Loop_Gallery::find_loop( $blocks, 'outer' );
+		$updated = Visual_Portfolio_Loop_Gallery::update( $found['block'], array( 'settings' => array( 'columns' => 2 ) ), $blocks, $found['index'] );
+		$this->assertSame(
+			array(
+				'per_page' => -1,
+				'lightbox' => true,
+				'columns'  => 2,
+			),
+			Visual_Portfolio_Loop_Gallery::describe( $updated )['settings']
+		);
+
+		$written = Visual_Portfolio_Loop_Gallery::replace_in_content( $content, $found['index'], $updated );
+		$this->assertStringEndsWith( "\n\n" . $third, $written );
+		$this->assertSame( 1, substr_count( $written, '<p>Tail</p>' ) );
+
+		// The last loop is the third one, not the one nested in the first.
+		$found   = Visual_Portfolio_Loop_Gallery::find_loop( $blocks, 'third' );
+		$updated = Visual_Portfolio_Loop_Gallery::update( $found['block'], array( 'settings' => array( 'per_page' => 2 ) ), $blocks, $found['index'] );
+		$written = Visual_Portfolio_Loop_Gallery::replace_in_content( $content, $found['index'], $updated );
+		$this->assertStringStartsWith( $outer . "\n\n", $written );
+
+		// A partial posts update keeps the block's default post type.
+		$updated = Visual_Portfolio_Loop_Gallery::update(
+			$loops[2]['block'],
+			array(
+				'source' => array(
+					'type'  => 'posts',
+					'order' => 'asc',
+				),
+			),
+			$blocks,
+			2
+		);
+		$this->assertSame( 'portfolio', $updated['attrs']['postsQuery']['source'] );
 	}
 
 	/**
