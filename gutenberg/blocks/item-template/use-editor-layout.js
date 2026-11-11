@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useLayoutEffect, useRef } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -40,7 +40,8 @@ export default function useEditorLayout({
 	const justifiedRef = useRef(justified);
 	justifiedRef.current = justified;
 
-	useEffect(() => {
+	// Before paint, so `useMoveAnimation()` measures moved items at their new place.
+	useLayoutEffect(() => {
 		const list = ref.current;
 
 		if (!list || !itemsCount) {
