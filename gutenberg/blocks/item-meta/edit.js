@@ -6,18 +6,13 @@ import {
 	useBlockEditingMode,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import {
-	TextControl,
-	ToggleControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { TextControl, ToggleControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
-
 /**
  * Internal dependencies
  */

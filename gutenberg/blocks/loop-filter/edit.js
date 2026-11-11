@@ -6,19 +6,13 @@ import {
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-import {
-	Disabled,
-	Spinner,
-	ToggleControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { Disabled, Spinner, ToggleControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { create } from '@wordpress/rich-text';
 import classnames from 'classnames/dedupe';
-
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 /**
  * Internal dependencies
  */

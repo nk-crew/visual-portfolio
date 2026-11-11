@@ -7,13 +7,11 @@ import {
 	Disabled,
 	TextControl,
 	ToggleControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames/dedupe';
-
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 /**
  * Internal dependencies
  */

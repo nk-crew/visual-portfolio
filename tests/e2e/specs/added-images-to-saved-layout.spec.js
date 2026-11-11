@@ -7,6 +7,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
  * Test Images
  */
 import rawImageFixtures from '../../fixtures/images.json';
+import { createLegacySavedLayout } from '../utils/create-legacy-saved-layout';
 import {
 	getEditorCanvas,
 	getPortfolioPreviewFrame,
@@ -83,11 +84,8 @@ test.describe('added images to saved layout', () => {
 			alternativeSetting,
 		});
 
-		await admin.createNewPost({
+		await createLegacySavedLayout(admin, editor, {
 			title: 'Test Adding Images to Saved Layout',
-			postType: 'vp_lists',
-			showWelcomeGuide: false,
-			legacyCanvas: true,
 		});
 
 		const canvas = getEditorCanvas(page, editor);

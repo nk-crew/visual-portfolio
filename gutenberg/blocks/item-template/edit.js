@@ -7,6 +7,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	store as blockEditorStore,
 	InspectorControls,
+	useBlockEditContext,
 	__experimentalUseBlockPreview as useBlockPreview,
 	useBlockProps,
 	useInnerBlocksProps,
@@ -27,8 +28,6 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarDropdownMenu,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -49,6 +48,8 @@ import ProNote from '../../components/pro-note';
  * Internal dependencies
  */
 import { getProLabel, ProLine } from '../../components/pro-teaser';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
+import { useIsInSyncedTemplate } from '../../extensions/saved-layout-sync/context';
 import getBlockGapValue, { getScreenBlockGaps } from '../../utils/block-gap';
 import { CONTROL_BLOCKS } from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
@@ -528,11 +529,17 @@ function getItemContext(item) {
  * @return {Element} component.
  */
 function ItemTemplateInnerBlocks({ style, effect, index, itemKey }) {
+	const { clientId } = useBlockEditContext();
+	const isSynced = useIsInSyncedTemplate(clientId);
 	const innerBlocksProps = useInnerBlocksProps(
 		effect
 			? { className: CARD_CLASS_NAME }
 			: { className: ITEM_CLASS_NAME, style },
-		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
+		{
+			template: TEMPLATE,
+			templateLock: isSynced ? 'all' : undefined,
+			__unstableDisableLayoutClassNames: true,
+		}
 	);
 
 	if (!effect) {

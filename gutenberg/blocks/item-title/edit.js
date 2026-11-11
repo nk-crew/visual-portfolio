@@ -13,12 +13,11 @@ import {
 	SelectControl,
 	TextControl,
 	ToggleControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 import { followsLink, getClickActions } from '../../utils/click-actions';
 import {
 	getResetAllValues,

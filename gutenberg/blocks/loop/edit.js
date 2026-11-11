@@ -13,14 +13,13 @@ import {
 	RangeControl,
 	ToggleControl,
 	ToolbarButton,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { ProTeaserPanel } from '../../components/pro-teaser';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 import { useLoopSource } from '../../loop-sources/registry';
 import SourcePicker from '../../loop-sources/source-picker';
 import {

@@ -6,14 +6,10 @@ import {
 	useBlockEditingMode,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import {
-	RangeControl,
-	SelectControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { RangeControl, SelectControl } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,

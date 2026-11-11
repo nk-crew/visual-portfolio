@@ -18,8 +18,6 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	ToolbarDropdownMenu,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -30,6 +28,7 @@ import { crop, fullscreen, link, linkOff } from '@wordpress/icons';
  * Internal dependencies
  */
 import { getMissingTeasers, ProTeaserPanel } from '../../components/pro-teaser';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 import { ALLOWED_MEDIA_TYPES } from '../../loop-sources/gallery-manager/prepare-images';
 import { followsLink, getClickActions } from '../../utils/click-actions';
 import { DimensionsTool } from '../../utils/dimensions-tools';

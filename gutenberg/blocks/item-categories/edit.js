@@ -10,14 +10,13 @@ import {
 	__experimentalNumberControl as NumberControl,
 	SelectControl,
 	TextControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,

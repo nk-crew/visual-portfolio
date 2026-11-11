@@ -1,11 +1,8 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import {
-	SelectControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 import { mayOpenLightbox } from '../../utils/click-actions';
 import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
 
