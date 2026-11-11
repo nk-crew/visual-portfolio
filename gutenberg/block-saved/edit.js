@@ -16,7 +16,7 @@ const { plugin_name: pluginName, loop_blocks: loopBlocks } =
  * @param props
  */
 export default function BlockEdit(props) {
-	const { clientId, setAttributes, attributes, isSelected } = props;
+	const { clientId, setAttributes, attributes } = props;
 
 	const { id } = attributes;
 
@@ -27,15 +27,16 @@ export default function BlockEdit(props) {
 		[]
 	);
 
-	// The Gallery Loop transform reads the layout's settings, which have to
-	// be in the store by the time the block switcher asks for them.
+	// The Gallery Loop transform reads the layout's settings. The block
+	// switcher caches what it offers until the block editor changes, so they
+	// are asked for when the block mounts, before anyone opens it.
 	useSelect(
 		(select) => {
-			if (loopBlocks && isSelected && id) {
+			if (loopBlocks && id) {
 				select('visual-portfolio').getLayoutOptions(id);
 			}
 		},
-		[isSelected, id]
+		[id]
 	);
 
 	function getSelector() {

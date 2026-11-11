@@ -1,6 +1,6 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { createHigherOrderComponent } from '@wordpress/compose';
-import { dispatch, withSelect } from '@wordpress/data';
+import { compose, createHigherOrderComponent } from '@wordpress/compose';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { Component } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import shorthash from 'shorthash';
@@ -35,15 +35,6 @@ function getFreeQueryId() {
 	}
 
 	return queryId;
-}
-
-/**
- * Join the id an editor assigns to the change that made the block, the way
- * core assigns its own ids. As a change of its own, the undo of it would make
- * the block assign it again, and the undo history would never get past it.
- */
-function markNotPersistent() {
-	dispatch(blockEditorStore).__unstableMarkNextChangeAsNotPersistent();
 }
 
 /**
@@ -119,7 +110,7 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
 
 			usedQueryIds[newQueryId] = clientId;
 
-			markNotPersistent();
+			this.props.markIdNotPersistent();
 			setAttributes({ queryId: newQueryId });
 		}
 
@@ -152,7 +143,7 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
 				}
 
 				if (newBlockId !== blockId) {
-					markNotPersistent();
+					this.props.markIdNotPersistent();
 					setAttributes({
 						block_id: newBlockId,
 					});
@@ -165,9 +156,20 @@ const withUniqueBlockId = createHigherOrderComponent((BlockEdit) => {
 		}
 	}
 
-	return withSelect((select, ownProps) => ({
-		blockName: ownProps.name,
-	}))(newEdit);
+	return compose(
+		withSelect((select, ownProps) => ({
+			blockName: ownProps.name,
+		})),
+		// The id joins the change that made the block, the way core assigns
+		// its own ids: as a change of its own, its undo would make the block
+		// assign it again, and undo would never get past it. Dispatched to
+		// the block's own registry, which is not the post's in a preview.
+		withDispatch((dispatch) => ({
+			markIdNotPersistent:
+				dispatch(blockEditorStore)
+					.__unstableMarkNextChangeAsNotPersistent,
+		}))
+	)(newEdit);
 }, 'withUniqueBlockId');
 
 addFilter('editor.BlockEdit', 'vpf/editor/unique-block-id', withUniqueBlockId);

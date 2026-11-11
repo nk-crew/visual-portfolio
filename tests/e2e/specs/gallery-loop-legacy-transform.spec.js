@@ -340,7 +340,29 @@ test.describe('Gallery Loop from the legacy block', () => {
 			layoutType: 'tiles',
 			layoutTiles: '3|1,1|',
 		});
-		expect(find(loop, 'item-cover').attributes.effect).toBe('fade');
+		// The Fade skin's stylesheet paints an opaque black on hover.
+		expect(find(loop, 'item-cover').attributes).toMatchObject({
+			effect: 'fade',
+			customHoverOverlayColor: '#000',
+			hoverDimRatio: 100,
+		});
+	});
+
+	test('a filter with no label for All has no All item', async ({ page }) => {
+		const loop = await switchLegacy(page, {
+			block_id: 'legacynoall',
+			content_source: 'post-based',
+			filter_text_all: '',
+			layout_elements: {
+				top: { elements: ['filter'], align: 'left' },
+				items: { elements: ['items'] },
+				bottom: { elements: [], align: 'center' },
+			},
+		});
+		const filter = find(loop, 'loop-filter');
+
+		expect(filter.attributes.showAllItem).toBe(false);
+		expect(filter.innerBlocks).toEqual([]);
 	});
 
 	test('a tiles pattern carries over as it is', async ({ page }) => {
@@ -460,6 +482,36 @@ test.describe('Gallery Loop from the legacy block', () => {
 		});
 
 		expect(result).toEqual({ queryType: 'images', itemsStyle: 'fade' });
+	});
+
+	test('a Saved Layout block offers Gallery Loop in the block switcher', async ({
+		editor,
+		page,
+	}) => {
+		await editor.insertBlock({
+			name: 'visual-portfolio/saved',
+			attributes: { id: String(layoutId) },
+		});
+		await page.waitForFunction(
+			(id) =>
+				window.wp.data
+					.select('visual-portfolio')
+					.hasFinishedResolution('getLayoutOptions', [id]),
+			String(layoutId)
+		);
+		await editor.showBlockToolbar();
+		await page
+			.getByRole('toolbar', { name: 'Block tools' })
+			.getByRole('button', {
+				name: 'Visual Portfolio Saved Layout',
+				exact: true,
+			})
+			.press('Enter');
+		await page.getByRole('menuitem', { name: LOOP_TITLE }).press('Enter');
+
+		await expect
+			.poll(async () => (await editor.getBlocks())[0].name)
+			.toBe('visual-portfolio/loop');
 	});
 
 	test('a Saved Layout block converts the layout into the post, and a missing one is not offered', async ({

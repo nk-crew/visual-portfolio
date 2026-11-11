@@ -394,10 +394,12 @@ is not offered the transform. These settings have no Gallery Loop equivalent
 and are left behind: the mouse wheel, speed, dynamic dots, sticky free mode,
 pause on hover and minimum height of a slider, the horizontal order of a
 masonry, the scroll to the top of a paged pagination, the pagination style,
-the icon and the hover overlay of the Classic skin, the link colors and the
-caption background of a skin, and *Stretch*. Custom CSS is kept as the loop's
+the icon and the hover overlay of the Classic skin, the tint Emerge puts over
+the picture, the hover color of links, and *Stretch*. A Read More shown only for posts
+with a More tag becomes one shown on every item. Custom CSS becomes the loop's
 own custom CSS, with `selector` written as `&`; rules that name the classes of
-the legacy markup match nothing in the loop.
+the legacy markup match nothing in the loop, and WordPress removes the CSS when
+a user who may not edit CSS (`unfiltered_html`) saves the post.
 
 ## Anatomy
 

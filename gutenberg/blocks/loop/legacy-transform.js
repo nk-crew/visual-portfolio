@@ -26,6 +26,7 @@ const SLIDER_EFFECTS = { slide: 'none', coverflow: 'coverflow', fade: 'fade' };
 
 // What the legacy skins print when no color is picked, in their stylesheets.
 const COVER_TEXT_COLOR = '#fff';
+const COVER_PANEL_COLOR = '#000';
 
 const ALIGNMENTS = ['wide', 'full'];
 
@@ -214,16 +215,21 @@ function getLightbox(legacy) {
 }
 
 /**
- * Style of a caption block: its alignment and its color.
+ * Style of a caption block: its alignment and its colors. The legacy skins
+ * color their links as the text unless a links color is picked.
  *
  * @param {string} textAlign - left, center or right.
  * @param {string} color     - text color.
+ * @param {string} linkColor - links color.
  * @return {Object} attributes.
  */
-function getCaptionStyle(textAlign, color) {
+function getCaptionStyle(textAlign, color, linkColor) {
 	const style = {
 		...(textAlign ? { typography: { textAlign } } : {}),
 		...(color ? { color: { text: color } } : {}),
+		elements: {
+			link: { color: { text: linkColor || color || 'inherit' } },
+		},
 	};
 
 	return Object.keys(style).length ? { style } : {};
@@ -237,12 +243,17 @@ function getCaptionStyle(textAlign, color) {
  * @param {Object} options   - how to draw them.
  * @param {string} options.textAlign - text alignment.
  * @param {string} options.color     - text color of each block.
+ * @param {string} options.linkColor - links color of each block.
  * @param {Object} options.titleLink - click attributes of the title.
  * @param {string} queryType - query type of the loop.
  * @return {Array} blocks.
  */
-function getCaptionBlocks(skin, { textAlign, color, titleLink }, queryType) {
-	const style = getCaptionStyle(textAlign, color);
+function getCaptionBlocks(
+	skin,
+	{ textAlign, color, linkColor, titleLink },
+	queryType
+) {
+	const style = getCaptionStyle(textAlign, color, linkColor);
 	const blocks = [];
 	const isPosts = 'posts' === queryType;
 
@@ -433,6 +444,7 @@ function getItemBlocks(legacy, queryType) {
 				{
 					textAlign: skin.caption_text_align,
 					color: skin.caption_text_color,
+					linkColor: skin.caption_links_color,
 					titleLink: click,
 				},
 				queryType
@@ -483,7 +495,13 @@ function getCoverBlocks(legacy, skin, click, ratio, radius, queryType) {
 								skin.overlay_text_align
 							),
 						}),
-				...getHoverOverlay(skin.overlay_bg_color),
+				// Emerge draws its caption on a panel of its own, which the
+				// cover paints with the hover overlay.
+				...getHoverOverlay(
+					(isEmerge
+						? skin.caption_bg_color
+						: skin.overlay_bg_color) || COVER_PANEL_COLOR
+				),
 				...click,
 				style: {
 					color: { text: color },
@@ -492,7 +510,11 @@ function getCoverBlocks(legacy, skin, click, ratio, radius, queryType) {
 			},
 			getCaptionBlocks(
 				skin,
-				{ textAlign, titleLink: { clickAction: 'none' } },
+				{
+					textAlign,
+					linkColor: isEmerge ? skin.caption_links_color : color,
+					titleLink: { clickAction: 'none' },
+				},
 				queryType
 			)
 		),
@@ -658,18 +680,25 @@ function getTopBlocks(legacy) {
 					'visual-portfolio/loop-filter',
 					{
 						showCount: isOn(legacy.filter_show_count),
+						// The legacy filter leaves "All" out when it has no label.
+						showAllItem: !!legacy.filter_text_all,
 						displayAsDropdown: 'dropdown' === legacy.filter,
 						...('default' === legacy.filter
 							? { className: 'is-style-fill' }
 							: {}),
 						layout: { type: 'flex', justifyContent },
 					},
-					[
-						createBlock('visual-portfolio/loop-filter-item', {
-							filter: '*',
-							text: legacy.filter_text_all || '',
-						}),
-					]
+					legacy.filter_text_all
+						? [
+								createBlock(
+									'visual-portfolio/loop-filter-item',
+									{
+										filter: '*',
+										text: legacy.filter_text_all,
+									}
+								),
+							]
+						: []
 				)
 			);
 		}
