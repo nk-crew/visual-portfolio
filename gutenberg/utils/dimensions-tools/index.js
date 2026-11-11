@@ -78,10 +78,12 @@ export const SCALE_OPTIONS = [
  * @param {string}   props.defaultValue   Ratio the block starts with.
  * @param {Function} props.onChange       Called with the new ratio.
  * @param {Function} props.resetAllFilter Attributes the panel's "Reset all" writes.
+ * @param {string[]} props.attributeKeys  Attributes the control writes, when its handler does more than write them.
  * @return {Element} The control.
  */
 export function AspectRatioTool({
 	panelId,
+	attributeKeys,
 	value,
 	defaultValue = '',
 	onChange,
@@ -133,6 +135,7 @@ export function AspectRatioTool({
 			onDeselect={() => onChange(defaultValue)}
 			resetAllFilter={resetAllFilter}
 			panelId={panelId}
+			attributeKeys={attributeKeys}
 		>
 			<SelectControl
 				label={__('Aspect ratio', 'visual-portfolio')}
@@ -152,10 +155,12 @@ export function AspectRatioTool({
  * @param {Object}   props.value          Current `{ width, height }`.
  * @param {Function} props.onChange       Called with the new `{ width, height }`.
  * @param {Function} props.resetAllFilter Attributes the panel's "Reset all" writes.
+ * @param {string[]} props.attributeKeys  Attributes the control writes, when its handler does more than write them.
  * @return {Element} The controls.
  */
 export function WidthHeightTool({
 	panelId,
+	attributeKeys,
 	value = {},
 	onChange,
 	resetAllFilter,
@@ -183,6 +188,7 @@ export function WidthHeightTool({
 				onDeselect={onDimensionChange('width')}
 				resetAllFilter={resetAllFilter}
 				panelId={panelId}
+				attributeKeys={attributeKeys}
 			>
 				<UnitControl
 					label={__('Width', 'visual-portfolio')}
@@ -202,6 +208,7 @@ export function WidthHeightTool({
 				onDeselect={onDimensionChange('height')}
 				resetAllFilter={resetAllFilter}
 				panelId={panelId}
+				attributeKeys={attributeKeys}
 			>
 				<UnitControl
 					label={__('Height', 'visual-portfolio')}
@@ -227,10 +234,12 @@ export function WidthHeightTool({
  * @param {Array}    props.options        Value, label and help of every choice.
  * @param {Function} props.onChange       Called with the new value.
  * @param {Function} props.resetAllFilter Attributes the panel's "Reset all" writes.
+ * @param {string[]} props.attributeKeys  Attributes the control writes, when its handler does more than write them.
  * @return {Element} The control.
  */
 export function ScaleTool({
 	panelId,
+	attributeKeys,
 	value,
 	defaultValue = 'cover',
 	options = SCALE_OPTIONS,
@@ -248,6 +257,7 @@ export function ScaleTool({
 			onDeselect={() => onChange(defaultValue)}
 			resetAllFilter={resetAllFilter}
 			panelId={panelId}
+			attributeKeys={attributeKeys}
 		>
 			<ToggleGroupControl
 				label={label}
@@ -267,6 +277,10 @@ export function ScaleTool({
 		</ToolsPanelItem>
 	);
 }
+
+// Every control of `DimensionsTool` writes all four, and its handlers keep
+// state of their own, so the synced settings panel is told rather than asked.
+const DIMENSION_KEYS = ['aspectRatio', 'width', 'height', 'scale'];
 
 /**
  * The three controls together, with the interplay core gives them.
@@ -335,6 +349,7 @@ export function DimensionsTool({
 		<>
 			<AspectRatioTool
 				panelId={panelId}
+				attributeKeys={DIMENSION_KEYS}
 				value={width && height ? 'custom' : (aspectRatio ?? '')}
 				defaultValue={defaultAspectRatio}
 				resetAllFilter={resetAllFilter}
@@ -351,6 +366,7 @@ export function DimensionsTool({
 			/>
 			<WidthHeightTool
 				panelId={panelId}
+				attributeKeys={DIMENSION_KEYS}
 				value={{ width, height }}
 				resetAllFilter={resetAllFilter}
 				onChange={({ width: nextWidth, height: nextHeight }) =>
@@ -372,6 +388,7 @@ export function DimensionsTool({
 			{!!(aspectRatio || (width && height)) && (
 				<ScaleTool
 					panelId={panelId}
+					attributeKeys={DIMENSION_KEYS}
 					value={lastScale}
 					defaultValue={defaultScale}
 					options={scaleOptions}

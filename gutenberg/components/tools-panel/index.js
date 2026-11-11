@@ -35,7 +35,8 @@ export function ToolsPanel({ resetAll, ...props }) {
  * Core's `ToolsPanelItem`. In a block synced with a Saved Layout, a setting
  * the block changed is marked, and its reset returns it to the layout's value.
  *
- * The attributes a setting owns are the ones its `onDeselect` writes.
+ * The attributes a setting owns are the ones its `onDeselect` writes, or the
+ * `attributeKeys` given when that handler does more than write them.
  *
  * @param {Object} props - `ToolsPanelItem` props.
  * @return {Element} component.
@@ -44,13 +45,18 @@ export function ToolsPanelItem({
 	hasValue,
 	onDeselect,
 	isShownByDefault,
+	attributeKeys,
 	children,
 	...props
 }) {
 	const sync = useContext(SyncContext);
-	const names = sync
-		? captureAttributeNames(onDeselect).filter(sync.isSynced)
-		: [];
+	let names = [];
+
+	if (sync) {
+		names = (attributeKeys || captureAttributeNames(onDeselect)).filter(
+			sync.isSynced
+		);
+	}
 
 	if (!names.length) {
 		return (

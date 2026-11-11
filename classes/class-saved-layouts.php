@@ -51,11 +51,11 @@ class Visual_Portfolio_Saved_Layouts {
 	private static $render_stack = array();
 
 	/**
-	 * Loops rendered from inserted layouts on this request.
+	 * Loops rendered from each inserted layout on this request, keyed by id.
 	 *
-	 * @var int
+	 * @var int[]
 	 */
-	private static $inserted_loops = 0;
+	private static $inserted_loops = array();
 
 	/**
 	 * Parsed loop block of each layout, keyed by id.
@@ -226,11 +226,11 @@ class Visual_Portfolio_Saved_Layouts {
 			return '';
 		}
 
-		$post = get_post( $id );
-
-		if ( 'publish' !== $post->post_status && ! current_user_can( 'edit_post', $id ) ) {
+		if ( ! self::is_visible( $id ) ) {
 			return '';
 		}
+
+		$post = get_post( $id );
 
 		$blocks = parse_blocks( $post->post_content );
 		$output = '';
@@ -257,26 +257,39 @@ class Visual_Portfolio_Saved_Layouts {
 	 *
 	 * A layout's loops carry the ids their own editor gave them, so two
 	 * layouts on one page, or one layout inserted twice, would share their
-	 * URL parameters and router region. The ids follow the order the page
-	 * renders them in, which is the same on every request.
+	 * URL parameters and router region. The ids are the layout's id and the
+	 * loop's place among that layout's loops on the page, so other layouts
+	 * added around it do not change them.
 	 *
 	 * @param array $blocks - parsed blocks, changed in place.
 	 * @param int   $id - layout id.
-	 * @param int   $count - loops of inserted layouts numbered so far on the page, advanced in place.
+	 * @param int[] $counts - loops numbered so far, by layout id, advanced in place.
 	 */
-	public static function number_inserted_loops( &$blocks, $id, &$count ) {
+	public static function number_inserted_loops( &$blocks, $id, &$counts ) {
 		foreach ( $blocks as &$block ) {
 			if ( 'visual-portfolio/loop' === ( $block['blockName'] ?? '' ) ) {
-				++$count;
+				$counts[ $id ] = ( $counts[ $id ] ?? 0 ) + 1;
 
-				$block['attrs']['queryId']  = $id * 100 + $count;
-				$block['attrs']['block_id'] = ( $block['attrs']['block_id'] ?? 'layout' ) . '-' . $id . '-' . $count;
+				$block['attrs']['queryId']  = $id * 100 + $counts[ $id ];
+				$block['attrs']['block_id'] = ( $block['attrs']['block_id'] ?? 'layout' ) . '-' . $id . '-' . $counts[ $id ];
 			}
 
 			if ( ! empty( $block['innerBlocks'] ) ) {
-				self::number_inserted_loops( $block['innerBlocks'], $id, $count );
+				self::number_inserted_loops( $block['innerBlocks'], $id, $counts );
 			}
 		}
+	}
+
+	/**
+	 * Whether an inserted layout shows for the current visitor: a published
+	 * one, or any one the visitor can edit.
+	 *
+	 * @param int $id - layout id.
+	 *
+	 * @return bool
+	 */
+	public static function is_visible( $id ) {
+		return 'publish' === get_post_status( $id ) || current_user_can( 'edit_post', $id );
 	}
 
 	/**

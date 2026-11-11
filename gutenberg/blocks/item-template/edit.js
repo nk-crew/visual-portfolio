@@ -536,7 +536,9 @@ function ItemTemplateInnerBlocks({ style, effect, index, itemKey }) {
 			? { className: CARD_CLASS_NAME }
 			: { className: ITEM_CLASS_NAME, style },
 		{
-			template: TEMPLATE,
+			// With the structure locked, core would reset the items to the
+			// template; a synced template's structure is the layout's.
+			template: isSynced ? undefined : TEMPLATE,
 			templateLock: isSynced ? 'all' : undefined,
 			__unstableDisableLayoutClassNames: true,
 		}

@@ -195,6 +195,10 @@ class ClassSavedLayoutsRest extends WP_UnitTestCase {
 		$this->assertSame( 200, $this->request( 'GET', '/visual-portfolio/v1/saved-layouts/' . $published . '/sync-source' )->get_status() );
 		$this->assertSame( 403, $this->request( 'GET', '/visual-portfolio/v1/saved-layouts/' . $draft . '/sync-source' )->get_status() );
 		$this->assertSame( 404, $this->request( 'GET', '/visual-portfolio/v1/saved-layouts/999999/sync-source' )->get_status() );
+
+		// Trashing an unpublished layout does not open it.
+		wp_trash_post( $draft );
+		$this->assertSame( 403, $this->request( 'GET', '/visual-portfolio/v1/saved-layouts/' . $draft . '/sync-source' )->get_status() );
 		$this->assertSame(
 			array( 'Published' ),
 			wp_list_pluck( $this->request( 'GET', '/visual-portfolio/v1/saved-layouts/choices' )->get_data(), 'title' )
@@ -203,6 +207,25 @@ class ClassSavedLayoutsRest extends WP_UnitTestCase {
 		wp_set_current_user( 0 );
 
 		$this->assertArrayNotHasKey( 'vpf_layout', $this->request( 'GET', '/wp/v2/vp_lists/' . $published )->get_data() );
+	}
+
+	/**
+	 * Restore brings a layout back with the status it had.
+	 */
+	public function test_restore_keeps_the_previous_status() {
+		$layout = self::factory()->post->create(
+			array(
+				'post_type'   => 'vp_lists',
+				'post_status' => 'publish',
+			)
+		);
+
+		wp_trash_post( $layout );
+
+		$response = $this->request( 'POST', '/visual-portfolio/v1/saved-layouts/' . $layout . '/restore' );
+
+		$this->assertSame( 'publish', $response->get_data()['status'] );
+		$this->assertSame( '', get_post_meta( $layout, '_wp_trash_meta_status', true ) );
 	}
 
 	/**

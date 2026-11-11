@@ -277,7 +277,9 @@ export default function ItemCoverEdit({
 			},
 		},
 		{
-			template: TEMPLATE,
+			// With the structure locked, core would reset the blocks to the
+			// template; a synced template's structure is the layout's.
+			template: isSynced ? undefined : TEMPLATE,
 			allowedBlocks: ALLOWED_BLOCKS,
 			templateLock: isSynced ? 'all' : undefined,
 		}

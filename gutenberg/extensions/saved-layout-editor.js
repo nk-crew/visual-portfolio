@@ -103,7 +103,7 @@ function useUsage(postId, isSaving) {
 			})
 			.catch(() => {
 				if (!cancelled) {
-					setUsage([]);
+					setUsage({ total: 0, items: [] });
 				}
 			});
 

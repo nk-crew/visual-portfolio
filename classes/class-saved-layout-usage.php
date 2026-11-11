@@ -276,10 +276,12 @@ class Visual_Portfolio_Saved_Layout_Usage {
 			'intval',
 			$wpdb->get_col(
 				$wpdb->prepare(
-					"SELECT DISTINCT p.ID FROM {$wpdb->posts} p
-					INNER JOIN {$wpdb->postmeta} m ON m.post_id = p.ID
-					WHERE m.meta_key IN ( {$key_placeholders} )
-					AND m.meta_value = %s
+					"SELECT p.ID FROM {$wpdb->posts} p
+					WHERE p.ID IN (
+						SELECT m.post_id FROM {$wpdb->postmeta} m
+						WHERE m.meta_key IN ( {$key_placeholders} )
+						AND m.meta_value = %s
+					)
 					AND p.post_type != 'revision'{$status_sql}
 					ORDER BY p.post_date DESC",
 					$args

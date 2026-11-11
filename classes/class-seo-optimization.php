@@ -126,7 +126,7 @@ class Visual_Portfolio_SEO_Optimization {
 			return null;
 		}
 
-		$inserted = 0;
+		$inserted = array();
 
 		foreach ( $this->find_loop_blocks( parse_blocks( $post->post_content ), array(), $inserted ) as $block ) {
 			$context  = Visual_Portfolio_Block_Loop::get_context_from_attributes( $block['attrs'] ?? array() );
@@ -186,7 +186,7 @@ class Visual_Portfolio_SEO_Optimization {
 	 *
 	 * @param array $blocks - parsed blocks.
 	 * @param int[] $layouts - Saved Layouts already expanded on the way here.
-	 * @param int   $inserted - loops of inserted layouts numbered so far.
+	 * @param int[] $inserted - loops of inserted layouts numbered so far, by layout id.
 	 *
 	 * @return array
 	 */
@@ -208,7 +208,8 @@ class Visual_Portfolio_SEO_Optimization {
 			if (
 				in_array( $block['blockName'], array( 'visual-portfolio/saved', 'nk/visual-portfolio' ), true ) &&
 				! in_array( $layout, $layouts, true ) &&
-				Visual_Portfolio_Saved_Layouts::is_block_layout( $layout )
+				Visual_Portfolio_Saved_Layouts::is_block_layout( $layout ) &&
+				Visual_Portfolio_Saved_Layouts::is_visible( $layout )
 			) {
 				// Numbered the way the layout is when it renders on the page.
 				$layout_blocks = parse_blocks( get_post( $layout )->post_content );

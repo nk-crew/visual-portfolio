@@ -344,8 +344,7 @@ function SavedLayoutsLibrary() {
 	const isTrash = search?.status === 'trash';
 	const [view, setView] = useStoredView();
 	const [selection, setSelection] = useState([]);
-	const { invalidateResolutionForStoreSelector, saveEntityRecord } =
-		useDispatch(coreStore);
+	const { invalidateResolutionForStoreSelector } = useDispatch(coreStore);
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch(noticesStore);
 
@@ -375,9 +374,9 @@ function SavedLayoutsLibrary() {
 		notifyError: (message) =>
 			createErrorNotice(message, { type: 'snackbar' }),
 		restore: (item) =>
-			saveEntityRecord('postType', POST_TYPE, {
-				id: item.id,
-				status: item.vpf_layout?.restoreAs || 'draft',
+			apiFetch({
+				path: `/visual-portfolio/v1/saved-layouts/${item.id}/restore`,
+				method: 'POST',
 			}),
 	});
 

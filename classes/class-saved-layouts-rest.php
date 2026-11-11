@@ -118,8 +118,6 @@ class Visual_Portfolio_Saved_Layouts_REST {
 				'usage'      => self::$counts[ $id ],
 				'usageReady' => (bool) get_option( Visual_Portfolio_Saved_Layout_Usage::INDEXED_OPTION ),
 				'editUrl'    => get_edit_post_link( $id, 'raw' ),
-				// What Restore brings a trashed layout back as.
-				'restoreAs'  => get_post_meta( $id, '_wp_trash_meta_status', true ) ? get_post_meta( $id, '_wp_trash_meta_status', true ) : 'draft',
 			)
 		);
 	}
@@ -214,6 +212,17 @@ class Visual_Portfolio_Saved_Layouts_REST {
 
 		register_rest_route(
 			self::NAMESPACE,
+			'/saved-layouts/(?P<id>\d+)/restore',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'restore' ),
+				'permission_callback' => array( $this, 'can_delete_layout' ),
+				'args'                => $id_arg,
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
 			'/saved-layouts/(?P<id>\d+)/duplicate',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -283,8 +292,8 @@ class Visual_Portfolio_Saved_Layouts_REST {
 	}
 
 	/**
-	 * Whether the user may read a layout to sync with it: a published or
-	 * trashed one, or any one the user can edit.
+	 * Whether the user may read a layout to sync with it: a published one, a
+	 * trashed one that was published, or any one the user can edit.
 	 *
 	 * @param WP_Post|null $post - layout.
 	 *
@@ -295,7 +304,12 @@ class Visual_Portfolio_Saved_Layouts_REST {
 			return false;
 		}
 
-		return in_array( $post->post_status, array( 'publish', 'trash' ), true ) || current_user_can( 'edit_post', $post->ID );
+		if ( current_user_can( 'edit_post', $post->ID ) || 'publish' === $post->post_status ) {
+			return true;
+		}
+
+		// A trashed layout still syncs when it was published before.
+		return 'trash' === $post->post_status && 'publish' === get_post_meta( $post->ID, '_wp_trash_meta_status', true );
 	}
 
 	/**
@@ -355,6 +369,39 @@ class Visual_Portfolio_Saved_Layouts_REST {
 				'editUrl' => current_user_can( 'edit_post', $post->ID ) ? (string) get_edit_post_link( $post->ID, 'raw' ) : '',
 			)
 		);
+	}
+
+	/**
+	 * Whether the request names a layout the user can delete and restore.
+	 *
+	 * @param WP_REST_Request $request - request.
+	 *
+	 * @return bool
+	 */
+	public function can_delete_layout( $request ) {
+		$id = (int) $request['id'];
+
+		return Visual_Portfolio_Saved_Layouts::POST_TYPE === get_post_type( $id ) && current_user_can( 'delete_post', $id );
+	}
+
+	/**
+	 * Bring a layout back from the trash with the status it had, so a layout
+	 * pages insert shows on them again.
+	 *
+	 * @param WP_REST_Request $request - request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function restore( $request ) {
+		add_filter( 'wp_untrash_post_status', 'wp_untrash_post_set_previous_status', 10, 3 );
+		$restored = wp_untrash_post( (int) $request['id'] );
+		remove_filter( 'wp_untrash_post_status', 'wp_untrash_post_set_previous_status', 10 );
+
+		if ( ! $restored ) {
+			return new WP_Error( 'vpf_layout_not_restored', __( 'The Saved Layout could not be restored.', 'visual-portfolio' ), array( 'status' => 400 ) );
+		}
+
+		return rest_ensure_response( array( 'status' => get_post_status( (int) $request['id'] ) ) );
 	}
 
 	/**

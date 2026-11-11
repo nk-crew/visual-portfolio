@@ -63,7 +63,7 @@ function useUsage(id) {
 
 		apiFetch({ path: `/visual-portfolio/v1/saved-layouts/${id}/usage` })
 			.then((result) => !cancelled && setUsage(result))
-			.catch(() => !cancelled && setUsage([]));
+			.catch(() => !cancelled && setUsage({ total: 0, items: [] }));
 
 		return () => {
 			cancelled = true;

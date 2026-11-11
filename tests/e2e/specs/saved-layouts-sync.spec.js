@@ -7,6 +7,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
  * Internal dependencies
  */
 import { deleteAllSavedLayouts } from '../utils/delete-all-saved-layouts';
+import { getFixturePath } from '../utils/fixture-path';
 import { getPluginSlug } from '../utils/plugin-slug';
 
 /**
@@ -20,7 +21,7 @@ import { getPluginSlug } from '../utils/plugin-slug';
 function loopMarkup(
 	attributes,
 	template,
-	items = '<!-- wp:visual-portfolio/item-image /--><!-- wp:visual-portfolio/item-title /-->'
+	items = '<!-- wp:visual-portfolio/item-image /--><!-- wp:visual-portfolio/item-title /--><!-- wp:visual-portfolio/item-date /-->'
 ) {
 	return `<!-- wp:visual-portfolio/loop ${JSON.stringify(attributes)} --><div class="wp-block-visual-portfolio-loop vp-block-loop"><!-- wp:visual-portfolio/item-template ${JSON.stringify(template)} -->${items}<!-- /wp:visual-portfolio/item-template --></div><!-- /wp:visual-portfolio/loop -->`;
 }
@@ -163,6 +164,7 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 		expect(state.items).toEqual([
 			'visual-portfolio/item-image',
 			'visual-portfolio/item-title',
+			'visual-portfolio/item-date',
 		]);
 		expect(state.layoutType).toBe('masonry');
 		expect(state.columns).toBe(2);
@@ -221,6 +223,76 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 		expect(state.columns).toBe(5);
 
 		await editor.saveDraft();
+	});
+
+	test('a synced page keeps its own settings on item blocks when it opens', async ({
+		admin,
+		editor,
+		page,
+		requestUtils,
+	}) => {
+		const layout = await requestUtils.rest({
+			path: `/wp/v2/vp_lists/${layoutId}`,
+			params: { context: 'edit' },
+		});
+		const dateKey = layout.content.raw.match(
+			/wp:visual-portfolio\/item-date \{"metadata":\{"vpSyncKey":"([^"]+)"/
+		)[1];
+		// The items have to render for the editor to mount their blocks.
+		const image = await requestUtils.uploadMedia(
+			getFixturePath('image-800x600.png')
+		);
+		const content = layout.content.raw
+			.replace('"queryType":"posts"', '"queryType":"images"')
+			.replace(
+				'<!-- wp:visual-portfolio/loop {',
+				`<!-- wp:visual-portfolio/loop {"savedLayout":{"id":${layoutId},"overrides":{"${dateKey}":["displayType"]}},"imagesQuery":{"images":[{"id":${image.id}}]},`
+			)
+			.replace(
+				`{"metadata":{"vpSyncKey":"${dateKey}"}}`,
+				`{"metadata":{"vpSyncKey":"${dateKey}"},"displayType":"modified"}`
+			);
+		const post = await requestUtils.rest({
+			method: 'POST',
+			path: '/wp/v2/pages',
+			data: {
+				title: 'Synced page with its own date',
+				status: 'draft',
+				content,
+			},
+		});
+
+		await admin.visitAdminPage('post.php', `post=${post.id}&action=edit`);
+
+		if (!page.url().includes('post.php')) {
+			await admin.visitAdminPage(
+				'post.php',
+				`post=${post.id}&action=edit`
+			);
+		}
+
+		await editor.setPreferences('core/edit-post', { welcomeGuide: false });
+
+		const getDate = () =>
+			page.evaluate(() => {
+				const find = (blocks) =>
+					blocks.reduce(
+						(found, block) =>
+							found ||
+							(block.name === 'visual-portfolio/item-date'
+								? block
+								: find(block.innerBlocks)),
+						null
+					);
+
+				return find(
+					window.wp.data.select('core/block-editor').getBlocks()
+				)?.attributes.displayType;
+			});
+
+		await expect.poll(getDate).toBe('modified');
+		await page.waitForTimeout(1500);
+		expect(await getDate()).toBe('modified');
 	});
 
 	test('the lock is saved with the layout', async ({
