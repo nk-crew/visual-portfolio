@@ -26,7 +26,6 @@ class Visual_Portfolio_Abilities {
 	 * Visual_Portfolio_Abilities constructor.
 	 */
 	public function __construct() {
-		// register the category and the abilities when the registries ask for them.
 		add_action( 'wp_abilities_api_categories_init', array( $this, 'register_category' ) );
 		add_action( 'wp_abilities_api_init', array( $this, 'register_abilities' ) );
 	}
@@ -533,8 +532,6 @@ class Visual_Portfolio_Abilities {
 
 		$content = serialize_blocks( Visual_Portfolio_Loop_Gallery::replace_at( $blocks, $found['path'], $loop ) );
 
-		// Nothing to save when the call asked for what the gallery already is,
-		// so a repeated call leaves no revision behind.
 		if ( $content !== $post->post_content ) {
 			$saved = wp_update_post(
 				wp_slash(

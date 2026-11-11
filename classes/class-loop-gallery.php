@@ -55,9 +55,7 @@ class Visual_Portfolio_Loop_Gallery {
 			),
 		);
 
-		// The sources the editor's source picker advertises without Pro,
-		// see `gutenberg/loop-sources/pro-sources.js`. With Pro they are Pro's
-		// to describe.
+		// The sources `gutenberg/loop-sources/pro-sources.js` advertises without Pro.
 		if ( ! $is_pro ) {
 			$sources['taxonomies']    = array(
 				'label'        => __( 'Taxonomies', 'visual-portfolio' ),
@@ -261,7 +259,7 @@ class Visual_Portfolio_Loop_Gallery {
 	 *
 	 * @return array
 	 */
-	public static function describe_image( $image ) {
+	private static function describe_image( $image ) {
 		$described = array( 'id' => (int) ( $image['id'] ?? 0 ) );
 
 		foreach ( array(
@@ -296,7 +294,6 @@ class Visual_Portfolio_Loop_Gallery {
 
 		$loop = $layouts[ $layout ]['loop'];
 
-		// A layout carries an id of its own, the same in every post it lands in.
 		$loop['attrs']['block_id'] = self::get_free_block_id( $blocks );
 		$loop['attrs']['queryId']  = self::get_free_query_id( $blocks );
 
@@ -313,8 +310,6 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @return array|WP_Error loop block.
 	 */
 	public static function update( $loop, $input, $blocks ) {
-		// The first write gives a loop saved without one the ids the editor
-		// would have given it.
 		if ( empty( $loop['attrs']['block_id'] ) ) {
 			$loop['attrs']['block_id'] = self::get_free_block_id( $blocks );
 		}
@@ -330,8 +325,6 @@ class Visual_Portfolio_Loop_Gallery {
 				return self::unknown_layout( $input['layout'], $layouts );
 			}
 
-			// The loop stays and takes the inner blocks of the layout, as the
-			// editor's layout picker does.
 			$loop = self::set_inner_blocks( $loop, $layouts[ $input['layout'] ]['loop']['innerBlocks'] );
 		}
 
@@ -369,7 +362,6 @@ class Visual_Portfolio_Loop_Gallery {
 			}
 		}
 
-		// Defaults follow whatever changed what a gallery is made of.
 		if ( 'create' === $action || $source || isset( $input['layout'] ) ) {
 			$loop = self::apply_layout_defaults( $loop );
 		}
@@ -572,8 +564,6 @@ class Visual_Portfolio_Loop_Gallery {
 		$ids    = array_map( 'intval', array_column( $images, 'id' ) );
 
 		foreach ( $input['add_images'] ?? array() as $image ) {
-			// Adding an image the gallery already shows changes nothing, so a
-			// repeated call leaves the gallery as the first one did.
 			if ( in_array( (int) $image['id'], $ids, true ) ) {
 				continue;
 			}
@@ -598,8 +588,6 @@ class Visual_Portfolio_Loop_Gallery {
 			$rank = array_flip( array_values( array_unique( array_map( 'intval', $input['order'] ) ) ) );
 			$tail = count( $rank );
 
-			// Images the order leaves out keep their place among themselves,
-			// after the ones it names.
 			foreach ( $images as $position => $image ) {
 				$images[ $position ]['__rank'] = $rank[ (int) ( $image['id'] ?? 0 ) ] ?? $tail + $position;
 			}
@@ -630,7 +618,7 @@ class Visual_Portfolio_Loop_Gallery {
 	 *
 	 * @return array
 	 */
-	public static function prepare_image( $image ) {
+	private static function prepare_image( $image ) {
 		$id       = (int) $image['id'];
 		$url      = (string) wp_get_attachment_url( $id );
 		$preview  = 'image/gif' === get_post_mime_type( $id ) ? false : wp_get_attachment_image_src( $id, 'large' );
@@ -820,7 +808,7 @@ class Visual_Portfolio_Loop_Gallery {
 	 *
 	 * @return string
 	 */
-	public static function get_free_block_id( $blocks ) {
+	private static function get_free_block_id( $blocks ) {
 		$used = array_map( 'strval', self::collect_attribute( $blocks, 'block_id' ) );
 
 		do {
@@ -837,7 +825,7 @@ class Visual_Portfolio_Loop_Gallery {
 	 *
 	 * @return int
 	 */
-	public static function get_free_query_id( $blocks ) {
+	private static function get_free_query_id( $blocks ) {
 		$used     = array_map( 'intval', self::collect_attribute( $blocks, 'queryId', self::LOOP ) );
 		$query_id = 1;
 

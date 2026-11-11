@@ -133,7 +133,6 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 				}
 			}
 
-			// The markup still parses back to the same loop.
 			$reparsed = parse_blocks( serialize_block( $loop ) );
 			$this->assertSame( $loop['attrs'], $reparsed[0]['attrs'], $slug );
 		}
@@ -201,7 +200,6 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 		$this->assertSame( $this->image_ids( $loop ), $this->image_ids( $updated ) );
 		$this->assertSame( 'tiles', Visual_Portfolio_Loop_Gallery::describe( $updated )['layout_type'] );
 
-		// The wrapper is the loop's own, so the block stays what it saved.
 		$this->assertSame( $loop['innerContent'][0], $updated['innerContent'][0] );
 		$this->assertSame( end( $loop['innerContent'] ), end( $updated['innerContent'] ) );
 	}
