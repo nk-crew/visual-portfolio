@@ -54,6 +54,42 @@ class Visual_Portfolio_Block_Item_Cover {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_block' ), 11 );
+
+		// styles. On the page and in the editor canvas alike.
+		add_action( 'enqueue_block_assets', array( $this, 'add_screen_style' ) );
+	}
+
+	/**
+	 * Attach the gap of the narrower screens to the stylesheet, inside the
+	 * media query of each screen.
+	 *
+	 * The queries are the editor's, the ones its Tablet and Mobile previews
+	 * cut at, which a stylesheet cannot read. The gap outweighs the panel's
+	 * own, which is an inline style.
+	 *
+	 * @return void
+	 */
+	public function add_screen_style() {
+		static $added = false;
+
+		if ( $added ) {
+			return;
+		}
+
+		$added = true;
+		$rules = '';
+
+		foreach ( Visual_Portfolio_Block_Item_Template::get_screen_queries() as $screen => $query ) {
+			$rules .= sprintf(
+				'%1$s{.wp-block-visual-portfolio-item-cover__inner.vp-has-%2$s-gap{gap:var(--vp-gap-%2$s)!important}}',
+				$query,
+				$screen
+			);
+		}
+
+		if ( $rules ) {
+			wp_add_inline_style( 'visual-portfolio-block-item-cover', $rules );
+		}
 	}
 
 	/**
@@ -418,10 +454,20 @@ class Visual_Portfolio_Block_Item_Cover {
 		// which core's Cover block has and this one does not.
 		$gap = visual_portfolio_get_block_gap( $attributes['style']['spacing']['blockGap'] ?? '' );
 
-		$panel_styles = array();
+		$panel_classes = array( 'wp-block-visual-portfolio-item-cover__inner' );
+		$panel_styles  = array();
 
 		if ( '' !== $gap ) {
 			$panel_styles[] = 'gap:' . $gap;
+		}
+
+		// A gap of its own for a narrower screen, applied by the rules of
+		// `add_screen_style()`.
+		foreach ( visual_portfolio_get_screen_block_gaps( $attributes['style'] ?? array() ) as $screen => $screen_gap ) {
+			if ( '' !== $screen_gap['left'] ) {
+				$panel_classes[] = 'vp-has-' . $screen . '-gap';
+				$panel_styles[]  = '--vp-gap-' . $screen . ':' . $screen_gap['left'];
+			}
 		}
 
 		// Padding is skipped by the block supports and applied here instead, for
@@ -437,7 +483,8 @@ class Visual_Portfolio_Block_Item_Cover {
 		}
 
 		$output .= sprintf(
-			'<div class="wp-block-visual-portfolio-item-cover__inner"%1$s>%2$s</div>',
+			'<div class="%1$s"%2$s>%3$s</div>',
+			esc_attr( implode( ' ', $panel_classes ) ),
 			empty( $panel_styles ) ? '' : ' style="' . esc_attr( implode( ';', $panel_styles ) ) . '"',
 			// The overlay last, so that the blocks keep the places the
 			// staggering counts.

@@ -78,16 +78,18 @@ lifts the maximum, and *Fill available space* drops the empty tracks of a row
 that cannot be filled. **Manual** asks for a count and keeps it. Tiles take
 their columns from the tiles notation, and justified has none.
 
-A count is not a promise to show that many on a phone. The stylesheet caps it at
-the plugin's breakpoints — four below 1200px, three below 992px, two below 768px
-and one below 576px — which is the ladder the legacy gallery walked, so every
-layout ends up a single column on a narrow screen. A tile is capped with it and
+A count is not a promise to show that many on a phone. The stylesheet caps it as
+the screen narrows — four below 1200px, three below 992px, two on a tablet and
+one on a phone, at the breakpoints the editor previews those screens at — so
+every layout ends up a single column on a narrow screen. A tile is capped with it and
 keeps its proportions, so a pattern narrows into a stack instead of spilling out
 of the grid. Auto mode is untouched: fitting the container is already what it
 does. The gap is **Block spacing** in the Dimensions panel, like any other block.
 Horizontal is the gap between columns, and between rows as well unless Vertical
 sets one of its own. With only Vertical set, the columns keep the default gap.
-A carousel has one row, so it reads Horizontal alone.
+A carousel has one row, so it reads Horizontal alone. With *Responsive styles*
+on, a gap set in the *Tablet* or *Mobile* view applies to that screen alone, on
+the item template and on the item cover, and so does the cover's padding.
 
 A grid row is as tall as its tallest item, and the other items of the row
 stretch to its height. The block toolbar of a grid aligns them to the top, the
@@ -115,6 +117,8 @@ What a theme overrides in CSS, without touching the markup:
 | `--vp-layout-track` | The `minmax()` track a grid repeats, auto mode only |
 | `--vp-layout-gap` | Block spacing |
 | `--vp-layout-row-gap` | Block spacing between rows, printed only when it differs from the columns |
+| `--vp-layout-gap-tablet`, `--vp-layout-gap-mobile` | Block spacing on that screen, with `vp-has-tablet-gap` or `vp-has-mobile-gap` |
+| `--vp-layout-row-gap-tablet`, `--vp-layout-row-gap-mobile` | Block spacing between rows on that screen, with `vp-has-tablet-row-gap` or `vp-has-mobile-row-gap` |
 | `--vp-layout-row-height` | Justified row height |
 
 Auto mode also puts `vp-layout-auto-columns` on the list, and
@@ -319,7 +323,8 @@ editor uses for the width of any block — *None* is the content width, then
 
 The carousel panel of the item template carries the rest: *Effect*, *Autoplay*
 with its mode (slide by slide, or a marquee with Pro) and its delay, *Repeat*,
-*Peek*, *Slides per step* (zero moves a whole screen at a time, and a swipe
+*Peek* (never more than a quarter of the carousel), *Slides per step* (never
+more than the screen shows; zero moves a whole screen at a time, and a swipe
 comes to rest on the same frames an arrow does), *Slide height* and *Blocks
 fill the slide*, *Fade the edges*, *Slide width from content* and *Free
 scrolling*.
