@@ -398,8 +398,8 @@ ${variables.exports};
 		const prefixed =
 			'id' === attribute.name.name
 				? `\${idPrefix}${value}`
-				: value.replace(/url\(#([^)]+)\)/g, (match, id) =>
-						ids.includes(id) ? `url(#\${idPrefix}${id})` : match
+				: value.replace(/(?<=url\(#|^#)[^)]+/g, (id) =>
+						ids.includes(id) ? `\${idPrefix}${id}` : id
 					);
 
 		if (prefixed !== value) {
