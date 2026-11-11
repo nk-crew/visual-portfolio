@@ -190,7 +190,7 @@ class Visual_Portfolio_Abilities {
 						'gallery_id'    => $this->get_gallery_id_schema(),
 						'layout'        => array(
 							'type'        => 'string',
-							'description' => __( 'New layout slug. The gallery keeps its source and settings.', 'visual-portfolio' ),
+							'description' => __( 'New layout slug. The gallery keeps its source, columns, lightbox and items per page unless `settings` changes them; the blocks inside the gallery come from the new layout.', 'visual-portfolio' ),
 							'enum'        => array_keys( Visual_Portfolio_Loop_Gallery::get_layouts() ),
 						),
 						'source'        => $this->get_source_schema(),
@@ -378,6 +378,8 @@ class Visual_Portfolio_Abilities {
 			)
 		);
 
+		_prime_post_caches( array_map( 'intval', $post_ids ), false, false );
+
 		$galleries = array();
 
 		foreach ( $post_ids as $post_id ) {
@@ -430,7 +432,7 @@ class Visual_Portfolio_Abilities {
 			return $this->gallery_not_found( $post, $input['gallery_id'] );
 		}
 
-		return $this->get_gallery_output( $post, $found['block'] );
+		return $this->get_gallery_output( $post, $found['block'], $found['index'] );
 	}
 
 	/**
@@ -457,44 +459,46 @@ class Visual_Portfolio_Abilities {
 			}
 		}
 
-		$content = $post ? $post->post_content : '';
-		$loop    = Visual_Portfolio_Loop_Gallery::create( $input['layout'], $input, parse_blocks( $content ) );
+		$build = function ( $content ) use ( $input ) {
+			$loop = Visual_Portfolio_Loop_Gallery::create( $input['layout'], $input, parse_blocks( $content ) );
 
-		if ( is_wp_error( $loop ) ) {
-			return $loop;
-		}
+			if ( is_wp_error( $loop ) ) {
+				return $loop;
+			}
 
-		$content = Visual_Portfolio_Loop_Gallery::insert_into_content( $content, $loop, $input['position'] ?? 'end' );
+			return array(
+				'content'  => Visual_Portfolio_Loop_Gallery::insert_into_content( $content, $loop, $input['position'] ?? 'end' ),
+				'block_id' => $loop['attrs']['block_id'],
+			);
+		};
 
 		if ( $post ) {
-			$saved = wp_update_post(
-				wp_slash(
-					array(
-						'ID'           => $post->ID,
-						'post_content' => $content,
-					)
-				),
-				true
-			);
-		} else {
-			$saved = wp_insert_post(
-				wp_slash(
-					array(
-						'post_type'    => 'page',
-						'post_status'  => 'draft',
-						'post_title'   => $input['title'] ?? __( 'Gallery', 'visual-portfolio' ),
-						'post_content' => $content,
-					)
-				),
-				true
-			);
+			return $this->write_gallery( $post, $build );
 		}
+
+		$built = $build( '' );
+
+		if ( is_wp_error( $built ) ) {
+			return $built;
+		}
+
+		$saved = wp_insert_post(
+			wp_slash(
+				array(
+					'post_type'    => 'page',
+					'post_status'  => 'draft',
+					'post_title'   => $input['title'] ?? __( 'Gallery', 'visual-portfolio' ),
+					'post_content' => $built['content'],
+				)
+			),
+			true
+		);
 
 		if ( is_wp_error( $saved ) ) {
 			return $saved;
 		}
 
-		return $this->get_saved_gallery( $saved, $loop['attrs']['block_id'] );
+		return $this->get_saved_gallery( $saved, $built['block_id'] );
 	}
 
 	/**
@@ -517,27 +521,94 @@ class Visual_Portfolio_Abilities {
 			return $post;
 		}
 
-		$blocks = parse_blocks( $post->post_content );
-		$found  = Visual_Portfolio_Loop_Gallery::find_loop( $blocks, $input['gallery_id'] );
+		return $this->write_gallery(
+			$post,
+			function ( $content ) use ( $post, $input ) {
+				$blocks = parse_blocks( $content );
+				$found  = Visual_Portfolio_Loop_Gallery::find_loop( $blocks, $input['gallery_id'] );
 
-		if ( ! $found ) {
-			return $this->gallery_not_found( $post, $input['gallery_id'] );
+				if ( ! $found ) {
+					return $this->gallery_not_found( $post, $input['gallery_id'] );
+				}
+
+				$loop = Visual_Portfolio_Loop_Gallery::update( $found['block'], $input, $blocks );
+
+				if ( is_wp_error( $loop ) ) {
+					return $loop;
+				}
+
+				$content = Visual_Portfolio_Loop_Gallery::replace_in_content( $content, $found['index'], $loop );
+
+				if ( null === $content ) {
+					return $this->gallery_not_found( $post, $input['gallery_id'] );
+				}
+
+				return array(
+					'content'  => $content,
+					'block_id' => $loop['attrs']['block_id'],
+				);
+			}
+		);
+	}
+
+	/**
+	 * Save a change to the galleries of a post.
+	 *
+	 * Refused while another user has the post open, as the editor would
+	 * refuse them both. A change that landed while this one was built is
+	 * kept: the gallery is built again on top of it.
+	 *
+	 * @param WP_Post  $post - post.
+	 * @param callable $build - takes the content, returns `array( content, block_id )` or a `WP_Error`.
+	 *
+	 * @return array|WP_Error gallery.
+	 */
+	private function write_gallery( $post, $build ) {
+		if ( ! function_exists( 'wp_check_post_lock' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/post.php';
 		}
 
-		$loop = Visual_Portfolio_Loop_Gallery::update( $found['block'], $input, $blocks );
+		$editor = wp_check_post_lock( $post->ID );
 
-		if ( is_wp_error( $loop ) ) {
-			return $loop;
+		if ( $editor ) {
+			return new WP_Error(
+				'vpf_post_locked',
+				sprintf(
+					// translators: %1$d - post id, %2$s - user name.
+					__( 'Post %1$d is open in the editor of %2$s. Try again once they close it.', 'visual-portfolio' ),
+					$post->ID,
+					get_the_author_meta( 'display_name', $editor )
+				),
+				array( 'status' => 409 )
+			);
 		}
 
-		$content = serialize_blocks( Visual_Portfolio_Loop_Gallery::replace_at( $blocks, $found['path'], $loop ) );
+		$built = $build( $post->post_content );
 
-		if ( $content !== $post->post_content ) {
+		if ( is_wp_error( $built ) ) {
+			return $built;
+		}
+
+		clean_post_cache( $post->ID );
+		$fresh = get_post_field( 'post_content', $post->ID, 'raw' );
+
+		if ( $fresh !== $post->post_content ) {
+			$post->post_content = $fresh;
+			$built              = $build( $fresh );
+
+			if ( is_wp_error( $built ) ) {
+				return $built;
+			}
+		}
+
+		// A call that asks for what the post already holds saves nothing and
+		// leaves no revision behind.
+		if ( $built['content'] !== $post->post_content ) {
 			$saved = wp_update_post(
 				wp_slash(
 					array(
 						'ID'           => $post->ID,
-						'post_content' => $content,
+						'post_content' => $built['content'],
 					)
 				),
 				true
@@ -548,7 +619,7 @@ class Visual_Portfolio_Abilities {
 			}
 		}
 
-		return $this->get_saved_gallery( $post->ID, $loop['attrs']['block_id'] );
+		return $this->get_saved_gallery( $post->ID, $built['block_id'] );
 	}
 
 	/**
@@ -644,7 +715,7 @@ class Visual_Portfolio_Abilities {
 			return $this->gallery_not_found( $post, $block_id );
 		}
 
-		return $this->get_gallery_output( $post, $found['block'] );
+		return $this->get_gallery_output( $post, $found['block'], $found['index'] );
 	}
 
 	/**
@@ -652,19 +723,11 @@ class Visual_Portfolio_Abilities {
 	 *
 	 * @param WP_Post $post - post.
 	 * @param array   $loop - loop block.
+	 * @param int     $index - 0-based position of the loop in the post.
 	 *
 	 * @return array
 	 */
-	private function get_gallery_output( $post, $loop ) {
-		$index = 0;
-
-		foreach ( Visual_Portfolio_Loop_Gallery::find_loops( parse_blocks( $post->post_content ) ) as $position => $found ) {
-			if ( $found['block']['attrs'] === $loop['attrs'] ) {
-				$index = $position;
-				break;
-			}
-		}
-
+	private function get_gallery_output( $post, $loop, $index ) {
 		return array_merge(
 			$this->get_post_fields( $post ),
 			array( 'gallery_id' => Visual_Portfolio_Loop_Gallery::get_gallery_id( $loop, $index ) ),
@@ -814,6 +877,11 @@ class Visual_Portfolio_Abilities {
 				'type' => 'string',
 				'enum' => array( 'asc', 'desc' ),
 			),
+			'query'     => array(
+				'type'        => 'string',
+				'description' => __( 'Read only: how get-gallery reports a `posts` source that is not one post type. Sent back, it changes nothing.', 'visual-portfolio' ),
+				'enum'        => array( 'ids', 'current_query', 'custom_query', 'post_types_set' ),
+			),
 		);
 
 		foreach ( $vocabulary['sources'] as $source ) {
@@ -823,10 +891,11 @@ class Visual_Portfolio_Abilities {
 		}
 
 		return array(
-			'type'        => 'object',
-			'description' => __( 'What the gallery shows. See the sources of get-gallery-options for what each type takes.', 'visual-portfolio' ),
-			'properties'  => $properties,
-			'required'    => array( 'type' ),
+			'type'                 => 'object',
+			'description'          => __( 'What the gallery shows. See the sources of get-gallery-options for what each type takes. On update, fields left out keep their value.', 'visual-portfolio' ),
+			'properties'           => $properties,
+			'required'             => array( 'type' ),
+			'additionalProperties' => false,
 		);
 	}
 

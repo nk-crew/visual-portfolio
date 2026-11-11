@@ -55,21 +55,20 @@ class Visual_Portfolio_Loop_Gallery {
 			),
 		);
 
-		// The sources `gutenberg/loop-sources/pro-sources.js` advertises without Pro.
-		if ( ! $is_pro ) {
-			$sources['taxonomies']    = array(
-				'label'        => __( 'Taxonomies', 'visual-portfolio' ),
-				'description'  => __( 'Display taxonomy archives such as categories, tags, and custom taxonomies.', 'visual-portfolio' ),
-				'available'    => false,
-				'requires_pro' => true,
-			);
-			$sources['social-stream'] = array(
-				'label'        => __( 'Social', 'visual-portfolio' ),
-				'description'  => __( 'Display social feeds such as Instagram, YouTube, Flickr, X, etc…', 'visual-portfolio' ),
-				'available'    => false,
-				'requires_pro' => true,
-			);
-		}
+		// The sources `gutenberg/loop-sources/pro-sources.js` advertises. Pro
+		// makes them available through the vocabulary filter.
+		$sources['taxonomies']    = array(
+			'label'        => __( 'Taxonomies', 'visual-portfolio' ),
+			'description'  => __( 'Display taxonomy archives such as categories, tags, and custom taxonomies.', 'visual-portfolio' ),
+			'available'    => false,
+			'requires_pro' => ! $is_pro,
+		);
+		$sources['social-stream'] = array(
+			'label'        => __( 'Social', 'visual-portfolio' ),
+			'description'  => __( 'Display social feeds such as Instagram, YouTube, Flickr, X, etc…', 'visual-portfolio' ),
+			'available'    => false,
+			'requires_pro' => ! $is_pro,
+		);
 
 		$vocabulary = array(
 			'sources'  => $sources,
@@ -83,11 +82,16 @@ class Visual_Portfolio_Loop_Gallery {
 					),
 				),
 				'per_page' => array(
-					'description' => __( 'Items per page, or -1 for all of them on one page.', 'visual-portfolio' ),
+					'description' => __( 'Items per page, or -1 for all of them on one page. An images gallery made by these abilities has no pagination, so there it is how many images show.', 'visual-portfolio' ),
 					'schema'      => array(
-						'type'    => 'integer',
-						'minimum' => -1,
-						'maximum' => 100,
+						'type'  => 'integer',
+						'oneOf' => array(
+							array( 'enum' => array( -1 ) ),
+							array(
+								'minimum' => 1,
+								'maximum' => 100,
+							),
+						),
 					),
 				),
 				'lightbox' => array(
@@ -191,15 +195,26 @@ class Visual_Portfolio_Loop_Gallery {
 	/**
 	 * The loop a gallery id names.
 	 *
+	 * A `loop-<n>` id keeps naming the n-th loop after a write gave it a
+	 * `block_id`, so a retried call finds the gallery it already changed.
+	 *
 	 * @param array  $blocks - parsed blocks of the post.
 	 * @param string $gallery_id - gallery id.
 	 *
-	 * @return array|null array( path, block ).
+	 * @return array|null array( path, block, index ).
 	 */
 	public static function find_loop( $blocks, $gallery_id ) {
-		foreach ( self::find_loops( $blocks ) as $index => $found ) {
-			if ( self::get_gallery_id( $found['block'], $index ) === (string) $gallery_id ) {
-				return $found;
+		$loops = self::find_loops( $blocks );
+
+		foreach ( $loops as $index => $found ) {
+			if ( (string) ( $found['block']['attrs']['block_id'] ?? '' ) === (string) $gallery_id ) {
+				return $found + array( 'index' => $index );
+			}
+		}
+
+		foreach ( $loops as $index => $found ) {
+			if ( 'loop-' . ( $index + 1 ) === (string) $gallery_id ) {
+				return $found + array( 'index' => $index );
 			}
 		}
 
@@ -225,13 +240,16 @@ class Visual_Portfolio_Loop_Gallery {
 			$source['images'] = array_map( array( __CLASS__, 'describe_image' ), $attrs['imagesQuery']['images'] ?? array() );
 		} elseif ( 'posts' === $query_type ) {
 			$posts_query = $attrs['postsQuery'] ?? array();
-			$posts_type  = $posts_query['source'] ?? 'portfolio';
+			$selector    = $posts_query['source'] ?? 'portfolio';
 
-			$source['post_type'] = $posts_type;
-			$source['ids']       = array_map( 'intval', $posts_query['ids'] ?? array() );
-			$source['terms']     = array_map( 'intval', $posts_query['taxonomies'] ?? array() );
-			$source['order_by']  = $posts_query['orderBy'] ?? 'post_date';
-			$source['order']     = $posts_query['order'] ?? 'desc';
+			// The other selectors (`ids`, `current_query`, `custom_query`,
+			// `post_types_set`) are not post types.
+			$source[ post_type_exists( $selector ) ? 'post_type' : 'query' ] = $selector;
+
+			$source['ids']      = array_map( 'intval', $posts_query['ids'] ?? array() );
+			$source['terms']    = array_map( 'intval', $posts_query['taxonomies'] ?? array() );
+			$source['order_by'] = $posts_query['orderBy'] ?? 'post_date';
+			$source['order']    = $posts_query['order'] ?? 'desc';
 		} else {
 			$source['settings'] = $attrs['sourceQuery'] ?? array();
 		}
@@ -241,7 +259,8 @@ class Visual_Portfolio_Loop_Gallery {
 			'lightbox' => self::has_lightbox( $loop['innerBlocks'] ),
 		);
 
-		if ( ! in_array( $layout, self::NO_COLUMNS, true ) ) {
+		// Automatic columns follow a minimum width, not a count.
+		if ( ! in_array( $layout, self::NO_COLUMNS, true ) && 'manual' === ( $t_attrs['layoutColumnsMode'] ?? 'auto' ) ) {
 			$settings['columns'] = (int) ( $t_attrs['layoutColumnCount'] ?? 3 );
 		}
 
@@ -261,6 +280,11 @@ class Visual_Portfolio_Loop_Gallery {
 	 */
 	private static function describe_image( $image ) {
 		$described = array( 'id' => (int) ( $image['id'] ?? 0 ) );
+
+		// An image inserted from a URL has no attachment.
+		if ( ! $described['id'] && ! empty( $image['imgUrl'] ) ) {
+			$described['url'] = (string) $image['imgUrl'];
+		}
 
 		foreach ( array(
 			'title'       => 'title',
@@ -310,11 +334,15 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @return array|WP_Error loop block.
 	 */
 	public static function update( $loop, $input, $blocks ) {
-		if ( empty( $loop['attrs']['block_id'] ) ) {
+		$block_ids = array_count_values( array_map( 'strval', self::collect_attribute( $blocks, 'block_id' ) ) );
+		$query_ids = array_count_values( array_map( 'intval', self::collect_attribute( $blocks, 'queryId', self::LOOP ) ) );
+
+		// Content written outside the editor can hold two loops with one id.
+		if ( empty( $loop['attrs']['block_id'] ) || ( $block_ids[ (string) $loop['attrs']['block_id'] ] ?? 0 ) > 1 ) {
 			$loop['attrs']['block_id'] = self::get_free_block_id( $blocks );
 		}
 
-		if ( empty( $loop['attrs']['queryId'] ) ) {
+		if ( empty( $loop['attrs']['queryId'] ) || ( $query_ids[ (int) $loop['attrs']['queryId'] ] ?? 0 ) > 1 ) {
 			$loop['attrs']['queryId'] = self::get_free_query_id( $blocks );
 		}
 
@@ -323,6 +351,12 @@ class Visual_Portfolio_Loop_Gallery {
 
 			if ( ! isset( $layouts[ $input['layout'] ] ) ) {
 				return self::unknown_layout( $input['layout'], $layouts );
+			}
+
+			// The columns and the click action live in the blocks the layout
+			// replaces, so they are carried over unless the call sets them.
+			if ( ! isset( $input['source']['type'] ) || ( $loop['attrs']['queryType'] ?? 'posts' ) === $input['source']['type'] ) {
+				$input['settings'] = array_merge( self::describe( $loop )['settings'], $input['settings'] ?? array() );
 			}
 
 			$loop = self::set_inner_blocks( $loop, $layouts[ $input['layout'] ]['loop']['innerBlocks'] );
@@ -352,7 +386,8 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @return array|WP_Error loop block.
 	 */
 	private static function apply( $loop, $input, $action ) {
-		$source = $input['source'] ?? null;
+		$source   = $input['source'] ?? null;
+		$previous = $loop['attrs']['queryType'] ?? 'posts';
 
 		if ( $source ) {
 			$loop = self::apply_source( $loop, $source );
@@ -362,7 +397,7 @@ class Visual_Portfolio_Loop_Gallery {
 			}
 		}
 
-		if ( 'create' === $action || $source || isset( $input['layout'] ) ) {
+		if ( 'create' === $action || isset( $input['layout'] ) || $previous !== $loop['attrs']['queryType'] ) {
 			$loop = self::apply_layout_defaults( $loop );
 		}
 
@@ -435,28 +470,60 @@ class Visual_Portfolio_Loop_Gallery {
 		$attrs              = $loop['attrs'];
 		$attrs['queryType'] = $type;
 
-		if ( 'images' === $type ) {
+		if ( 'images' === $type && isset( $source['images'] ) ) {
 			$attrs['imagesQuery']           = $attrs['imagesQuery'] ?? array();
-			$attrs['imagesQuery']['images'] = array_map( array( __CLASS__, 'prepare_image' ), $source['images'] ?? array() );
+			$attrs['imagesQuery']['images'] = array_map( array( __CLASS__, 'prepare_image' ), $source['images'] );
 		} elseif ( 'posts' === $type ) {
-			$ids         = array_values( array_map( 'intval', $source['ids'] ?? array() ) );
-			$posts_query = array_merge(
-				$attrs['postsQuery'] ?? array(),
-				array(
-					'source'     => empty( $ids ) ? ( $source['post_type'] ?? 'post' ) : 'ids',
-					'ids'        => $ids,
-					'taxonomies' => array_values( array_map( 'intval', $source['terms'] ?? array() ) ),
-					'orderBy'    => $source['order_by'] ?? ( empty( $ids ) ? 'post_date' : 'post__in' ),
-					'order'      => $source['order'] ?? 'desc',
-				)
-			);
-
-			$attrs['postsQuery'] = $posts_query;
+			$attrs['postsQuery'] = self::merge_posts_query( $attrs['postsQuery'] ?? array(), $source );
 		}
 
 		$loop['attrs'] = $attrs;
 
 		return $loop;
+	}
+
+	/**
+	 * A posts query with the fields a source input gives; the rest stay.
+	 *
+	 * @param array $posts_query - stored `postsQuery`.
+	 * @param array $source - source input.
+	 *
+	 * @return array
+	 */
+	private static function merge_posts_query( $posts_query, $source ) {
+		if ( isset( $source['post_type'] ) ) {
+			$posts_query['source'] = $source['post_type'];
+		}
+
+		if ( isset( $source['ids'] ) ) {
+			$posts_query['ids'] = array_values( array_map( 'intval', $source['ids'] ) );
+
+			if ( ! empty( $posts_query['ids'] ) ) {
+				$posts_query['source']  = 'ids';
+				$posts_query['orderBy'] = 'post__in';
+			} elseif ( 'ids' === ( $posts_query['source'] ?? '' ) ) {
+				$posts_query['source'] = $source['post_type'] ?? 'post';
+			}
+		}
+
+		// A loop that never had a posts query starts on posts.
+		if ( empty( $posts_query['source'] ) ) {
+			$posts_query['source'] = 'post';
+		}
+
+		if ( isset( $source['terms'] ) ) {
+			$posts_query['taxonomies'] = array_values( array_map( 'intval', $source['terms'] ) );
+		}
+
+		if ( isset( $source['order_by'] ) ) {
+			$posts_query['orderBy'] = $source['order_by'];
+		}
+
+		if ( isset( $source['order'] ) ) {
+			$posts_query['order'] = $source['order'];
+		}
+
+		return $posts_query;
 	}
 
 	/**
@@ -493,6 +560,12 @@ class Visual_Portfolio_Loop_Gallery {
 			$loop['attrs']['baseQuery']['perPage'] = -1;
 
 			return $loop;
+		}
+
+		// "Every item on one page" is an images default; on posts it would
+		// put every post of the type on one page.
+		if ( -1 === (int) ( $loop['attrs']['baseQuery']['perPage'] ?? 0 ) ) {
+			$loop['attrs']['baseQuery']['perPage'] = 6;
 		}
 
 		return self::set_click_action(
@@ -602,6 +675,11 @@ class Visual_Portfolio_Loop_Gallery {
 			foreach ( $images as $position => $image ) {
 				unset( $images[ $position ]['__rank'] );
 			}
+
+			// A sort set on the gallery would reorder the images again on the page.
+			$loop['attrs']['imagesQuery']            = $loop['attrs']['imagesQuery'] ?? array();
+			$loop['attrs']['imagesQuery']['orderBy'] = 'default';
+			$loop['attrs']['imagesQuery']['order']   = 'asc';
 		}
 
 		$loop['attrs']['imagesQuery']           = $loop['attrs']['imagesQuery'] ?? array();
@@ -626,6 +704,12 @@ class Visual_Portfolio_Loop_Gallery {
 			'id'              => $id,
 			'imgUrl'          => $url,
 			'imgThumbnailUrl' => $preview ? $preview[0] : $url,
+		);
+
+		// What the media frame hands the editor's gallery manager.
+		$image += array(
+			'title'       => get_post_field( 'post_title', $id, 'raw' ),
+			'description' => get_post_field( 'post_content', $id, 'raw' ),
 		);
 
 		foreach ( array(
@@ -837,24 +921,38 @@ class Visual_Portfolio_Loop_Gallery {
 	}
 
 	/**
-	 * Replace the block at a path.
+	 * Post content with the n-th loop's markup replaced, and every other byte
+	 * kept.
 	 *
-	 * @param array $blocks - blocks.
-	 * @param array $path - indexes leading to the block.
-	 * @param array $block - new block.
+	 * Serializing the whole post again would rewrite blocks the call never
+	 * named: the block parser decodes `{}` as an empty array and `1.0` as `1`.
 	 *
-	 * @return array
+	 * @param string $content - post content.
+	 * @param int    $index - 0-based position of the loop among the loops of the post.
+	 * @param array  $loop - new loop block.
+	 *
+	 * @return string|null null when the loop is not where the parser found it.
 	 */
-	public static function replace_at( $blocks, $path, $block ) {
-		$index = array_shift( $path );
-
-		if ( empty( $path ) ) {
-			$blocks[ $index ] = $block;
-		} else {
-			$blocks[ $index ]['innerBlocks'] = self::replace_at( $blocks[ $index ]['innerBlocks'], $path, $block );
+	public static function replace_in_content( $content, $index, $loop ) {
+		// Loops never nest, so the n-th opener and the closer after it span the n-th loop.
+		if ( ! preg_match_all( '#<!--\s+wp:visual-portfolio/loop(?:\s+\{.*?\})?\s+(/)?-->#s', $content, $openers, PREG_OFFSET_CAPTURE | PREG_SET_ORDER ) || ! isset( $openers[ $index ] ) ) {
+			return null;
 		}
 
-		return $blocks;
+		$start = $openers[ $index ][0][1];
+		$end   = $start + strlen( $openers[ $index ][0][0] );
+
+		$is_void = isset( $openers[ $index ][1] ) && '/' === $openers[ $index ][1][0];
+
+		if ( ! $is_void ) {
+			if ( ! preg_match( '#<!--\s+/wp:visual-portfolio/loop\s+-->#', $content, $closer, PREG_OFFSET_CAPTURE, $end ) ) {
+				return null;
+			}
+
+			$end = $closer[0][1] + strlen( $closer[0][0] );
+		}
+
+		return substr( $content, 0, $start ) . serialize_block( $loop ) . substr( $content, $end );
 	}
 
 	/**

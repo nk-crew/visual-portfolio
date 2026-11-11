@@ -125,6 +125,7 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 			$this->assertSame( 'images', $loop['attrs']['queryType'], $slug );
 			$this->assertSame( -1, $loop['attrs']['baseQuery']['perPage'], $slug );
 			$this->assertSame( array_slice( self::$image_ids, 0, 3 ), $this->image_ids( $loop ), $slug );
+			$this->assertSame( get_post_field( 'post_title', self::$image_ids[0], 'raw' ), $loop['attrs']['imagesQuery']['images'][0]['title'], $slug );
 			$this->assertNotContains( Visual_Portfolio_Loop_Gallery::PAGINATION, array_column( $flat, 'blockName' ), $slug );
 
 			foreach ( $flat as $block ) {
@@ -184,7 +185,38 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 
 		$described = Visual_Portfolio_Loop_Gallery::describe( $loop );
 		$this->assertSame( array( 12, 7 ), $described['source']['ids'] );
+		$this->assertSame( 'ids', $described['source']['query'] );
+		$this->assertArrayNotHasKey( 'post_type', $described['source'] );
 		$this->assertFalse( $described['settings']['lightbox'] );
+
+		// A change of the order alone keeps the rest of the query.
+		$updated = Visual_Portfolio_Loop_Gallery::update(
+			$loop,
+			array(
+				'source' => array(
+					'type'  => 'posts',
+					'order' => 'asc',
+				),
+			),
+			array( $loop )
+		);
+
+		$this->assertSame(
+			array_merge( $loop['attrs']['postsQuery'], array( 'order' => 'asc' ) ),
+			$updated['attrs']['postsQuery']
+		);
+	}
+
+	/**
+	 * Leaving images for posts does not put every post on one page.
+	 */
+	public function test_images_to_posts_restores_paging() {
+		$loop    = Visual_Portfolio_Loop_Gallery::create( 'visual-portfolio/gallery-grid-classic', array( 'source' => $this->images_source( 1 ) ), array() );
+		$updated = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'source' => array( 'type' => 'posts' ) ), array( $loop ) );
+
+		$this->assertSame( 6, $updated['attrs']['baseQuery']['perPage'] );
+		$this->assertSame( 'post', $updated['attrs']['postsQuery']['source'] );
+		$this->assertSame( $this->image_ids( $loop ), $this->image_ids( $updated ) );
 	}
 
 	/**
@@ -192,8 +224,29 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 	 * ids, its source and its images.
 	 */
 	public function test_layout_change_keeps_ids_and_source() {
-		$loop    = Visual_Portfolio_Loop_Gallery::create( 'visual-portfolio/gallery-masonry-classic', array( 'source' => $this->images_source( 2 ) ), array() );
+		$loop    = Visual_Portfolio_Loop_Gallery::create(
+			'visual-portfolio/gallery-masonry-classic',
+			array(
+				'source'   => $this->images_source( 2 ),
+				'settings' => array(
+					'columns'  => 5,
+					'lightbox' => false,
+					'per_page' => 8,
+				),
+			),
+			array()
+		);
 		$updated = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'layout' => 'visual-portfolio/gallery-tiles-mosaic' ), array( $loop ) );
+		$grid    = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'layout' => 'visual-portfolio/gallery-grid-classic' ), array( $loop ) );
+
+		$this->assertSame(
+			array(
+				'per_page' => 8,
+				'lightbox' => false,
+				'columns'  => 5,
+			),
+			Visual_Portfolio_Loop_Gallery::describe( $grid )['settings']
+		);
 
 		$this->assertSame( $loop['attrs']['block_id'], $updated['attrs']['block_id'] );
 		$this->assertSame( $loop['attrs']['queryId'], $updated['attrs']['queryId'] );
@@ -241,6 +294,44 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An explicit order turns off the sort a gallery had, which would
+	 * reorder the images again on the page.
+	 */
+	public function test_explicit_order_turns_off_sorting() {
+		$loop = Visual_Portfolio_Loop_Gallery::create( 'visual-portfolio/gallery-grid-classic', array( 'source' => $this->images_source( 2 ) ), array() );
+
+		$loop['attrs']['imagesQuery']['orderBy'] = 'image_title';
+		$loop['attrs']['imagesQuery']['order']   = 'desc';
+
+		$updated = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'order' => array( self::$image_ids[1] ) ), array( $loop ) );
+
+		$this->assertSame( 'default', $updated['attrs']['imagesQuery']['orderBy'] );
+		$this->assertSame( 'asc', $updated['attrs']['imagesQuery']['order'] );
+	}
+
+	/**
+	 * A write gives a loop that shares its ids with another loop ids of its
+	 * own; `loop-<n>` keeps naming the loop after that.
+	 */
+	public function test_update_repairs_duplicate_ids() {
+		$markup = '<!-- wp:visual-portfolio/loop {"block_id":"same","queryId":1,"queryType":"posts"} --><div class="vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->';
+		$blocks = parse_blocks( $markup . $markup );
+		$found  = Visual_Portfolio_Loop_Gallery::find_loop( $blocks, 'loop-2' );
+
+		$this->assertSame( 1, $found['index'] );
+
+		$updated = Visual_Portfolio_Loop_Gallery::update( $found['block'], array( 'settings' => array( 'per_page' => 3 ) ), $blocks );
+
+		$this->assertNotSame( 'same', $updated['attrs']['block_id'] );
+		$this->assertSame( 2, $updated['attrs']['queryId'] );
+
+		$content = Visual_Portfolio_Loop_Gallery::replace_in_content( $markup . $markup, 1, $updated );
+
+		$this->assertStringStartsWith( $markup, $content );
+		$this->assertSame( 1, Visual_Portfolio_Loop_Gallery::find_loop( parse_blocks( $content ), 'loop-2' )['index'] );
+	}
+
+	/**
 	 * Image operations on a gallery of posts are refused.
 	 */
 	public function test_image_operations_need_an_images_gallery() {
@@ -278,6 +369,10 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 		);
 
 		$this->assertArrayNotHasKey( 'columns', Visual_Portfolio_Loop_Gallery::describe( $tiles )['settings'] );
+
+		// The captions layout lays out by a minimum column width.
+		$auto = Visual_Portfolio_Loop_Gallery::create( 'visual-portfolio/gallery-masonry-captions', array( 'source' => $this->images_source( 1 ) ), array() );
+		$this->assertArrayNotHasKey( 'columns', Visual_Portfolio_Loop_Gallery::describe( $auto )['settings'] );
 		$this->assertSame(
 			array(
 				'per_page' => 8,

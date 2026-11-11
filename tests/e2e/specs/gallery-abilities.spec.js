@@ -115,15 +115,18 @@ test.describe('Gallery abilities', () => {
 			path: '/wp-abilities/v1/abilities',
 			params: { category: 'visual-portfolio', per_page: 100 },
 		});
-		const names = abilities.map(({ name }) => name).sort();
+		const names = abilities.map(({ name }) => name);
 
-		expect(names).toEqual([
-			'visual-portfolio/create-gallery',
-			'visual-portfolio/get-gallery',
-			'visual-portfolio/get-gallery-options',
-			'visual-portfolio/list-galleries',
-			'visual-portfolio/update-gallery',
-		]);
+		// Pro adds abilities of its own to the category.
+		expect(names).toEqual(
+			expect.arrayContaining([
+				'visual-portfolio/create-gallery',
+				'visual-portfolio/get-gallery',
+				'visual-portfolio/get-gallery-options',
+				'visual-portfolio/list-galleries',
+				'visual-portfolio/update-gallery',
+			])
+		);
 	});
 
 	test('build a gallery the editor accepts and the page shows', async ({

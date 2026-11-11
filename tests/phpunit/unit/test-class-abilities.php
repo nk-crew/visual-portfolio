@@ -32,7 +32,7 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 	 *
 	 * @var string
 	 */
-	const SURROUNDINGS = "<!-- wp:paragraph -->\n<p>Before &amp; <em>after</em></p>\n<!-- /wp:paragraph -->\n\n<!-- wp:group {\"layout\":{\"type\":\"constrained\"}} -->\n<div class=\"wp-block-group\"><!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Work</h2>\n<!-- /wp:heading --></div>\n<!-- /wp:group -->";
+	const SURROUNDINGS = "<!-- wp:paragraph -->\n<p>Before &amp; <em>after</em></p>\n<!-- /wp:paragraph -->\n\n<!-- wp:group {\"style\":{},\"layout\":{\"type\":\"constrained\"}} -->\n<div class=\"wp-block-group\"><!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Work</h2>\n<!-- /wp:heading --></div>\n<!-- /wp:group -->";
 
 	/**
 	 * Create users and images once.
@@ -70,6 +70,28 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 		wp_set_current_user( self::$users[ $role ] );
 
 		return wp_get_ability( 'visual-portfolio/' . $name )->execute( $input );
+	}
+
+	/**
+	 * A post holding exactly the content given.
+	 *
+	 * Saved through the database, because a save without `unfiltered_html`
+	 * runs every block through kses, which writes `{}` as `[]`.
+	 *
+	 * @param string $content - post content.
+	 * @param array  $args - other post fields.
+	 *
+	 * @return int post id.
+	 */
+	private function create_post( $content, $args = array() ) {
+		global $wpdb;
+
+		$post_id = self::factory()->post->create( $args );
+
+		$wpdb->update( $wpdb->posts, array( 'post_content' => $content ), array( 'ID' => $post_id ) );
+		clean_post_cache( $post_id );
+
+		return $post_id;
 	}
 
 	/**
@@ -115,7 +137,7 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 	 * was, and reads back in the vocabulary it was written in.
 	 */
 	public function test_create_gallery_in_a_post() {
-		$post_id = self::factory()->post->create( array( 'post_content' => self::SURROUNDINGS ) );
+		$post_id = $this->create_post( self::SURROUNDINGS );
 		$gallery = $this->run_ability(
 			'create-gallery',
 			array(
@@ -164,12 +186,7 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 	 * post is left as it was.
 	 */
 	public function test_create_gallery_respects_edit_rights() {
-		$post_id = self::factory()->post->create(
-			array(
-				'post_author'  => self::$users['administrator'],
-				'post_content' => self::SURROUNDINGS,
-			)
-		);
+		$post_id = $this->create_post( self::SURROUNDINGS, array( 'post_author' => self::$users['administrator'] ) );
 		$result  = $this->run_ability(
 			'create-gallery',
 			array(
@@ -202,12 +219,7 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 				'post_mime_type' => 'application/pdf',
 			)
 		);
-		$post_id      = self::factory()->post->create(
-			array(
-				'post_author'  => self::$users['author'],
-				'post_content' => self::SURROUNDINGS,
-			)
-		);
+		$post_id      = $this->create_post( self::SURROUNDINGS, array( 'post_author' => self::$users['author'] ) );
 
 		foreach ( array( $hidden, $document, 999999 ) as $id ) {
 			$result = $this->run_ability(
@@ -308,7 +320,7 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 	 */
 	public function test_update_gallery_is_repeatable_and_local() {
 		$other   = '<!-- wp:visual-portfolio/loop {"block_id":"other","queryType":"posts","queryId":1} --><div class="vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->';
-		$post_id = self::factory()->post->create( array( 'post_content' => self::SURROUNDINGS . "\n\n" . $other ) );
+		$post_id = $this->create_post( self::SURROUNDINGS . "\n\n" . $other );
 		$gallery = $this->run_ability(
 			'create-gallery',
 			array(
@@ -356,5 +368,89 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 		$this->assertIsArray( $updated );
 		$this->assertNotSame( 'loop-1', $updated['gallery_id'] );
 		$this->assertSame( 'grid', $updated['layout_type'] );
+
+		// A retry with the same id finds the gallery it already changed.
+		$this->assertSame(
+			$updated,
+			$this->run_ability(
+				'update-gallery',
+				array(
+					'post_id'    => $post_id,
+					'gallery_id' => 'loop-1',
+					'layout'     => 'visual-portfolio/gallery-posts-classic',
+				)
+			)
+		);
+	}
+
+	/**
+	 * A posts source read from a gallery is accepted back unchanged.
+	 */
+	public function test_posts_source_round_trips() {
+		$post_id = self::factory()->post->create();
+		$gallery = $this->run_ability(
+			'create-gallery',
+			array(
+				'post_id' => $post_id,
+				'layout'  => 'visual-portfolio/gallery-posts-classic',
+				'source'  => array(
+					'type' => 'posts',
+					'ids'  => array( $post_id ),
+				),
+			)
+		);
+		$again   = $this->run_ability(
+			'update-gallery',
+			array(
+				'post_id'    => $post_id,
+				'gallery_id' => $gallery['gallery_id'],
+				'source'     => $gallery['source'],
+				'settings'   => $gallery['settings'],
+			)
+		);
+
+		$this->assertSame( $gallery, $again );
+	}
+
+	/**
+	 * Zero items per page, which no gallery can render, is refused.
+	 */
+	public function test_per_page_zero_is_refused() {
+		$post_id = $this->create_post( self::SURROUNDINGS );
+		$result  = $this->run_ability(
+			'create-gallery',
+			array(
+				'post_id'  => $post_id,
+				'layout'   => 'visual-portfolio/gallery-grid-classic',
+				'source'   => $this->images_source( array( 0 ) ),
+				'settings' => array( 'per_page' => 0 ),
+			)
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'ability_invalid_input', $result->get_error_code() );
+		$this->assertSame( self::SURROUNDINGS, get_post( $post_id )->post_content );
+	}
+
+	/**
+	 * A post another user has open in the editor is not written.
+	 */
+	public function test_post_open_by_another_user_is_refused() {
+		$post_id = $this->create_post( self::SURROUNDINGS );
+
+		update_post_meta( $post_id, '_edit_lock', time() . ':' . self::$users['author'] );
+
+		$result = $this->run_ability(
+			'create-gallery',
+			array(
+				'post_id' => $post_id,
+				'layout'  => 'visual-portfolio/gallery-grid-classic',
+				'source'  => $this->images_source( array( 0 ) ),
+			)
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'vpf_post_locked', $result->get_error_code() );
+		$this->assertSame( self::SURROUNDINGS, get_post( $post_id )->post_content );
 	}
 }
