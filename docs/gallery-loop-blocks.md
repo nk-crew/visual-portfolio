@@ -18,6 +18,7 @@ and are not affected by anything on this page.
 - [Block context](#block-context)
 - [PHP hooks](#php-hooks)
 - [Content sources](#content-sources)
+- [Abilities for AI agents](#abilities-for-ai-agents)
 - [Block Bindings](#block-bindings)
 - [Interactivity stores](#interactivity-stores)
 - [URL parameters and caching](#url-parameters-and-caching)
@@ -904,6 +905,92 @@ columns and pattern editor filters. The notation itself — `parseTiles`,
 in the `visual-portfolio/components` store beside `TilesPresetsSelect`, with
 `getViewportBreakpoints()` for the breakpoints the editor previews a tablet and
 a phone at.
+
+## Abilities for AI agents
+
+On WordPress 7.1 and newer the plugin registers five abilities with the
+Abilities API, in the category `visual-portfolio`. Each is `public`, so the
+REST API, the WordPress MCP Adapter and the agents behind it (Claude, Cursor,
+any MCP client) can call it, always as the logged-in user and only within
+that user's capabilities.
+
+| Ability | Permission | What it does |
+| --- | --- | --- |
+| `visual-portfolio/get-gallery-options` | `edit_posts` | Lists the layouts (the patterns registered for `visual-portfolio/loop`), the sources and the settings. |
+| `visual-portfolio/list-galleries` | `edit_posts` | Lists the loops in posts, pages and templates the user can edit. |
+| `visual-portfolio/get-gallery` | `edit_post` | Reads one loop. |
+| `visual-portfolio/create-gallery` | `edit_post`, or creating a page | Adds a loop built from a layout to a post, or to a new draft page. |
+| `visual-portfolio/update-gallery` | `edit_post` | Changes the layout, source, settings or images of a loop. |
+
+A gallery is addressed by `post_id` and `gallery_id`, the loop's `block_id`. A
+loop saved without one is `loop-<n>`, its position in the post, until its first
+change gives it an id.
+
+The abilities speak a vocabulary of their own rather than block attributes:
+`layout` is a pattern slug, `source` is `{ type, ... }` (`images` with
+attachment ids, `posts` with a post type, ids, terms and an order), `settings`
+are `columns`, `per_page` and `lightbox`. A new loop starts the way the
+editor's setup starts it (`gutenberg/blocks/loop/layout-defaults.js`), with a
+fresh `block_id` and the lowest `queryId` free in the post. Writes go through
+`wp_update_post()`, so revisions and the Custom Query guard apply.
+
+Over REST, `update-gallery` is annotated destructive and idempotent, so its
+`run` endpoint answers `DELETE` with the input in the query string, the method
+`executeAbility()` of `@wordpress/abilities` picks for it.
+
+### Extending the vocabulary
+
+`vpf_gallery_ability_vocabulary` filters the sources and settings the
+abilities accept. A source is `type => array( label, description, available,
+requires_pro, schema )`, where `schema` is a JSON schema whose `properties`
+join the input schema of `source`. A setting is `key => array( description,
+schema )`.
+
+```php
+add_filter(
+	'vpf_gallery_ability_vocabulary',
+	function ( $vocabulary ) {
+		$vocabulary['sources']['acme/instagram'] = array(
+			'label'        => 'Instagram',
+			'description'  => 'Photos of an Instagram account.',
+			'available'    => true,
+			'requires_pro' => false,
+			'schema'       => array(
+				'properties' => array(
+					'account' => array( 'type' => 'string' ),
+				),
+			),
+		);
+
+		return $vocabulary;
+	}
+);
+```
+
+`vpf_gallery_ability_apply` filters the parsed loop after the plugin applied
+what it knows, with the ability input and the action, `create` or `update`.
+A source type or setting added above is turned into attributes here.
+
+```php
+add_filter(
+	'vpf_gallery_ability_apply',
+	function ( $loop, $input, $action ) {
+		if ( 'acme/instagram' === ( $input['source']['type'] ?? '' ) ) {
+			$loop['attrs']['sourceQuery'] = array(
+				'account' => $input['source']['account'] ?? '',
+			);
+		}
+
+		return $loop;
+	},
+	10,
+	3
+);
+```
+
+Without Pro, `get-gallery-options` lists the Pro sources, Taxonomies and
+Social, with `requires_pro: true`, and asking for one returns the
+`vpf_requires_pro` error with a link to Pro.
 
 ## Block Bindings
 
