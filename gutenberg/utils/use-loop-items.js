@@ -20,7 +20,7 @@ import { addAction, removeAction } from '@wordpress/hooks';
  * social feed finishing its first sync.
  *
  * @param {Object} query - what the endpoint needs, memoised by the caller: its identity is what triggers a request.
- * @return {Object} `{ items, foundItems, isLoading, isFirstLoad }`. The last answer stays while the next one loads.
+ * @return {Object} `{ items, foundItems, isLoading, isFirstLoad, answeredQuery }`. The last answer stays while the next one loads; `answeredQuery` is the query it answers.
  */
 export function useLoopItems(query) {
 	const [answer, setAnswer] = useState(null);
@@ -59,12 +59,15 @@ export function useLoopItems(query) {
 						return;
 					}
 
-					setAnswer(response?.success ? response.response : {});
+					setAnswer({
+						...(response?.success ? response.response : {}),
+						query,
+					});
 					setIsLoading(false);
 				})
 				.catch((error) => {
 					if (!cancelled) {
-						setAnswer((current) => current || {});
+						setAnswer((current) => current || { query });
 						setIsLoading(false);
 					}
 
@@ -84,5 +87,6 @@ export function useLoopItems(query) {
 		foundItems: answer?.found_items ?? null,
 		isLoading,
 		isFirstLoad: isLoading && !answer,
+		answeredQuery: answer?.query,
 	};
 }

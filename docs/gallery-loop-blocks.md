@@ -42,6 +42,22 @@ and whenever a user writes the `vp_posts_custom_query` meta that Saved Layouts,
 the shortcode and the Saved block read; an import or a command run without a
 user is left alone. The editor previews such a user's query the same way.
 
+**Bulk import.** A gallery of images takes a whole folder or a ZIP archive at
+once. The drop zone takes files, folders and archives, and *Upload* on the
+first step of a loop takes files and archives. *Import* offers *Upload folder*
+on that step, and *Upload files or ZIP* and *Upload folder* beside *Add media*
+in the sidebar. An archive is
+unpacked in the browser, so its size is not bound by the site's upload limit;
+the files inside it and inside nested folders are uploaded one by one, three at
+a time, and join the gallery in the natural order of their paths (`IMG_2`
+before `IMG_10`), whatever order the uploads finish in. System files
+(`.DS_Store`, `__MACOSX`, hidden files) are left out, files of another type are
+counted and skipped, and so is a file whose name and size match an image the
+gallery already holds, so importing the same folder twice adds nothing. The
+progress shows under the actions until the last file is in, and leaving the
+page meanwhile asks first. A failed file is listed with its reason and *Retry
+failed* sends it again.
+
 **Item image.** On a gallery of images the toolbar of the item image carries
 the two media tools the core Image block has: *Crop* and *Replace*. Both act on
 the entry of the item in the loop's gallery — the same entry the gallery
@@ -52,6 +68,17 @@ the inline cropper the block editor still ships for plugins, with the zoom, the
 aspect ratio and the rotation in the toolbar. Replace offers the media library
 and an upload. A posts loop shows neither: its image is the featured image of
 the post, and belongs to it.
+
+The same toolbar moves the image along the gallery, the way the core Gallery
+moves one of its images: *Move left* and *Move right* swap it with its
+neighbour in the order the gallery is shown, and *Remove from gallery* in the
+options menu takes it out of the gallery and leaves the attachment in the media
+library. The Item Cover block carries the same controls. A gallery sorted by
+date, title or at random has no order of its own, so it offers the removal
+alone. The preview redraws the items it already holds at once, sliding each to
+its new place, and the server's answer confirms the order when it arrives. The
+arrows stop at the last image the preview shows, so the image being edited
+stays in sight; the gallery manager in the sidebar moves an image further.
 
 **Format badge.** The Item Image and Item Cover blocks can mark an item that is
 not a still picture. *Format badge* puts the video, audio or gallery icon of the
@@ -91,6 +118,8 @@ sets one of its own. With only Vertical set, the columns keep the default gap.
 A carousel has one row, so it reads Horizontal alone. With *Responsive styles*
 on, a gap set in the *Tablet* or *Mobile* view applies to that screen alone, on
 the item template and on the item cover, and so does the cover's padding.
+The blocks inside one item are spaced the way a Group spaces its blocks: the
+theme's block gap between each two, unless a block sets a margin of its own.
 
 A grid row is as tall as its tallest item, and the other items of the row
 stretch to its height. The block toolbar of a grid aligns them to the top, the
@@ -382,6 +411,31 @@ the focus moves to the first link of the first item that arrived, or to that
 item itself when it holds none. A last page the infinite scroll loads by itself
 leaves the focus where it is.
 
+**From the legacy block.** A Visual Portfolio block and a Saved Layout block
+turn into a Gallery Loop from the block switcher, the way a core Gallery or
+Query Loop does: *Gallery Loop* in the list of blocks to transform to, with a
+preview of the result. The loop keeps the source and its query, the number of
+items per page, the layout with its columns, tiles pattern or carousel
+settings, the gap, the skin, the click action and the lightbox captions, the
+filter, the sort and the search above the items, the pagination below them, the notice
+for no results and the custom CSS. The Classic skin becomes an Item Image with
+the caption blocks below it; Fade, Fly and Emerge become an Item Cover with
+the effect of the same name and the caption blocks inside. A Saved Layout is
+copied into the post, so the loop no longer follows later edits of the layout.
+Undo brings the legacy block back.
+
+A block whose setup is not finished, or whose source the loop does not have,
+is not offered the transform. These settings have no Gallery Loop equivalent
+and are left behind: the mouse wheel, speed, dynamic dots, sticky free mode,
+pause on hover and minimum height of a slider, the horizontal order of a
+masonry, the scroll to the top of a paged pagination, the pagination style,
+the icon, the hover overlay and the hover zoom of the Classic skin (Pro keeps the zoom), the tint Emerge puts over
+the picture, the hover color of links, and *Stretch*. A Read More shown only for posts
+with a More tag becomes one shown on every item. Custom CSS becomes the loop's
+own custom CSS, with `selector` written as `&`; rules that name the classes of
+the legacy markup match nothing in the loop, and WordPress removes the CSS when
+a user who may not edit CSS (`unfiltered_html`) saves the post.
+
 ## Anatomy
 
 ```
@@ -668,6 +722,16 @@ panel for the watermark. A trigger set to infinite scroll has an Infinite Scroll
 panel for loading on startup, pausing every few pages and the threshold
 distance.
 
+### The legacy block transform
+
+`vpf.loopLegacyTransform` filters the Gallery Loop a Visual Portfolio or Saved
+Layout block turns into. It is given the converted block (or blocks) and every
+attribute of the legacy block with the defaults resolved, and what it returns
+is inserted. An extension maps there the settings it added to the legacy
+block. A legacy source the loop offers through `registerLoopSource()` is
+offered the transform. The settings of a Saved Layout come from the
+`visual-portfolio/v1/get_layout` REST route.
+
 ### Item meta types
 
 The item meta block prints one value of an item, with its mark. Its types are
@@ -885,6 +949,19 @@ is measured by Fancybox and PhotoSwipe. Upload to Media Library in its Image
 Settings asks the server to fetch the file (`POST /wp/v2/media` with `url`) and
 moves the entry to the new attachment, keeping everything typed into it. An
 entry whose attachment was deleted keeps its `id` and stays a No Image item.
+
+**Import sources.** The *Import* menu of a gallery lists the sources of the
+`vpf.galleryImportSources` JavaScript filter after its own items. It is given an
+empty array and `{ clientId }`, and returns `{ name, label, icon, render }`
+entries. Once one is picked the menu mounts `render` as a component with
+`{ clientId, importItems, onClose }`. `importItems( items )` hands files to the
+gallery's queue, which skips, orders, uploads and reports them as it does a
+folder. An item is `{ name, size, path }` plus one of `getFile()`, resolving to
+the file's data the editor uploads, or `run()`, resolving to an attachment as
+`/wp/v2/media` answers one, for a file the source puts in the library itself.
+`POST /visual-portfolio/v1/gallery_file_matches` with `{ ids, files }` answers
+the indexes of `files` (`{ name, size }`) the attachments `ids` were uploaded
+from; the queue asks it before every import.
 
 Per-image fields in the gallery manager are added through the
 `VP.LoopImageSettings` slot. The formats its Format list offers come from the

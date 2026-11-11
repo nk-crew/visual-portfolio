@@ -9,6 +9,14 @@ function reducer(state = { layouts: [] }, action = {}) {
 				state.layouts = action.layouts;
 			}
 			return state;
+		case 'SET_LAYOUT_OPTIONS':
+			return {
+				...state,
+				layoutOptions: {
+					...state.layoutOptions,
+					[action.id]: action.options,
+				},
+			};
 		// no default
 	}
 

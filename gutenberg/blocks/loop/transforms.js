@@ -4,6 +4,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 
 import { URL_OR_POPUP } from '../../utils/click-actions';
+import { convertLegacyBlock, getLegacyQueryType } from './legacy-transform';
 
 const PER_PAGE_ALL = -1;
 
@@ -339,6 +340,31 @@ function getPostsQuery(query) {
 
 export default {
 	from: [
+		{
+			type: 'block',
+			blocks: ['visual-portfolio/block'],
+			// A block whose wizard is not finished has no source yet.
+			isMatch: (attributes) => !!getLegacyQueryType(attributes),
+			transform: (attributes) => convertLegacyBlock(attributes),
+		},
+		{
+			type: 'block',
+			blocks: ['visual-portfolio/saved'],
+			// The editor of the Saved block loads the layout's settings, and
+			// the transform is offered once they are in.
+			isMatch: ({ id }) => {
+				const options = id
+					? select('visual-portfolio').getLayoutOptions(id)
+					: null;
+
+				return !!options && !!getLegacyQueryType(options);
+			},
+			transform: ({ id, align, className, anchor }) =>
+				convertLegacyBlock(
+					select('visual-portfolio').getLayoutOptions(id),
+					{ align, className, anchor }
+				),
+		},
 		{
 			type: 'block',
 			blocks: ['core/gallery'],
