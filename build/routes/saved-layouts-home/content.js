@@ -52700,19 +52700,24 @@ function useUsage(id) {
 function UsageList({ item, final }) {
 	const usage = useUsage(item.id);
 	if (usage === null) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_components.Spinner, {});
-	if (!usage.length) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_components.__experimentalText, { children: item.vpf_layout?.kind === "legacy" ? (0, import_i18n.__)("It is not used on any page. Shortcodes inside page builders are not counted, and they will show nothing.", "visual-portfolio") : (0, import_i18n.__)("It is not used on any page.", "visual-portfolio") });
-	const synced = usage.some((page) => page.synced);
-	const inserted = usage.some((page) => page.inserted);
+	if (!usage.total) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_components.__experimentalText, { children: item.vpf_layout?.kind === "legacy" ? (0, import_i18n.__)("It is not used on any page. Shortcodes inside page builders are not counted, and they will show nothing.", "visual-portfolio") : (0, import_i18n.__)("It is not used on any page.", "visual-portfolio") });
+	const synced = usage.items.some((page) => page.synced);
+	const inserted = usage.items.some((page) => page.inserted);
+	const more = usage.total - usage.items.length;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_components.__experimentalVStack, {
 		spacing: 3,
 		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_components.__experimentalText, { children: (0, import_i18n.sprintf)((0, import_i18n._n)("It is used on %d page:", "It is used on %d pages:", usage.length, "visual-portfolio"), usage.length) }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_components.__experimentalText, { children: (0, import_i18n.sprintf)((0, import_i18n._n)("It is used on %d page:", "It is used on %d pages:", usage.total, "visual-portfolio"), usage.total) }),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
 				className: "vpf-library-usage",
-				children: usage.map((page) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: page.title || (0, import_i18n.__)("(no title)", "visual-portfolio") }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+				children: usage.items.map((page) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: page.title || (0, import_i18n.__)("(no title)", "visual-portfolio") }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 					className: "vpf-library-muted",
 					children: page.synced ? (0, import_i18n.__)("Synced", "visual-portfolio") : (0, import_i18n.__)("Inserted", "visual-portfolio")
 				})] }, page.id))
+			}),
+			more > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_components.__experimentalText, {
+				variant: "muted",
+				children: (0, import_i18n.sprintf)((0, import_i18n._n)("And %d more.", "And %d more.", more, "visual-portfolio"), more)
 			}),
 			inserted && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_components.__experimentalText, { children: (0, import_i18n.__)("Inserted copies stop showing on these pages.", "visual-portfolio") }),
 			synced && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_components.__experimentalText, { children: final ? (0, import_i18n.__)("Synced galleries keep their current look and stop syncing.", "visual-portfolio") : (0, import_i18n.__)("Synced galleries keep following it until it is deleted for good.", "visual-portfolio") })
@@ -53129,7 +53134,7 @@ function SavedLayoutsLibrary() {
 		notifyError: (message) => createErrorNotice(message, { type: "snackbar" }),
 		restore: (item) => saveEntityRecord("postType", POST_TYPE, {
 			id: item.id,
-			status: "draft"
+			status: item.vpf_layout?.restoreAs || "draft"
 		})
 	});
 	const { data, paginationInfo } = (0, import_element.useMemo)(() => filterSortAndPaginate(records || [], view, fields), [records, view]);
