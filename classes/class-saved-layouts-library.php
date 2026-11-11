@@ -34,7 +34,11 @@ class Visual_Portfolio_Saved_Layouts_Library {
 
 		// menu.
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), 13 );
+		add_filter( 'submenu_file', array( $this, 'highlight_menu' ) );
 		add_action( 'load-edit.php', array( $this, 'redirect_list_table' ) );
+
+		// translations.
+		add_action( 'admin_enqueue_scripts', array( $this, 'set_translations' ), 20 );
 	}
 
 	/**
@@ -90,6 +94,31 @@ class Visual_Portfolio_Saved_Layouts_Library {
 			'visual_portfolio_vpf_saved_layouts_wp_admin_render_page',
 			$position
 		);
+	}
+
+	/**
+	 * Load the plugin's translations into the library route, a script module
+	 * the build registers under its own handle.
+	 */
+	public function set_translations() {
+		wp_set_script_module_translations(
+			',/routes/saved-layouts-home/content',
+			'visual-portfolio',
+			visual_portfolio()->plugin_path . 'languages'
+		);
+	}
+
+	/**
+	 * Mark the library current in the plugin menu while it is open.
+	 *
+	 * @param string|null $submenu_file - current submenu item.
+	 *
+	 * @return string|null
+	 */
+	public function highlight_menu( $submenu_file ) {
+		global $plugin_page;
+
+		return self::PAGE === $plugin_page ? self::PAGE : $submenu_file;
 	}
 
 	/**

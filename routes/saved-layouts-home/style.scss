@@ -1,0 +1,195 @@
+// Previews draw the shape of a layout, not its pictures, in the neutral
+// tones core uses for pattern placeholders.
+.vpf-library-preview {
+	box-sizing: border-box;
+	width: 100%;
+	aspect-ratio: 1;
+	padding: 10%;
+	overflow: hidden;
+	background: #f6f6f6;
+
+	> div {
+		height: 100%;
+	}
+}
+
+.vpf-library-preview__tile {
+	display: block;
+	min-height: 0;
+	background: #e2e2e2;
+	border-radius: 2px;
+
+	&:nth-child(3n + 2) {
+		background: #d6d6d6;
+	}
+
+	&:nth-child(4n + 3) {
+		background: #ebebeb;
+	}
+}
+
+.vpf-library-preview__grid {
+	display: grid;
+	grid-auto-rows: 1fr;
+	gap: 6%;
+}
+
+.vpf-library-preview__masonry {
+	column-gap: 6%;
+
+	.vpf-library-preview__tile {
+		margin-bottom: 6%;
+		break-inside: avoid;
+	}
+}
+
+.vpf-library-preview__justified {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6%;
+	align-content: stretch;
+
+	.vpf-library-preview__tile {
+		height: 28%;
+	}
+}
+
+.vpf-library-preview__tiles {
+	display: grid;
+	grid-template-rows: repeat(3, 1fr);
+	grid-template-columns: repeat(4, 1fr);
+	gap: 6%;
+
+	.vpf-library-preview__tile:first-child {
+		grid-row: span 2;
+		grid-column: span 2;
+	}
+
+	.vpf-library-preview__tile:nth-child(4) {
+		grid-column: span 2;
+	}
+}
+
+.vpf-library-preview__carousel {
+	display: flex;
+	gap: 6%;
+	align-items: stretch;
+	margin-right: -30%;
+
+	.vpf-library-preview__tile {
+		flex: 0 0 45%;
+	}
+}
+
+.vpf-library-title {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 4px 8px;
+	align-items: center;
+	min-width: 0;
+}
+
+.vpf-library-title__link {
+	min-width: 0;
+	color: inherit;
+	font-weight: 500;
+	text-decoration: none;
+	overflow-wrap: anywhere;
+
+	&:hover,
+	&:focus {
+		color: var(--wp-admin-theme-color, #3858e9);
+	}
+}
+
+.vpf-library-badge {
+	padding: 0 6px;
+	color: #2f2f2f;
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 20px;
+	white-space: nowrap;
+	background: #f0f0f0;
+	border-radius: 2px;
+
+	&.is-legacy {
+		color: #6e5b00;
+		background: #fcf9e8;
+	}
+}
+
+.vpf-library-muted {
+	color: #757575;
+}
+
+.vpf-library-code {
+	padding: 2px 4px;
+	font-size: 12px;
+	white-space: nowrap;
+	background: #f0f0f0;
+	border-radius: 2px;
+}
+
+.vpf-library-add {
+	width: auto;
+
+	> .components-button:first-child {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+
+	.vpf-library-add__toggle {
+		min-width: 32px;
+		padding: 0 4px;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+		box-shadow: inset 1px 0 0 rgb(255 255 255 / 30%);
+	}
+}
+
+.vpf-library-empty {
+	max-width: 480px;
+	margin: 64px auto;
+	text-align: center;
+}
+
+.vpf-library-usage {
+	max-height: 200px;
+	padding: 0;
+	margin: 0;
+	overflow: auto;
+	list-style: none;
+
+	li {
+		display: flex;
+		gap: 12px;
+		justify-content: space-between;
+		padding: 8px 0;
+		margin: 0;
+		border-bottom: 1px solid #f0f0f0;
+
+		> :first-child {
+			min-width: 0;
+			overflow-wrap: anywhere;
+		}
+
+		> :last-child {
+			flex: none;
+		}
+	}
+}
+
+.vpf-library-snackbars {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	z-index: 100000;
+	width: max-content;
+	max-width: calc(100vw - 32px);
+	transform: translateX(-50%);
+}
+
+// DataViews pads its grid but leaves its select-all bar to the page.
+.vpf-library .dataviews-view-grid__bulk-actions-header {
+	padding: 0 24px;
+}
