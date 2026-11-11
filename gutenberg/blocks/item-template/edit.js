@@ -1556,7 +1556,7 @@ export default function BlockEdit({
 					help={
 						peekable
 							? __(
-									'How much of the next slide shows at the edge, as an invitation to scroll.',
+									'How much of the next slide shows at the edge, as an invitation to scroll. Never more than a quarter of the carousel, so a phone keeps most of the slide.',
 									'visual-portfolio'
 								)
 							: __(
@@ -1580,7 +1580,7 @@ export default function BlockEdit({
 				<RangeControl
 					label={__('Slides per step', 'visual-portfolio')}
 					help={__(
-						'How many slides an arrow moves at a press. Zero moves a whole screen at a time, however many slides that is.',
+						'How many slides an arrow moves at a press, never more than the screen shows. Zero moves a whole screen at a time, however many slides that is.',
 						'visual-portfolio'
 					)}
 					value={carouselSlidesPerGroup}
