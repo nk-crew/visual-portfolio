@@ -22,25 +22,28 @@ test.describe('Block icons', () => {
 	}) => {
 		await admin.createNewPost();
 
-		const foreignReferences = await page.evaluate(async () => {
-			const { createElement, createRoot } = window.wp.element;
+		const foreignReferences = await page.evaluate(() => {
+			const { createElement, createRoot, flushSync } = window.wp.element;
 			const iconBlocks = window.wp.blocks
 				.getBlockTypes()
 				.filter(({ name }) => name.startsWith('visual-portfolio/'));
 			const host = document.createElement('div');
 			document.body.append(host);
 
-			createRoot(host).render(
-				iconBlocks.map(({ name, icon }) =>
-					createElement(
-						'div',
-						{ key: name, 'data-block': name },
-						createElement('div', { hidden: true }, icon.src),
-						createElement('div', null, icon.src)
+			const root = createRoot(host);
+
+			flushSync(() =>
+				root.render(
+					iconBlocks.map(({ name, icon }) =>
+						createElement(
+							'div',
+							{ key: name, 'data-block': name },
+							createElement('div', { hidden: true }, icon.src),
+							createElement('div', null, icon.src)
+						)
 					)
 				)
 			);
-			await new Promise((resolve) => setTimeout(resolve, 100));
 
 			const result = [];
 
