@@ -515,6 +515,11 @@ function getCoverBlocks(legacy, skin, click, ratio, radius, queryType) {
 				style: {
 					color: { text: color },
 					...radius.style,
+					// The legacy skins spaced their caption blocks wider than
+					// the cover's own default.
+					...(legacy.items_style in COVER_PANEL_COLORS
+						? { spacing: { blockGap: '1.5em' } }
+						: {}),
 				},
 			},
 			getCaptionBlocks(

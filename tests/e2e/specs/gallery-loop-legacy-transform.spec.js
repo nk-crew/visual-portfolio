@@ -345,6 +345,7 @@ test.describe('Gallery Loop from the legacy block', () => {
 			effect: 'fade',
 			customHoverOverlayColor: '#000',
 			hoverDimRatio: 100,
+			style: { spacing: { blockGap: '1.5em' } },
 		});
 	});
 
