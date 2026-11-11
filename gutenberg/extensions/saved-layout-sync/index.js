@@ -5,15 +5,16 @@ import {
 	InspectorControls,
 } from '@wordpress/block-editor';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 import { getCapture, isResetting, SyncContext } from './context';
-import SyncController, { useLayout } from './controller';
+import SyncController from './controller';
 import SavedLayoutPanel from './panel';
+import { useLayout } from './source';
 import {
 	getChangedNames,
 	getOverrides,
@@ -79,6 +80,7 @@ function useSyncedLoopId(clientId, name) {
  */
 function SyncedBlockEdit({ BlockEdit, loopId, editProps }) {
 	const { name, attributes, setAttributes } = editProps;
+	const registry = useRegistry();
 	const { updateBlockAttributes } = useDispatch(blockEditorStore);
 	const { createWarningNotice } = useDispatch(noticesStore);
 	const reference = useSelect(
@@ -118,20 +120,22 @@ function SyncedBlockEdit({ BlockEdit, loopId, editProps }) {
 				names.forEach((attribute) => {
 					delete value[attribute];
 				});
-				updateBlockAttributes(loopId, {
-					savedLayout: {
-						...reference,
-						overrides: withoutOverrides(
-							reference?.overrides,
-							key,
-							names
-						),
-					},
-				});
+				registry.batch(() => {
+					updateBlockAttributes(loopId, {
+						savedLayout: {
+							...reference,
+							overrides: withoutOverrides(
+								reference?.overrides,
+								key,
+								names
+							),
+						},
+					});
 
-				if (Object.keys(value).length) {
-					setAttributes(value);
-				}
+					if (Object.keys(value).length) {
+						setAttributes(value);
+					}
+				});
 
 				return;
 			}
@@ -158,15 +162,23 @@ function SyncedBlockEdit({ BlockEdit, loopId, editProps }) {
 				return;
 			}
 
-			updateBlockAttributes(loopId, {
-				savedLayout: {
-					...reference,
-					overrides: withOverrides(reference?.overrides, key, names),
-				},
+			// One undo step for the change and its override.
+			registry.batch(() => {
+				updateBlockAttributes(loopId, {
+					savedLayout: {
+						...reference,
+						overrides: withOverrides(
+							reference?.overrides,
+							key,
+							names
+						),
+					},
+				});
+				setAttributes(next);
 			});
-			setAttributes(next);
 		},
 		[
+			registry,
 			attributes,
 			createWarningNotice,
 			isSynced,

@@ -176,14 +176,15 @@ class ClassSavedLayoutUsage extends WP_UnitTestCase {
 			Visual_Portfolio_Saved_Layout_Usage::get_counts( array( $layout ) )
 		);
 
-		$usage = wp_list_pluck( Visual_Portfolio_Saved_Layout_Usage::get_usage( $layout ), 'changes', 'id' );
+		$usage = Visual_Portfolio_Saved_Layout_Usage::get_usage( $layout );
 
-		$this->assertSame(
+		$this->assertSame( 2, $usage['total'] );
+		$this->assertEqualsCanonicalizing(
 			array(
 				$first  => 2,
 				$second => 0,
 			),
-			$usage
+			wp_list_pluck( $usage['items'], 'changes', 'id' )
 		);
 	}
 
@@ -198,12 +199,33 @@ class ClassSavedLayoutUsage extends WP_UnitTestCase {
 		delete_post_meta( $page, Visual_Portfolio_Saved_Layout_Usage::SYNCED_META );
 		delete_option( Visual_Portfolio_Saved_Layout_Usage::INDEXED_OPTION );
 
-		$usage = new Visual_Portfolio_Saved_Layout_Usage();
-
-		$this->assertFalse( $usage->run_backfill() );
-		$this->assertFalse( $usage->run_backfill() );
+		$this->assertFalse( Visual_Portfolio_Saved_Layout_Usage::run_backfill() );
+		$this->assertFalse( Visual_Portfolio_Saved_Layout_Usage::run_backfill() );
 		$this->assertSame( array( (string) $layout ), get_post_meta( $page, Visual_Portfolio_Saved_Layout_Usage::SYNCED_META ) );
 		$this->assertTrue( (bool) get_option( Visual_Portfolio_Saved_Layout_Usage::INDEXED_OPTION ) );
+	}
+
+	/**
+	 * Synced patterns and trashed pages are detached too, and the first batch
+	 * runs during the delete itself, without WP-Cron.
+	 */
+	public function test_permanent_delete_reaches_every_post_type_and_status() {
+		$layout  = $this->create_layout();
+		$pattern = $this->create_synced_page( $layout );
+		$trashed = $this->create_synced_page( $layout );
+
+		set_post_type( $pattern, 'wp_block' );
+		wp_trash_post( $trashed );
+
+		$usage = Visual_Portfolio_Saved_Layout_Usage::get_usage( $layout );
+
+		$this->assertContains( $pattern, wp_list_pluck( $usage['items'], 'id' ) );
+
+		wp_delete_post( $layout, true );
+
+		$this->assertStringNotContainsString( 'savedLayout', get_post( $pattern )->post_content );
+		$this->assertStringNotContainsString( 'savedLayout', get_post( $trashed )->post_content );
+		$this->assertFalse( get_option( Visual_Portfolio_Saved_Layout_Usage::DETACH_OPTION . $layout ) );
 	}
 
 	/**
@@ -218,10 +240,8 @@ class ClassSavedLayoutUsage extends WP_UnitTestCase {
 
 		wp_delete_post( $layout, true );
 
-		$usage = new Visual_Portfolio_Saved_Layout_Usage();
-
-		$this->assertFalse( $usage->run_detach( $layout ) );
-		$this->assertFalse( $usage->run_detach( $layout ) );
+		// The delete ran the first batch; another run finds nothing left.
+		$this->assertFalse( Visual_Portfolio_Saved_Layout_Usage::run_detach( $layout ) );
 
 		$content = get_post( $page )->post_content;
 

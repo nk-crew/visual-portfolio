@@ -51,6 +51,13 @@ class Visual_Portfolio_Saved_Layouts {
 	private static $render_stack = array();
 
 	/**
+	 * Loops rendered from inserted layouts on this request.
+	 *
+	 * @var int
+	 */
+	private static $inserted_loops = 0;
+
+	/**
 	 * Parsed loop block of each layout, keyed by id.
 	 *
 	 * @var array
@@ -77,6 +84,9 @@ class Visual_Portfolio_Saved_Layouts {
 	 * Register the lock meta.
 	 */
 	public function register_meta() {
+		// REST carries a post type's meta only when it supports custom fields.
+		add_post_type_support( self::POST_TYPE, 'custom-fields' );
+
 		register_post_meta(
 			self::POST_TYPE,
 			self::LOCK_META,
@@ -222,8 +232,17 @@ class Visual_Portfolio_Saved_Layouts {
 			return '';
 		}
 
+		$blocks = parse_blocks( $post->post_content );
+		$output = '';
+
+		self::number_inserted_loops( $blocks, $id, self::$inserted_loops );
+
 		self::$render_stack[] = $id;
-		$output               = do_blocks( $post->post_content );
+
+		foreach ( $blocks as $block ) {
+			$output .= render_block( $block );
+		}
+
 		array_pop( self::$render_stack );
 
 		if ( $class_name ) {
@@ -231,6 +250,33 @@ class Visual_Portfolio_Saved_Layouts {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Give each loop of an inserted layout ids of its own on this page.
+	 *
+	 * A layout's loops carry the ids their own editor gave them, so two
+	 * layouts on one page, or one layout inserted twice, would share their
+	 * URL parameters and router region. The ids follow the order the page
+	 * renders them in, which is the same on every request.
+	 *
+	 * @param array $blocks - parsed blocks, changed in place.
+	 * @param int   $id - layout id.
+	 * @param int   $count - loops of inserted layouts numbered so far on the page, advanced in place.
+	 */
+	public static function number_inserted_loops( &$blocks, $id, &$count ) {
+		foreach ( $blocks as &$block ) {
+			if ( 'visual-portfolio/loop' === ( $block['blockName'] ?? '' ) ) {
+				++$count;
+
+				$block['attrs']['queryId']  = $id * 100 + $count;
+				$block['attrs']['block_id'] = ( $block['attrs']['block_id'] ?? 'layout' ) . '-' . $id . '-' . $count;
+			}
+
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				self::number_inserted_loops( $block['innerBlocks'], $id, $count );
+			}
+		}
 	}
 
 	/**

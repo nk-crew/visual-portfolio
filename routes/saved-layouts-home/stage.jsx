@@ -377,7 +377,7 @@ function SavedLayoutsLibrary() {
 		restore: (item) =>
 			saveEntityRecord('postType', POST_TYPE, {
 				id: item.id,
-				status: 'draft',
+				status: item.vpf_layout?.restoreAs || 'draft',
 			}),
 	});
 

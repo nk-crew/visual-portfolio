@@ -1,7 +1,8 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
+
+import { useLayout } from './source';
 
 import {
 	createMergedBlock,
@@ -13,58 +14,36 @@ import {
 	indexBySyncKey,
 	LOOP_KEY,
 	LOOP_SYNCED_ATTRIBUTES,
-	parseLayout,
 	TEMPLATE_BLOCK,
 } from './utils';
 
 export const LAYOUT_POST_TYPE = 'vp_lists';
 export const LOCK_META = 'vp_saved_layout_locked';
 
-/**
- * A layout record and its parsed loop.
- *
- * @param {number} id - layout id.
- * @return {Object} `{ record, layout, locked, isResolving }`.
- */
-export function useLayout(id) {
-	const { record, isResolving } = useSelect(
-		(select) => {
-			const { getEntityRecord, isResolving: isResolvingSelector } =
-				select(coreStore);
-			const args = ['postType', LAYOUT_POST_TYPE, id];
-
-			return {
-				record: id ? getEntityRecord(...args) : null,
-				isResolving: id
-					? isResolvingSelector('getEntityRecord', args)
-					: false,
-			};
-		},
-		[id]
-	);
-
-	const content = record?.content?.raw;
-	const layout = useMemo(() => parseLayout(content), [content]);
-
-	return {
-		record,
-		layout,
-		locked: !!record?.meta?.[LOCK_META],
-		isResolving,
-	};
-}
+// Attributes the editor keeps for itself; the layout never sets them.
+const OWN_ATTRIBUTES = ['lock'];
 
 /**
- * Patch that turns one set of attributes into another.
+ * Patch that turns some attributes of a block into the wanted ones.
  *
- * @param {Object} current - current attributes.
- * @param {Object} desired - wanted attributes.
+ * @param {Object}   current - current attributes.
+ * @param {Object}   desired - wanted attributes.
+ * @param {string[]} names   - attributes to compare, both sets' keys when omitted.
  * @return {Object|null} patch, null when nothing differs.
  */
-function getPatch(current, desired) {
+function getPatch(
+	current,
+	desired,
+	names = new Set([...Object.keys(current), ...Object.keys(desired)])
+) {
 	const patch = {};
 
-	Object.keys(desired).forEach((name) => {
+	names.forEach((name) => {
+		if (OWN_ATTRIBUTES.includes(name)) {
+			return;
+		}
+
+		// A key the layout leaves out is unset, as it is on the page.
 		if (JSON.stringify(current[name]) !== JSON.stringify(desired[name])) {
 			patch[name] = desired[name];
 		}
@@ -103,6 +82,21 @@ export default function SyncController({ clientId }) {
 	const { layout, locked } = useLayout(reference?.id);
 	const overridesKey = JSON.stringify(getOverrides(reference?.overrides));
 
+	// Core's block-support panels reset their settings with
+	// `updateBlockAttributes()`, past the synced setter, so a change to the
+	// synced blocks is checked against the layout too.
+	const syncedState = useSelect(
+		(select) => {
+			const loop = select(blockEditorStore).getBlock(clientId);
+			const template = loop?.innerBlocks.find(
+				(block) => block.name === TEMPLATE_BLOCK
+			);
+
+			return JSON.stringify([loop?.attributes.lightbox, template]);
+		},
+		[clientId]
+	);
+
 	useEffect(() => {
 		if (!layout) {
 			return;
@@ -125,7 +119,8 @@ export default function SyncController({ clientId }) {
 							name,
 							layout.loop.attributes[name],
 						])
-					)
+					),
+					LOOP_SYNCED_ATTRIBUTES
 				);
 
 		if (lightbox) {
@@ -180,6 +175,7 @@ export default function SyncController({ clientId }) {
 		layout,
 		locked,
 		overridesKey,
+		syncedState,
 		registry,
 		markNotPersistent,
 		replaceInnerBlocks,

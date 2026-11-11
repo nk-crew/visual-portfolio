@@ -88,7 +88,7 @@ function UsageList({ item, final }) {
 		return <Spinner />;
 	}
 
-	if (!usage.length) {
+	if (!usage.total) {
 		return (
 			<Text>
 				{item.vpf_layout?.kind === 'legacy'
@@ -101,8 +101,9 @@ function UsageList({ item, final }) {
 		);
 	}
 
-	const synced = usage.some((page) => page.synced);
-	const inserted = usage.some((page) => page.inserted);
+	const synced = usage.items.some((page) => page.synced);
+	const inserted = usage.items.some((page) => page.inserted);
+	const more = usage.total - usage.items.length;
 
 	return (
 		<VStack spacing={3}>
@@ -112,14 +113,14 @@ function UsageList({ item, final }) {
 					_n(
 						'It is used on %d page:',
 						'It is used on %d pages:',
-						usage.length,
+						usage.total,
 						'visual-portfolio'
 					),
-					usage.length
+					usage.total
 				)}
 			</Text>
 			<ul className="vpf-library-usage">
-				{usage.map((page) => (
+				{usage.items.map((page) => (
 					<li key={page.id}>
 						<span>
 							{page.title || __('(no title)', 'visual-portfolio')}
@@ -132,6 +133,20 @@ function UsageList({ item, final }) {
 					</li>
 				))}
 			</ul>
+			{more > 0 && (
+				<Text variant="muted">
+					{sprintf(
+						// translators: %d - number of pages not listed.
+						_n(
+							'And %d more.',
+							'And %d more.',
+							more,
+							'visual-portfolio'
+						),
+						more
+					)}
+				</Text>
+			)}
 			{inserted && (
 				<Text>
 					{__(

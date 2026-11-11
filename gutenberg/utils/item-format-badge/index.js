@@ -1,12 +1,9 @@
 /**
  * WordPress dependencies
  */
-import {
-	SelectControl,
-	ToggleControl,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { SelectControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { ToolsPanelItem } from '../../components/tools-panel';
 
 // The icons of `templates/icons/`, the ones the render callback prints.
 const BADGES = {

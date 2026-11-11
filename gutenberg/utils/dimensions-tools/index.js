@@ -6,12 +6,12 @@ import {
 	SelectControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
+import { ToolsPanelItem } from '../../components/tools-panel';
 
 /**
  * The Dimensions panel of the core Featured Image block, rebuilt.

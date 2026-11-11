@@ -17,37 +17,9 @@ import { useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
-import {
-	getStartingOverrides,
-	LAYOUT_POST_TYPE,
-	useLayout,
-} from './controller';
-import { countOverrides, getChangedFromDefaults, parseLayout } from './utils';
-
-/**
- * Block-based layouts the user can sync with.
- *
- * @return {Object[]|null} layouts, null while loading.
- */
-function useBlockLayouts() {
-	return useSelect((select) => {
-		const records = select(coreStore).getEntityRecords(
-			'postType',
-			LAYOUT_POST_TYPE,
-			{
-				per_page: 100,
-				status: ['publish', 'draft', 'private'],
-				orderby: 'title',
-				order: 'asc',
-				_fields: 'id,title,status,vpf_layout',
-			}
-		);
-
-		return records
-			? records.filter((record) => record.vpf_layout?.kind === 'blocks')
-			: null;
-	}, []);
-}
+import { getStartingOverrides, LAYOUT_POST_TYPE } from './controller';
+import { fetchLayout, useChoices, useLayout } from './source';
+import { countOverrides, getChangedFromDefaults } from './utils';
 
 /**
  * Modal that names a new layout made from the block.
@@ -130,14 +102,20 @@ export default function SavedLayoutPanel({ clientId, attributes }) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch(noticesStore);
 
-	const currentPostType = useSelect(
-		(select) => select(editorStore)?.getCurrentPostType?.(),
+	const { currentPostType, canCreate } = useSelect(
+		(select) => ({
+			currentPostType: select(editorStore)?.getCurrentPostType?.(),
+			canCreate: select(coreStore).canUser('create', {
+				kind: 'postType',
+				name: LAYOUT_POST_TYPE,
+			}),
+		}),
 		[]
 	);
-	const layouts = useBlockLayouts();
+	const [layouts, refreshLayouts] = useChoices();
 	const reference = attributes.savedLayout;
 	const id = reference?.id || 0;
-	const { record, locked, isResolving } = useLayout(id);
+	const { record, locked, error } = useLayout(id);
 	const changes = countOverrides(reference?.overrides);
 
 	if (currentPostType === LAYOUT_POST_TYPE) {
@@ -155,14 +133,15 @@ export default function SavedLayoutPanel({ clientId, attributes }) {
 		);
 	};
 
-	const link = async (layoutId, { keepChanges = true, title } = {}) => {
-		const layoutRecord = await registry
-			.resolveSelect(coreStore)
-			.getEntityRecord('postType', LAYOUT_POST_TYPE, layoutId);
-		const layout = parseLayout(layoutRecord?.content?.raw);
+	const link = async (layoutId, { keepChanges = true } = {}) => {
+		const { record: layoutRecord, layout } = await fetchLayout(layoutId);
 		const loop = registry.select(blockEditorStore).getBlock(clientId);
 
 		if (!layout || !loop) {
+			createErrorNotice(
+				__('This Saved Layout cannot be synced.', 'visual-portfolio'),
+				{ type: 'snackbar' }
+			);
 			return;
 		}
 
@@ -173,22 +152,25 @@ export default function SavedLayoutPanel({ clientId, attributes }) {
 		);
 		const kept = keepChanges ? overrides : {};
 
-		keys.forEach(([blockClientId, key]) => {
-			const { metadata } = registry
-				.select(blockEditorStore)
-				.getBlockAttributes(blockClientId);
+		// One undo step for the keys and the link.
+		registry.batch(() => {
+			keys.forEach(([blockClientId, key]) => {
+				const { metadata } = registry
+					.select(blockEditorStore)
+					.getBlockAttributes(blockClientId);
 
-			updateBlockAttributes(blockClientId, {
-				metadata: { ...metadata, vpSyncKey: key },
+				updateBlockAttributes(blockClientId, {
+					metadata: { ...metadata, vpSyncKey: key },
+				});
+			});
+
+			updateBlockAttributes(clientId, {
+				savedLayout: { id: layoutId, overrides: kept },
 			});
 		});
 
-		updateBlockAttributes(clientId, {
-			savedLayout: { id: layoutId, overrides: kept },
-		});
-
 		const count = countOverrides(kept);
-		const name = title || layoutRecord.title?.raw || '';
+		const name = layoutRecord.title || '';
 
 		createSuccessNotice(
 			count
@@ -228,7 +210,8 @@ export default function SavedLayoutPanel({ clientId, attributes }) {
 			);
 
 			setIsSavingAs(false);
-			await link(created.id, { keepChanges: false, title });
+			refreshLayouts();
+			await link(created.id, { keepChanges: false });
 		} catch (error) {
 			createErrorNotice(
 				error?.message ||
@@ -244,8 +227,8 @@ export default function SavedLayoutPanel({ clientId, attributes }) {
 	const options = [
 		{ label: __('None', 'visual-portfolio'), value: '' },
 		...(layouts || []).map((layout) => ({
-			label: layout.title?.rendered
-				? layout.title.rendered.replace(/<[^>]+>/g, '')
+			label: layout.title
+				? layout.title
 				: sprintf(
 						// translators: %d - layout id.
 						__('Untitled (#%d)', 'visual-portfolio'),
@@ -259,7 +242,7 @@ export default function SavedLayoutPanel({ clientId, attributes }) {
 		options.push({ label: `#${id}`, value: `${id}` });
 	}
 
-	const isMissing = id && !isResolving && !record;
+	const isMissing = error === 'missing';
 	const isTrashed = record?.status === 'trash';
 	let status = null;
 
@@ -313,14 +296,25 @@ export default function SavedLayoutPanel({ clientId, attributes }) {
 							'visual-portfolio'
 						)}
 					</p>
-					<Button
-						__next40pxDefaultSize
-						variant="secondary"
-						onClick={() => setIsSavingAs(true)}
-					>
-						{__('Save as Saved Layout', 'visual-portfolio')}
-					</Button>
+					{canCreate && (
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={() => setIsSavingAs(true)}
+						>
+							{__('Save as Saved Layout', 'visual-portfolio')}
+						</Button>
+					)}
 				</>
+			)}
+
+			{error === 'forbidden' && (
+				<Notice status="info" isDismissible={false}>
+					{__(
+						'This Saved Layout is not published, so its settings cannot be shown here. The page still follows it.',
+						'visual-portfolio'
+					)}
+				</Notice>
 			)}
 
 			{(isMissing || isTrashed) && (
@@ -344,10 +338,10 @@ export default function SavedLayoutPanel({ clientId, attributes }) {
 				<div className="vpf-saved-layout-panel__status">
 					<p>{status}</p>
 					<Flex justify="flex-start" gap={4}>
-						{record?.vpf_layout?.editUrl && (
+						{record?.editUrl && (
 							<Button
 								variant="link"
-								href={record.vpf_layout.editUrl}
+								href={record.editUrl}
 								target="_blank"
 							>
 								{__('Edit Saved Layout', 'visual-portfolio')}

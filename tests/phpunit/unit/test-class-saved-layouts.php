@@ -216,6 +216,45 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Two insertions of one layout get loop ids of their own.
+	 */
+	public function test_inserted_layouts_get_their_own_loop_ids() {
+		$layout = $this->create_layout();
+		$output = do_blocks( str_repeat( '<!-- wp:visual-portfolio/saved {"id":"' . $layout . '"} /-->', 2 ) );
+
+		preg_match_all( '/data-wp-router-region="([^"]+)"/', $output, $regions );
+
+		$this->assertCount( 2, $regions[1] );
+		$this->assertCount( 2, array_unique( $regions[1] ) );
+	}
+
+	/**
+	 * The lock is saved through REST, which the editor uses.
+	 */
+	public function test_lock_saves_through_rest() {
+		register_post_type(
+			'vp_lists',
+			array(
+				'map_meta_cap' => true,
+				'show_in_rest' => true,
+				'supports'     => array( 'title', 'editor' ),
+			)
+		);
+		( new Visual_Portfolio_Saved_Layouts() )->register_meta();
+
+		$layout  = $this->create_layout();
+		$request = new WP_REST_Request( 'POST', '/wp/v2/vp_lists/' . $layout );
+		$request->set_param( 'meta', array( Visual_Portfolio_Saved_Layouts::LOCK_META => true ) );
+
+		// A fresh server, so the route's controller sees the meta support.
+		$GLOBALS['wp_rest_server'] = null;
+		$response                  = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status(), wp_json_encode( $response->get_data() ) );
+		$this->assertTrue( Visual_Portfolio_Saved_Layouts::is_locked( $layout ) );
+	}
+
+	/**
 	 * A draft layout is visible only to those who can edit it.
 	 */
 	public function test_draft_layout_renders_for_editors_only() {

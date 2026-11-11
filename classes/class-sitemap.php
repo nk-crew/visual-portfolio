@@ -274,7 +274,7 @@ class Visual_Portfolio_Sitemap {
 			// pictures that belong to the posts themselves, and those posts are
 			// in the sitemap already with the very same featured images.
 			if ( 'visual-portfolio/loop' === $block['blockName'] ) {
-				$block_images = array_merge( $block_images, $this->get_loop_images( $block ) );
+				$block_images = array_merge( $block_images, $this->get_loop_images( Visual_Portfolio_Saved_Layouts::apply_layout( $block ) ) );
 
 				continue;
 			}

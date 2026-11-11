@@ -114,11 +114,21 @@ class Visual_Portfolio_SEO_Optimization {
 
 		// Cheap enough to run on every page of the site; parsing the blocks of
 		// one that holds no gallery is not.
-		if ( ! $post || ! has_blocks( $post->post_content ) || false === strpos( $post->post_content, 'wp:visual-portfolio/loop ' ) ) {
+		if (
+			! $post ||
+			! has_blocks( $post->post_content ) ||
+			(
+				false === strpos( $post->post_content, 'wp:visual-portfolio/loop ' ) &&
+				false === strpos( $post->post_content, 'wp:visual-portfolio/saved ' ) &&
+				false === strpos( $post->post_content, 'wp:nk/visual-portfolio ' )
+			)
+		) {
 			return null;
 		}
 
-		foreach ( $this->find_loop_blocks( parse_blocks( $post->post_content ) ) as $block ) {
+		$inserted = 0;
+
+		foreach ( $this->find_loop_blocks( parse_blocks( $post->post_content ), array(), $inserted ) as $block ) {
 			$context  = Visual_Portfolio_Block_Loop::get_context_from_attributes( $block['attrs'] ?? array() );
 			$query_id = Visual_Portfolio_Block_Loop::get_query_id( $context );
 			$page     = Visual_Portfolio_Get::get_current_page_number( $query_id );
@@ -175,10 +185,12 @@ class Visual_Portfolio_SEO_Optimization {
 	 * Every Gallery Loop of a parsed block tree, nested ones included.
 	 *
 	 * @param array $blocks - parsed blocks.
+	 * @param int[] $layouts - Saved Layouts already expanded on the way here.
+	 * @param int   $inserted - loops of inserted layouts numbered so far.
 	 *
 	 * @return array
 	 */
-	private function find_loop_blocks( $blocks ) {
+	private function find_loop_blocks( $blocks, $layouts, &$inserted ) {
 		$found = array();
 
 		foreach ( $blocks as $block ) {
@@ -190,8 +202,24 @@ class Visual_Portfolio_SEO_Optimization {
 				$found[] = $block;
 			}
 
+			// A Saved Layout built from blocks brings its own loops.
+			$layout = (int) ( $block['attrs']['id'] ?? 0 );
+
+			if (
+				in_array( $block['blockName'], array( 'visual-portfolio/saved', 'nk/visual-portfolio' ), true ) &&
+				! in_array( $layout, $layouts, true ) &&
+				Visual_Portfolio_Saved_Layouts::is_block_layout( $layout )
+			) {
+				// Numbered the way the layout is when it renders on the page.
+				$layout_blocks = parse_blocks( get_post( $layout )->post_content );
+
+				Visual_Portfolio_Saved_Layouts::number_inserted_loops( $layout_blocks, $layout, $inserted );
+
+				$found = array_merge( $found, $this->find_loop_blocks( $layout_blocks, array_merge( $layouts, array( $layout ) ), $inserted ) );
+			}
+
 			if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
-				$found = array_merge( $found, $this->find_loop_blocks( $block['innerBlocks'] ) );
+				$found = array_merge( $found, $this->find_loop_blocks( $block['innerBlocks'], $layouts, $inserted ) );
 			}
 		}
 

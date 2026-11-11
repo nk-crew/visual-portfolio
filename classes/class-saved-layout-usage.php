@@ -73,11 +73,11 @@ class Visual_Portfolio_Saved_Layout_Usage {
 		// index.
 		add_action( 'save_post', array( $this, 'index_on_save' ), 20, 2 );
 		add_action( 'admin_init', array( $this, 'maybe_schedule_backfill' ) );
-		add_action( self::BACKFILL_HOOK, array( $this, 'run_backfill' ) );
+		add_action( self::BACKFILL_HOOK, array( __CLASS__, 'run_backfill' ) );
 
 		// delete.
 		add_action( 'before_delete_post', array( $this, 'schedule_detach' ), 10, 2 );
-		add_action( self::DETACH_HOOK, array( $this, 'run_detach' ) );
+		add_action( self::DETACH_HOOK, array( __CLASS__, 'run_detach' ) );
 	}
 
 	/**
@@ -248,61 +248,87 @@ class Visual_Portfolio_Saved_Layout_Usage {
 	}
 
 	/**
+	 * Ids of posts of any type that record a layout, newest first.
+	 *
+	 * Templates, template parts and synced patterns are posts that no
+	 * `post_type => 'any'` query reaches, so the rows are read directly.
+	 *
+	 * @param int      $id - layout id.
+	 * @param string[] $meta_keys - meta keys to read.
+	 * @param string[] $statuses - post statuses, every status when empty.
+	 *
+	 * @return int[]
+	 */
+	private static function get_post_ids( $id, $meta_keys, $statuses = array() ) {
+		global $wpdb;
+
+		$key_placeholders = implode( ',', array_fill( 0, count( $meta_keys ), '%s' ) );
+		$status_sql       = '';
+		$args             = array_merge( $meta_keys, array( (string) (int) $id ) );
+
+		if ( $statuses ) {
+			$status_sql = ' AND p.post_status IN ( ' . implode( ',', array_fill( 0, count( $statuses ), '%s' ) ) . ' )';
+			$args       = array_merge( $args, $statuses );
+		}
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return array_map(
+			'intval',
+			$wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT DISTINCT p.ID FROM {$wpdb->posts} p
+					INNER JOIN {$wpdb->postmeta} m ON m.post_id = p.ID
+					WHERE m.meta_key IN ( {$key_placeholders} )
+					AND m.meta_value = %s
+					AND p.post_type != 'revision'{$status_sql}
+					ORDER BY p.post_date DESC",
+					$args
+				)
+			)
+		);
+		// phpcs:enable
+	}
+
+	/**
 	 * Posts using a layout, with how each uses it.
 	 *
 	 * @param int $id - layout id.
+	 * @param int $limit - most posts to describe.
 	 *
-	 * @return array[] Each with `id`, `title`, `type`, `status`, `editUrl`, `synced`, `inserted` and `changes`.
+	 * @return array `total`, and `items` each with `id`, `title`, `type`, `status`, `editUrl`, `synced`, `inserted` and `changes`.
 	 */
-	public static function get_usage( $id ) {
+	public static function get_usage( $id, $limit = 200 ) {
 		$id    = (int) $id;
-		$query = new WP_Query(
-			array(
-				'post_type'              => 'any',
-				'post_status'            => self::COUNTED_STATUSES,
-				'posts_per_page'         => 200,
-				'orderby'                => 'title',
-				'order'                  => 'ASC',
-				'no_found_rows'          => true,
-				'update_post_term_cache' => false,
-				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-				'meta_query'             => array(
-					'relation' => 'OR',
-					array(
-						'key'   => self::SYNCED_META,
-						'value' => $id,
-					),
-					array(
-						'key'   => self::INSERTED_META,
-						'value' => $id,
-					),
-				),
-			)
-		);
+		$ids   = self::get_post_ids( $id, array( self::SYNCED_META, self::INSERTED_META ), self::COUNTED_STATUSES );
+		$items = array();
 
-		$usage = array();
+		foreach ( array_slice( $ids, 0, $limit ) as $post_id ) {
+			$post = get_post( $post_id );
 
-		foreach ( $query->posts as $post ) {
-			if ( ! current_user_can( 'read_post', $post->ID ) ) {
+			if ( ! $post || ! current_user_can( 'read_post', $post->ID ) ) {
 				continue;
 			}
 
 			$synced   = in_array( (string) $id, get_post_meta( $post->ID, self::SYNCED_META ), true );
 			$inserted = in_array( (string) $id, get_post_meta( $post->ID, self::INSERTED_META ), true );
+			$type     = get_post_type_object( $post->post_type );
 
-			$usage[] = array(
+			$items[] = array(
 				'id'       => $post->ID,
 				'title'    => html_entity_decode( get_the_title( $post ), ENT_QUOTES, 'UTF-8' ),
-				'type'     => get_post_type_object( $post->post_type ) ? get_post_type_object( $post->post_type )->labels->singular_name : $post->post_type,
+				'type'     => $type ? $type->labels->singular_name : $post->post_type,
 				'status'   => $post->post_status,
-				'editUrl'  => current_user_can( 'edit_post', $post->ID ) ? get_edit_post_link( $post->ID, 'raw' ) : '',
+				'editUrl'  => current_user_can( 'edit_post', $post->ID ) ? (string) get_edit_post_link( $post->ID, 'raw' ) : '',
 				'synced'   => $synced,
 				'inserted' => $inserted,
 				'changes'  => $synced ? self::count_changes( $post->post_content, $id ) : 0,
 			);
 		}
 
-		return $usage;
+		return array(
+			'total' => count( $ids ),
+			'items' => $items,
+		);
 	}
 
 	/**
@@ -369,14 +395,29 @@ class Visual_Portfolio_Saved_Layout_Usage {
 	}
 
 	/**
-	 * Index one batch of old content, unless it is all indexed already.
+	 * Run one batch of the background work that is still pending: the index
+	 * of old content, and the detach of each layout deleted for good.
 	 *
-	 * Runs from the background job and from every library request, so the
-	 * counts arrive even where WP-Cron does not run.
+	 * Runs from the background jobs and from every library request, so the
+	 * work finishes even where WP-Cron does not run.
 	 */
-	public static function backfill_step() {
+	public static function run_pending() {
 		if ( ! get_option( self::INDEXED_OPTION ) ) {
-			( new self() )->run_backfill();
+			self::run_backfill();
+		}
+
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$pending = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
+				$wpdb->esc_like( self::DETACH_OPTION ) . '%'
+			)
+		);
+
+		foreach ( $pending as $name ) {
+			self::run_detach( (int) substr( $name, strlen( self::DETACH_OPTION ) ) );
 		}
 	}
 
@@ -388,7 +429,7 @@ class Visual_Portfolio_Saved_Layout_Usage {
 	 *
 	 * @return bool Whether posts are left for another batch.
 	 */
-	public function run_backfill() {
+	public static function run_backfill() {
 		global $wpdb;
 
 		$after = (int) get_option( self::CURSOR_OPTION, 0 );
@@ -399,11 +440,12 @@ class Visual_Portfolio_Saved_Layout_Usage {
 				"SELECT ID FROM {$wpdb->posts}
 				WHERE ID > %d
 				AND post_type NOT IN ( 'revision', 'attachment' )
-				AND ( post_content LIKE %s OR post_content LIKE %s OR post_content LIKE %s )
+				AND ( post_content LIKE %s OR post_content LIKE %s OR post_content LIKE %s OR post_content LIKE %s )
 				ORDER BY ID ASC
 				LIMIT %d",
 				$after,
 				'%' . $wpdb->esc_like( 'wp:visual-portfolio/saved' ) . '%',
+				'%' . $wpdb->esc_like( 'wp:nk/visual-portfolio' ) . '%',
 				'%' . $wpdb->esc_like( '"savedLayout"' ) . '%',
 				'%' . $wpdb->esc_like( '[visual_portfolio' ) . '%',
 				self::BATCH
@@ -457,7 +499,8 @@ class Visual_Portfolio_Saved_Layout_Usage {
 			false
 		);
 
-		wp_schedule_single_event( time(), self::DETACH_HOOK, array( (int) $post_id ) );
+		// The first batch runs now, the rest in the background.
+		self::run_detach( (int) $post_id );
 	}
 
 	/**
@@ -472,7 +515,7 @@ class Visual_Portfolio_Saved_Layout_Usage {
 	 *
 	 * @return bool Whether loops are left for another run.
 	 */
-	public function run_detach( $id ) {
+	public static function run_detach( $id ) {
 		$id       = (int) $id;
 		$snapshot = get_option( self::DETACH_OPTION . $id );
 
@@ -480,19 +523,7 @@ class Visual_Portfolio_Saved_Layout_Usage {
 			return false;
 		}
 
-		$query = new WP_Query(
-			array(
-				'post_type'      => 'any',
-				'post_status'    => 'any',
-				'posts_per_page' => self::BATCH,
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key, WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-				'meta_key'       => self::SYNCED_META,
-				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-				'meta_value'     => $id,
-			)
-		);
+		$post_ids = array_slice( self::get_post_ids( $id, array( self::SYNCED_META ) ), 0, self::BATCH );
 
 		// The content is the site's own and is written back unchanged apart
 		// from the loops, so it does not pass through the HTML filter a
@@ -503,41 +534,45 @@ class Visual_Portfolio_Saved_Layout_Usage {
 			kses_remove_filters();
 		}
 
-		foreach ( $query->posts as $post_id ) {
-			$post   = get_post( $post_id );
-			$blocks = self::walk_loops(
-				parse_blocks( $post->post_content ),
-				$id,
-				function ( $loop ) use ( $snapshot ) {
-					return self::detach_loop( $loop, $snapshot['layout'], ! empty( $snapshot['locked'] ) );
-				}
-			);
+		try {
+			foreach ( $post_ids as $post_id ) {
+				$post   = get_post( $post_id );
+				$blocks = self::walk_loops(
+					parse_blocks( $post->post_content ),
+					$id,
+					function ( $loop ) use ( $snapshot ) {
+						return self::detach_loop( $loop, $snapshot['layout'], ! empty( $snapshot['locked'] ) );
+					}
+				);
 
-			wp_update_post(
-				wp_slash(
-					array(
-						'ID'           => $post_id,
-						'post_content' => serialize_blocks( $blocks ),
+				wp_update_post(
+					wp_slash(
+						array(
+							'ID'           => $post_id,
+							'post_content' => serialize_blocks( $blocks ),
+						)
 					)
-				)
-			);
+				);
 
-			// A post the editor never saved through `save_post` still drops
-			// its rows here.
-			delete_post_meta( $post_id, self::SYNCED_META, $id );
+				// A post `save_post` does not index, such as a template, still
+				// drops its row here.
+				delete_post_meta( $post_id, self::SYNCED_META, $id );
+			}
+		} finally {
+			if ( $kses ) {
+				kses_init_filters();
+			}
 		}
 
-		if ( $kses ) {
-			kses_init_filters();
-		}
-
-		if ( count( $query->posts ) < self::BATCH ) {
+		if ( count( $post_ids ) < self::BATCH ) {
 			delete_option( self::DETACH_OPTION . $id );
 
 			return false;
 		}
 
-		wp_schedule_single_event( time(), self::DETACH_HOOK, array( $id ) );
+		if ( ! wp_next_scheduled( self::DETACH_HOOK, array( $id ) ) ) {
+			wp_schedule_single_event( time(), self::DETACH_HOOK, array( $id ) );
+		}
 
 		return true;
 	}

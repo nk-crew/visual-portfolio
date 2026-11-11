@@ -20,7 +20,7 @@ class ClassSavedLayoutsRest extends WP_UnitTestCase {
 	 */
 	private function layout_content( $image ) {
 		return sprintf(
-			'<!-- wp:visual-portfolio/loop {"queryType":"images","imagesQuery":{"images":[{"id":%d},{"id":999999}]}} --><div class="wp-block-visual-portfolio-loop vp-block-loop"><!-- wp:visual-portfolio/item-template {"layoutType":"justified"} --><!-- wp:visual-portfolio/item-title /--><!-- /wp:visual-portfolio/item-template --></div><!-- /wp:visual-portfolio/loop -->',
+			'<!-- wp:visual-portfolio/loop {"queryType":"images","imagesQuery":{"images":[{"id":%d},{"id":999999},{"imgUrl":"https://example.com/a.jpg"}]}} --><div class="wp-block-visual-portfolio-loop vp-block-loop"><!-- wp:visual-portfolio/item-template {"layoutType":"justified"} --><!-- wp:visual-portfolio/item-title /--><!-- /wp:visual-portfolio/item-template --></div><!-- /wp:visual-portfolio/loop -->',
 			$image
 		);
 	}
@@ -83,7 +83,7 @@ class ClassSavedLayoutsRest extends WP_UnitTestCase {
 		);
 		self::factory()->post->create( array( 'post_content' => '<!-- wp:visual-portfolio/saved {"id":"' . $layout . '"} /-->' ) );
 
-		$field = $this->request( 'GET', '/wp/v2/vp_lists/' . $layout )->get_data()['vpf_layout'];
+		$field = $this->request( 'GET', '/wp/v2/vp_lists/' . $layout, array( 'context' => 'edit' ) )->get_data()['vpf_layout'];
 
 		$this->assertSame( 'blocks', $field['kind'] );
 		$this->assertSame( 'images', $field['source'] );
@@ -147,7 +147,62 @@ class ClassSavedLayoutsRest extends WP_UnitTestCase {
 		$loop     = Visual_Portfolio_Saved_Layouts::find_block( parse_blocks( $imported->post_content ), 'visual-portfolio/loop' );
 
 		$this->assertSame( 'Exported', $imported->post_title );
-		$this->assertSame( array( array( 'id' => $image ) ), $loop['attrs']['imagesQuery']['images'] );
+		$this->assertSame(
+			array(
+				array( 'id' => $image ),
+				array( 'imgUrl' => 'https://example.com/a.jpg' ),
+			),
+			$loop['attrs']['imagesQuery']['images']
+		);
+	}
+
+	/**
+	 * Editors without the Saved Layout capabilities read published layouts to
+	 * sync with, but not drafts, and the library field stays out of view.
+	 */
+	public function test_editors_read_published_layouts_for_sync() {
+		// Saved Layouts have capabilities of their own, which editors lack.
+		register_post_type(
+			'vp_lists',
+			array(
+				'map_meta_cap'    => true,
+				'show_in_rest'    => true,
+				'capability_type' => 'vp_list',
+			)
+		);
+
+		$image     = self::factory()->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png' );
+		$published = self::factory()->post->create(
+			array(
+				'post_type'    => 'vp_lists',
+				'post_status'  => 'publish',
+				'post_title'   => 'Published',
+				'post_content' => $this->layout_content( $image ),
+			)
+		);
+		$draft     = self::factory()->post->create(
+			array(
+				'post_type'    => 'vp_lists',
+				'post_status'  => 'draft',
+				'post_title'   => 'Draft',
+				'post_author'  => self::factory()->user->create( array( 'role' => 'administrator' ) ),
+				'post_content' => $this->layout_content( $image ),
+			)
+		);
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+
+		$this->assertSame( 200, $this->request( 'GET', '/visual-portfolio/v1/saved-layouts/' . $published . '/sync-source' )->get_status() );
+		$this->assertSame( 403, $this->request( 'GET', '/visual-portfolio/v1/saved-layouts/' . $draft . '/sync-source' )->get_status() );
+		$this->assertSame( 404, $this->request( 'GET', '/visual-portfolio/v1/saved-layouts/999999/sync-source' )->get_status() );
+		$this->assertSame(
+			array( 'Published' ),
+			wp_list_pluck( $this->request( 'GET', '/visual-portfolio/v1/saved-layouts/choices' )->get_data(), 'title' )
+		);
+
+		wp_set_current_user( 0 );
+
+		$this->assertArrayNotHasKey( 'vpf_layout', $this->request( 'GET', '/wp/v2/vp_lists/' . $published )->get_data() );
 	}
 
 	/**

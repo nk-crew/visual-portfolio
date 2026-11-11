@@ -223,6 +223,54 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 		await editor.saveDraft();
 	});
 
+	test('the lock is saved with the layout', async ({
+		admin,
+		editor,
+		page,
+	}) => {
+		await admin.visitAdminPage('post.php', `post=${layoutId}&action=edit`);
+
+		// The first admin page after activation is the welcome screen.
+		if (!page.url().includes('post.php')) {
+			await admin.visitAdminPage(
+				'post.php',
+				`post=${layoutId}&action=edit`
+			);
+		}
+
+		await editor.setPreferences('core/edit-post', { welcomeGuide: false });
+		await editor.openDocumentSettingsSidebar();
+
+		const syncing = page.getByRole('button', { name: 'Syncing' });
+
+		if ((await syncing.getAttribute('aria-expanded')) !== 'true') {
+			await syncing.click();
+		}
+
+		await page
+			.getByRole('checkbox', { name: 'Galleries can change settings' })
+			.uncheck();
+		await page.getByRole('button', { name: 'Save', exact: true }).click();
+		await expect(
+			page.locator('.components-snackbar', { hasText: /updated|Saved/ })
+		).toBeVisible();
+
+		await page.reload();
+		await editor.openDocumentSettingsSidebar();
+
+		const syncingAgain = page.getByRole('button', { name: 'Syncing' });
+
+		if ((await syncingAgain.getAttribute('aria-expanded')) !== 'true') {
+			await syncingAgain.click();
+		}
+
+		await expect(
+			page.getByRole('checkbox', {
+				name: 'Galleries can change settings',
+			})
+		).not.toBeChecked();
+	});
+
 	test('the page renders the layout and a layout change reaches it', async ({
 		page,
 		requestUtils,

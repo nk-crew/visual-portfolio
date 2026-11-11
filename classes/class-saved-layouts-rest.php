@@ -60,7 +60,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 				'get_callback' => array( $this, 'get_layout_field' ),
 				'schema'       => array(
 					'type'     => 'object',
-					'context'  => array( 'view', 'edit' ),
+					'context'  => array( 'edit' ),
 					'readonly' => true,
 				),
 			)
@@ -76,13 +76,24 @@ class Visual_Portfolio_Saved_Layouts_REST {
 	 * @return WP_Post[]
 	 */
 	public function prime_counts( $posts, $query ) {
-		if ( defined( 'REST_REQUEST' ) && REST_REQUEST && Visual_Portfolio_Saved_Layouts::POST_TYPE === $query->get( 'post_type' ) && $posts ) {
-			Visual_Portfolio_Saved_Layout_Usage::backfill_step();
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST && Visual_Portfolio_Saved_Layouts::POST_TYPE === $query->get( 'post_type' ) && $posts && self::can_manage_layouts() ) {
+			Visual_Portfolio_Saved_Layout_Usage::run_pending();
 
 			self::$counts += Visual_Portfolio_Saved_Layout_Usage::get_counts( wp_list_pluck( $posts, 'ID' ) );
 		}
 
 		return $posts;
+	}
+
+	/**
+	 * Whether the user works with the library.
+	 *
+	 * @return bool
+	 */
+	private static function can_manage_layouts() {
+		$type = get_post_type_object( Visual_Portfolio_Saved_Layouts::POST_TYPE );
+
+		return $type && current_user_can( $type->cap->edit_posts );
 	}
 
 	/**
@@ -107,6 +118,8 @@ class Visual_Portfolio_Saved_Layouts_REST {
 				'usage'      => self::$counts[ $id ],
 				'usageReady' => (bool) get_option( Visual_Portfolio_Saved_Layout_Usage::INDEXED_OPTION ),
 				'editUrl'    => get_edit_post_link( $id, 'raw' ),
+				// What Restore brings a trashed layout back as.
+				'restoreAs'  => get_post_meta( $id, '_wp_trash_meta_status', true ) ? get_post_meta( $id, '_wp_trash_meta_status', true ) : 'draft',
 			)
 		);
 	}
@@ -180,6 +193,27 @@ class Visual_Portfolio_Saved_Layouts_REST {
 
 		register_rest_route(
 			self::NAMESPACE,
+			'/saved-layouts/choices',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_choices' ),
+				'permission_callback' => array( $this, 'can_sync' ),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/saved-layouts/(?P<id>\d+)/sync-source',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_sync_source' ),
+				'permission_callback' => array( $this, 'can_sync' ),
+				'args'                => $id_arg,
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
 			'/saved-layouts/(?P<id>\d+)/duplicate',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -234,6 +268,93 @@ class Visual_Portfolio_Saved_Layouts_REST {
 		$id = (int) $request['id'];
 
 		return Visual_Portfolio_Saved_Layouts::POST_TYPE === get_post_type( $id ) && current_user_can( 'edit_post', $id );
+	}
+
+	/**
+	 * Whether the user edits content that can hold a synced gallery.
+	 *
+	 * Editors and authors sync galleries without managing Saved Layouts,
+	 * the way they insert them with the Saved Layout block.
+	 *
+	 * @return bool
+	 */
+	public function can_sync() {
+		return current_user_can( 'edit_posts' );
+	}
+
+	/**
+	 * Whether the user may read a layout to sync with it: a published or
+	 * trashed one, or any one the user can edit.
+	 *
+	 * @param WP_Post|null $post - layout.
+	 *
+	 * @return bool
+	 */
+	private static function can_read_for_sync( $post ) {
+		if ( ! $post || Visual_Portfolio_Saved_Layouts::POST_TYPE !== $post->post_type ) {
+			return false;
+		}
+
+		return in_array( $post->post_status, array( 'publish', 'trash' ), true ) || current_user_can( 'edit_post', $post->ID );
+	}
+
+	/**
+	 * Block-based layouts a gallery can sync with.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function get_choices() {
+		$posts   = get_posts(
+			array(
+				'post_type'      => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status'    => array( 'publish', 'draft', 'pending', 'private', 'future' ),
+				'posts_per_page' => -1,
+				'orderby'        => 'title',
+				'order'          => 'ASC',
+			)
+		);
+		$choices = array();
+
+		foreach ( $posts as $post ) {
+			if ( self::can_read_for_sync( $post ) && Visual_Portfolio_Saved_Layouts::is_block_layout( $post ) ) {
+				$choices[] = array(
+					'id'    => $post->ID,
+					'title' => html_entity_decode( get_the_title( $post ), ENT_QUOTES, 'UTF-8' ),
+				);
+			}
+		}
+
+		return rest_ensure_response( $choices );
+	}
+
+	/**
+	 * What a synced gallery takes from a layout.
+	 *
+	 * @param WP_REST_Request $request - request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_sync_source( $request ) {
+		$post = get_post( (int) $request['id'] );
+
+		if ( ! $post || Visual_Portfolio_Saved_Layouts::POST_TYPE !== $post->post_type || ! Visual_Portfolio_Saved_Layouts::is_block_layout( $post ) ) {
+			return new WP_Error( 'vpf_layout_not_found', __( 'This Saved Layout no longer exists.', 'visual-portfolio' ), array( 'status' => 404 ) );
+		}
+
+		if ( ! self::can_read_for_sync( $post ) ) {
+			return new WP_Error( 'vpf_layout_forbidden', __( 'This Saved Layout is not published.', 'visual-portfolio' ), array( 'status' => 403 ) );
+		}
+
+		return rest_ensure_response(
+			array(
+				'id'      => $post->ID,
+				'title'   => html_entity_decode( get_the_title( $post ), ENT_QUOTES, 'UTF-8' ),
+				'status'  => $post->post_status,
+				'content' => $post->post_content,
+				'locked'  => Visual_Portfolio_Saved_Layouts::is_locked( $post->ID ),
+				'editUrl' => current_user_can( 'edit_post', $post->ID ) ? (string) get_edit_post_link( $post->ID, 'raw' ) : '',
+			)
+		);
 	}
 
 	/**
@@ -495,9 +616,15 @@ class Visual_Portfolio_Saved_Layouts_REST {
 		$kept = array();
 
 		foreach ( $images as $image ) {
-			$id = is_array( $image ) ? (int) ( $image['id'] ?? 0 ) : 0;
+			if ( ! is_array( $image ) ) {
+				++$dropped;
+				continue;
+			}
 
-			if ( $id && 'attachment' === get_post_type( $id ) ) {
+			$id = (int) ( $image['id'] ?? 0 );
+
+			// An image added by URL has no attachment and travels as it is.
+			if ( ( ! $id && ! empty( $image['imgUrl'] ) ) || ( $id && 'attachment' === get_post_type( $id ) ) ) {
 				$kept[] = $image;
 			} else {
 				++$dropped;

@@ -1,14 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	RangeControl,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { RangeControl } from '@wordpress/components';
 /**
  * External dependencies
  */
 import classnames from 'classnames/dedupe';
+import { ToolsPanelItem } from '../../components/tools-panel';
 
 /**
  * The attributes one overlay is stored under.

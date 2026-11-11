@@ -32,7 +32,10 @@ import {
  */
 function useSyncKeys() {
 	const registry = useRegistry();
-	const { updateBlockAttributes } = useDispatch(blockEditorStore);
+	const {
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent: markNotPersistent,
+	} = useDispatch(blockEditorStore);
 
 	useEffect(() => {
 		const check = () => {
@@ -54,6 +57,8 @@ function useSyncKeys() {
 							const fresh = createSyncKey();
 
 							seen.add(fresh);
+							// Not an undo step: undoing it would only bring it back.
+							markNotPersistent();
 							updateBlockAttributes(block.clientId, {
 								metadata: {
 									...block.attributes.metadata,
@@ -68,7 +73,7 @@ function useSyncKeys() {
 		check();
 
 		return registry.subscribe(check, blockEditorStore);
-	}, [registry, updateBlockAttributes]);
+	}, [registry, updateBlockAttributes, markNotPersistent]);
 }
 
 /**
@@ -192,7 +197,8 @@ function SavedLayoutPanels({ postId, isSaving, locked }) {
 		})
 	);
 	const usage = useUsage(postId, isSaving);
-	const synced = (usage || []).filter((item) => item.synced).length;
+	const items = usage?.items || [];
+	const synced = items.filter((item) => item.synced).length;
 
 	useSyncKeys();
 
@@ -245,12 +251,12 @@ function SavedLayoutPanels({ postId, isSaving, locked }) {
 				className="vpf-saved-layout-usage"
 			>
 				{usage === null && <Spinner />}
-				{usage?.length === 0 && (
+				{usage?.total === 0 && (
 					<p className="vpf-saved-layout-panel__help">
 						{__('Not used on any page yet.', 'visual-portfolio')}
 					</p>
 				)}
-				{usage?.length > 0 && (
+				{usage?.total > 0 && (
 					<>
 						{synced > 0 && (
 							<p className="vpf-saved-layout-usage__note">
@@ -267,7 +273,7 @@ function SavedLayoutPanels({ postId, isSaving, locked }) {
 							</p>
 						)}
 						<ul className="vpf-saved-layout-usage__list">
-							{usage.map((item) => (
+							{items.map((item) => (
 								<li key={item.id}>
 									{item.editUrl ? (
 										<ExternalLink href={item.editUrl}>
