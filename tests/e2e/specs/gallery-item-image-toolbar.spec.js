@@ -348,6 +348,52 @@ test.describe('Gallery Item Image toolbar', () => {
 		await expect
 			.poll(() => getShownOrder(canvas, attachments))
 			.toEqual([spare.id, third.id, image.id]);
+
+		// The first item is edited without being picked, and still goes
+		// along with its image.
+		expect(getAttachmentUrls(third)).toContain(
+			await getShownImageUrl(canvas)
+		);
+	});
+
+	test('stops at the last image the preview shows', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Item Image toolbar - page edge',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		const loop = getLoopBlock({
+			queryType: 'images',
+			imagesQuery: {
+				images: [image, spare, third].map(({ id }) => ({ id })),
+			},
+		});
+
+		loop.attributes.baseQuery = { perPage: 2, maxPages: 1 };
+
+		await editor.insertBlock(loop);
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await expect
+			.poll(() => getShownOrder(canvas, [image, spare, third]))
+			.toEqual([image.id, spare.id]);
+
+		await selectItemImage(editor, canvas, 1);
+
+		// One more step would move the image being edited out of sight, and
+		// the next image into its block.
+		await expect(
+			page
+				.getByRole('toolbar', { name: 'Block tools' })
+				.getByRole('button', { name: 'Move right' })
+		).toBeDisabled();
 	});
 
 	test('removes a Media image from the gallery from the options menu', async ({

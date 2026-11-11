@@ -59,9 +59,9 @@ options menu takes it out of the gallery and leaves the attachment in the media
 library. The Item Cover block carries the same controls. A gallery sorted by
 date, title or at random has no order of its own, so it offers the removal
 alone. The preview redraws the items it already holds at once, sliding each to
-its new place, and the server's answer confirms the order when it arrives. An
-image moved past the last item of the preview leaves it, and the next one
-comes in once the answer lands.
+its new place, and the server's answer confirms the order when it arrives. The
+arrows stop at the last image the preview shows, so the image being edited
+stays in sight; the gallery manager in the sidebar moves an image further.
 
 **Format badge.** The Item Image and Item Cover blocks can mark an item that is
 not a still picture. *Format badge* puts the video, audio or gallery icon of the

@@ -786,8 +786,16 @@ export default function BlockEdit({
 	// took its place inherits it: an image cropped or replaced from the toolbar
 	// is a new item to the endpoint, standing exactly where the old one stood,
 	// and the block being edited must not jump away from it.
+	// The item edited last is followed too, so the one edited without being
+	// picked - the first, until another is clicked - stays with its image
+	// when the image moves.
 	const activeIndexRef = useRef(0);
-	const activeIndex = itemKeys.indexOf(activeBlockContextId);
+	const activeKeyRef = useRef();
+	const pickedIndex = itemKeys.indexOf(activeBlockContextId);
+	const activeIndex =
+		-1 !== pickedIndex
+			? pickedIndex
+			: itemKeys.indexOf(activeKeyRef.current);
 
 	if (-1 !== activeIndex) {
 		activeIndexRef.current = activeIndex;
@@ -797,6 +805,8 @@ export default function BlockEdit({
 		itemKeys[activeIndex] ??
 		itemKeys[activeIndexRef.current] ??
 		itemKeys[0];
+
+	activeKeyRef.current = activeContextId;
 
 	// A preview has no one to tell about an empty source, and is what shows a
 	// layout: the inserter previews a pattern with no images of its own.

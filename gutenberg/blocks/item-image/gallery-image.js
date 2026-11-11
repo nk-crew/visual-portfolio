@@ -50,8 +50,8 @@ export function getGalleryImageId(queryType, imgId) {
  *
  * @param {Function} select   - registry `select`.
  * @param {string}   clientId - client id of the item block.
- * @return {Object} `{ loopClientId, imagesQuery, images }`, `loopClientId`
- *                  undefined outside a loop.
+ * @return {Object} `{ loopClientId, imagesQuery, images, perPage }`,
+ *                  `loopClientId` undefined outside a loop.
  */
 function getLoopGallery(select, clientId) {
 	const { getBlockParentsByBlockName, getBlockAttributes } =
@@ -61,11 +61,26 @@ function getLoopGallery(select, clientId) {
 		'visual-portfolio/loop',
 		true
 	);
-	const imagesQuery = loopClientId
-		? getBlockAttributes(loopClientId)?.imagesQuery || {}
-		: {};
+	const attributes = loopClientId ? getBlockAttributes(loopClientId) : {};
+	const imagesQuery = attributes?.imagesQuery || {};
 
-	return { loopClientId, imagesQuery, images: imagesQuery.images || [] };
+	return {
+		loopClientId,
+		imagesQuery,
+		images: imagesQuery.images || [],
+		perPage: parseInt(attributes?.baseQuery?.perPage, 10),
+	};
+}
+
+/**
+ * How many images of a gallery the editor preview shows: its first page.
+ *
+ * @param {Array}  images  - entries of the gallery.
+ * @param {number} perPage - `baseQuery.perPage` of the loop.
+ * @return {number} count.
+ */
+function getShownCount(images, perPage) {
+	return perPage > 0 ? Math.min(images.length, perPage) : images.length;
 }
 
 /**
@@ -194,7 +209,8 @@ export function useGalleryImage(clientId, imgId) {
 /**
  * The place of a gallery entry an item stands for, and the tools that change it.
  *
- * `moveBy( step )` counts in the order the gallery is shown, which `desc` reverses.
+ * `moveBy( step )` counts in the order the gallery is shown, which `desc` reverses,
+ * and stays inside the preview, so the image being edited never leaves it.
  *
  * @param {string} clientId - client id of the item block.
  * @param {string} itemKey  - key of the item's image, see `getItemKey()`.
@@ -210,7 +226,10 @@ export function useGalleryOrder(clientId, itemKey) {
 				return null;
 			}
 
-			const { imagesQuery, images } = getLoopGallery(select, clientId);
+			const { imagesQuery, images, perPage } = getLoopGallery(
+				select,
+				clientId
+			);
 			const index = images.findIndex(
 				(image) => getImageEntryKey(image) === itemKey
 			);
@@ -227,7 +246,7 @@ export function useGalleryOrder(clientId, itemKey) {
 			return {
 				canMove: 'default' === (imagesQuery.orderBy || 'default'),
 				isFirst: 0 === shown,
-				isLast: images.length - 1 === shown,
+				isLast: shown >= getShownCount(images, perPage) - 1,
 			};
 		},
 		[clientId, itemKey]
@@ -235,10 +254,8 @@ export function useGalleryOrder(clientId, itemKey) {
 
 	const update = useCallback(
 		(edit) => {
-			const { loopClientId, imagesQuery, images } = getLoopGallery(
-				registry.select,
-				clientId
-			);
+			const { loopClientId, imagesQuery, images, perPage } =
+				getLoopGallery(registry.select, clientId);
 			const index = images.findIndex(
 				(image) => getImageEntryKey(image) === itemKey
 			);
@@ -247,7 +264,7 @@ export function useGalleryOrder(clientId, itemKey) {
 				return;
 			}
 
-			const next = edit(images, index, imagesQuery);
+			const next = edit(images, index, imagesQuery, perPage);
 
 			if (!next) {
 				return;
@@ -270,10 +287,12 @@ export function useGalleryOrder(clientId, itemKey) {
 
 	const moveBy = useCallback(
 		(step) =>
-			update((images, index, { order }) => {
-				const to = index + ('desc' === order ? -step : step);
+			update((images, index, { order }, perPage) => {
+				const isDesc = 'desc' === order;
+				const to = index + (isDesc ? -step : step);
+				const shownTo = isDesc ? images.length - 1 - to : to;
 
-				if (to < 0 || to >= images.length) {
+				if (shownTo < 0 || shownTo >= getShownCount(images, perPage)) {
 					return null;
 				}
 
