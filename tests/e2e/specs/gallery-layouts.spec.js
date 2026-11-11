@@ -1799,7 +1799,7 @@ test.describe('Gallery Item Template layouts', () => {
 			.toBe(1);
 	});
 
-	test('a step wider than the carousel still reaches its end', async ({
+	test('a step wider than the slides left still reaches the end', async ({
 		page,
 		requestUtils,
 	}) => {
@@ -1810,11 +1810,11 @@ test.describe('Gallery Item Template layouts', () => {
 			layout: {
 				layoutType: 'carousel',
 				layoutColumnsMode: 'manual',
-				layoutColumnCount: 2,
-				// A step wider than there are slides to take: asking for a
-				// slide off the end used to be refused outright, and the arrow
-				// did nothing at all.
-				carouselSlidesPerGroup: 6,
+				layoutColumnCount: 4,
+				// A step wider than the slides left to take - four a press, two
+				// to go: asking for a slide off the end used to be refused
+				// outright, and the arrow did nothing at all.
+				carouselSlidesPerGroup: 4,
 			},
 			carousel: ['loop-carousel-previous', 'loop-carousel-next'],
 		});
@@ -1876,6 +1876,141 @@ test.describe('Gallery Item Template layouts', () => {
 
 		await expect.poll(places, { timeout: 10000 }).toEqual(['0', '2', '4']);
 		await expect(dots.first()).toHaveAttribute('aria-current', 'true');
+	});
+
+	test('an arrow moves no further than the slides a phone shows', async ({
+		page,
+		requestUtils,
+	}) => {
+		// Four across steps down to one on a phone, and three slides a press
+		// would skip two nobody saw.
+		await page.setViewportSize({ width: 390, height: 900 });
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel group on a phone',
+			blockId: 'e2e-carousel-group-phone',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 4,
+				carouselSlidesPerGroup: 3,
+			},
+			carousel: ['loop-carousel-indicator', 'loop-carousel-next'],
+		});
+
+		const dots = page.locator(`${NAV} ${DOT}`);
+
+		await expect
+			.poll(
+				() =>
+					dots.evaluateAll((nodes) =>
+						nodes.map((dot) => dot.dataset.vpSlide)
+					),
+				{ timeout: 10000 }
+			)
+			.toEqual(['0', '1', '2', '3', '4', '5']);
+
+		await page.locator(NEXT_ARROW).click();
+		await expect(dots.nth(1)).toHaveAttribute('aria-current', 'true', {
+			timeout: 10000,
+		});
+	});
+
+	test('a peek leaves a phone most of the slide', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.setViewportSize({ width: 390, height: 900 });
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel peek on a phone',
+			blockId: 'e2e-carousel-peek-phone',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 1,
+				carouselPeek: 200,
+				style: { spacing: { blockGap: '0' } },
+			},
+		});
+
+		const frame = await page.locator(FRAME).boundingBox();
+		const slide = await page
+			.locator(`${LIST} > ${ITEM}`)
+			.first()
+			.boundingBox();
+
+		// A quarter of the frame at most, so three quarters stay the slide's.
+		expect(slide.width).toBeGreaterThanOrEqual(frame.width * 0.75 - 1);
+		expect(slide.width).toBeLessThan(frame.width);
+	});
+
+	test('a manual count steps down at the editor screens', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - ladder at the editor screens',
+			blockId: 'e2e-ladder-screens',
+			images,
+			layout: {
+				layoutType: 'grid',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 4,
+			},
+		});
+
+		const columns = async () =>
+			new Set((await getItemBoxes(page)).map(({ x }) => Math.round(x)))
+				.size;
+
+		// A tablet at the theme's breakpoints, 480px to 782px by default: two
+		// columns, at a width the old 576px step stacked to one.
+		await page.setViewportSize({ width: 540, height: 900 });
+		await expect.poll(columns, { timeout: 10000 }).toBe(2);
+
+		await page.setViewportSize({ width: 390, height: 900 });
+		await expect.poll(columns, { timeout: 10000 }).toBe(1);
+	});
+
+	test('a gap set for a screen applies on that screen alone', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - gap per screen',
+			blockId: 'e2e-gap-per-screen',
+			images,
+			layout: {
+				layoutType: 'grid',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				style: {
+					spacing: { blockGap: '40px' },
+					'@tablet': { spacing: { blockGap: '10px' } },
+				},
+			},
+		});
+
+		const list = page.locator(LIST);
+		const gaps = () =>
+			list.evaluate((node) => {
+				const styles = window.getComputedStyle(node);
+
+				return [styles.columnGap, styles.rowGap];
+			});
+
+		await expect.poll(gaps, { timeout: 10000 }).toEqual(['40px', '40px']);
+
+		await page.setViewportSize({ width: 600, height: 900 });
+		await expect.poll(gaps, { timeout: 10000 }).toEqual(['10px', '10px']);
+
+		// A phone has no gap of its own, and the editor's screens are ranges:
+		// it keeps the desktop's rather than the tablet's.
+		await page.setViewportSize({ width: 390, height: 900 });
+		await expect.poll(gaps, { timeout: 10000 }).toEqual(['40px', '40px']);
 	});
 
 	test('a counter names the slide on screen and how many there are', async ({

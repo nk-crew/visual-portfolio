@@ -545,6 +545,111 @@ test.describe('Gallery Item Template', () => {
 			.toBeGreaterThan(Number.parseFloat(heightBefore));
 	});
 
+	test('masonry in the editor places an item again once its picture arrives', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		// Every picture is held, and the one of the first item is let through
+		// after all the others, so the last `load` belongs to an item that has
+		// another one under it.
+		const held = new Map();
+		let lateUrl = null;
+		let isHolding = true;
+
+		await page.route(/\/wp-content\/uploads\//, (route) => {
+			const url = route.request().url();
+
+			if (!isHolding && url !== lateUrl) {
+				return route.continue();
+			}
+
+			return new Promise((resolve) => {
+				held.set(url, [...(held.get(url) || []), resolve]);
+			}).then(() => route.continue());
+		});
+
+		const release = (filter) => {
+			held.forEach((resolvers, url) => {
+				if (filter(url)) {
+					held.delete(url);
+					for (const resolve of resolvers) {
+						resolve();
+					}
+				}
+			});
+		};
+
+		await admin.createNewPost({
+			title: 'Gallery Item Template - masonry pictures',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock(
+			getLoopBlock({
+				query: { queryType: 'images', imagesQuery: { images } },
+				perPage: IMAGES_COUNT,
+				layout: {
+					layoutType: 'masonry',
+					layoutColumnsMode: 'manual',
+					layoutColumnCount: 2,
+				},
+				// No ratio of its own: the cover takes its picture's.
+				itemBlocks: [
+					{
+						name: 'visual-portfolio/item-cover',
+						attributes: { aspectRatio: '' },
+					},
+				],
+			})
+		);
+
+		const items = getEditorCanvas(page, editor).locator(
+			`${LIST} ${ITEM}:visible`
+		);
+
+		await expect(items).toHaveCount(IMAGES_COUNT);
+
+		lateUrl = await items
+			.first()
+			.locator('img')
+			.evaluate((image) => image.currentSrc || image.src);
+		isHolding = false;
+		release((url) => url !== lateUrl);
+
+		const readPictures = () =>
+			items.evaluateAll((nodes) =>
+				nodes.map((node) => {
+					const image = node.querySelector('img');
+
+					return !!(image?.complete && image.naturalWidth);
+				})
+			);
+
+		await expect.poll(readPictures).toEqual([false, true, true]);
+
+		release((url) => url === lateUrl);
+
+		await expect.poll(readPictures).toEqual([true, true, true]);
+
+		// Two columns and three items: the third is under the first, and has to
+		// move down once the first has grown to the height of its picture.
+		await expect
+			.poll(() =>
+				items.evaluateAll((nodes) => {
+					const [first, , third] = nodes;
+
+					return (
+						third.offsetLeft === first.offsetLeft &&
+						third.offsetTop >= first.offsetTop + first.offsetHeight
+					);
+				})
+			)
+			.toBe(true);
+	});
+
 	test('the images source renders in the editor preview and on the front end', async ({
 		page,
 		admin,

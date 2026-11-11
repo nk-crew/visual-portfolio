@@ -33,6 +33,7 @@ import classnames from 'classnames/dedupe';
  * Internal dependencies
  */
 import { getMissingTeasers } from '../../components/pro-teaser';
+import { getScreenBlockGaps } from '../../utils/block-gap';
 import { followsLink, getClickActions } from '../../utils/click-actions';
 import { AspectRatioTool, ScaleTool } from '../../utils/dimensions-tools';
 import {
@@ -57,6 +58,7 @@ import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../../utils/tools-panel';
+import GalleryOrderControls from '../item-image/gallery-order-controls';
 import {
 	getDrawnEffect,
 	getEffectSelectOptions,
@@ -249,11 +251,25 @@ export default function ItemCoverEdit({
 	// blocks actually sit in. On the card it could only ever be added to the
 	// panel's own, and it would inset the overlay with it, leaving an unshaded
 	// frame around the picture.
+	// A gap of its own for a narrower screen is applied by the rules the
+	// server prints inside the media query of each screen.
+	const screenGaps = Object.entries(getScreenBlockGaps(style)).filter(
+		([, { left }]) => left
+	);
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			className: 'wp-block-visual-portfolio-item-cover__inner',
+			className: classnames(
+				'wp-block-visual-portfolio-item-cover__inner',
+				screenGaps.map(([screen]) => `vp-has-${screen}-gap`)
+			),
 			style: {
 				gap: getGapCSSValue(style?.spacing?.blockGap) || undefined,
+				...Object.fromEntries(
+					screenGaps.map(([screen, { left }]) => [
+						`--vp-gap-${screen}`,
+						left,
+					])
+				),
 				...getSpacingClassesAndStyles({
 					style: { spacing: { padding: style?.spacing?.padding } },
 				}).style,
@@ -266,6 +282,10 @@ export default function ItemCoverEdit({
 		<>
 			{blockEditingMode === 'default' && (
 				<>
+					<GalleryOrderControls
+						clientId={clientId}
+						context={context}
+					/>
 					<BlockControls group="block">
 						<BlockAlignmentMatrixControl
 							label={__('Content position', 'visual-portfolio')}

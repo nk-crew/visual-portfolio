@@ -9,6 +9,7 @@ import { useCallback, useMemo, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { prepareImage } from '../../loop-sources/gallery-manager/prepare-images';
+import { getImageEntryKey } from '../item-template/arrange-items';
 
 /**
  * Whether two ids name the same attachment.
@@ -45,6 +46,44 @@ export function getGalleryImageId(queryType, imgId) {
 }
 
 /**
+ * The gallery of the loop an item block sits in.
+ *
+ * @param {Function} select   - registry `select`.
+ * @param {string}   clientId - client id of the item block.
+ * @return {Object} `{ loopClientId, imagesQuery, images, perPage }`,
+ *                  `loopClientId` undefined outside a loop.
+ */
+function getLoopGallery(select, clientId) {
+	const { getBlockParentsByBlockName, getBlockAttributes } =
+		select(blockEditorStore);
+	const [loopClientId] = getBlockParentsByBlockName(
+		clientId,
+		'visual-portfolio/loop',
+		true
+	);
+	const attributes = loopClientId ? getBlockAttributes(loopClientId) : {};
+	const imagesQuery = attributes?.imagesQuery || {};
+
+	return {
+		loopClientId,
+		imagesQuery,
+		images: imagesQuery.images || [],
+		perPage: parseInt(attributes?.baseQuery?.perPage, 10),
+	};
+}
+
+/**
+ * How many images of a gallery the editor preview shows: its first page.
+ *
+ * @param {Array}  images  - entries of the gallery.
+ * @param {number} perPage - `baseQuery.perPage` of the loop.
+ * @return {number} count.
+ */
+function getShownCount(images, perPage) {
+	return perPage > 0 ? Math.min(images.length, perPage) : images.length;
+}
+
+/**
  * The tools the toolbar has for the gallery entry an item stands for.
  *
  * The images of the Media source live in `imagesQuery.images` of the loop
@@ -72,16 +111,7 @@ export function useGalleryImage(clientId, imgId) {
 				return false;
 			}
 
-			const { getBlockParentsByBlockName, getBlockAttributes } =
-				select(blockEditorStore);
-			const [loopClientId] = getBlockParentsByBlockName(
-				clientId,
-				'visual-portfolio/loop',
-				true
-			);
-			const images = loopClientId
-				? getBlockAttributes(loopClientId)?.imagesQuery?.images || []
-				: [];
+			const { images } = getLoopGallery(select, clientId);
 
 			return !images.some((image) => isSameImage(image.id, imgId));
 		},
@@ -97,20 +127,10 @@ export function useGalleryImage(clientId, imgId) {
 	// returns, and answers with the entry as it was.
 	const editImage = useCallback(
 		(fromId, edit) => {
-			const { getBlockParentsByBlockName, getBlockAttributes } =
-				registry.select(blockEditorStore);
-			const [loopClientId] = getBlockParentsByBlockName(
-				clientId,
-				'visual-portfolio/loop',
-				true
+			const { loopClientId, imagesQuery, images } = getLoopGallery(
+				registry.select,
+				clientId
 			);
-
-			if (!loopClientId) {
-				return undefined;
-			}
-
-			const { imagesQuery } = getBlockAttributes(loopClientId);
-			const images = imagesQuery?.images || [];
 			const index = images.findIndex((image) =>
 				isSameImage(image.id, fromId)
 			);
@@ -183,5 +203,120 @@ export function useGalleryImage(clientId, imgId) {
 	return useMemo(
 		() => ({ replaceImage, cropImage, isPending }),
 		[replaceImage, cropImage, isPending]
+	);
+}
+
+/**
+ * The place of a gallery entry an item stands for, and the tools that change it.
+ *
+ * `moveBy( step )` counts in the order the gallery is shown, which `desc` reverses,
+ * and stays inside the preview, so the image being edited never leaves it.
+ *
+ * @param {string} clientId - client id of the item block.
+ * @param {string} itemKey  - key of the item's image, see `getItemKey()`.
+ * @return {Object|null} `{ canMove, isFirst, isLast, moveBy( step ), remove() }`,
+ *                       or `null` when the gallery has no such entry.
+ */
+export function useGalleryOrder(clientId, itemKey) {
+	const registry = useRegistry();
+
+	const place = useSelect(
+		(select) => {
+			if (!itemKey) {
+				return null;
+			}
+
+			const { imagesQuery, images, perPage } = getLoopGallery(
+				select,
+				clientId
+			);
+			const keys = images.map(getImageEntryKey);
+			const index = keys.indexOf(itemKey);
+
+			// A gallery holding an image twice keys its preview by the
+			// server's ids, which follow the index, so neither the entry nor
+			// the edited item could be told apart after a move.
+			if (-1 === index || new Set(keys).size !== keys.length) {
+				return null;
+			}
+
+			const shown =
+				'desc' === imagesQuery.order
+					? images.length - 1 - index
+					: index;
+
+			return {
+				canMove: 'default' === (imagesQuery.orderBy || 'default'),
+				isFirst: 0 === shown,
+				isLast: shown >= getShownCount(images, perPage) - 1,
+			};
+		},
+		[clientId, itemKey]
+	);
+
+	const update = useCallback(
+		(edit) => {
+			const { loopClientId, imagesQuery, images, perPage } =
+				getLoopGallery(registry.select, clientId);
+			const index = images.findIndex(
+				(image) => getImageEntryKey(image) === itemKey
+			);
+
+			if (-1 === index) {
+				return;
+			}
+
+			const next = edit(images, index, imagesQuery, perPage);
+
+			if (!next) {
+				return;
+			}
+
+			const {
+				updateBlockAttributes,
+				__unstableMarkLastChangeAsPersistent,
+			} = registry.dispatch(blockEditorStore);
+
+			updateBlockAttributes(loopClientId, {
+				imagesQuery: { ...imagesQuery, images: next },
+			});
+
+			// The block editor folds consecutive edits of one attribute into one undo step.
+			__unstableMarkLastChangeAsPersistent();
+		},
+		[registry, clientId, itemKey]
+	);
+
+	const moveBy = useCallback(
+		(step) =>
+			update((images, index, { order }, perPage) => {
+				const isDesc = 'desc' === order;
+				const to = index + (isDesc ? -step : step);
+				const shownTo = isDesc ? images.length - 1 - to : to;
+
+				if (shownTo < 0 || shownTo >= getShownCount(images, perPage)) {
+					return null;
+				}
+
+				const next = [...images];
+
+				[next[index], next[to]] = [next[to], next[index]];
+
+				return next;
+			}),
+		[update]
+	);
+
+	const remove = useCallback(
+		() =>
+			update((images, index) =>
+				images.filter((image, current) => current !== index)
+			),
+		[update]
+	);
+
+	return useMemo(
+		() => (place ? { ...place, moveBy, remove } : null),
+		[place, moveBy, remove]
 	);
 }

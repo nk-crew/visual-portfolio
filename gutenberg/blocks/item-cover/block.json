@@ -8,6 +8,7 @@
 	"ancestor": ["visual-portfolio/item-template"],
 	"textdomain": "visual-portfolio",
 	"usesContext": [
+		"vp/queryType",
 		"vp/itemImgId",
 		"vp/itemImgUrl",
 		"vp/itemImgWidth",
@@ -172,6 +173,9 @@
 	"selectors": {
 		"filter": {
 			"duotone": ".wp-block-visual-portfolio-item-cover img"
+		},
+		"spacing": {
+			"padding": ".wp-block-visual-portfolio-item-cover .wp-block-visual-portfolio-item-cover__inner"
 		}
 	},
 	"style": "visual-portfolio-block-item-cover"

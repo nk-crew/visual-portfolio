@@ -38,3 +38,44 @@ export default function getBlockGapValue(gap, axis = 'left') {
 
 	return gap;
 }
+
+/**
+ * Block spacing a block was given for the narrower screens, as CSS lengths.
+ *
+ * A mirror of `visual_portfolio_get_screen_block_gaps()`. An axis the screen
+ * leaves unset keeps the base value, and the other screen's value never
+ * applies: the editor's screens are ranges, not steps.
+ *
+ * @param {Object} style - `style` attribute of a block.
+ *
+ * @return {Object} screen name to `{ left, top }`, for the screens that have a
+ *                  gap of their own. A length is empty where the theme decides.
+ */
+export function getScreenBlockGaps(style) {
+	const gaps = {};
+	const base = style?.spacing?.blockGap;
+
+	['tablet', 'mobile'].forEach((screen) => {
+		const gap = style?.[`@${screen}`]?.spacing?.blockGap;
+
+		if (
+			undefined === gap ||
+			null === gap ||
+			'' === gap ||
+			('object' === typeof gap && !Object.keys(gap).length)
+		) {
+			return;
+		}
+
+		gaps[screen] = {};
+
+		['left', 'top'].forEach((axis) => {
+			gaps[screen][axis] =
+				'object' === typeof gap && undefined === gap[axis]
+					? getBlockGapValue(base, axis)
+					: getBlockGapValue(gap, axis);
+		});
+	});
+
+	return gaps;
+}
