@@ -51,7 +51,7 @@ class Visual_Portfolio_Block_Loop_Filter {
 	 *
 	 * @return array Parsed filter item blocks to render.
 	 */
-	private static function get_items( $saved, $terms, $show_all ) {
+	public static function get_items( $saved, $terms, $show_all ) {
 		$by_key   = array_column( $terms, null, 'key' );
 		$items    = array();
 		$used     = array();
@@ -112,6 +112,52 @@ class Visual_Portfolio_Block_Loop_Filter {
 	}
 
 	/**
+	 * Items in the order the block asks for.
+	 *
+	 * "All" leads whatever the order. `name` sorts by the label shown, `count`
+	 * by the items each term holds, most first, and `manual` keeps the saved
+	 * order followed by the new terms.
+	 *
+	 * @param array  $items - parsed filter item blocks.
+	 * @param string $order - `manual`, `name` or `count`.
+	 *
+	 * @return array
+	 */
+	public static function sort_items( $items, $order ) {
+		if ( 'name' !== $order && 'count' !== $order ) {
+			return $items;
+		}
+
+		$all   = array();
+		$terms = array();
+
+		foreach ( $items as $item ) {
+			if ( '*' === ( $item['attrs']['filter'] ?? '*' ) ) {
+				$all[] = $item;
+			} else {
+				$terms[] = $item;
+			}
+		}
+
+		usort(
+			$terms,
+			static function ( $a, $b ) use ( $order ) {
+				if ( 'count' === $order ) {
+					$by_count = (int) ( $b['attrs']['count'] ?? 0 ) <=> (int) ( $a['attrs']['count'] ?? 0 );
+
+					if ( 0 !== $by_count ) {
+						return $by_count;
+					}
+				}
+
+				return strnatcasecmp( wp_strip_all_tags( (string) ( $a['attrs']['text'] ?? '' ) ), wp_strip_all_tags( (string) ( $b['attrs']['text'] ?? '' ) ) );
+			}
+		);
+
+		return array_merge( $all, $terms );
+	}
+
+	/**
 	 * The term a saved item points at, in the language of the page.
 	 *
 	 * A translated page keeps the term ids saved in the original, while its
@@ -167,6 +213,12 @@ class Visual_Portfolio_Block_Loop_Filter {
 			return '';
 		}
 
+		// A filter set up by an extension lists what only that extension knows
+		// how to read. Without it there is nothing honest to print.
+		if ( ! empty( $attributes['extensions']['facet'] ) && is_array( $attributes['extensions']['facet'] ) ) {
+			return '';
+		}
+
 		$options = Visual_Portfolio_Gutenberg::transform_context_to_attributes( $block->context );
 		$terms   = $options ? Visual_Portfolio_Filter_Terms::get( $options, Visual_Portfolio_Block_Loop::get_query_id( $block->context ) ) : array();
 
@@ -177,7 +229,8 @@ class Visual_Portfolio_Block_Loop_Filter {
 		}
 
 		$as_dropdown = ! empty( $attributes['displayAsDropdown'] );
-		$items       = self::get_items( $block->parsed_block['innerBlocks'] ?? array(), $terms, ! empty( $attributes['showAllItem'] ) );
+		$items       = self::sort_items( self::get_items( $block->parsed_block['innerBlocks'] ?? array(), $terms, ! empty( $attributes['showAllItem'] ) ), $attributes['order'] ?? 'manual' );
+		$label       = trim( (string) ( $attributes['label'] ?? '' ) );
 		$content     = '';
 		$context     = array_merge(
 			$block->context,
@@ -224,8 +277,8 @@ class Visual_Portfolio_Block_Loop_Filter {
 					'filter',
 					$content,
 					array(
-						'label'  => __( 'Category filter', 'visual-portfolio' ),
-						'prompt' => __( 'Select category', 'visual-portfolio' ),
+						'label'  => '' !== $label ? $label : __( 'Category filter', 'visual-portfolio' ),
+						'prompt' => '' !== $label ? $label : __( 'Select category', 'visual-portfolio' ),
 						'submit' => __( 'Filter', 'visual-portfolio' ),
 					),
 					'vp-block-loop-filter',
@@ -238,7 +291,7 @@ class Visual_Portfolio_Block_Loop_Filter {
 			array(
 				'class'      => 'vp-block-loop-filter',
 				// `get_block_wrapper_attributes()` escapes the values itself.
-				'aria-label' => __( 'Category filter', 'visual-portfolio' ),
+				'aria-label' => '' !== $label ? $label : __( 'Category filter', 'visual-portfolio' ),
 			)
 		);
 

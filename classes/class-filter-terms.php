@@ -341,7 +341,7 @@ class Visual_Portfolio_Filter_Terms {
 	 *
 	 * @return array Counts keyed by term id.
 	 */
-	private static function count_terms( $ids, $taxonomies ) {
+	public static function count_terms( $ids, $taxonomies ) {
 		global $wpdb;
 
 		$counts = array();
@@ -367,7 +367,7 @@ class Visual_Portfolio_Filter_Terms {
 	 *
 	 * @return string
 	 */
-	private static function get_version() {
+	public static function get_version() {
 		$version = get_transient( self::VERSION_KEY );
 
 		if ( ! $version ) {

@@ -8,13 +8,18 @@ import {
 import { createBlock } from '@wordpress/blocks';
 import {
 	Disabled,
+	SelectControl,
 	Spinner,
+	TextControl,
 	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
 import { create } from '@wordpress/rich-text';
 import classnames from 'classnames/dedupe';
@@ -22,6 +27,8 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
+import ProBlockNote from '../../components/pro-block-note';
+import { getMissingTeasers } from '../../components/pro-teaser';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import { loopSourceSupports } from '../../utils/loop-source-supports';
 import {
@@ -30,6 +37,104 @@ import {
 } from '../../utils/tools-panel';
 
 const ITEM_BLOCK = 'visual-portfolio/loop-filter-item';
+
+const { pro: isProPlugin } = window.VPGutenbergVariables || {};
+
+// The ways the filter shows its items. An extension adds its own through
+// `vpf.loopFilterDisplayOptions`, keeping its value where it likes.
+const DISPLAY_OPTIONS = [
+	{
+		value: 'buttons',
+		label: __('Buttons', 'visual-portfolio'),
+		isSelected: (attributes) => !attributes.displayAsDropdown,
+		select: () => ({ displayAsDropdown: false }),
+	},
+	{
+		value: 'dropdown',
+		label: __('Dropdown', 'visual-portfolio'),
+		isSelected: (attributes) => !!attributes.displayAsDropdown,
+		select: () => ({ displayAsDropdown: true }),
+	},
+];
+
+// The settings Pro adds to the filter, for an install without them, shown in
+// the menu of the panel.
+const PRO_SETTINGS = [
+	{
+		name: 'filterBy',
+		label: __('Filter by', 'visual-portfolio'),
+		line: __(
+			'Pick the taxonomy, or the image categories, this filter lists, and put several filters in one gallery.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_loop_filter_by',
+	},
+	{
+		name: 'selection',
+		label: __('Several terms', 'visual-portfolio'),
+		line: __(
+			'Let visitors choose more than one term at a time.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_loop_filter_selection',
+	},
+	{
+		name: 'childTerms',
+		label: __('Child terms', 'visual-portfolio'),
+		line: __(
+			'Show child terms under their parent, or once a parent is chosen.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_loop_filter_child_terms',
+	},
+	{
+		name: 'hideEmpty',
+		label: __('Hide empty terms', 'visual-portfolio'),
+		line: __(
+			'Leave out the terms the other filters leave without items.',
+			'visual-portfolio'
+		),
+		campaign: 'teaser_loop_filter_hide_empty',
+	},
+];
+
+/**
+ * Items sorted the way the page sorts them.
+ *
+ * A mirror of `Visual_Portfolio_Block_Loop_Filter::sort_items()`: "All"
+ * leads, then the terms by label, or by count with the label breaking ties.
+ *
+ * @param {Array}  blocks - filter item blocks.
+ * @param {string} order  - `manual`, `name` or `count`.
+ * @return {Array} sorted blocks, the same array when nothing sorts.
+ */
+function sortItems(blocks, order) {
+	if ('name' !== order && 'count' !== order) {
+		return blocks;
+	}
+
+	const label = (block) => create({ html: block.attributes.text || '' }).text;
+	const all = blocks.filter((block) => '*' === block.attributes.filter);
+	const terms = blocks
+		.filter((block) => '*' !== block.attributes.filter)
+		.sort((a, b) => {
+			if ('count' === order) {
+				const byCount =
+					(b.attributes.count || 0) - (a.attributes.count || 0);
+
+				if (byCount) {
+					return byCount;
+				}
+			}
+
+			return label(a).localeCompare(label(b), undefined, {
+				numeric: true,
+				sensitivity: 'base',
+			});
+		});
+
+	return [...all, ...terms];
+}
 
 // What names the term of an item. Every other attribute is its style, which an
 // item added for a new term takes from the first term item, as the page does.
@@ -134,7 +239,17 @@ export default function BlockEdit({
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { showCount, showAllItem, displayAsDropdown } = attributes;
+	const {
+		showCount,
+		showAllItem,
+		displayAsDropdown,
+		label,
+		order: termOrder,
+		extensions,
+	} = attributes;
+	const facet = extensions?.facet;
+	const hasFacet =
+		!!facet && 'object' === typeof facet && !!Object.keys(facet).length;
 
 	useLoopOrphanWarning('visual-portfolio/loop-filter', context);
 
@@ -187,6 +302,8 @@ export default function BlockEdit({
 		),
 		sourceQuery,
 		showAllItem,
+		termOrder,
+		facet: hasFacet ? facet : null,
 	});
 
 	// Another kind of source, or other post types, is a new set of terms: the
@@ -196,6 +313,9 @@ export default function BlockEdit({
 		queryType,
 		source: postsQuery?.source,
 		postTypesSet: postsQuery?.postTypesSet,
+		// Another taxonomy, or another set of categories, is another set of terms.
+		facetBy: hasFacet ? facet.by : null,
+		facetChosen: hasFacet ? facet.chosen : null,
 	});
 
 	useEffect(() => {
@@ -230,6 +350,7 @@ export default function BlockEdit({
 				postsQuery,
 				imagesQuery,
 				sourceQuery,
+				extensions,
 				post_id: postId,
 				block_id: clientId,
 			},
@@ -310,11 +431,15 @@ export default function BlockEdit({
 					}
 				});
 
+				// Sorted the way the page sorts them, so the editor shows the
+				// order visitors get.
+				const sortedBlocks = sortItems(updatedBlocks, termOrder);
+
 				// Untouched items are returned by identity, so this also tells
 				// us whether anything is worth writing to the editor store.
 				const isUnchanged =
-					updatedBlocks.length === currentBlocks.length &&
-					updatedBlocks.every(
+					sortedBlocks.length === currentBlocks.length &&
+					sortedBlocks.every(
 						(block, index) => block === currentBlocks[index]
 					);
 
@@ -325,7 +450,7 @@ export default function BlockEdit({
 						__unstableMarkNextChangeAsNotPersistent();
 					}
 
-					replaceInnerBlocks(clientId, updatedBlocks, false);
+					replaceInnerBlocks(clientId, sortedBlocks, false);
 				}
 			})
 			.catch((error) => {
@@ -356,6 +481,8 @@ export default function BlockEdit({
 		postsQuery,
 		imagesQuery,
 		showAllItem,
+		termOrder,
+		extensions,
 		postId,
 		clientId,
 		getBlocks,
@@ -408,7 +535,25 @@ export default function BlockEdit({
 
 	let content = <div {...innerBlocksProps} />;
 
-	if (isLoading) {
+	// The page prints nothing for a filter only Pro knows how to read.
+	if (hasFacet && !isProPlugin) {
+		content = (
+			<div {...blockProps}>
+				<ProBlockNote
+					title={__(
+						'This filter is set up in Pro',
+						'visual-portfolio'
+					)}
+					campaign="teaser_loop_filter_note"
+				>
+					{__(
+						'Visitors see nothing here until Visual Portfolio Pro is active. Its settings are kept.',
+						'visual-portfolio'
+					)}
+				</ProBlockNote>
+			</div>
+		);
+	} else if (isLoading) {
 		content = (
 			<div {...blockProps}>
 				<Spinner />
@@ -421,7 +566,8 @@ export default function BlockEdit({
 					<select value={allOption?.clientId ?? ''} readOnly>
 						{!allOption && (
 							<option value="" disabled>
-								{__('Select category', 'visual-portfolio')}
+								{label.trim() ||
+									__('Select category', 'visual-portfolio')}
 							</option>
 						)}
 						{options.map((item) => (
@@ -438,6 +584,30 @@ export default function BlockEdit({
 		);
 	}
 
+	const displayOptions = applyFilters(
+		'vpf.loopFilterDisplayOptions',
+		DISPLAY_OPTIONS,
+		{ attributes }
+	);
+
+	// The last option that claims the attributes wins, so an option an
+	// extension adds over a free one shows as chosen.
+	const displayValue =
+		[...displayOptions]
+			.reverse()
+			.find((option) => option.isSelected(attributes))?.value ||
+		'buttons';
+
+	const settingsItems = applyFilters('vpf.loopFilterSettingsItems', [], {
+		attributes,
+		setAttributes,
+		context,
+		clientId,
+	});
+	const teasers = getMissingTeasers(settingsItems, PRO_SETTINGS, {
+		attributes,
+	});
+
 	return (
 		<>
 			<InspectorControls>
@@ -446,7 +616,9 @@ export default function BlockEdit({
 					resetAll={(filters) =>
 						setAttributes(
 							getResetAllValues(filters, {
-								displayAsDropdown: false,
+								...displayOptions[0].select(attributes),
+								label: '',
+								order: 'manual',
 								showCount: false,
 								showAllItem: true,
 							})
@@ -463,23 +635,95 @@ export default function BlockEdit({
 						</p>
 					)}
 					<ToolsPanelItem
-						label={__('Display as dropdown', 'visual-portfolio')}
+						label={__('Display as', 'visual-portfolio')}
 						isShownByDefault
-						hasValue={() => displayAsDropdown}
+						hasValue={() => displayValue !== 'buttons'}
 						onDeselect={() =>
-							setAttributes({ displayAsDropdown: false })
+							setAttributes(displayOptions[0].select(attributes))
 						}
 					>
-						<ToggleControl
-							label={__(
-								'Display as dropdown',
+						<ToggleGroupControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							isBlock
+							label={__('Display as', 'visual-portfolio')}
+							value={displayValue}
+							onChange={(value) => {
+								const option = displayOptions.find(
+									(candidate) => candidate.value === value
+								);
+
+								if (option) {
+									setAttributes(option.select(attributes));
+								}
+							}}
+						>
+							{displayOptions.map((option) => (
+								<ToggleGroupControlOption
+									key={option.value}
+									value={option.value}
+									label={option.label}
+								/>
+							))}
+						</ToggleGroupControl>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={__('Label', 'visual-portfolio')}
+						isShownByDefault
+						hasValue={() => !!label}
+						onDeselect={() => setAttributes({ label: '' })}
+					>
+						<TextControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={__('Label', 'visual-portfolio')}
+							help={__(
+								'The name screen readers give the filter, and the prompt of its dropdown.',
 								'visual-portfolio'
 							)}
-							checked={displayAsDropdown}
-							onChange={() =>
-								setAttributes({
-									displayAsDropdown: !displayAsDropdown,
-								})
+							placeholder={__(
+								'Category filter',
+								'visual-portfolio'
+							)}
+							value={label}
+							onChange={(value) =>
+								setAttributes({ label: value })
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={__('Order', 'visual-portfolio')}
+						isShownByDefault
+						hasValue={() => 'manual' !== termOrder}
+						onDeselect={() => setAttributes({ order: 'manual' })}
+					>
+						<SelectControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={__('Order', 'visual-portfolio')}
+							value={termOrder}
+							options={[
+								{
+									value: 'manual',
+									label: __(
+										'As arranged in the editor',
+										'visual-portfolio'
+									),
+								},
+								{
+									value: 'name',
+									label: __('Name', 'visual-portfolio'),
+								},
+								{
+									value: 'count',
+									label: __(
+										'Number of items',
+										'visual-portfolio'
+									),
+								},
+							]}
+							onChange={(value) =>
+								setAttributes({ order: value })
 							}
 						/>
 					</ToolsPanelItem>
@@ -519,6 +763,20 @@ export default function BlockEdit({
 							}
 						/>
 					</ToolsPanelItem>
+					{settingsItems.map(({ name, Item }) => (
+						<Item
+							key={name}
+							attributes={attributes}
+							setAttributes={setAttributes}
+							context={context}
+							clientId={clientId}
+						/>
+					))}
+
+					{/* After the settings there are, so the menu leads with those. */}
+					{teasers.map(({ name, Item }) => (
+						<Item key={name} clientId={clientId} />
+					))}
 				</ToolsPanel>
 			</InspectorControls>
 			{content}

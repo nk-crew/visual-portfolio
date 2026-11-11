@@ -219,7 +219,9 @@ class Visual_Portfolio_SEO_Optimization {
 				return true;
 			}
 
-			if ( ! preg_match( '/^vp[_-](?:[0-9]+-)?(filter|sort|search|page)$/', $name, $matches ) ) {
+			// A loop's own parameters are all states of it, whatever an extension
+			// names them, so `vp-3-year` narrows the way `vp-3-filter` does.
+			if ( ! preg_match( '/^vp_(filter|sort|search|page)$/', $name, $matches ) && ! preg_match( '/^vp-[0-9]+-([a-z0-9_-]+)$/', $name, $matches ) ) {
 				continue;
 			}
 

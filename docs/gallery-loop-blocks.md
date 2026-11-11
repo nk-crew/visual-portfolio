@@ -333,9 +333,14 @@ scrolling*.
 With JavaScript they swap the gallery in place; without it they work as ordinary
 page loads. Both paths land on the same URL.
 
-*Display as dropdown* shows the filter or the sort as a select instead of links.
-It is off for the filter and on for the sort, which is how both looked before the
-setting existed. A filter shown as a dropdown keeps its items. The editor lists
+*Display as* shows the filter as Buttons, its links, or as a Dropdown, a select;
+the sort has a *Display as dropdown* toggle. The filter starts as buttons and the
+sort as a dropdown, which is how both looked before the setting existed. Display
+as is a setting rather than a block style, since it changes the markup; block
+styles such as Fill only restyle it. *Label* names the filter for screen readers
+and is the prompt of its dropdown; empty, they say *Category filter* and *Select
+category*. *Order* sorts the terms by name or by the number of items they hold,
+behind "All", or keeps the order they are arranged in, the default. A filter shown as a dropdown keeps its items. The editor lists
 them under the select while the filter is selected, so labels, order and the Hide
 option still apply. Item styles do not, since an option holds text only. An item hidden on some screen sizes is hidden with CSS, which the native
 picker of a phone may not apply to an option. While no option stands for the
@@ -543,6 +548,7 @@ it reads — no hook involved:
 | `vpf_loop_item_click_attributes` | filter `( $attributes, $action, $context )` | The link an item block renders for a click action an extension added; without `href` the item links to its own address |
 | `vpf_rest_loop_items_source_configs` | filter `( $configs, $params )` | Allow-list of source parameters the editor preview endpoint accepts, keyed by content source |
 | `vpf_rest_filter_items_source_configs` | filter `( $configs, $params )` | The same allow-list for the endpoint that lists the terms of the filter block in the editor. It starts from the answer of `vpf_rest_loop_items_source_configs`, and a source missing from it gets the "All" item alone |
+| `vpf_rest_filter_terms` | filter `( $terms, $extensions, $options )` | The terms that endpoint lists, from the filter block's `extensions`, in the shape `Visual_Portfolio_Filter_Terms::get()` returns. Runs under the endpoint's read restrictions, so an extension's own queries read only what the editor may |
 
 ### The query
 
@@ -588,6 +594,23 @@ no key at all.
 The options of a loop's query carry `$options['is_loop'] = true`, so a query
 filter that should act on the classic gallery alone, such as one reading a
 classic URL parameter, can tell the two apart.
+
+**The asking loop.** `get_query_params()` puts `$options['loop_query_id']`, the
+loop's query id or null, and `$options['loop_for_filter']`, true when the query
+is asked for the terms of a filter rather than for the items, on the options
+before `vpf_extend_options_before_query_args`. An extension that adds its own
+parameters reads those of this loop, `vp-{queryId}-{name}` through
+`get_query_var_name( $name, $query_id )`, and can leave its own narrowing out of
+a count it makes for itself. `Visual_Portfolio_Filter_Terms::count_terms()` and
+`get_version()`, the grouped count and the key every cached count carries, are
+public for that count.
+
+**A filter set up by an extension.** A filter block whose `extensions.facet` is a
+non-empty object lists what only an extension can read: its render callback
+returns nothing, and the editor shows a note in its place. The extension
+replaces the render callbacks of the filter and its items through
+`register_block_type_args` and builds on `Visual_Portfolio_Block_Loop_Filter::get_items()`
+and `sort_items()`, which merge the saved items with the terms and sort them.
 
 Three of them need a word for sources that are neither posts nor images:
 
@@ -654,13 +677,18 @@ cover effect is the same, and an effect the install lacks is drawn as a fade.
 
 The editor lists an extension adds to take `{ name, Item }` entries, where `Item`
 is a `ToolsPanelItem`: `vpf.loopPostsFilterItems` (the loop's Filters panel),
+`vpf.loopFilterSettingsItems` (the filter's Settings panel, whose Pro entries are
+`filterBy`, `selection`, `childTerms` and `hideEmpty`),
 `vpf.itemCoverSettingsItems` (the cover's Settings panel) and
 `vpf.itemImageSettingsItems` (the image's Settings panel). Without Pro, the free
 plugin adds a teaser for each Pro entry the list lacks, under the same `name`:
 a panel menu item marked "(Pro)" that shows one line and a link. An entry under
 that name replaces it. The Effect lists do the same by `value`, with a disabled
 option: `vpf.carouselEffects` for the item template and `vpf.itemCoverEffects`
-(`{ label, value }`) for the cover. Three panels of Pro settings appear only
+(`{ label, value }`) for the cover. The filter's Display as takes its choices from
+`vpf.loopFilterDisplayOptions`, entries `{ value, label, isSelected( attributes ),
+select( attributes ) }`: the last entry whose `isSelected` holds is the one shown,
+and `select` returns the attributes the choice writes. Three panels of Pro settings appear only
 without Pro, each a menu of teasers. The loop has a Protection panel for
 password, age gate and right-click protection. The item image has a Protection
 panel for the watermark. A trigger set to infinite scroll has an Infinite Scroll
@@ -1095,6 +1123,7 @@ so two galleries on one page never move each other:
 | Sort | `vp_sort` | `vp-{queryId}-sort` |
 | Search | none, see below | `vp-{queryId}-search` |
 | Random seed | `vpf_random_seed` | shared by the page |
+| An extension's own | none | `vp-{queryId}-{name}` |
 
 Defaults are never written: page one, an empty filter, the default sort and an
 empty search are removed from the URL rather than spelled out. The canonical view of a page is
@@ -1129,6 +1158,7 @@ distinct combination below is a separate cacheable URL:
 | `vp-1-filter=…` | yes | One entry per term shown by the filter |
 | `vp-1-sort=…` | yes | One entry per sort option |
 | `vp-1-search=…` | unbounded | One entry per term a visitor types |
+| `vp-1-{name}=…` | yes, or unbounded | An extension's own parameter, `noindex, follow` like the rest. Bounded for a set of choices, unbounded for a range a visitor types |
 | Combinations of the above | yes | The product of them, which is what to keep an eye on: three galleries with four filters and four sort options each is already a large surface |
 | `vpf_random_seed=…` | unbounded | See below |
 

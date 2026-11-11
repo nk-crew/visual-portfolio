@@ -263,4 +263,49 @@ class ClassGetPortfolioQueryVars extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'vp-4-page=2', $urls );
 		$this->assertStringNotContainsString( 'vp_page', $urls );
 	}
+
+	/**
+	 * The query hooks learn which loop asks, and whether for its filter terms.
+	 *
+	 * @return void
+	 */
+	public function test_query_hooks_receive_the_loop() {
+		$seen = array();
+
+		$capture = function ( $options ) use ( &$seen ) {
+			$seen[] = array(
+				array_key_exists( 'loop_query_id', $options ) ? $options['loop_query_id'] : 'missing',
+				array_key_exists( 'loop_for_filter', $options ) ? $options['loop_for_filter'] : 'missing',
+			);
+
+			return $options;
+		};
+
+		add_filter( 'vpf_extend_options_before_query_args', $capture );
+
+		$options = array(
+			'content_source'         => 'images',
+			'images'                 => array(),
+			'images_order_by'        => 'default',
+			'images_order_direction' => 'asc',
+			'items_count'            => 4,
+		);
+
+		Visual_Portfolio_Get::get_query_params( $options, false, false, 7 );
+		Visual_Portfolio_Get::get_query_params( $options, true, false, '7' );
+		Visual_Portfolio_Get::get_query_params( $options );
+		Visual_Portfolio_Get::get_query_params( $options, false, false, 'loop' );
+
+		remove_filter( 'vpf_extend_options_before_query_args', $capture );
+
+		$this->assertSame(
+			array(
+				array( 7, false ),
+				array( 7, true ),
+				array( null, false ),
+				array( null, false ),
+			),
+			$seen
+		);
+	}
 }
