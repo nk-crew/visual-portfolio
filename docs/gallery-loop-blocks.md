@@ -596,14 +596,13 @@ filter that should act on the classic gallery alone, such as one reading a
 classic URL parameter, can tell the two apart.
 
 **The asking loop.** `get_query_params()` puts `$options['loop_query_id']`, the
-loop's query id or null, and `$options['loop_for_filter']`, true when the query
-is asked for the terms of a filter rather than for the items, on the options
-before `vpf_extend_options_before_query_args`. An extension that adds its own
+loop's query id or null, on the options before
+`vpf_extend_options_before_query_args`. An extension that adds its own
 parameters reads those of this loop, `vp-{queryId}-{name}` through
 `get_query_var_name( $name, $query_id )`, and can leave its own narrowing out of
-a count it makes for itself. `Visual_Portfolio_Filter_Terms::count_terms()` and
-`get_version()`, the grouped count and the key every cached count carries, are
-public for that count.
+a count it makes for itself. `Visual_Portfolio_Filter_Terms::get_version()`, the
+key every cached count of terms carries, is public, so a count an extension caches
+is forgotten with them.
 
 **A filter set up by an extension.** A filter block whose `extensions.facet` is a
 non-empty object lists what only an extension can read: its render callback

@@ -341,7 +341,7 @@ class Visual_Portfolio_Filter_Terms {
 	 *
 	 * @return array Counts keyed by term id.
 	 */
-	public static function count_terms( $ids, $taxonomies ) {
+	private static function count_terms( $ids, $taxonomies ) {
 		global $wpdb;
 
 		$counts = array();

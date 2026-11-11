@@ -265,7 +265,7 @@ class ClassGetPortfolioQueryVars extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The query hooks learn which loop asks, and whether for its filter terms.
+	 * The query hooks learn which loop asks.
 	 *
 	 * @return void
 	 */
@@ -273,10 +273,7 @@ class ClassGetPortfolioQueryVars extends WP_UnitTestCase {
 		$seen = array();
 
 		$capture = function ( $options ) use ( &$seen ) {
-			$seen[] = array(
-				array_key_exists( 'loop_query_id', $options ) ? $options['loop_query_id'] : 'missing',
-				array_key_exists( 'loop_for_filter', $options ) ? $options['loop_for_filter'] : 'missing',
-			);
+			$seen[] = array_key_exists( 'loop_query_id', $options ) ? $options['loop_query_id'] : 'missing';
 
 			return $options;
 		};
@@ -298,14 +295,6 @@ class ClassGetPortfolioQueryVars extends WP_UnitTestCase {
 
 		remove_filter( 'vpf_extend_options_before_query_args', $capture );
 
-		$this->assertSame(
-			array(
-				array( 7, false ),
-				array( 7, true ),
-				array( null, false ),
-				array( null, false ),
-			),
-			$seen
-		);
+		$this->assertSame( array( 7, 7, null, null ), $seen );
 	}
 }

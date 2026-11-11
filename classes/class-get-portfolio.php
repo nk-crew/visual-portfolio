@@ -2046,10 +2046,8 @@ class Visual_Portfolio_Get {
 			$options['active_sort'] = $active_sort;
 		}
 
-		// Which loop asks, and whether for its items or for the terms of its
-		// filter, so an extension reads the parameters of that loop alone.
-		$options['loop_query_id']   = self::sanitize_query_id( $query_id );
-		$options['loop_for_filter'] = (bool) $for_filter;
+		// Which loop asks, so an extension reads the parameters of that loop alone.
+		$options['loop_query_id'] = self::sanitize_query_id( $query_id );
 
 		$options    = apply_filters( 'vpf_extend_options_before_query_args', $options, $layout_id );
 		$query_opts = array();
