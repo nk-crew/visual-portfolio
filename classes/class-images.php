@@ -106,10 +106,8 @@ class Visual_Portfolio_Images {
 			return $threshold;
 		}
 
-		// Regenerating without scaling leaves the attached file on the "-scaled" copy while the metadata describes the original.
-		$attached = pathinfo( (string) get_attached_file( $attachment_id, true ), PATHINFO_FILENAME );
-
-		if ( ! empty( wp_get_attachment_metadata( $attachment_id )['original_image'] ) && str_ends_with( $attached, '-scaled' ) ) {
+		// Core points the attachment at a new file only when it scales or rotates, so a regenerated "-scaled", rotated or edited upload keeps the threshold.
+		if ( wp_normalize_path( (string) get_attached_file( $attachment_id, true ) ) !== wp_normalize_path( $file ) ) {
 			return $threshold;
 		}
 
