@@ -675,7 +675,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 		$this->assertStringContainsString( '--vp-layout-gap:1rem', $output );
 		$this->assertStringContainsString( 'vp-has-tablet-gap', $output );
 		$this->assertStringContainsString( '--vp-layout-gap-tablet:3rem', $output );
-		$this->assertStringNotContainsString( '--vp-layout-row-gap-tablet', $output );
+		$this->assertStringContainsString( '--vp-layout-row-gap-tablet:3rem', $output );
 		$this->assertStringNotContainsString( 'vp-has-mobile-gap', $output );
 	}
 
@@ -723,9 +723,30 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 			$rules
 		);
 		$this->assertStringContainsString(
-			'.vp-has-mobile-gap{--vp-layout-gap:var(--vp-layout-gap-mobile)!important;',
+			'.vp-has-mobile-gap{--vp-layout-gap:var(--vp-layout-gap-mobile)!important}',
 			$rules
 		);
+	}
+
+	/**
+	 * An axis no screen and no desktop value decides stays the theme's: a
+	 * theme that redeclares the gap keeps it.
+	 *
+	 * @return void
+	 */
+	public function test_a_screen_gap_leaves_an_undecided_axis_to_the_theme() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'style' => array(
+					'@tablet' => array( 'spacing' => array( 'blockGap' => array( 'top' => '20px' ) ) ),
+				),
+			)
+		);
+
+		$this->assertStringContainsString( 'vp-has-tablet-row-gap', $output );
+		$this->assertStringContainsString( '--vp-layout-row-gap-tablet:20px', $output );
+		$this->assertStringNotContainsString( 'vp-has-tablet-gap', $output );
 	}
 
 	/**

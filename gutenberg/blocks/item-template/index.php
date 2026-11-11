@@ -82,7 +82,7 @@ class Visual_Portfolio_Block_Item_Template {
 		// checked are plain lengths, and the screen names are this class's own.
 		foreach ( self::get_screen_queries() as $screen => $query ) {
 			$rules .= sprintf(
-				'%1$s{.wp-block-visual-portfolio-item-template:not(.vp-layout-auto-columns){--vp-layout-current-columns:min(var(--vp-layout-columns, 3), %2$d)}.wp-block-visual-portfolio-item-template.vp-has-%3$s-gap{--vp-layout-gap:var(--vp-layout-gap-%3$s)!important;--vp-layout-row-gap:var(--vp-layout-row-gap-%3$s)!important}}',
+				'%1$s{.wp-block-visual-portfolio-item-template:not(.vp-layout-auto-columns){--vp-layout-current-columns:min(var(--vp-layout-columns, 3), %2$d)}.wp-block-visual-portfolio-item-template.vp-has-%3$s-gap{--vp-layout-gap:var(--vp-layout-gap-%3$s)!important}.wp-block-visual-portfolio-item-template.vp-has-%3$s-row-gap{--vp-layout-row-gap:var(--vp-layout-row-gap-%3$s)!important}}',
 				$query,
 				$steps[ $screen ],
 				$screen
@@ -712,17 +712,18 @@ class Visual_Portfolio_Block_Item_Template {
 		}
 
 		// A gap of its own for a narrower screen, applied by the rules of
-		// `get_screen_rules()`. A length left empty makes the variable those
-		// rules read invalid, which hands the gap back to the theme.
+		// `get_screen_rules()`, each axis by a class of its own: an axis the
+		// theme decides is left to the theme. The rows are written even where
+		// they match the columns, to outweigh a row gap of the desktop's.
 		foreach ( visual_portfolio_get_screen_block_gaps( $attributes['style'] ?? array() ) as $screen => $screen_gap ) {
-			$classes[] = 'vp-has-' . $screen . '-gap';
-
 			if ( '' !== $screen_gap['left'] ) {
-				$styles .= sprintf( '--vp-layout-gap-%1$s:%2$s;', $screen, $screen_gap['left'] );
+				$classes[] = 'vp-has-' . $screen . '-gap';
+				$styles   .= sprintf( '--vp-layout-gap-%1$s:%2$s;', $screen, $screen_gap['left'] );
 			}
 
-			if ( '' !== $screen_gap['top'] && $screen_gap['top'] !== $screen_gap['left'] ) {
-				$styles .= sprintf( '--vp-layout-row-gap-%1$s:%2$s;', $screen, $screen_gap['top'] );
+			if ( '' !== $screen_gap['top'] ) {
+				$classes[] = 'vp-has-' . $screen . '-row-gap';
+				$styles   .= sprintf( '--vp-layout-row-gap-%1$s:%2$s;', $screen, $screen_gap['top'] );
 			}
 		}
 

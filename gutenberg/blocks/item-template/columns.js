@@ -210,16 +210,16 @@ export function getColumnsProps(
 	}
 
 	// A gap of its own for a narrower screen, applied by the rules the server
-	// prints inside the media query of each screen. A length left empty makes
-	// the variable those rules read invalid, which hands the gap to the theme.
+	// prints inside the media query of each screen, each axis by a class of
+	// its own: an axis the theme decides is left to the theme.
 	Object.entries(screenGaps).forEach(([screen, { left, top }]) => {
-		classNames.push(`vp-has-${screen}-gap`);
-
 		if (left) {
+			classNames.push(`vp-has-${screen}-gap`);
 			style[`--vp-layout-gap-${screen}`] = left;
 		}
 
-		if (top && top !== left) {
+		if (top) {
+			classNames.push(`vp-has-${screen}-row-gap`);
 			style[`--vp-layout-row-gap-${screen}`] = top;
 		}
 	});
