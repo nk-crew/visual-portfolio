@@ -49,7 +49,7 @@ import ProNote from '../../components/pro-note';
  * Internal dependencies
  */
 import { getProLabel, ProLine } from '../../components/pro-teaser';
-import getBlockGapValue from '../../utils/block-gap';
+import getBlockGapValue, { getScreenBlockGaps } from '../../utils/block-gap';
 import { CONTROL_BLOCKS } from '../../utils/carousel-controls';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import {
@@ -884,14 +884,15 @@ export default function BlockEdit({
 						: previewColumns.layoutColumnCountMobile,
 				},
 				getBlockGapValue(attributes.style?.spacing?.blockGap),
-				getBlockGapValue(attributes.style?.spacing?.blockGap, 'top')
+				getBlockGapValue(attributes.style?.spacing?.blockGap, 'top'),
+				getScreenBlockGaps(attributes.style)
 			),
 		[
 			layoutType,
 			previewColumns,
 			tilesColumns,
 			singleSlide,
-			attributes.style?.spacing?.blockGap,
+			attributes.style,
 		]
 	);
 

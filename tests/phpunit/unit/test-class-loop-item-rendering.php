@@ -655,6 +655,100 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A block gap set with Responsive editing for one screen reaches that
+	 * screen alone. Core prints a screen's gap through the layout support
+	 * only, which the item template does not have.
+	 *
+	 * @return void
+	 */
+	public function test_a_screen_gap_is_written_for_its_screen() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'style' => array(
+					'spacing' => array( 'blockGap' => '1rem' ),
+					'@tablet' => array( 'spacing' => array( 'blockGap' => '3rem' ) ),
+				),
+			)
+		);
+
+		$this->assertStringContainsString( '--vp-layout-gap:1rem', $output );
+		$this->assertStringContainsString( 'vp-has-tablet-gap', $output );
+		$this->assertStringContainsString( '--vp-layout-gap-tablet:3rem', $output );
+		$this->assertStringNotContainsString( '--vp-layout-row-gap-tablet', $output );
+		$this->assertStringNotContainsString( 'vp-has-mobile-gap', $output );
+	}
+
+	/**
+	 * An axis a screen leaves unset keeps the base value, so rows set apart
+	 * from the columns stay apart.
+	 *
+	 * @return void
+	 */
+	public function test_a_screen_gap_keeps_the_axis_it_leaves_unset() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array(
+				'style' => array(
+					'spacing' => array(
+						'blockGap' => array(
+							'top'  => '2rem',
+							'left' => '1rem',
+						),
+					),
+					'@mobile' => array( 'spacing' => array( 'blockGap' => array( 'left' => '0' ) ) ),
+				),
+			)
+		);
+
+		$this->assertStringContainsString( '--vp-layout-gap-mobile:0px', $output );
+		$this->assertStringContainsString( '--vp-layout-row-gap-mobile:2rem', $output );
+	}
+
+	/**
+	 * The ladder ends at the editor's screens, and a screen's gap outweighs
+	 * the inline one of the gallery.
+	 *
+	 * @return void
+	 */
+	public function test_the_screen_rules_follow_the_editor_breakpoints() {
+		$rules = Visual_Portfolio_Block_Item_Template::get_screen_rules();
+
+		$this->assertStringContainsString(
+			'@media (480px < width <= 782px){.wp-block-visual-portfolio-item-template:not(.vp-layout-auto-columns){--vp-layout-current-columns:min(var(--vp-layout-columns, 3), 2)}',
+			$rules
+		);
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.wp-block-visual-portfolio-item-template:not(.vp-layout-auto-columns){--vp-layout-current-columns:min(var(--vp-layout-columns, 3), 1)}',
+			$rules
+		);
+		$this->assertStringContainsString(
+			'.vp-has-mobile-gap{--vp-layout-gap:var(--vp-layout-gap-mobile)!important;',
+			$rules
+		);
+	}
+
+	/**
+	 * The gap between the blocks of a cover follows its screen too, on the
+	 * panel that holds them.
+	 *
+	 * @return void
+	 */
+	public function test_a_cover_gap_is_written_for_its_screen() {
+		$output = $this->render_loop(
+			sprintf(
+				'<!-- wp:visual-portfolio/item-cover %s --><!-- wp:visual-portfolio/item-title /--><!-- /wp:visual-portfolio/item-cover -->',
+				wp_json_encode( array( 'style' => array( '@mobile' => array( 'spacing' => array( 'blockGap' => '2rem' ) ) ) ) )
+			)
+		);
+
+		$this->assertMatchesRegularExpression(
+			'/class="wp-block-visual-portfolio-item-cover__inner vp-has-mobile-gap"[^>]*style="[^"]*--vp-gap-mobile:2rem/',
+			$output
+		);
+	}
+
+	/**
 	 * The thumbnails are a strip of buttons naming a slide each, in the order
 	 * the slides are in - an item with no picture keeps its place, or every
 	 * press after it would reach the wrong slide.

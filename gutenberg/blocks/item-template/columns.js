@@ -167,9 +167,16 @@ export function getViewportBreakpoints(viewport) {
  * @param {Object} attributes - block attributes.
  * @param {string} blockGap   - resolved block spacing, or an empty string.
  * @param {string} rowGap     - resolved spacing between rows, or an empty string.
+ * @param {Object} screenGaps - resolved spacing of the narrower screens, from
+ *                            `getScreenBlockGaps()`.
  * @return {{className: string, style: Object}} layout props.
  */
-export function getColumnsProps(attributes, blockGap, rowGap = '') {
+export function getColumnsProps(
+	attributes,
+	blockGap,
+	rowGap = '',
+	screenGaps = {}
+) {
 	const isAuto = isAutoColumns(attributes);
 	const classNames = [];
 	const style = {
@@ -201,6 +208,21 @@ export function getColumnsProps(attributes, blockGap, rowGap = '') {
 	if (rowGap && rowGap !== blockGap) {
 		style['--vp-layout-row-gap'] = rowGap;
 	}
+
+	// A gap of its own for a narrower screen, applied by the rules the server
+	// prints inside the media query of each screen. A length left empty makes
+	// the variable those rules read invalid, which hands the gap to the theme.
+	Object.entries(screenGaps).forEach(([screen, { left, top }]) => {
+		classNames.push(`vp-has-${screen}-gap`);
+
+		if (left) {
+			style[`--vp-layout-gap-${screen}`] = left;
+		}
+
+		if (top && top !== left) {
+			style[`--vp-layout-row-gap-${screen}`] = top;
+		}
+	});
 
 	if (isAuto) {
 		classNames.push('vp-layout-auto-columns');

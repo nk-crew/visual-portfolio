@@ -51,6 +51,65 @@ class Visual_Portfolio_Block_Item_Template {
 
 		// editor. Late, so that the editor bundle it attaches to is registered.
 		add_action( 'enqueue_block_assets', array( $this, 'enqueue_tiles_presets' ), 20 );
+
+		// styles. On the page and in the editor canvas alike. Early, so that
+		// Pro's screen counts, printed at the same weight, come after the
+		// ladder steps and win over them.
+		add_action( 'enqueue_block_assets', array( $this, 'add_screen_style' ), 5 );
+	}
+
+	/**
+	 * The rules a narrower screen is drawn by, inside the media query of each
+	 * screen.
+	 *
+	 * The last two steps of the column ladder - two columns at most on a
+	 * tablet, one on a phone - and the gap a gallery was given for a screen.
+	 * Printed with the stylesheet rather than written into it, because a
+	 * stylesheet cannot read the breakpoints of a theme, and these have to
+	 * match the editor's Tablet and Mobile previews. The gap outweighs the
+	 * gallery's own, which is an inline style.
+	 *
+	 * @return string CSS.
+	 */
+	public static function get_screen_rules() {
+		$steps = array(
+			'tablet' => 2,
+			'mobile' => 1,
+		);
+		$rules = '';
+
+		// The queries are built by the editor out of breakpoints it has
+		// checked are plain lengths, and the screen names are this class's own.
+		foreach ( self::get_screen_queries() as $screen => $query ) {
+			$rules .= sprintf(
+				'%1$s{.wp-block-visual-portfolio-item-template:not(.vp-layout-auto-columns){--vp-layout-current-columns:min(var(--vp-layout-columns, 3), %2$d)}.wp-block-visual-portfolio-item-template.vp-has-%3$s-gap{--vp-layout-gap:var(--vp-layout-gap-%3$s)!important;--vp-layout-row-gap:var(--vp-layout-row-gap-%3$s)!important}}',
+				$query,
+				$steps[ $screen ],
+				$screen
+			);
+		}
+
+		return $rules;
+	}
+
+	/**
+	 * Attach the rules of the narrower screens to the stylesheet.
+	 *
+	 * @return void
+	 */
+	public function add_screen_style() {
+		static $added = false;
+
+		if ( $added ) {
+			return;
+		}
+
+		$added = true;
+		$rules = self::get_screen_rules();
+
+		if ( $rules ) {
+			wp_add_inline_style( self::STYLE, $rules );
+		}
 	}
 
 	/**
@@ -650,6 +709,21 @@ class Visual_Portfolio_Block_Item_Template {
 		// Unset or the same, the rows keep the gap of the columns.
 		if ( '' !== $row_gap && $row_gap !== $gap ) {
 			$styles .= sprintf( '--vp-layout-row-gap:%s;', $row_gap );
+		}
+
+		// A gap of its own for a narrower screen, applied by the rules of
+		// `get_screen_rules()`. A length left empty makes the variable those
+		// rules read invalid, which hands the gap back to the theme.
+		foreach ( visual_portfolio_get_screen_block_gaps( $attributes['style'] ?? array() ) as $screen => $screen_gap ) {
+			$classes[] = 'vp-has-' . $screen . '-gap';
+
+			if ( '' !== $screen_gap['left'] ) {
+				$styles .= sprintf( '--vp-layout-gap-%1$s:%2$s;', $screen, $screen_gap['left'] );
+			}
+
+			if ( '' !== $screen_gap['top'] && $screen_gap['top'] !== $screen_gap['left'] ) {
+				$styles .= sprintf( '--vp-layout-row-gap-%1$s:%2$s;', $screen, $screen_gap['top'] );
+			}
 		}
 
 		if ( $is_auto ) {
