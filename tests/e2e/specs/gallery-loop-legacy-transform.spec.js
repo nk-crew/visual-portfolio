@@ -470,17 +470,18 @@ test.describe('Gallery Loop from the legacy block', () => {
 				content_source: '',
 			})
 		).toBe(null);
-		expect(
-			await switchLegacy(page, {
-				block_id: 'legacysocial',
-				content_source: 'social-stream',
-			})
-		).toBe(
-			// Pro registers the source, and the transform with it.
-			(await page.evaluate(() => !!window.VPGutenbergVariables.pro))
-				? expect.anything()
-				: null
-		);
+
+		const social = await switchLegacy(page, {
+			block_id: 'legacysocial',
+			content_source: 'social-stream',
+		});
+
+		// Pro registers the source, and the transform with it.
+		if (await page.evaluate(() => !!window.VPGutenbergVariables.pro)) {
+			expect(social.attributes.queryType).toBe('social-stream');
+		} else {
+			expect(social).toBe(null);
+		}
 	});
 
 	test('an extension gets every legacy setting and decides the result', async ({
