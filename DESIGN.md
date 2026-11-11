@@ -9,3 +9,13 @@ Use the labels, descriptions, defaults and limits registered by the settings API
 Hidden and collapsed controls preserve pending values and submit them through the existing form. Numeric controls allow intermediate typing and use native final validity. Dependency changes never reset values. Group disclosure uses native keyboard behavior. Controls stack at narrow widths, and size fields may share a responsive grid.
 
 Watermarks and the Social Feeds preview are outside this design change.
+
+# Saved Layouts library
+
+The Saved Layouts screen is a core admin page: `@wordpress/admin-ui` `Page` with DataViews, the way core builds Fonts and its own lists. It takes its type, spacing and colors from those components and adds no values of its own beyond the layout preview and the Legacy badge.
+
+Grid is the default view and table the dense one. A card shows a preview, the title, one summary line (source · layout) and usage. Previews draw the arrangement of a layout from its settings in neutral placeholder tones, never images. Legacy layouts carry a yellow Legacy badge; drafts carry their status. Rare actions live in the item menu; destructive ones open a dialog that names the pages a layout is used on.
+
+New layouts are added from one split button whose menu holds the legacy editor. Below the medium breakpoint the button reads Add New and Import becomes an icon button.
+
+In the editor, a setting a synced gallery changed shows a dot, "Changed on this gallery" and a reset icon above its control, in the theme color. The Saved Layout panel sits first in the loop's inspector.
