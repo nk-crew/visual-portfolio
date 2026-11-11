@@ -1,0 +1,40 @@
+.vpf-gallery-import {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 16px;
+	font-size: 12px;
+}
+
+.vpf-gallery-import__line {
+	margin: 0;
+}
+
+.vpf-gallery-import__bar {
+	width: 100%;
+	max-width: none;
+}
+
+.vpf-gallery-import__failed {
+	max-height: 160px;
+	margin: 0;
+	overflow-y: auto;
+	list-style: none;
+
+	li {
+		display: flex;
+		flex-direction: column;
+		margin: 0 0 6px;
+		overflow-wrap: anywhere;
+	}
+
+	span {
+		color: var(--wp-components-color-gray-700, #757575);
+	}
+}
+
+.vpf-gallery-import__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
