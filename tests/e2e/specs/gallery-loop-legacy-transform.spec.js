@@ -348,6 +348,20 @@ test.describe('Gallery Loop from the legacy block', () => {
 		});
 	});
 
+	test('a skin the free plugin does not style keeps the cover overlay', async ({
+		page,
+	}) => {
+		const loop = await switchLegacy(page, {
+			block_id: 'legacycaptionmove',
+			content_source: 'post-based',
+			items_style: 'caption-move',
+		});
+		const cover = find(loop, 'item-cover').attributes;
+
+		expect(cover.effect).toBe('caption-move');
+		expect(cover.customHoverOverlayColor).toBeUndefined();
+	});
+
 	test('a filter with no label for All has no All item', async ({ page }) => {
 		const loop = await switchLegacy(page, {
 			block_id: 'legacynoall',
@@ -488,16 +502,27 @@ test.describe('Gallery Loop from the legacy block', () => {
 		editor,
 		page,
 	}) => {
-		await editor.insertBlock({
-			name: 'visual-portfolio/saved',
-			attributes: { id: String(layoutId) },
-		});
+		// Inserted unselected: the settings load when the block mounts, not
+		// when it is selected, since the switcher caches what it offers.
+		await page.evaluate((id) => {
+			const { dispatch } = window.wp.data;
+
+			dispatch('core/block-editor').insertBlock(
+				window.wp.blocks.createBlock('visual-portfolio/saved', { id }),
+				undefined,
+				undefined,
+				false
+			);
+		}, String(layoutId));
 		await page.waitForFunction(
 			(id) =>
 				window.wp.data
 					.select('visual-portfolio')
 					.hasFinishedResolution('getLayoutOptions', [id]),
 			String(layoutId)
+		);
+		await editor.selectBlocks(
+			editor.canvas.locator('[data-type="visual-portfolio/saved"]')
 		);
 		await editor.showBlockToolbar();
 		await page

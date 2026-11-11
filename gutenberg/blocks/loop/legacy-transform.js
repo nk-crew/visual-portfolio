@@ -26,7 +26,9 @@ const SLIDER_EFFECTS = { slide: 'none', coverflow: 'coverflow', fade: 'fade' };
 
 // What the legacy skins print when no color is picked, in their stylesheets.
 const COVER_TEXT_COLOR = '#fff';
-const COVER_PANEL_COLOR = '#000';
+// The overlay of Fade and Fly and the caption panel of Emerge. A skin Pro adds
+// keeps the cover's own until Pro maps it.
+const COVER_PANEL_COLORS = { fade: '#000', fly: '#000', emerge: '#000' };
 
 const ALIGNMENTS = ['wide', 'full'];
 
@@ -216,7 +218,7 @@ function getLightbox(legacy) {
 
 /**
  * Style of a caption block: its alignment and its colors. The legacy skins
- * color their links as the text unless a links color is picked.
+ * color their links as the text around them unless a links color is picked.
  *
  * @param {string} textAlign - left, center or right.
  * @param {string} color     - text color.
@@ -228,11 +230,11 @@ function getCaptionStyle(textAlign, color, linkColor) {
 		...(textAlign ? { typography: { textAlign } } : {}),
 		...(color ? { color: { text: color } } : {}),
 		elements: {
-			link: { color: { text: linkColor || color || 'inherit' } },
+			link: { color: { text: linkColor || 'inherit' } },
 		},
 	};
 
-	return Object.keys(style).length ? { style } : {};
+	return { style };
 }
 
 /**
@@ -500,7 +502,8 @@ function getCoverBlocks(legacy, skin, click, ratio, radius, queryType) {
 				...getHoverOverlay(
 					(isEmerge
 						? skin.caption_bg_color
-						: skin.overlay_bg_color) || COVER_PANEL_COLOR
+						: skin.overlay_bg_color) ||
+						COVER_PANEL_COLORS[legacy.items_style]
 				),
 				...click,
 				style: {
@@ -512,7 +515,7 @@ function getCoverBlocks(legacy, skin, click, ratio, radius, queryType) {
 				skin,
 				{
 					textAlign,
-					linkColor: isEmerge ? skin.caption_links_color : color,
+					linkColor: skin.caption_links_color,
 					titleLink: { clickAction: 'none' },
 				},
 				queryType
