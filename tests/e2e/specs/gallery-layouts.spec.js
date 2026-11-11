@@ -57,6 +57,7 @@ function getLoopMarkup({
 	carousel = [],
 	carouselOverlay = false,
 	queryId = 1,
+	itemBlocks = '',
 }) {
 	const loop = {
 		block_id: blockId,
@@ -97,6 +98,7 @@ function getLoopMarkup({
 		// the file, and an image forced into a square would be laid out to one
 		// shape and drawn in another.
 		'<!-- wp:visual-portfolio/item-image {"clickAction":"url"} /-->',
+		itemBlocks,
 		carouselOverlay ? carouselNav : '',
 		'<!-- /wp:visual-portfolio/item-template -->',
 		carouselOverlay ? '' : carouselNav,
@@ -282,6 +284,35 @@ test.describe('Gallery Item Template layouts', () => {
 
 		return created.link;
 	}
+
+	test('the blocks of an item are a block gap apart', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - item block gap',
+			blockId: 'e2e-item-block-gap',
+			images: images.map((image) => ({ ...image, title: 'Item title' })),
+			layout: { layoutType: 'grid' },
+			itemBlocks: '<!-- wp:visual-portfolio/item-title /-->',
+		});
+
+		const item = page.locator(ITEM).first();
+		const [image, title, gap] = await Promise.all([
+			item.locator('.wp-block-visual-portfolio-item-image').boundingBox(),
+			item.locator('.wp-block-visual-portfolio-item-title').boundingBox(),
+			page.evaluate(() =>
+				parseFloat(
+					getComputedStyle(document.body).getPropertyValue(
+						'--wp--style--block-gap'
+					)
+				)
+			),
+		]);
+
+		expect(gap).toBeGreaterThan(0);
+		expect(title.y - (image.y + image.height)).toBeCloseTo(gap, 0);
+	});
 
 	test('thumbnails stay in the middle of a centred row', async ({
 		page,

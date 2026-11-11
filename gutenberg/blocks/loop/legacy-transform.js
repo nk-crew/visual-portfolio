@@ -283,7 +283,13 @@ function getCaptionBlocks(
 	const meta = [];
 
 	if (isOn(skin.show_author)) {
-		meta.push(createBlock('visual-portfolio/item-author', style));
+		// The legacy skins print the author's avatar beside the name.
+		meta.push(
+			createBlock('visual-portfolio/item-author', {
+				showAvatar: true,
+				...style,
+			})
+		);
 	}
 
 	if (skin.show_date && !['false', false].includes(skin.show_date)) {
