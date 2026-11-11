@@ -107,7 +107,9 @@ class Visual_Portfolio_Images {
 		}
 
 		// Regenerating without scaling leaves the attached file on the "-scaled" copy while the metadata describes the original.
-		if ( ! empty( wp_get_attachment_metadata( $attachment_id )['original_image'] ) ) {
+		$attached = pathinfo( (string) get_attached_file( $attachment_id, true ), PATHINFO_FILENAME );
+
+		if ( ! empty( wp_get_attachment_metadata( $attachment_id )['original_image'] ) && str_ends_with( $attached, '-scaled' ) ) {
 			return $threshold;
 		}
 

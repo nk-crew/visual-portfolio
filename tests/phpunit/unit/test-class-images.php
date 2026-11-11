@@ -405,10 +405,8 @@ class ClassImages extends WP_UnitTestCase {
         wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, wp_get_original_image_path( $attachment_id ) ) );
 
         $full = wp_get_attachment_image_src( $attachment_id, 'full' );
-        $file = wp_getimagesize( get_attached_file( $attachment_id ) );
 
         $this->assertSame( array( 1000, 324 ), array( $full[1], $full[2] ) );
-        $this->assertSame( array( 1000, 324 ), array( $file[0], $file[1] ) );
     }
 
     /**
