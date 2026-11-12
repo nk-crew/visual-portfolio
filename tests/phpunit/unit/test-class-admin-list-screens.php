@@ -29,8 +29,21 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 			$this->registered_portfolio = true;
 		}
 
-		register_post_type( 'vpf_test_item', array( 'label' => 'Test Items' ) );
-		register_taxonomy( 'vpf_test_group', 'vpf_test_item', array( 'label' => 'Test Groups' ) );
+		register_post_type(
+			'vpf_test_item',
+			array(
+				'label'   => 'Test Items',
+				'show_ui' => true,
+			)
+		);
+		register_taxonomy(
+			'vpf_test_group',
+			'vpf_test_item',
+			array(
+				'label'   => 'Test Groups',
+				'show_ui' => true,
+			)
+		);
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 	}
 
@@ -182,6 +195,94 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'aria-label="Test Items"', $groups );
 		$this->assertStringContainsString( 'taxonomy=vpf_test_group" aria-current="page">Groups</a>', $groups );
 		$this->assertSame( ' vpf-admin-list-screen', $this->body_class_on( 'edit-vpf_test_group' ) );
+	}
+
+	/**
+	 * A user who can edit the items but cannot manage the groups gets no
+	 * Groups tab, unless the groups are the screen on view, and no tab for a
+	 * taxonomy WordPress shows no screen for.
+	 */
+	public function test_tabs_leave_out_screens_the_user_cannot_open() {
+		register_taxonomy(
+			'vpf_test_label',
+			'vpf_test_item',
+			array(
+				'label'        => 'Test Labels',
+				'show_ui'      => true,
+				'capabilities' => array( 'manage_terms' => 'edit_posts' ),
+			)
+		);
+		register_taxonomy(
+			'vpf_test_hidden',
+			'vpf_test_item',
+			array(
+				'label'        => 'Test Hidden',
+				'show_ui'      => false,
+				'capabilities' => array( 'manage_terms' => 'edit_posts' ),
+			)
+		);
+		add_filter(
+			'vpf_admin_list_screens',
+			function ( $screens ) {
+				$sections   = $this->test_sections();
+				$sections[] = array(
+					'label'    => 'Labels',
+					'url'      => 'http://example.org/wp-admin/edit-tags.php?taxonomy=vpf_test_label',
+					'taxonomy' => 'vpf_test_label',
+				);
+				$sections[] = array(
+					'label'    => 'Hidden',
+					'url'      => 'http://example.org/wp-admin/edit-tags.php?taxonomy=vpf_test_hidden',
+					'taxonomy' => 'vpf_test_hidden',
+				);
+
+				$screens[] = array(
+					'post_type' => 'vpf_test_item',
+					'sections'  => $sections,
+				);
+				$screens[] = array(
+					'taxonomy' => 'vpf_test_group',
+					'sections' => $sections,
+				);
+
+				return $screens;
+			}
+		);
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'author' ) ) );
+
+		$items  = $this->header_on( 'edit-vpf_test_item' );
+		$groups = $this->header_on( 'edit-vpf_test_group' );
+
+		unregister_taxonomy( 'vpf_test_label' );
+		unregister_taxonomy( 'vpf_test_hidden' );
+
+		$this->assertStringContainsString( 'aria-current="page">Items</a><a href="http://example.org/wp-admin/edit-tags.php?taxonomy=vpf_test_label">Labels</a></nav>', $items );
+		$this->assertStringNotContainsString( 'Groups', $items );
+		$this->assertStringContainsString( 'aria-current="page">Groups</a>', $groups );
+	}
+
+	/**
+	 * With one tab left for the user, the header prints no tab bar, as for a
+	 * screen with no sections.
+	 */
+	public function test_one_tab_left_prints_no_tab_bar() {
+		add_filter(
+			'vpf_admin_list_screens',
+			function ( $screens ) {
+				$screens[] = array(
+					'post_type' => 'vpf_test_item',
+					'sections'  => $this->test_sections(),
+				);
+
+				return $screens;
+			}
+		);
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'author' ) ) );
+
+		$items = $this->header_on( 'edit-vpf_test_item' );
+
+		$this->assertStringContainsString( '<h1>Test Items</h1>', $items );
+		$this->assertStringNotContainsString( 'vpf-admin-page__sections', $items );
 	}
 
 	/**
