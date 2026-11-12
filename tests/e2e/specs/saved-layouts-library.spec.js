@@ -7,6 +7,7 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
  * Internal dependencies
  */
 import { deleteAllSavedLayouts } from '../utils/delete-all-saved-layouts';
+import { getFixturePath } from '../utils/fixture-path';
 import { getPluginSlug } from '../utils/plugin-slug';
 
 const LIBRARY = ['admin.php', 'page=vpf-saved-layouts-wp-admin'];
@@ -102,6 +103,78 @@ test.describe('Saved Layouts library', () => {
 		await expect(masonry).toContainText('1 page · 1 synced');
 		await expect(legacy).toContainText('Legacy');
 		await expect(legacy).toContainText('Not used yet');
+	});
+
+	test('previews a layout as a page renders it', async ({
+		admin,
+		page,
+		requestUtils,
+	}) => {
+		const image = await requestUtils.uploadMedia(
+			getFixturePath('image-800x600.png')
+		);
+
+		await requestUtils.rest({
+			method: 'POST',
+			path: '/wp/v2/vp_lists',
+			data: {
+				title: 'Library Photos',
+				status: 'publish',
+				content: loopMarkup(
+					{
+						queryType: 'images',
+						imagesQuery: { images: [{ id: image.id }] },
+					},
+					{ layoutType: 'grid' }
+				).replace(
+					'<!-- wp:visual-portfolio/item-title /-->',
+					'<!-- wp:visual-portfolio/item-image /-->'
+				),
+			},
+		});
+
+		// A table row is too small for a gallery, so it keeps the schematic.
+		await admin.visitAdminPage(...LIBRARY);
+		await expect(page.locator('.vpf-library-preview__frame')).toHaveCount(
+			0
+		);
+
+		await page.evaluate(() =>
+			window.localStorage.setItem(
+				'vpf-saved-layouts-view-v1',
+				JSON.stringify({ type: 'grid' })
+			)
+		);
+		await admin.visitAdminPage(...LIBRARY);
+
+		const card = page
+			.locator('.dataviews-view-grid__card')
+			.filter({ hasText: 'Library Photos' });
+		const frame = card.locator('.vpf-library-preview__frame');
+
+		await expect(
+			card.locator('.vpf-library-preview.is-ready')
+		).toBeVisible();
+		await expect(
+			card
+				.frameLocator('.vpf-library-preview__frame')
+				.locator('.wp-block-visual-portfolio-item-template__item img')
+		).toHaveCount(1);
+
+		// A layout with no items keeps the schematic.
+		await expect(
+			page
+				.locator('.dataviews-view-grid__card')
+				.filter({ hasText: 'Library Masonry' })
+				.locator('.vpf-library-preview.is-empty')
+		).toBeVisible();
+
+		// The preview URL is the user's own.
+		const url = new URL(await frame.getAttribute('src'));
+
+		url.searchParams.set('_wpnonce', 'invalid');
+
+		expect((await page.request.get(url.href)).status()).toBe(403);
 	});
 
 	test('duplicates a layout', async ({ page }) => {

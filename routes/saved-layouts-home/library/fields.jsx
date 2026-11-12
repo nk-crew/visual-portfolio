@@ -133,9 +133,7 @@ export const fields = [
 	{
 		id: 'preview',
 		label: __('Preview', 'visual-portfolio'),
-		render: ({ item }) => (
-			<LayoutPreview preview={item.vpf_layout?.preview} />
-		),
+		render: ({ item }) => <LayoutPreview item={item} />,
 		enableSorting: false,
 		enableHiding: false,
 	},

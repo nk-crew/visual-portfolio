@@ -118,6 +118,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 				'usage'      => self::$counts[ $id ],
 				'usageReady' => (bool) get_option( Visual_Portfolio_Saved_Layout_Usage::INDEXED_OPTION ),
 				'editUrl'    => get_edit_post_link( $id, 'raw' ),
+				'previewUrl' => Visual_Portfolio_Saved_Layout_Preview::get_url( $id ),
 			)
 		);
 	}

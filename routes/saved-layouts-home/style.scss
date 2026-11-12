@@ -1,15 +1,52 @@
-// Previews draw the shape of a layout, not its pictures, in the neutral
-// tones core uses for pattern placeholders.
+// A preview is the layout rendered on a page, scaled down. Its schematic,
+// drawn from the settings in the neutral tones core uses for pattern
+// placeholders, shows while the page loads and when the layout has no items.
 .vpf-library-preview {
+	position: relative;
 	box-sizing: border-box;
 	width: 100%;
 	aspect-ratio: 1;
-	padding: 10%;
 	overflow: hidden;
 	background: #f6f6f6;
 
+	&.is-ready {
+		background: #fff;
+	}
+}
+
+.vpf-library-preview__schematic {
+	position: absolute;
+	inset: 0;
+	box-sizing: border-box;
+	padding: 10%;
+
 	> div {
 		height: 100%;
+	}
+
+	.is-ready > & {
+		visibility: hidden;
+		transition: visibility 0s 0.2s;
+	}
+}
+
+.vpf-library-preview__frame {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: #fff;
+	border: 0;
+	opacity: 0;
+	transform-origin: 0 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease-out;
+
+	.is-ready > & {
+		opacity: 1;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
 	}
 }
 

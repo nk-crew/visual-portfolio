@@ -1,3 +1,15 @@
+import { useEffect, useRef, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+
+// Width of the page a layout is rendered on, so a gallery takes its desktop
+// columns however small its preview is drawn. Core previews patterns at the
+// same width.
+const VIEWPORT_WIDTH = 1200;
+
+// Below this width a preview is a thumbnail of a table or list row, where the
+// schematic reads better than a gallery a few pixels wide.
+const MIN_LIVE_WIDTH = 120;
+
 // Relative heights of masonry tiles and widths of justified ones, so a
 // preview shows the shape of its layout without any images.
 const MASONRY = [1.35, 0.8, 1.1, 0.75, 1.25, 0.95, 1.15, 0.7, 1.05];
@@ -28,7 +40,7 @@ function tiles(count, styles = () => undefined) {
  * @param {Object} props.preview - `{ type, columns }` of the layout.
  * @return {Element} component.
  */
-export default function LayoutPreview({ preview }) {
+function LayoutSchematic({ preview }) {
 	const type = preview?.type || 'grid';
 	const columns = Math.min(
 		Math.max(parseInt(preview?.columns, 10) || 3, 1),
@@ -81,9 +93,110 @@ export default function LayoutPreview({ preview }) {
 			);
 	}
 
+	return <div className="vpf-library-preview__schematic">{content}</div>;
+}
+
+/**
+ * Width of an element, followed as it resizes.
+ *
+ * @return {Array} `[ ref, width ]`.
+ */
+function useWidth() {
+	const ref = useRef(null);
+	const [width, setWidth] = useState(0);
+
+	useEffect(() => {
+		const element = ref.current;
+
+		if (!element) {
+			return;
+		}
+
+		const observer = new window.ResizeObserver(([entry]) =>
+			setWidth(entry.contentRect.width)
+		);
+
+		observer.observe(element);
+
+		return () => observer.disconnect();
+	}, []);
+
+	return [ref, width];
+}
+
+/**
+ * Preview of a layout: the gallery as a page renders it, scaled to the
+ * preview, over its schematic until it loads. A layout that shows no items
+ * keeps the schematic.
+ *
+ * @param {Object} props      - component props.
+ * @param {Object} props.item - layout record.
+ * @return {Element} component.
+ */
+export default function LayoutPreview({ item }) {
+	const layout = item.vpf_layout;
+	const [ref, width] = useWidth();
+	const frame = useRef(null);
+	const [state, setState] = useState('loading');
+	const [height, setHeight] = useState(VIEWPORT_WIDTH);
+	const url = layout?.previewUrl;
+	const isLive = !!url && width >= MIN_LIVE_WIDTH;
+	const scale = width / VIEWPORT_WIDTH;
+
+	// A gallery shorter than the preview sits in its middle, as core
+	// centres a short pattern.
+	const offset = Math.max(0, (width - height * scale) / 2);
+
+	useEffect(() => {
+		setState('loading');
+	}, [url]);
+
+	useEffect(() => {
+		if (!isLive) {
+			return;
+		}
+
+		const onMessage = (event) => {
+			if (
+				event.source === frame.current?.contentWindow &&
+				'vpf-layout-preview' === event.data?.type
+			) {
+				setState(event.data.empty ? 'empty' : 'ready');
+				setHeight(event.data.height || VIEWPORT_WIDTH);
+			}
+		};
+
+		window.addEventListener('message', onMessage);
+
+		return () => window.removeEventListener('message', onMessage);
+	}, [isLive]);
+
 	return (
-		<div className="vpf-library-preview" aria-hidden="true">
-			{content}
+		<div
+			ref={ref}
+			className={`vpf-library-preview is-${isLive ? state : 'schematic'}`}
+			aria-hidden="true"
+		>
+			<LayoutSchematic preview={layout?.preview} />
+			{isLive && 'empty' !== state && (
+				<iframe
+					ref={frame}
+					className="vpf-library-preview__frame"
+					src={url}
+					title={sprintf(
+						// translators: %s - layout name.
+						__('Preview of %s', 'visual-portfolio'),
+						item.title?.raw || item.title?.rendered || ''
+					)}
+					loading="lazy"
+					tabIndex={-1}
+					style={{
+						width: VIEWPORT_WIDTH,
+						height: VIEWPORT_WIDTH,
+						transform: `translateY(${offset}px) scale(${scale})`,
+					}}
+				/>
+			)}
 		</div>
 	);
 }
