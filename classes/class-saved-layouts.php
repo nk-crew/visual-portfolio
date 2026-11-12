@@ -371,10 +371,13 @@ class Visual_Portfolio_Saved_Layouts {
 	/**
 	 * A layout block with the loop's overridden attributes on top.
 	 *
-	 * Item blocks are dynamic, but a block that saves markup keeps the loop's
-	 * markup once one of its attributes is overridden, so the markup matches
-	 * the attributes. The structure under the item template is the layout's
-	 * on both sides, so the markup's inner block slots still line up.
+	 * A block that saves markup of its own, such as a paragraph or a group,
+	 * holds part of its settings in that markup, so once any of its attributes
+	 * is overridden it is the loop's block whole: attributes and markup. Its
+	 * inner blocks are still merged one by one. Markup is tested rather than
+	 * `is_dynamic()`, because core's heading, button and image save markup and
+	 * also have a render callback. Item blocks save none, so an override takes
+	 * only the attributes it lists.
 	 *
 	 * @param array $layout_block - block from the layout.
 	 * @param array $own_blocks - the loop's blocks, keyed by sync key.
@@ -388,11 +391,15 @@ class Visual_Portfolio_Saved_Layouts {
 		if ( $key && ! empty( $overrides[ $key ] ) && isset( $own_blocks[ $key ] ) ) {
 			$own = $own_blocks[ $key ];
 
-			foreach ( $overrides[ $key ] as $name ) {
-				if ( array_key_exists( $name, $own['attrs'] ) ) {
-					$layout_block['attrs'][ $name ] = $own['attrs'][ $name ];
-				} else {
-					unset( $layout_block['attrs'][ $name ] );
+			if ( '' !== trim( $layout_block['innerHTML'] ) ) {
+				$layout_block['attrs'] = $own['attrs'];
+			} else {
+				foreach ( $overrides[ $key ] as $name ) {
+					if ( array_key_exists( $name, $own['attrs'] ) ) {
+						$layout_block['attrs'][ $name ] = $own['attrs'][ $name ];
+					} else {
+						unset( $layout_block['attrs'][ $name ] );
+					}
 				}
 			}
 

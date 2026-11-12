@@ -235,8 +235,15 @@ export function getMergedAttributes(layoutBlock, ownBlocks, overrides) {
 	const key = getSyncKey(layoutBlock);
 	const attributes = { ...layoutBlock.attributes };
 	const own = key && ownBlocks[key];
+	const names = own ? overrides[key] || [] : [];
 
-	(own ? overrides[key] || [] : []).forEach((name) => {
+	// `originalContent` is the markup `parse()` read, the `innerHTML` the PHP
+	// merge tests.
+	if (names.length && layoutBlock.originalContent) {
+		return { ...own.attributes };
+	}
+
+	names.forEach((name) => {
 		attributes[name] = own.attributes[name];
 	});
 

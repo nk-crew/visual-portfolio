@@ -1430,7 +1430,12 @@ and the blocks around the item template. Blocks are matched by
 template and `save_post` fills in where it is missing, derived from the block's
 position. `overrides` lists, per sync key, the attributes the loop changed; their
 values are the loop's own, or the block default when the loop's block no longer
-carries one. The reserved key `loop` holds the loop's own synced attributes.
+carries one. A block that saves markup of its own, such as a paragraph, a
+heading or a group, keeps part of its settings in that markup, so once any of
+its attributes is overridden the loop's block is used whole, every attribute
+and its markup; the blocks inside it are still merged one by one. Item blocks
+save no markup of their own and take only the attributes listed. The reserved
+key `loop` holds the loop's own synced attributes.
 
 The merge runs on `render_block_data`, so a change to the layout reaches every
 page on its next render. In the editor the same merge is applied when the page

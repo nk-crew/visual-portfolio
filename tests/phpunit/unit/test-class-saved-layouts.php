@@ -66,11 +66,13 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 	 *
 	 * @param array  $loop - loop attributes.
 	 * @param array  $template - item template attributes.
-	 * @param string $items - serialized blocks inside the item template.
+	 * @param string $items - serialized blocks inside the item template, an item title when omitted.
 	 *
 	 * @return string
 	 */
-	private function loop_markup( $loop, $template, $items = '<!-- wp:visual-portfolio/item-title {"metadata":{"vpSyncKey":"title"}} /-->' ) {
+	private function loop_markup( $loop, $template, $items = null ) {
+		$items = $items ?? '<!-- wp:visual-portfolio/item-title {"metadata":{"vpSyncKey":"title"}} /-->';
+
 		return sprintf(
 			'<!-- wp:visual-portfolio/loop %1$s --><div class="wp-block-visual-portfolio-loop vp-block-loop"><!-- wp:visual-portfolio/item-template %2$s -->%3$s<!-- /wp:visual-portfolio/item-template --></div><!-- /wp:visual-portfolio/loop -->',
 			wp_json_encode( (object) $loop ),
@@ -100,11 +102,12 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 	/**
 	 * A published block-based layout: masonry, four columns, item titles.
 	 *
-	 * @param array $template - item template attributes on top of the defaults.
+	 * @param array       $template - item template attributes on top of the defaults.
+	 * @param string|null $items - serialized blocks inside the item template.
 	 *
 	 * @return int
 	 */
-	private function create_layout( $template = array() ) {
+	private function create_layout( $template = array(), $items = null ) {
 		return self::factory()->post->create(
 			array(
 				'post_type'    => 'vp_lists',
@@ -119,7 +122,8 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 							'metadata'          => array( 'vpSyncKey' => 'template' ),
 						),
 						$template
-					)
+					),
+					$items
 				),
 			)
 		);
@@ -128,13 +132,14 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 	/**
 	 * Render a page loop synced with a layout.
 	 *
-	 * @param int   $layout - layout id.
-	 * @param array $overrides - overridden attributes by sync key.
-	 * @param array $template - the page loop's own item template attributes.
+	 * @param int         $layout - layout id.
+	 * @param array       $overrides - overridden attributes by sync key.
+	 * @param array       $template - the page loop's own item template attributes.
+	 * @param string|null $items - the page loop's own blocks inside the item template.
 	 *
 	 * @return string
 	 */
-	private function render_synced( $layout, $overrides = array(), $template = array() ) {
+	private function render_synced( $layout, $overrides = array(), $template = array(), $items = null ) {
 		$loop = array_merge(
 			$this->images_loop( self::$own_images, 'page' ),
 			array(
@@ -148,7 +153,8 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 		return do_blocks(
 			$this->loop_markup(
 				$loop,
-				array_merge( array( 'metadata' => array( 'vpSyncKey' => 'template' ) ), $template )
+				array_merge( array( 'metadata' => array( 'vpSyncKey' => 'template' ) ), $template ),
+				$items
 			)
 		);
 	}
@@ -302,6 +308,70 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 
 		$default = $this->render_synced( $layout, array( 'template' => array( 'layoutColumnCount' ) ) );
 		$this->assertStringContainsString( '--vp-layout-columns:3"', $default );
+	}
+
+	/**
+	 * A block that saves markup renders the page's markup once anything in it
+	 * is overridden, and the layout's otherwise. A heading counts, although
+	 * core gives it a render callback.
+	 */
+	public function test_overridden_static_block_renders_page_markup() {
+		$layout = $this->create_layout(
+			array(),
+			'<!-- wp:paragraph {"metadata":{"vpSyncKey":"text"},"className":"layout-text","style":{"elements":{"link":{"color":{"text":"#ff0000"}}}}} --><p class="layout-text">Layout text</p><!-- /wp:paragraph --><!-- wp:heading {"metadata":{"vpSyncKey":"heading"}} --><h2 class="wp-block-heading">Layout heading</h2><!-- /wp:heading -->'
+		);
+		$items  = '<!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Page text</p><!-- /wp:paragraph --><!-- wp:heading {"metadata":{"vpSyncKey":"heading"}} --><h2 class="wp-block-heading">Page heading</h2><!-- /wp:heading -->';
+
+		$own = $this->render_synced(
+			$layout,
+			array(
+				'text'    => array( 'content' ),
+				'heading' => array( 'content' ),
+			),
+			array(),
+			$items
+		);
+		$this->assertStringContainsString( 'Page text', $own );
+		$this->assertStringContainsString( 'Page heading', $own );
+		$this->assertStringNotContainsString( 'Layout text', $own );
+		$this->assertStringNotContainsString( 'layout-text', $own );
+		$this->assertStringNotContainsString( 'wp-elements-', $own );
+		$this->assertStringNotContainsString( 'Layout heading', $own );
+
+		$synced = $this->render_synced( $layout, array(), array(), $items );
+		$this->assertMatchesRegularExpression( '/<p class="[^"]*layout-text[^"]*wp-elements-[^"]*">Layout text</', $synced );
+		$this->assertStringContainsString( 'Layout heading', $synced );
+		$this->assertStringNotContainsString( 'Page text', $synced );
+	}
+
+	/**
+	 * An overridden group is the page's block, every attribute and its markup,
+	 * while the blocks inside it still follow the layout.
+	 */
+	public function test_overridden_group_keeps_merging_inner_blocks() {
+		$template = array( 'metadata' => array( 'vpSyncKey' => 'template' ) );
+		$layout   = parse_blocks(
+			$this->loop_markup(
+				array(),
+				$template,
+				'<!-- wp:group {"metadata":{"vpSyncKey":"group"},"className":"layout-group"} --><div class="wp-block-group layout-group"><!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Layout text</p><!-- /wp:paragraph --></div><!-- /wp:group -->'
+			)
+		)[0];
+		$loop     = parse_blocks(
+			$this->loop_markup(
+				array( 'savedLayout' => array( 'overrides' => array( 'group' => array( 'className' ) ) ) ),
+				$template,
+				'<!-- wp:group {"metadata":{"vpSyncKey":"group"},"className":"page-group","tagName":"section"} --><section class="wp-block-group page-group"><!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Page text</p><!-- /wp:paragraph --></section><!-- /wp:group -->'
+			)
+		)[0];
+
+		$merged = Visual_Portfolio_Saved_Layouts::find_block( Visual_Portfolio_Saved_Layouts::apply_layout( $loop, $layout, false )['innerBlocks'], 'core/group' );
+		$own    = Visual_Portfolio_Saved_Layouts::find_block( $loop['innerBlocks'], 'core/group' );
+
+		$this->assertSame( $own['attrs'], $merged['attrs'] );
+		$this->assertSame( $own['innerContent'], $merged['innerContent'] );
+		$this->assertSame( '<p>Layout text</p>', $merged['innerBlocks'][0]['innerHTML'] );
+		$this->assertMatchesRegularExpression( '/^<section class="wp-block-group page-group">.*Layout text/', render_block( $merged ) );
 	}
 
 	/**
