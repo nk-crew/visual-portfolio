@@ -707,6 +707,13 @@ const newConfig = {
 		clean: {
 			keep: shouldKeepOnClean,
 		},
+		// webpack derives these from the browserslist target and would put
+		// `Object.hasOwn` and `||=` into the runtime of bundles Babel keeps ES5.
+		environment: {
+			...defaultConfig.output.environment,
+			hasOwn: false,
+			logicalAssignment: false,
+		},
 	},
 	infrastructureLogging: isQuietBuild
 		? {
