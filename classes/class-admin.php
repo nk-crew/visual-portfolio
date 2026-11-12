@@ -242,7 +242,10 @@ class Visual_Portfolio_Admin {
 		 * - `sections` (array, optional): the underline tabs under the title, each
 		 *   with `label`, `url`, and the `taxonomy` or `post_type` of the screen it
 		 *   opens, which marks the tab of the screen on view. Screens that share
-		 *   tabs list the same sections. The tab bar's accessible name is the
+		 *   tabs list the same sections. A tab is printed only for the screen on
+		 *   view and for screens the current user can open (the post type's
+		 *   `edit_posts` or the taxonomy's `manage_terms` capability), and the tab
+		 *   bar only when two tabs or more remain. Its accessible name is the
 		 *   title of the first section's screen.
 		 * - `actions` (array, optional): buttons on the right of the title, each
 		 *   with `label` and `url`, the first one primary. They are printed as
@@ -360,6 +363,26 @@ class Visual_Portfolio_Admin {
 	}
 
 	/**
+	 * Whether the current user passes the check WordPress's `edit.php` or
+	 * `edit-tags.php` makes before it shows a list screen.
+	 *
+	 * @param string $key - `post:<post type>` or `term:<taxonomy>`.
+	 *
+	 * @return bool
+	 */
+	private static function current_user_can_open( $key ) {
+		list( $type, $name ) = explode( ':', $key, 2 );
+
+		$object = 'post' === $type ? get_post_type_object( $name ) : get_taxonomy( $name );
+
+		if ( ! $object ) {
+			return false;
+		}
+
+		return current_user_can( 'post' === $type ? $object->cap->edit_posts : $object->cap->manage_terms );
+	}
+
+	/**
 	 * Print the frame's header on the list screens of `vpf_admin_list_screens`.
 	 * The screen's own title and Add New link are hidden by the stylesheet.
 	 */
@@ -394,8 +417,14 @@ class Visual_Portfolio_Admin {
 			);
 		}
 
+		$tabs = array();
+
 		foreach ( $list['sections'] as $section ) {
-			$sections .= sprintf(
+			if ( $section['key'] !== $list['key'] && ! self::current_user_can_open( $section['key'] ) ) {
+				continue;
+			}
+
+			$tabs[] = sprintf(
 				'<a href="%1$s"%2$s>%3$s</a>',
 				esc_url( $section['url'] ),
 				$section['key'] === $list['key'] ? ' aria-current="page"' : '',
@@ -403,8 +432,8 @@ class Visual_Portfolio_Admin {
 			);
 		}
 
-		if ( $sections ) {
-			$sections = '<nav class="vpf-admin-page__sections" aria-label="' . esc_attr( $list['sections_label'] ) . '">' . $sections . '</nav>';
+		if ( count( $tabs ) > 1 ) {
+			$sections = '<nav class="vpf-admin-page__sections" aria-label="' . esc_attr( $list['sections_label'] ) . '">' . implode( '', $tabs ) . '</nav>';
 		}
 
 		echo '<div class="vpf-admin-page">';
