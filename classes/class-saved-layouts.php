@@ -419,9 +419,13 @@ class Visual_Portfolio_Saved_Layouts {
 			if ( count( $own['innerBlocks'] ) === count( $layout_block['innerBlocks'] ) ) {
 				$layout_block['innerHTML']    = $own['innerHTML'];
 				$layout_block['innerContent'] = $own['innerContent'];
-			} elseif ( $saves_markup && $own['innerContent'] ) {
-				$layout_block['innerContent'] = self::wrap_slots( $own['innerContent'], $layout_block['innerContent'] );
-				$layout_block['innerHTML']    = implode( '', array_filter( $layout_block['innerContent'], 'is_string' ) );
+			} elseif ( $saves_markup ) {
+				$own_content = in_array( null, $own['innerContent'], true ) ? $own['innerContent'] : self::open_slot( $own['innerContent'], $layout_block['innerContent'] );
+
+				if ( $own_content ) {
+					$layout_block['innerContent'] = self::wrap_slots( $own_content, $layout_block['innerContent'] );
+					$layout_block['innerHTML']    = implode( '', array_filter( $layout_block['innerContent'], 'is_string' ) );
+				}
 			}
 		}
 
@@ -463,21 +467,13 @@ class Visual_Portfolio_Saved_Layouts {
 	 * The page's markup around the layout's inner block slots: what the editor
 	 * saves for the page's attributes once the layout's inner blocks changed.
 	 *
-	 * @param array $own - the loop block's inner content, not empty.
+	 * @param array $own - the loop block's inner content, with at least one slot.
 	 * @param array $layout - the layout block's inner content.
 	 *
 	 * @return array
 	 */
 	private static function wrap_slots( $own, $layout ) {
-		$own_slots = array_keys( $own, null, true );
-
-		// A block saved with no inner blocks is one chunk, the wrapper opened and closed.
-		if ( ! $own_slots ) {
-			$split     = (int) strrpos( $own[0], '</' );
-			$own       = array( substr( $own[0], 0, $split ), null, substr( $own[0], $split ) );
-			$own_slots = array( 1 );
-		}
-
+		$own_slots    = array_keys( $own, null, true );
 		$layout_slots = array_keys( $layout, null, true );
 		$inner        = $layout_slots ? array_slice( $layout, $layout_slots[0], end( $layout_slots ) - $layout_slots[0] + 1 ) : array();
 
@@ -486,6 +482,35 @@ class Visual_Portfolio_Saved_Layouts {
 			$inner,
 			array_slice( $own, end( $own_slots ) + 1 )
 		);
+	}
+
+	/**
+	 * The markup of a block the loop saved with no inner blocks, with a slot
+	 * where the layout's inner blocks go: right after an opening tag and
+	 * before as many closing tags as the layout has after its last slot.
+	 * Null when the layout has other markup after that slot, such as a
+	 * quote's citation, or the loop's markup opens no element there, since
+	 * only the block's save() knows where its inner blocks go then.
+	 *
+	 * @param array $own - the loop block's inner content, without a slot.
+	 * @param array $layout - the layout block's inner content, with at least one slot.
+	 *
+	 * @return array|null
+	 */
+	private static function open_slot( $own, $layout ) {
+		$after = implode( '', array_slice( $layout, max( array_keys( $layout, null, true ) ) + 1 ) );
+
+		if ( 1 !== count( $own ) || ! preg_match( '/^(?:\s*<\/[a-z][a-z0-9-]*>)+\s*$/i', $after ) ) {
+			return null;
+		}
+
+		$closing = '(?:\s*<\/[a-z][a-z0-9-]*>){' . substr_count( $after, '</' ) . '}\s*';
+
+		if ( ! preg_match( '/^(.*<[a-z][^>]*(?<!\/)>)(' . $closing . ')$/is', $own[0], $parts ) ) {
+			return null;
+		}
+
+		return array( $parts[1], null, $parts[2] );
 	}
 
 	/**

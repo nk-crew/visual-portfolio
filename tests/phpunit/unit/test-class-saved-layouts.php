@@ -388,39 +388,50 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 	}
 
 	/**
-	 * An overridden group the page saved empty wraps the blocks the layout
+	 * An overridden block the page saved empty wraps the blocks the layout
 	 * later put in it with the page's markup, and a detached loop saves it
-	 * that way, the markup the editor saves for the page's attributes.
+	 * that way, the markup the editor saves for the page's attributes. Where
+	 * the layout has other markup after its inner blocks, such as a quote's
+	 * citation, the layout's markup stays, since only the block's save()
+	 * knows where its inner blocks go.
 	 */
-	public function test_overridden_empty_group_wraps_layout_blocks() {
+	public function test_overridden_empty_block_wraps_layout_blocks() {
 		$template = array( 'metadata' => array( 'vpSyncKey' => 'template' ) );
-		$layout   = parse_blocks(
-			$this->loop_markup(
-				array(),
-				$template,
-				'<!-- wp:group {"metadata":{"vpSyncKey":"group"},"className":"layout-group"} --><div class="wp-block-group layout-group"><!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Layout text</p><!-- /wp:paragraph --></div><!-- /wp:group -->'
-			)
-		)[0];
-		$own      = '<!-- wp:group {"metadata":{"vpSyncKey":"group"},"className":"page-group","tagName":"section"} --><section class="wp-block-group page-group"></section><!-- /wp:group -->';
-		$loop     = parse_blocks(
-			$this->loop_markup(
-				array( 'savedLayout' => array( 'overrides' => array( 'group' => array( 'className' ) ) ) ),
-				$template,
-				$own
-			)
-		)[0];
-
-		$merged = Visual_Portfolio_Saved_Layouts::find_block( Visual_Portfolio_Saved_Layouts::apply_layout( $loop, $layout, false )['innerBlocks'], 'core/group' );
-
-		$this->assertSame( parse_blocks( $own )[0]['attrs'], $merged['attrs'] );
-		$this->assertMatchesRegularExpression( '/^<section class="wp-block-group page-group">.*Layout text.*<\/section>$/s', render_block( $merged ) );
-
-		$detached = Visual_Portfolio_Saved_Layouts::find_block( Visual_Portfolio_Saved_Layout_Usage::detach_loop( $loop, $layout, false )['innerBlocks'], 'core/group' );
-
-		$this->assertSame(
-			'<!-- wp:group {"metadata":{"vpSyncKey":"group"},"className":"page-group","tagName":"section"} --><section class="wp-block-group page-group"><!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Layout text</p><!-- /wp:paragraph --></section><!-- /wp:group -->',
-			serialize_block( $detached )
+		$text     = '<!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Layout text</p><!-- /wp:paragraph -->';
+		$rows     = array(
+			'group' => array(
+				'<!-- wp:group {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><div class="wp-block-group layout-box">' . $text . '</div><!-- /wp:group -->',
+				'<!-- wp:group {"metadata":{"vpSyncKey":"box"},"className":"page-box","tagName":"section"} --><section class="wp-block-group page-box"></section><!-- /wp:group -->',
+				'<!-- wp:group {"metadata":{"vpSyncKey":"box"},"className":"page-box","tagName":"section"} --><section class="wp-block-group page-box">' . $text . '</section><!-- /wp:group -->',
+			),
+			'cover' => array(
+				'<!-- wp:cover {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><div class="wp-block-cover layout-box"><span aria-hidden="true" class="wp-block-cover__background"></span><div class="wp-block-cover__inner-container">' . $text . '</div></div><!-- /wp:cover -->',
+				'<!-- wp:cover {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><div class="wp-block-cover page-box"><span aria-hidden="true" class="wp-block-cover__background"></span><div class="wp-block-cover__inner-container"></div></div><!-- /wp:cover -->',
+				'<!-- wp:cover {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><div class="wp-block-cover page-box"><span aria-hidden="true" class="wp-block-cover__background"></span><div class="wp-block-cover__inner-container">' . $text . '</div></div><!-- /wp:cover -->',
+			),
+			'quote' => array(
+				'<!-- wp:quote {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><blockquote class="wp-block-quote layout-box">' . $text . '<cite>Cite</cite></blockquote><!-- /wp:quote -->',
+				'<!-- wp:quote {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><blockquote class="wp-block-quote page-box"><cite>Cite</cite></blockquote><!-- /wp:quote -->',
+				'<!-- wp:quote {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><blockquote class="wp-block-quote layout-box">' . $text . '<cite>Cite</cite></blockquote><!-- /wp:quote -->',
+			),
 		);
+
+		foreach ( $rows as $name => $row ) {
+			$layout = parse_blocks( $this->loop_markup( array(), $template, $row[0] ) )[0];
+			$loop   = parse_blocks(
+				$this->loop_markup(
+					array( 'savedLayout' => array( 'overrides' => array( 'box' => array( 'className' ) ) ) ),
+					$template,
+					$row[1]
+				)
+			)[0];
+
+			$merged = Visual_Portfolio_Saved_Layouts::find_block( Visual_Portfolio_Saved_Layouts::apply_layout( $loop, $layout, false )['innerBlocks'], 'core/' . $name );
+			$this->assertSame( parse_blocks( $row[1] )[0]['attrs'], $merged['attrs'], $name );
+
+			$detached = Visual_Portfolio_Saved_Layouts::find_block( Visual_Portfolio_Saved_Layout_Usage::detach_loop( $loop, $layout, false )['innerBlocks'], 'core/' . $name );
+			$this->assertSame( $row[2], serialize_block( $detached ), $name );
+		}
 	}
 
 	/**
