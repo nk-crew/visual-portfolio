@@ -388,6 +388,111 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Merged attributes of the item image of a loop synced with a layout.
+	 *
+	 * @param array $layout_extensions - the layout's image extensions.
+	 * @param array $own_extensions - the page's image extensions.
+	 * @param array $overrides - the image's overridden names.
+	 *
+	 * @return array
+	 */
+	private function merge_image_extensions( $layout_extensions, $own_extensions, $overrides ) {
+		$template = array( 'metadata' => array( 'vpSyncKey' => 'template' ) );
+		$image    = function ( $extensions ) {
+			return '<!-- wp:visual-portfolio/item-image ' . wp_json_encode(
+				array(
+					'metadata'   => array( 'vpSyncKey' => 'image' ),
+					'extensions' => (object) $extensions,
+				)
+			) . ' /-->';
+		};
+		$layout   = parse_blocks( $this->loop_markup( array(), $template, $image( $layout_extensions ) ) )[0];
+		$loop     = parse_blocks(
+			$this->loop_markup(
+				array( 'savedLayout' => array( 'overrides' => array( 'image' => $overrides ) ) ),
+				$template,
+				$image( $own_extensions )
+			)
+		)[0];
+
+		return Visual_Portfolio_Saved_Layouts::find_block(
+			Visual_Portfolio_Saved_Layouts::apply_layout( $loop, $layout, false )['innerBlocks'],
+			'visual-portfolio/item-image'
+		)['attrs'];
+	}
+
+	/**
+	 * An `extensions.<key>` override takes that key alone from the page, or
+	 * drops it when the page has none, and the layout keeps the other keys. A
+	 * whole `extensions` override still takes the page's object.
+	 */
+	public function test_extensions_key_override_takes_one_key() {
+		$layout_extensions = array(
+			'imageFilter' => array( 'normal' => 'grayscale(1)' ),
+			'tilt'        => 'direct',
+			'blendMode'   => 'multiply',
+		);
+		$own_extensions    = array(
+			'imageFilter' => array( 'normal' => 'sepia(1)' ),
+			'tilt'        => 'opposite',
+			'hoverTransform' => 'scale(1.05)',
+		);
+
+		$this->assertSame(
+			array(
+				'imageFilter' => array( 'normal' => 'sepia(1)' ),
+				'tilt'        => 'direct',
+				'hoverTransform' => 'scale(1.05)',
+			),
+			$this->merge_image_extensions( $layout_extensions, $own_extensions, array( 'extensions.imageFilter', 'extensions.blendMode', 'extensions.hoverTransform' ) )['extensions']
+		);
+
+		$this->assertSame(
+			$own_extensions,
+			$this->merge_image_extensions( $layout_extensions, $own_extensions, array( 'extensions', 'extensions.tilt' ) )['extensions']
+		);
+
+		$this->assertSame(
+			$layout_extensions,
+			$this->merge_image_extensions( $layout_extensions, $own_extensions, array( 'metadata.vpSyncKey', 'extensions.' ) )['extensions']
+		);
+	}
+
+	/**
+	 * Stored overrides keep attribute names and `extensions.<key>` paths, and
+	 * drop a path into any other attribute.
+	 */
+	public function test_sanitize_overrides_keeps_extension_paths_only() {
+		$this->assertSame(
+			array( 'image' => array( 'extensions', 'extensions.tilt', 'align' ) ),
+			Visual_Portfolio_Saved_Layouts::sanitize_overrides(
+				array( 'image' => array( 'extensions', 'extensions.tilt', 'style.color', 'extensions.', 'align', 3 ) )
+			)
+		);
+	}
+
+	/**
+	 * A block that saves markup is the page's block whole once one key of its
+	 * `extensions` is overridden.
+	 */
+	public function test_extensions_key_override_takes_static_block_whole() {
+		$template = array( 'metadata' => array( 'vpSyncKey' => 'template' ) );
+		$layout   = parse_blocks( $this->loop_markup( array(), $template, '<!-- wp:paragraph {"metadata":{"vpSyncKey":"text"},"extensions":{"a":1,"b":1}} --><p>Layout text</p><!-- /wp:paragraph -->' ) )[0];
+		$loop     = parse_blocks(
+			$this->loop_markup(
+				array( 'savedLayout' => array( 'overrides' => array( 'text' => array( 'extensions.a' ) ) ) ),
+				$template,
+				'<!-- wp:paragraph {"metadata":{"vpSyncKey":"text"},"extensions":{"a":2}} --><p>Page text</p><!-- /wp:paragraph -->'
+			)
+		)[0];
+
+		$merged = Visual_Portfolio_Saved_Layouts::find_block( Visual_Portfolio_Saved_Layouts::apply_layout( $loop, $layout, false )['innerBlocks'], 'core/paragraph' );
+
+		$this->assertSame( array( 'a' => 2 ), $merged['attrs']['extensions'] );
+		$this->assertSame( '<p>Page text</p>', $merged['innerHTML'] );
+	}
+
+	/**
 	 * A locked layout ignores the loop's overrides.
 	 */
 	public function test_locked_layout_ignores_overrides() {

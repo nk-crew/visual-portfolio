@@ -47,21 +47,22 @@ export function getCapture() {
 	return captures.length ? captures[captures.length - 1] : null;
 }
 
-let resetDepth = 0;
+const resets = [];
 
 /**
  * Run a reset of settings, in which a synced block returns the synced
  * attributes it is given to the layout's values instead of writing them.
  *
  * @param {Function} callback - function that resets settings.
+ * @param {string[]} names    - settings reset besides those it writes.
  */
-export function runAsReset(callback) {
-	resetDepth += 1;
+export function runAsReset(callback, names = []) {
+	resets.push(names);
 
 	try {
 		callback?.();
 	} finally {
-		resetDepth -= 1;
+		resets.pop();
 	}
 }
 
@@ -71,7 +72,16 @@ export function runAsReset(callback) {
  * @return {boolean} whether resetting.
  */
 export function isResetting() {
-	return resetDepth > 0;
+	return resets.length > 0;
+}
+
+/**
+ * Settings the running reset names besides those it writes.
+ *
+ * @return {string[]} names.
+ */
+export function getResetNames() {
+	return resets.flat();
 }
 
 /**

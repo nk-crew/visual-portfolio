@@ -12,6 +12,43 @@ export const LOOP_SYNCED_ATTRIBUTES = ['lightbox'];
 // Attributes that describe a block rather than set it up.
 const NOT_SETTINGS = ['metadata', 'lock'];
 
+// Object attributes whose keys are overridden one by one, as
+// `extensions.<key>`, see `Visual_Portfolio_Saved_Layouts::PATH_ATTRIBUTES`.
+// A bare name still stands for the whole object.
+const PATH_ATTRIBUTES = ['extensions'];
+
+const isObject = (value) =>
+	!!value && typeof value === 'object' && !Array.isArray(value);
+
+/**
+ * The attribute and object key an override names.
+ *
+ * @param {string} name - override, `attribute` or `attribute.key`.
+ * @return {{attribute: string, key: string}} parts, `key` empty for a whole attribute.
+ */
+export function parseOverride(name) {
+	const dot = name.indexOf('.');
+
+	if (dot === -1) {
+		return { attribute: name, key: '' };
+	}
+
+	return { attribute: name.slice(0, dot), key: name.slice(dot + 1) };
+}
+
+/**
+ * Whether a setting is overridden: listed itself, or its whole attribute is.
+ *
+ * @param {string[]} names - overridden names of a block.
+ * @param {string}   name  - setting, `attribute` or `attribute.key`.
+ * @return {boolean} whether overridden.
+ */
+export function isOverridden(names, name) {
+	return (
+		names.includes(name) || names.includes(parseOverride(name).attribute)
+	);
+}
+
 /**
  * Sync key of a block.
  *
@@ -46,9 +83,18 @@ export function getOverrides(overrides) {
 
 	Object.keys(overrides).forEach((key) => {
 		if (Array.isArray(overrides[key])) {
-			result[key] = overrides[key].filter(
-				(name) => typeof name === 'string'
-			);
+			result[key] = overrides[key].filter((name) => {
+				if (typeof name !== 'string') {
+					return false;
+				}
+
+				const { attribute, key: path } = parseOverride(name);
+
+				return (
+					attribute === name ||
+					(PATH_ATTRIBUTES.includes(attribute) && path !== '')
+				);
+			});
 		}
 	});
 
@@ -101,7 +147,11 @@ export function withoutOverrides(overrides, key, names) {
  */
 export function withOverrides(overrides, key, names) {
 	const result = { ...getOverrides(overrides) };
-	const merged = new Set([...(result[key] || []), ...names]);
+	const current = result[key] || [];
+	const merged = new Set([
+		...current,
+		...names.filter((name) => !isOverridden(current, name)),
+	]);
 
 	result[key] = [...merged];
 
@@ -109,8 +159,10 @@ export function withOverrides(overrides, key, names) {
 }
 
 /**
- * Attribute names a setter would write, setting aside what only describes the
- * block.
+ * Settings a setter would write, setting aside what only describes the block.
+ *
+ * An object of `PATH_ATTRIBUTES` names each key whose value differs, added,
+ * changed or removed, as `attribute.key`, and itself bare when no key differs.
  *
  * @param {Object|Function} next    - what `setAttributes` received.
  * @param {Object}          current - current attributes.
@@ -119,13 +171,66 @@ export function withOverrides(overrides, key, names) {
 export function getChangedNames(next, current) {
 	const value = typeof next === 'function' ? next(current) : next;
 
-	return Object.keys(value || {}).filter(
-		(name) => !NOT_SETTINGS.includes(name)
-	);
+	return Object.keys(value || {})
+		.filter((name) => !NOT_SETTINGS.includes(name))
+		.flatMap((name) => {
+			if (!PATH_ATTRIBUTES.includes(name)) {
+				return [name];
+			}
+
+			const before = isObject(current?.[name]) ? current[name] : {};
+			const after = isObject(value[name]) ? value[name] : {};
+			const keys = [
+				...new Set([...Object.keys(before), ...Object.keys(after)]),
+			].filter(
+				(key) =>
+					JSON.stringify(before[key]) !== JSON.stringify(after[key])
+			);
+
+			return keys.length ? keys.map((key) => `${name}.${key}`) : [name];
+		});
 }
 
 /**
- * Attributes of a block that differ from its block type's defaults.
+ * Settings of `getChangedNames()` that change something: an object of
+ * `PATH_ATTRIBUTES` written as it was is left out.
+ *
+ * @param {string[]} names - settings.
+ * @return {string[]} names.
+ */
+export function withoutUnchanged(names) {
+	return names.filter((name) => !PATH_ATTRIBUTES.includes(name));
+}
+
+/**
+ * Overridden keys of an object attribute that a block does not set: settings
+ * cleared on the page. A handler that drops such a key writes the object as
+ * it is, so these are what it can be told to own.
+ *
+ * @param {string[]} names      - overridden names of the block.
+ * @param {string}   attribute  - object attribute.
+ * @param {Object}   attributes - the block's attributes.
+ * @return {string[]} names.
+ */
+export function getClearedKeys(names, attribute, attributes) {
+	const value = isObject(attributes?.[attribute])
+		? attributes[attribute]
+		: {};
+
+	return names.filter((name) => {
+		const { attribute: owner, key } = parseOverride(name);
+
+		return (
+			owner === attribute &&
+			key !== '' &&
+			typeof value[key] === 'undefined'
+		);
+	});
+}
+
+/**
+ * Settings of a block that differ from its block type's defaults, named as
+ * `getChangedNames()` names them.
  *
  * @param {Object} block - block.
  * @return {string[]} names.
@@ -133,20 +238,19 @@ export function getChangedNames(next, current) {
 export function getChangedFromDefaults(block) {
 	const definitions = getBlockType(block.name)?.attributes || {};
 
-	return Object.keys(block.attributes || {}).filter((name) => {
-		if (NOT_SETTINGS.includes(name)) {
-			return false;
-		}
-
+	return Object.keys(block.attributes || {}).flatMap((name) => {
 		const value = block.attributes[name];
+		const fallback = definitions[name]?.default;
 
-		if (typeof value === 'undefined') {
-			return false;
+		if (
+			NOT_SETTINGS.includes(name) ||
+			typeof value === 'undefined' ||
+			JSON.stringify(value) === JSON.stringify(fallback)
+		) {
+			return [];
 		}
 
-		return (
-			JSON.stringify(value) !== JSON.stringify(definitions[name]?.default)
-		);
+		return getChangedNames({ [name]: value }, { [name]: fallback });
 	});
 }
 
@@ -244,7 +348,38 @@ export function getMergedAttributes(layoutBlock, ownBlocks, overrides) {
 	}
 
 	names.forEach((name) => {
-		attributes[name] = own.attributes[name];
+		const { attribute, key: path } = parseOverride(name);
+
+		if (!path) {
+			attributes[name] = own.attributes[name];
+			return;
+		}
+
+		if (names.includes(attribute)) {
+			return;
+		}
+
+		const ownValue = own.attributes[attribute];
+		const isSet =
+			isObject(ownValue) && typeof ownValue[path] !== 'undefined';
+
+		if (!isObject(attributes[attribute])) {
+			if (isSet) {
+				attributes[attribute] = { [path]: ownValue[path] };
+			}
+
+			return;
+		}
+
+		const value = { ...attributes[attribute] };
+
+		if (isSet) {
+			value[path] = ownValue[path];
+		} else {
+			delete value[path];
+		}
+
+		attributes[attribute] = value;
 	});
 
 	return attributes;
