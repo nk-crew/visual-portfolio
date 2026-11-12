@@ -123,6 +123,10 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 	 * Add New, and no description or sections.
 	 */
 	public function test_proofing_list_keeps_its_frame_without_an_entry_from_pro() {
+		if ( visual_portfolio()->is_pro() ) {
+			$this->markTestSkipped( 'Pro registers its own Proofing entry.' );
+		}
+
 		register_post_type(
 			'vp_proofing',
 			array(
