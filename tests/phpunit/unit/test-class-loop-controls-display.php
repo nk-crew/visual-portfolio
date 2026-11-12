@@ -111,7 +111,7 @@ class ClassLoopControlsDisplay extends WP_UnitTestCase {
 	 * @return array Options as `[ value, text, selected ]`.
 	 */
 	private function get_options( $html, $name ) {
-		preg_match( '/<select name="' . preg_quote( $name, '/' ) . '"[^>]*>(.*?)<\/select>/s', $html, $select );
+		preg_match( '/<select[^>]* name="' . preg_quote( $name, '/' ) . '"[^>]*>(.*?)<\/select>/s', $html, $select );
 		preg_match_all( '/<option [^>]*value="([^"]*)"([^>]*)>([^<]*)<\/option>/', $select[1] ?? '', $matches, PREG_SET_ORDER );
 
 		return array_map(
@@ -262,5 +262,78 @@ class ClassLoopControlsDisplay extends WP_UnitTestCase {
 
 		$this->assertMatchesRegularExpression( '/<nav [^>]*class="[^"]*vp-block-loop-filter[^"]*"[^>]*>.*?<a [^>]*class="[^"]*vp-block-loop-filter-item/s', $html );
 		$this->assertCount( 5, $this->get_options( $html, 'vp-1-sort' ) );
+	}
+
+	/**
+	 * The label names the filter: the prompt of its dropdown and the name a
+	 * screen reader gives its links.
+	 *
+	 * @return void
+	 */
+	public function test_the_label_names_the_filter() {
+		$dropdown = $this->render_loop( '<!-- wp:visual-portfolio/loop-filter {"displayAsDropdown":true,"showAllItem":false,"label":"Theme"} /-->' );
+
+		$this->assertSame( array( '', 'Theme', true ), $this->get_options( $dropdown, 'vp-1-filter' )[0] );
+		$this->assertStringContainsString( 'aria-label="Theme"', $dropdown );
+
+		$links = $this->render_loop( '<!-- wp:visual-portfolio/loop-filter {"label":"Theme"} /-->' );
+
+		$this->assertMatchesRegularExpression( '/<nav [^>]*aria-label="Theme"/', $links );
+	}
+
+	/**
+	 * The order setting sorts the terms by name or by count, behind "All".
+	 *
+	 * @return void
+	 */
+	public function test_the_order_setting_sorts_the_terms() {
+		$filter = '<!-- wp:visual-portfolio/loop-filter {"displayAsDropdown":true,"order":"%s"} -->'
+			. '<!-- wp:visual-portfolio/loop-filter-item {"text":"All"} /-->'
+			. '<!-- wp:visual-portfolio/loop-filter-item {"text":"Zoo","filter":"city"} /-->'
+			. '<!-- wp:visual-portfolio/loop-filter-item {"text":"Alps","filter":"nature"} /-->'
+			. '<!-- /wp:visual-portfolio/loop-filter -->';
+
+		$labels = function ( $order ) use ( $filter ) {
+			return array_column( $this->get_options( $this->render_loop( sprintf( $filter, $order ) ), 'vp-1-filter' ), 1 );
+		};
+
+		$this->assertSame( array( 'All', 'Zoo', 'Alps' ), $labels( 'manual' ) );
+		$this->assertSame( array( 'All', 'Alps', 'Zoo' ), $labels( 'name' ) );
+
+		$swapped = str_replace( array( '"city"', '"nature"' ), array( '"tmp"', '"city"' ), $filter );
+		$swapped = str_replace( '"tmp"', '"nature"', $swapped );
+
+		$this->assertSame( array( 'All', 'Zoo', 'Alps' ), array_column( $this->get_options( $this->render_loop( sprintf( $swapped, 'count' ) ), 'vp-1-filter' ), 1 ) );
+		$this->assertSame( array( 'All', 'Alps', 'Zoo' ), array_column( $this->get_options( $this->render_loop( sprintf( $swapped, 'name' ) ), 'vp-1-filter' ), 1 ) );
+	}
+
+	/**
+	 * A filter an extension set up prints nothing without that extension.
+	 *
+	 * @return void
+	 */
+	public function test_a_filter_set_up_by_an_extension_prints_nothing_alone() {
+		if ( class_exists( 'Visual_Portfolio_Pro_Loop_Filter_Block' ) ) {
+			$this->markTestSkipped( 'Pro renders the filter it set up.' );
+		}
+
+		$html = $this->render_loop( '<!-- wp:visual-portfolio/loop-filter {"extensions":{"facet":{"by":"chosen","chosen":["nature"]}}} /-->' );
+
+		$this->assertStringNotContainsString( 'vp-block-loop-filter', $html );
+		$this->assertStringContainsString( 'vp-block-loop-filter', $this->render_loop( '<!-- wp:visual-portfolio/loop-filter {"extensions":{"facet":[]}} /-->' ) );
+	}
+
+	/**
+	 * Labels sort by letters first, as the editor sorts them: case and accents
+	 * do not move a label past Z, and numbers sort by value.
+	 *
+	 * @return void
+	 */
+	public function test_labels_sort_by_letters_case_and_accents_aside() {
+		$labels = array( 'Mango', 'Éclair', 'apple', 'абрикос', 'Банан', 'Item 10', 'Item 9' );
+
+		usort( $labels, array( 'Visual_Portfolio_Block_Loop_Filter', 'compare_labels' ) );
+
+		$this->assertSame( array( 'apple', 'Éclair', 'Item 9', 'Item 10', 'Mango', 'абрикос', 'Банан' ), $labels );
 	}
 }

@@ -115,6 +115,21 @@ const DEFAULTS = {
 };
 
 /**
+ * Whether a source lists posts, the one post type WordPress pins.
+ *
+ * @param {string}   source       `postsQuery.source`.
+ * @param {string[]} postTypesSet `postsQuery.postTypesSet`.
+ *
+ * @return {boolean} Whether the Sticky posts setting applies.
+ */
+function hasStickyPosts(source, postTypesSet) {
+	return (
+		'post' === source ||
+		(SOURCE_POST_TYPES_SET === source && postTypesSet.includes('post'))
+	);
+}
+
+/**
  * Post types the loop can query.
  *
  * Mirrors the legacy control: everything public, minus attachments, which the
@@ -349,7 +364,7 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 							// As the core Query block does when its post type
 							// changes: only posts are sticky, and a post type
 							// without formats would match none of them.
-							...('post' !== value
+							...(!hasStickyPosts(value, postTypesSet)
 								? { sticky: DEFAULTS.sticky }
 								: {}),
 							...(postTypes.some(
@@ -384,15 +399,20 @@ function PostsSettingsPanel({ attributes, setAttributes, clientId }) {
 									key={slug}
 									label={label}
 									checked={postTypesSet.includes(slug)}
-									onChange={(checked) =>
+									onChange={(checked) => {
+										const nextSet = checked
+											? [...postTypesSet, slug]
+											: postTypesSet.filter(
+													(name) => name !== slug
+												);
+
 										update({
-											postTypesSet: checked
-												? [...postTypesSet, slug]
-												: postTypesSet.filter(
-														(name) => name !== slug
-													),
-										})
-									}
+											postTypesSet: nextSet,
+											...(!hasStickyPosts(source, nextSet)
+												? { sticky: DEFAULTS.sticky }
+												: {}),
+										});
+									}}
 								/>
 							))}
 						</VStack>
@@ -753,8 +773,7 @@ function PostsFiltersPanel(props) {
 				</ToolsPanelItem>
 			) : null}
 
-			{/* WordPress pins only posts. */}
-			{'post' === source ? (
+			{hasStickyPosts(source, postTypesSet) ? (
 				<ToolsPanelItem
 					label={__('Sticky posts', 'visual-portfolio')}
 					hasValue={() => !!sticky}

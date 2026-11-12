@@ -23,6 +23,10 @@ WordPress plugin: portfolio / gallery layouts and Gutenberg integration. PHP bac
   browser already does it — say so in the code when that is the case.
 - WordPress: sanitize/escape; AJAX with nonces; capability checks.
 - `build/` is generated — edit sources, never the bundles.
+- AI agents reach the Gallery Loop through the abilities in `classes/class-abilities.php`.
+  A change to what a loop can be made of (a block attribute, a layout type, a content
+  source, a default the editor applies) changes them in the same diff;
+  `tests/phpunit/unit/test-class-abilities-coverage.php` fails until it does.
 - Do not run packaging/release commands (`build:prod`, `zip`, `bump:*`) unless the user asks.
 
 ## Free and Pro

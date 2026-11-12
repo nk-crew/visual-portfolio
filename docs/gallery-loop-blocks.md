@@ -19,6 +19,7 @@ this page. Saved Layouts built from these blocks are described under
 - [Block context](#block-context)
 - [PHP hooks](#php-hooks)
 - [Content sources](#content-sources)
+- [Abilities for AI agents](#abilities-for-ai-agents)
 - [Block Bindings](#block-bindings)
 - [Interactivity stores](#interactivity-stores)
 - [URL parameters and caching](#url-parameters-and-caching)
@@ -84,8 +85,13 @@ stays in sight; the gallery manager in the sidebar moves an image further.
 **Format badge.** The Item Image and Item Cover blocks can mark an item that is
 not a still picture. *Format badge* puts the video, audio or gallery icon of the
 classic gallery in a corner of the picture, and *Badge position* picks the
-corner. It is off by default, and a standard item gets no badge. The badge
-carries the name of the format for screen readers.
+corner. *Formats* under the switch picks which formats get one, with a checkbox
+for each format of the gallery manager that has an icon: the `vpf.loopImageFormats`
+list, so Pro adds Audio and Gallery beside Video. All are checked until one is
+unchecked; `formatBadgeFormats` then holds the formats left, and an empty list
+means every format. A list of Gallery alone marks albums the way the legacy
+gallery did. The badge is off by default, and a standard item gets no badge. The
+badge carries the name of the format for screen readers.
 
 **Layouts.** The item template offers grid, masonry, tiles, justified and
 carousel — a block variation each, the way the Group block offers Group, Row,
@@ -245,11 +251,12 @@ and are applied where it applies them:
 | `authors` (user ids) | `posts_authors` | A post type, a post types set and the current query |
 | `formats` (`standard`, `image`, …) | `posts_formats` | A post type and a post types set. `standard` is a post with no format, and formats join by OR |
 | `excludeTaxonomies` (term ids) | `posts_excluded_taxonomies` | A post type and a post types set. Joined to `taxonomies` and `formats` by AND |
-| `sticky` (`''`, `ignore`, `exclude`, `only`) | `posts_sticky` | The Posts source alone. `''` includes sticky posts first on the first page, as WordPress does |
+| `sticky` (`''`, `ignore`, `exclude`, `only`) | `posts_sticky` | The Posts source and a post types set that includes posts. `''` includes sticky posts first on the first page, as WordPress does for a set too |
 
 Formats is offered where the core Query block offers it: for a post type that
 supports post formats, while the theme declares one beside `standard`. Sticky
-posts is offered for the Posts source only, and leaving that source clears it.
+posts is offered where posts are queried: the Posts source, or a post types set
+that includes them. A source or a set without posts clears it.
 None of these reaches a manual selection or a custom query.
 
 *Avoid duplicates* hides what the page has already shown — another gallery, or
@@ -364,9 +371,14 @@ scrolling*.
 With JavaScript they swap the gallery in place; without it they work as ordinary
 page loads. Both paths land on the same URL.
 
-*Display as dropdown* shows the filter or the sort as a select instead of links.
-It is off for the filter and on for the sort, which is how both looked before the
-setting existed. A filter shown as a dropdown keeps its items. The editor lists
+*Display as* shows the filter as Buttons, its links, or as a Dropdown, a select;
+the sort has a *Display as dropdown* toggle. The filter starts as buttons and the
+sort as a dropdown, which is how both looked before the setting existed. Display
+as is a setting rather than a block style, since it changes the markup; block
+styles such as Fill only restyle it. *Label* names the filter for screen readers
+and is the prompt of its dropdown; empty, they say *Category filter* and *Select
+category*. *Order* sorts the terms by name or by the number of items they hold,
+behind "All", or keeps the order they are arranged in, the default. A filter shown as a dropdown keeps its items. The editor lists
 them under the select while the filter is selected, so labels, order and the Hide
 option still apply. Item styles do not, since an option holds text only. An item hidden on some screen sizes is hidden with CSS, which the native
 picker of a phone may not apply to an option. While no option stands for the
@@ -599,6 +611,7 @@ it reads — no hook involved:
 | `vpf_loop_item_click_attributes` | filter `( $attributes, $action, $context )` | The link an item block renders for a click action an extension added; without `href` the item links to its own address |
 | `vpf_rest_loop_items_source_configs` | filter `( $configs, $params )` | Allow-list of source parameters the editor preview endpoint accepts, keyed by content source |
 | `vpf_rest_filter_items_source_configs` | filter `( $configs, $params )` | The same allow-list for the endpoint that lists the terms of the filter block in the editor. It starts from the answer of `vpf_rest_loop_items_source_configs`, and a source missing from it gets the "All" item alone |
+| `vpf_rest_filter_terms` | filter `( $terms, $extensions, $options )` | The terms that endpoint lists, from the filter block's `extensions`, in the shape `Visual_Portfolio_Filter_Terms::get()` returns. Runs under the endpoint's read restrictions, so an extension's own queries read only what the editor may |
 
 ### The query
 
@@ -644,6 +657,23 @@ no key at all.
 The options of a loop's query carry `$options['is_loop'] = true`, so a query
 filter that should act on the classic gallery alone, such as one reading a
 classic URL parameter, can tell the two apart.
+
+**The asking loop.** `get_query_params()` puts `$options['loop_query_id']`, the
+loop's query id or null, on the options before
+`vpf_extend_options_before_query_args`. An extension that adds its own
+parameters reads those of this loop, `vp-{queryId}-{name}` through
+`get_query_var_name( $name, $query_id )`, and can leave its own narrowing out of
+a count it makes for itself. `Visual_Portfolio_Filter_Terms::get_version()`, the
+key every cached count of terms carries, is public, so a count an extension caches
+is forgotten with them.
+
+**A filter set up by an extension.** A filter block whose `extensions.facet` is a
+non-empty object lists what only an extension can read. Without the extension it
+renders nothing on the page, and the editor shows its saved items as they are,
+with no note. The extension
+replaces the render callbacks of the filter and its items through
+`register_block_type_args` and builds on `Visual_Portfolio_Block_Loop_Filter::get_items()`
+and `sort_items()`, which merge the saved items with the terms and sort them.
 
 Three of them need a word for sources that are neither posts nor images:
 
@@ -710,13 +740,18 @@ cover effect is the same, and an effect the install lacks is drawn as a fade.
 
 The editor lists an extension adds to take `{ name, Item }` entries, where `Item`
 is a `ToolsPanelItem`: `vpf.loopPostsFilterItems` (the loop's Filters panel),
+`vpf.loopFilterSettingsItems` (the filter's Settings panel, whose Pro entries are
+`filterBy`, `selection`, `childTerms` and `hideEmpty`),
 `vpf.itemCoverSettingsItems` (the cover's Settings panel) and
 `vpf.itemImageSettingsItems` (the image's Settings panel). Without Pro, the free
 plugin adds a teaser for each Pro entry the list lacks, under the same `name`:
 a panel menu item marked "(Pro)" that shows one line and a link. An entry under
 that name replaces it. The Effect lists do the same by `value`, with a disabled
 option: `vpf.carouselEffects` for the item template and `vpf.itemCoverEffects`
-(`{ label, value }`) for the cover. Three panels of Pro settings appear only
+(`{ label, value }`) for the cover. The filter's Display as takes its choices from
+`vpf.loopFilterDisplayOptions`, entries `{ value, label, isSelected( attributes ),
+select( attributes ) }`: the last entry whose `isSelected` holds is the one shown,
+and `select` returns the attributes the choice writes. Three panels of Pro settings appear only
 without Pro, each a menu of teasers. The loop has a Protection panel for
 password, age gate and right-click protection. The item image has a Protection
 panel for the watermark. A trigger set to infinite scroll has an Infinite Scroll
@@ -989,6 +1024,111 @@ in the `visual-portfolio/components` store beside `TilesPresetsSelect`, with
 `getViewportBreakpoints()` for the breakpoints the editor previews a tablet and
 a phone at.
 
+## Abilities for AI agents
+
+On WordPress 7.1 and newer the plugin registers eight abilities with the
+Abilities API, in the category `visual-portfolio`. Each is `public`, so the
+REST API, the WordPress MCP Adapter and the agents behind it (Claude, Cursor,
+any MCP client) can call it, always as the logged-in user and only within
+that user's capabilities.
+
+| Ability | Permission | What it does |
+| --- | --- | --- |
+| `visual-portfolio/get-gallery-options` | `edit_posts` | Lists the layouts (the patterns registered for `visual-portfolio/loop`), the sources and the settings. |
+| `visual-portfolio/list-galleries` | `edit_posts` | Lists the loops in posts, pages and templates the user can edit. |
+| `visual-portfolio/find-images` | `upload_files` | Finds Media Library images by words and upload date, to use as a gallery's images. |
+| `visual-portfolio/find-posts` | `edit_posts` | Finds published posts of a type by words and terms. |
+| `visual-portfolio/find-terms` | `edit_posts` | Finds public terms by taxonomy and words. |
+| `visual-portfolio/get-gallery` | `edit_post` | Reads one loop. |
+| `visual-portfolio/create-gallery` | `edit_post`, or creating a page or a post | Adds a loop built from a layout to a post, or to a new draft: a page, or a post for a user who cannot create pages. |
+| `visual-portfolio/update-gallery` | `edit_post` | Changes the layout, source, settings or images of a loop. |
+
+A gallery is addressed by `post_id` and `gallery_id`, the loop's `block_id`. A
+loop saved without one, or with one an earlier loop of the post already holds,
+is `loop-<n>`, its position in the post. Its first change gives it an id of its
+own, and a gallery created at the start of the post moves the positions.
+
+The abilities speak a vocabulary of their own rather than block attributes:
+`layout` is a pattern slug, `source` is `{ type, ... }` (`images` with
+attachment ids, `posts` with a post type, ids, terms and an order), `settings`
+are `columns`, `per_page` and `lightbox`. A new loop starts the way the
+editor's setup starts it (`gutenberg/blocks/loop/layout-defaults.js`), with a
+fresh `block_id` and the lowest `queryId` free in the post. Writes go through
+`wp_update_post()`, so revisions and the Custom Query guard apply.
+
+Over REST, `update-gallery` is annotated destructive and idempotent, so its
+`run` endpoint answers `DELETE` with the input in the query string, the method
+`executeAbility()` of `@wordpress/abilities` picks for it.
+
+### Extending the vocabulary
+
+`vpf_gallery_ability_vocabulary` filters the sources and settings the
+abilities accept. A source is `type => array( label, description, available,
+requires_pro, schema, keys )`, where `schema` is a JSON schema whose
+`properties` join the input schema of `source`, and `keys` lists the
+`sourceQuery` keys `get-gallery` reports as the source's `settings`. A setting is `key => array( description,
+schema )`.
+
+```php
+add_filter(
+	'vpf_gallery_ability_vocabulary',
+	function ( $vocabulary ) {
+		$vocabulary['sources']['acme/instagram'] = array(
+			'label'        => 'Instagram',
+			'description'  => 'Photos of an Instagram account.',
+			'available'    => true,
+			'requires_pro' => false,
+			'schema'       => array(
+				'properties' => array(
+					'account' => array( 'type' => 'string' ),
+				),
+			),
+		);
+
+		return $vocabulary;
+	}
+);
+```
+
+A source of another type reads and writes its fields as `source.settings`,
+which the plugin merges into the loop's `sourceQuery`. `get-gallery` reports
+them the same way, so an agent can send a gallery back unchanged.
+
+`vpf_gallery_ability_apply` filters the parsed loop after the plugin applied
+what it knows, with the ability input, the action, `create` or `update`, and the
+loop before the change (on create, the layout's loop). A switch to another
+source keeps the keys `sourceQuery` held, as the editor's source picker does,
+so a source drops the keys of the source before it that it would misread.
+Fields declared at the top level of the source, and settings added above, are
+turned into attributes here.
+
+```php
+add_filter(
+	'vpf_gallery_ability_apply',
+	function ( $loop, $input, $action ) {
+		if ( 'acme/instagram' === ( $input['source']['type'] ?? '' ) ) {
+			// Merge: `sourceQuery` also holds fields of other features.
+			$loop['attrs']['sourceQuery'] = array_merge(
+				$loop['attrs']['sourceQuery'] ?? array(),
+				array( 'account' => $input['source']['account'] ?? '' )
+			);
+		}
+
+		return $loop;
+	},
+	10,
+	3
+);
+```
+
+`tests/phpunit/unit/test-class-abilities-coverage.php` fails when the loop gains
+an attribute, a layout type, a source or a setup default the abilities have not
+decided about, so the abilities change in the same diff as the blocks.
+
+Without Pro, `get-gallery-options` lists the Pro sources, Taxonomies and
+Social, with `requires_pro: true`, and asking for one returns the
+`vpf_requires_pro` error with a link to Pro.
+
 ## Block Bindings
 
 `visual-portfolio/item` binds core blocks to item data. It is a developer tool:
@@ -1174,6 +1314,7 @@ so two galleries on one page never move each other:
 | Sort | `vp_sort` | `vp-{queryId}-sort` |
 | Search | none, see below | `vp-{queryId}-search` |
 | Random seed | `vpf_random_seed` | shared by the page |
+| An extension's own | none | `vp-{queryId}-{name}` |
 
 Defaults are never written: page one, an empty filter, the default sort and an
 empty search are removed from the URL rather than spelled out. The canonical view of a page is
@@ -1208,6 +1349,7 @@ distinct combination below is a separate cacheable URL:
 | `vp-1-filter=…` | yes | One entry per term shown by the filter |
 | `vp-1-sort=…` | yes | One entry per sort option |
 | `vp-1-search=…` | unbounded | One entry per term a visitor types |
+| `vp-1-{name}=…` | yes, or unbounded | An extension's own parameter, `noindex, follow` like the rest. Bounded for a set of choices, unbounded for a range a visitor types |
 | Combinations of the above | yes | The product of them, which is what to keep an eye on: three galleries with four filters and four sort options each is already a large surface |
 | `vpf_random_seed=…` | unbounded | See below |
 

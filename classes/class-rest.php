@@ -299,7 +299,8 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			}
 		}
 
-		$post_id = absint( $request->get_param( 'post_id' ) );
+		$post_id    = absint( $request->get_param( 'post_id' ) );
+		$extensions = isset( $params['extensions'] ) && is_array( $params['extensions'] ) ? $params['extensions'] : array();
 
 		// Converted the way the block context is when the page renders, so the
 		// editor lists the terms the page will.
@@ -345,6 +346,19 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 		add_action( 'pre_get_posts', $restrict_to_readable );
 
 		$terms = Visual_Portfolio_Filter_Terms::get( $options );
+
+		/**
+		 * Filters the terms the editor lists in a Gallery Filter block.
+		 *
+		 * Runs under the same restrictions as the default list, so the queries an
+		 * extension makes here read only what the editor may.
+		 *
+		 * @param array $terms      - terms as `Visual_Portfolio_Filter_Terms::get()` returns them.
+		 * @param array $extensions - the block's `extensions` attribute.
+		 * @param array $options    - options of the gallery, in the legacy format.
+		 */
+		$terms = apply_filters( 'vpf_rest_filter_terms', $terms, $extensions, $options );
+		$terms = is_array( $terms ) ? $terms : array();
 
 		remove_action( 'pre_get_posts', $restrict_to_readable );
 		remove_filter( 'vpf_extend_query_args', $restrict_statuses, PHP_INT_MAX );

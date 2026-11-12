@@ -289,6 +289,34 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The preview of a post types set with posts applies its sticky choice.
+	 *
+	 * @return void
+	 */
+	public function test_preview_of_a_set_applies_the_sticky_choice() {
+		$this->factory->post->create( array( 'post_title' => 'Not pinned' ) );
+		$pinned = $this->factory->post->create( array( 'post_title' => 'Pinned' ) );
+
+		stick_post( $pinned );
+
+		$items = $this->get_items(
+			$this->dispatch(
+				$this->get_body(
+					'posts',
+					10,
+					array(
+						'source'       => 'post_types_set',
+						'postTypesSet' => array( 'post', 'page' ),
+						'sticky'       => 'only',
+					)
+				)
+			)
+		);
+
+		$this->assertSame( array( 'Pinned' ), wp_list_pluck( $items, 'itemTitle' ) );
+	}
+
+	/**
 	 * Items arrive with the context keys of the item blocks, unprefixed.
 	 *
 	 * The editor reads the same keys the rendered item blocks get through block

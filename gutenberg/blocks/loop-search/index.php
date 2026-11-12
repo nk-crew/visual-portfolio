@@ -24,7 +24,7 @@ class Visual_Portfolio_Block_Loop_Search {
 	 * Register Block.
 	 */
 	public function register_block() {
-		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-loop-search', 'build/gutenberg/blocks/loop-search/style' );
+		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-loop-search', 'build/gutenberg/blocks/loop-search/style', array( 'visual-portfolio-loop-field' ) );
 		wp_style_add_data( 'visual-portfolio-block-loop-search', 'rtl', 'replace' );
 
 		register_block_type_from_metadata(

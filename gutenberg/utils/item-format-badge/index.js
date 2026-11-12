@@ -1,9 +1,23 @@
+import './editor.scss';
+
 /**
  * WordPress dependencies
  */
-import { SelectControl, ToggleControl } from '@wordpress/components';
+import {
+	BaseControl,
+	CheckboxControl,
+	SelectControl,
+	ToggleControl,
+} from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { ToolsPanelItem } from '../../components/tools-panel';
+
+/**
+ * Internal dependencies
+ */
+import { getLoopImageFormats } from '../loop-image-formats';
 
 // The icons of `templates/icons/`, the ones the render callback prints.
 const BADGES = {
@@ -71,6 +85,7 @@ const BADGES = {
 export const FORMAT_BADGE_DEFAULTS = {
 	showFormatBadge: false,
 	formatBadgePosition: 'top-right',
+	formatBadgeFormats: [],
 };
 
 const POSITIONS = [
@@ -81,17 +96,41 @@ const POSITIONS = [
 ];
 
 /**
+ * The icon of a format, as the badge draws it.
+ *
+ * @param {Object} props        - component props.
+ * @param {string} props.format - item format.
+ * @return {Element} icon.
+ */
+function BadgeIcon({ format }) {
+	return (
+		<svg
+			className="vp-svg-icon"
+			width="20"
+			height="20"
+			viewBox="0 0 20 20"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			aria-hidden="true"
+		>
+			{BADGES[format].icon}
+		</svg>
+	);
+}
+
+/**
  * The badge of an item that is not a still picture, as the page prints it.
  *
  * @param {Object} props          - component props.
  * @param {string} props.format   - item format.
  * @param {string} props.position - corner of the picture.
+ * @param {Array}  props.formats  - formats that get a badge, every one when empty.
  * @return {Element|null} badge.
  */
-export function ItemFormatBadge({ format, position }) {
+export function ItemFormatBadge({ format, position, formats = [] }) {
 	const badge = BADGES[format];
 
-	if (!badge) {
+	if (!badge || (formats.length && !formats.includes(format))) {
 		return null;
 	}
 
@@ -101,17 +140,100 @@ export function ItemFormatBadge({ format, position }) {
 			role="img"
 			aria-label={badge.label}
 		>
-			<svg
-				className="vp-svg-icon"
-				width="20"
-				height="20"
-				viewBox="0 0 20 20"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				{badge.icon}
-			</svg>
+			<BadgeIcon format={format} />
 		</span>
+	);
+}
+
+/**
+ * The formats with a badge that items of a source can have: the post formats
+ * the theme supports for posts, the formats an image can be given otherwise.
+ *
+ * @param {string} queryType - query type of the loop.
+ * @return {Array} formats, as `{ value, label }`.
+ */
+function useBadgeFormats(queryType) {
+	const themeFormats = useSelect(
+		(select) =>
+			'posts' === queryType
+				? select(coreStore).getThemeSupports()?.formats
+				: null,
+		[queryType]
+	);
+
+	if ('posts' === queryType) {
+		return Object.keys(BADGES)
+			.filter(
+				(format) =>
+					Array.isArray(themeFormats) && themeFormats.includes(format)
+			)
+			.map((format) => ({ value: format, label: BADGES[format].label }));
+	}
+
+	return getLoopImageFormats().filter((format) => BADGES[format.value]);
+}
+
+/**
+ * A checkbox per format that has a badge, of the formats the loop's items can
+ * have.
+ *
+ * An empty list checks them all. Unchecking one writes the explicit list, and
+ * the last checked one stays checked: an empty list would mean every format.
+ *
+ * @param {Object}   props           - component props.
+ * @param {Array}    props.value     - formats picked, every one when empty.
+ * @param {Function} props.onChange  - formats setter.
+ * @param {string}   props.queryType - query type of the loop.
+ * @return {Element|null} control.
+ */
+function FormatBadgeFormatsControl({ value, onChange, queryType }) {
+	const offered = useBadgeFormats(queryType);
+	const offeredValues = offered.map((format) => format.value);
+	const picked = value.length ? value : offeredValues;
+
+	// A single format leaves nothing to pick, unless a saved list hides it.
+	if (offered.length < 2 && !value.length) {
+		return null;
+	}
+
+	const toggle = (format, isChecked) => {
+		const next = isChecked
+			? [...picked, format]
+			: picked.filter((item) => item !== format);
+		const isEveryFormat =
+			next.length === offeredValues.length &&
+			offeredValues.every((item) => next.includes(item));
+
+		onChange(isEveryFormat ? [] : next);
+	};
+
+	return (
+		<fieldset className="vpf-format-badge-formats">
+			<BaseControl.VisualLabel as="legend">
+				{__('Formats', 'visual-portfolio')}
+			</BaseControl.VisualLabel>
+			{offered.map((format) => {
+				const checked = picked.includes(format.value);
+
+				return (
+					<CheckboxControl
+						key={format.value}
+						label={
+							<span className="vpf-format-badge-formats__label">
+								<BadgeIcon format={format.value} />
+								{format.label}
+							</span>
+						}
+						checked={checked}
+						disabled={checked && picked.length === 1}
+						onChange={(isChecked) =>
+							toggle(format.value, isChecked)
+						}
+						__nextHasNoMarginBottom
+					/>
+				);
+			})}
+		</fieldset>
 	);
 }
 
@@ -122,10 +244,17 @@ export function ItemFormatBadge({ format, position }) {
  * @param {Object}   props.attributes    - block attributes.
  * @param {Function} props.setAttributes - block attribute setter.
  * @param {string}   props.panelId       - tools panel id.
+ * @param {string}   props.queryType     - query type of the loop.
  * @return {Element} panel items.
  */
-export function FormatBadgeSettings({ attributes, setAttributes, panelId }) {
-	const { showFormatBadge, formatBadgePosition } = attributes;
+export function FormatBadgeSettings({
+	attributes,
+	setAttributes,
+	panelId,
+	queryType,
+}) {
+	const { showFormatBadge, formatBadgePosition, formatBadgeFormats } =
+		attributes;
 
 	return (
 		<ToolsPanelItem
@@ -144,14 +273,23 @@ export function FormatBadgeSettings({ attributes, setAttributes, panelId }) {
 				onChange={(value) => setAttributes({ showFormatBadge: value })}
 			/>
 			{showFormatBadge && (
-				<SelectControl
-					label={__('Badge position', 'visual-portfolio')}
-					value={formatBadgePosition}
-					options={POSITIONS}
-					onChange={(value) =>
-						setAttributes({ formatBadgePosition: value })
-					}
-				/>
+				<>
+					<FormatBadgeFormatsControl
+						queryType={queryType}
+						value={formatBadgeFormats || []}
+						onChange={(value) =>
+							setAttributes({ formatBadgeFormats: value })
+						}
+					/>
+					<SelectControl
+						label={__('Badge position', 'visual-portfolio')}
+						value={formatBadgePosition}
+						options={POSITIONS}
+						onChange={(value) =>
+							setAttributes({ formatBadgePosition: value })
+						}
+					/>
+				</>
 			)}
 		</ToolsPanelItem>
 	);

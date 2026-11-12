@@ -238,4 +238,45 @@ class ClassLoopItemMedia extends WP_UnitTestCase {
 		// Off by default.
 		$this->assertStringNotContainsString( 'vp-item-format-badge', $this->render_loop( $images, '<!-- wp:visual-portfolio/item-image /-->' ) );
 	}
+
+	/**
+	 * A list of formats leaves the badge to those formats, and an unknown slug
+	 * in it is dropped.
+	 *
+	 * @return void
+	 */
+	public function test_the_badge_shows_only_the_formats_picked() {
+		$images = array(
+			array(
+				'id'        => self::$attachment_id,
+				'title'     => 'Video',
+				'format'    => 'video',
+				'video_url' => 'https://www.youtube.com/watch?v=mSC6GwizOag',
+			),
+			array(
+				'id'     => self::$attachment_id,
+				'title'  => 'Album',
+				'format' => 'gallery',
+			),
+		);
+
+		$all = $this->render_loop( $images, '<!-- wp:visual-portfolio/item-image {"showFormatBadge":true} /-->' );
+
+		$this->assertSame( 2, substr_count( $all, 'vp-item-format-badge' ) );
+
+		$gallery = $this->render_loop( $images, '<!-- wp:visual-portfolio/item-image {"showFormatBadge":true,"formatBadgeFormats":["gallery"]} /-->' );
+
+		$this->assertSame( 1, substr_count( $gallery, 'vp-item-format-badge' ) );
+		$this->assertStringContainsString( 'aria-label="Gallery"', $gallery );
+
+		$cover = $this->render_loop( $images, '<!-- wp:visual-portfolio/item-cover {"showFormatBadge":true,"formatBadgeFormats":["unknown","video"]} --><!-- wp:visual-portfolio/item-title /--><!-- /wp:visual-portfolio/item-cover -->' );
+
+		$this->assertSame( 1, substr_count( $cover, 'vp-item-format-badge' ) );
+		$this->assertStringContainsString( 'aria-label="Video"', $cover );
+
+		// A list of formats no item has badges none, as the editor shows it.
+		$unknown = $this->render_loop( $images, '<!-- wp:visual-portfolio/item-image {"showFormatBadge":true,"formatBadgeFormats":["unknown"]} /-->' );
+
+		$this->assertSame( 0, substr_count( $unknown, 'vp-item-format-badge' ) );
+	}
 }

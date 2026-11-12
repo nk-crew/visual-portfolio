@@ -477,6 +477,13 @@ test.describe('Gallery Loop blocks', () => {
 			);
 			await editor.openDocumentSettingsSidebar();
 
+			// A filter opens on its List tab, and the note is in Settings.
+			const settingsTab = page.getByRole('tab', { name: 'Settings' });
+
+			if (await settingsTab.count()) {
+				await settingsTab.click();
+			}
+
 			await expect(page.getByText(note, { exact: true })).toBeVisible();
 		}
 
@@ -556,6 +563,72 @@ test.describe('Gallery Loop blocks', () => {
 		const [pageLoop] = await editor.getBlocks();
 
 		expect(pageLoop.attributes.postsQuery.sticky).toBe('');
+	});
+
+	test('a post types set offers sticky posts while it includes posts', async ({
+		admin,
+		editor,
+		page,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Loop - sticky posts of a set',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		await editor.insertBlock(getLoopBlock(PAGED_PAGINATION));
+		await editor.selectBlocks(
+			editor.canvas.locator('[data-type="visual-portfolio/loop"]')
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const settings = page.locator('.components-tools-panel', {
+			has: page.getByRole('heading', { name: 'Settings' }),
+		});
+		const filters = page.locator('.components-tools-panel', {
+			has: page.getByRole('heading', { name: 'Filters' }),
+		});
+		const sticky = filters.getByRole('combobox', { name: 'Sticky posts' });
+		// The panel menu names an item it would show as `Show {label}`, and
+		// as `{label}, show` from WordPress 7.2.
+		const stickyMenuItem = page.getByRole('menuitemcheckbox', {
+			name: /^(Show Sticky posts|Sticky posts, show)$/,
+		});
+
+		await filters.getByRole('button', { name: /options/i }).click();
+		await stickyMenuItem.click();
+		await page.keyboard.press('Escape');
+		await sticky.selectOption('exclude');
+
+		// A new set holds posts alone, so the choice stays.
+		await settings
+			.getByRole('combobox', { name: 'Source' })
+			.selectOption('post_types_set');
+		await settings
+			.getByRole('checkbox', { name: 'Page', exact: true })
+			.check();
+
+		await expect(sticky).toHaveValue('exclude');
+
+		let [loop] = await editor.getBlocks();
+
+		expect(loop.attributes.postsQuery.sticky).toBe('exclude');
+
+		// Without posts nothing in the set is ever pinned.
+		await settings
+			.getByRole('checkbox', { name: 'Post', exact: true })
+			.uncheck();
+
+		await expect(sticky).toHaveCount(0);
+
+		await filters.getByRole('button', { name: /options/i }).click();
+
+		await expect(stickyMenuItem).toHaveCount(0);
+
+		[loop] = await editor.getBlocks();
+
+		expect(loop.attributes.postsQuery.sticky).toBe('');
 	});
 });
 
