@@ -70,7 +70,7 @@
 		gap: 24px;
 	}
 
-	.vpf-settings-field {
+	.vpf-settings-row {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		gap: 8px;
@@ -84,7 +84,7 @@
 		color: #1e1e1e;
 	}
 
-	.vpf-settings-field > .vpf-settings-field-help {
+	.vpf-settings-row > .vpf-settings-field-help {
 		max-width: 640px;
 		margin: 0;
 		font-size: 12px;
@@ -107,7 +107,7 @@
 		}
 
 		@media (min-width: 783px) {
-			> .vpf-settings-field {
+			.vpf-settings-row {
 				grid-template-columns: minmax(0, 1fr) 280px;
 				gap: 4px 32px;
 				align-items: center;
@@ -122,7 +122,7 @@
 				grid-column: 1 / -1;
 			}
 
-			> :has(> .vpf-settings-field-help) {
+			.vpf-settings-row:has(> .vpf-settings-field-help) {
 				> .vpf-settings-field-label {
 					align-self: end;
 				}
@@ -136,12 +136,12 @@
 				}
 			}
 
-			.vpf-setting-type-toggle > .vpf-settings-field-control {
+			.vpf-setting-type-toggle .vpf-settings-field-control {
 				justify-self: end;
 			}
 
-			.vpf-setting-type-textarea,
-			.vpf-setting-type-image {
+			.vpf-setting-type-textarea > .vpf-settings-row,
+			.vpf-setting-type-image > .vpf-settings-row {
 				grid-template-rows: auto 1fr;
 				align-items: start;
 
@@ -222,6 +222,10 @@
 		display: flex;
 		gap: 8px;
 		align-items: flex-end;
+
+		> .components-base-control {
+			flex: 1;
+		}
 	}
 
 	.vpf-settings-color-swatch {

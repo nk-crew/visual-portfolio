@@ -75,7 +75,17 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 			/>
 		);
 	} else if (field.type === 'select') {
-		control = <SelectControl {...props} options={options} />;
+		control = (
+			<SelectControl
+				{...props}
+				options={options}
+				// SelectControl sets aria-describedby to its own help's id, and this row renders the help outside it.
+				ref={(node) => {
+					if (node && helpId)
+						node.setAttribute('aria-describedby', helpId);
+				}}
+			/>
+		);
 	} else if (field.type === 'color') {
 		control = (
 			<div className="vpf-settings-color">
@@ -165,7 +175,6 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 							value: undefined,
 							defaultValue: initialValue,
 							name: source.name,
-							id: source.id,
 						}
 					: {})}
 				ref={
@@ -185,7 +194,7 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 		);
 	}
 	return (
-		<>
+		<div className="vpf-settings-row">
 			{field.label && (
 				<label
 					className="vpf-settings-field-label"
@@ -205,7 +214,7 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 					{field.desc}
 				</RawHTML>
 			)}
-		</>
+		</div>
 	);
 }
 
@@ -491,22 +500,28 @@ $(() => {
 				}
 				container.append(originals);
 			} else {
+				const settingRow = document.createElement('div');
+				settingRow.className = 'vpf-settings-row';
 				const label = row.querySelector('th');
 				if (label?.textContent.trim()) {
 					const name = document.createElement('div');
 					name.className = 'vpf-settings-field-label';
 					name.append(...label.childNodes);
-					container.append(name);
+					settingRow.append(name);
 				}
 				const control = document.createElement('div');
 				control.className = 'vpf-settings-field-control';
 				control.append(...row.querySelector('td').childNodes);
-				container.append(control);
 				const help = control.querySelector(':scope > .description');
+				help?.remove();
+				if (control.textContent.trim() || control.children.length) {
+					settingRow.append(control);
+				}
 				if (help) {
 					help.classList.add('vpf-settings-field-help');
-					container.append(help);
+					settingRow.append(help);
 				}
+				container.append(settingRow);
 				if (
 					field.name === 'portfolio_archive_page' &&
 					field.type === 'select' &&

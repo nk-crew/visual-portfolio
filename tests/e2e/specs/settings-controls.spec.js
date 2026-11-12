@@ -62,6 +62,9 @@ test.describe('Contextual settings controls', () => {
 	}) => {
 		let form = await openTab(admin, page, 'vp_images');
 		await remember(form);
+		await expect(
+			form.getByLabel('Lazy Loading', { exact: true })
+		).toHaveAccessibleDescription(/^Enable lazy loading for /);
 		await form
 			.getByLabel('Lazy Loading', { exact: true })
 			.selectOption('full');
@@ -168,6 +171,12 @@ test.describe('Contextual settings controls', () => {
 			.click();
 		await page.unroute('**/admin-ajax.php?**');
 		const count = form.getByLabel('Archive Page Items Per Page');
+		const countName = await form
+			.locator('.archive_page_items_per_page .vpf-settings-field-label')
+			.boundingBox();
+		expect((await count.boundingBox()).x).toBeGreaterThan(
+			countName.x + countName.width
+		);
 		await count.fill('');
 		await count.pressSequentially('-1');
 		await expect(count).toHaveValue('-1');
