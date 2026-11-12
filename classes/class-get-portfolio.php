@@ -2396,10 +2396,10 @@ class Visual_Portfolio_Get {
 
 					// Only where a queried post type has formats: a set that lost
 					// them keeps the saved choice without narrowing to nothing.
-					$format_types = 'post_types_set' === $options['posts_source'] ? (array) ( $options['post_types_set'] ?? array() ) : array( $options['posts_source'] );
-					$has_formats  = false;
+					$queried_types = 'post_types_set' === $options['posts_source'] ? (array) ( $options['post_types_set'] ?? array() ) : array( $options['posts_source'] );
+					$has_formats   = false;
 
-					foreach ( $format_types as $format_type ) {
+					foreach ( $queried_types as $format_type ) {
 						$has_formats = $has_formats || post_type_supports( $format_type, 'post-formats' );
 					}
 
@@ -2446,9 +2446,9 @@ class Visual_Portfolio_Get {
 						);
 					}
 
-					// WordPress pins only posts, so the other post types have
+					// WordPress pins only posts, so a source without them has
 					// no sticky choice. Include, the default, is no key.
-					if ( 'post' === $options['posts_source'] && ! empty( $options['posts_sticky'] ) ) {
+					if ( in_array( 'post', $queried_types, true ) && ! empty( $options['posts_sticky'] ) ) {
 						$sticky = array_map( 'absint', (array) get_option( 'sticky_posts' ) );
 
 						switch ( $options['posts_sticky'] ) {

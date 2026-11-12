@@ -423,7 +423,7 @@ class Visual_Portfolio_Block_Item_Cover {
 
 		// Part of the picture, so it goes wherever a stylesheet moves the picture.
 		if ( ! empty( $attributes['showFormatBadge'] ) ) {
-			$media .= visual_portfolio_get_item_format_badge( $context['vp/itemFormat'] ?? '', $attributes['formatBadgePosition'] ?? '' );
+			$media .= visual_portfolio_get_item_format_badge( $context['vp/itemFormat'] ?? '', $attributes['formatBadgePosition'] ?? '', $attributes['formatBadgeFormats'] ?? array() );
 		}
 
 		$hover_overlay = visual_portfolio_get_item_overlay(

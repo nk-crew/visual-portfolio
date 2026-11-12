@@ -82,8 +82,13 @@ stays in sight; the gallery manager in the sidebar moves an image further.
 **Format badge.** The Item Image and Item Cover blocks can mark an item that is
 not a still picture. *Format badge* puts the video, audio or gallery icon of the
 classic gallery in a corner of the picture, and *Badge position* picks the
-corner. It is off by default, and a standard item gets no badge. The badge
-carries the name of the format for screen readers.
+corner. *Formats* under the switch picks which formats get one, with a checkbox
+for each format of the gallery manager that has an icon: the `vpf.loopImageFormats`
+list, so Pro adds Audio and Gallery beside Video. All are checked until one is
+unchecked; `formatBadgeFormats` then holds the formats left, and an empty list
+means every format. A list of Gallery alone marks albums the way the legacy
+gallery did. The badge is off by default, and a standard item gets no badge. The
+badge carries the name of the format for screen readers.
 
 **Layouts.** The item template offers grid, masonry, tiles, justified and
 carousel — a block variation each, the way the Group block offers Group, Row,
@@ -243,11 +248,12 @@ and are applied where it applies them:
 | `authors` (user ids) | `posts_authors` | A post type, a post types set and the current query |
 | `formats` (`standard`, `image`, …) | `posts_formats` | A post type and a post types set. `standard` is a post with no format, and formats join by OR |
 | `excludeTaxonomies` (term ids) | `posts_excluded_taxonomies` | A post type and a post types set. Joined to `taxonomies` and `formats` by AND |
-| `sticky` (`''`, `ignore`, `exclude`, `only`) | `posts_sticky` | The Posts source alone. `''` includes sticky posts first on the first page, as WordPress does |
+| `sticky` (`''`, `ignore`, `exclude`, `only`) | `posts_sticky` | The Posts source and a post types set that includes posts. `''` includes sticky posts first on the first page, as WordPress does for a set too |
 
 Formats is offered where the core Query block offers it: for a post type that
 supports post formats, while the theme declares one beside `standard`. Sticky
-posts is offered for the Posts source only, and leaving that source clears it.
+posts is offered where posts are queried: the Posts source, or a post types set
+that includes them. A source or a set without posts clears it.
 None of these reaches a manual selection or a custom query.
 
 *Avoid duplicates* hides what the page has already shown — another gallery, or

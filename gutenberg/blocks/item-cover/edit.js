@@ -168,6 +168,7 @@ export default function ItemCoverEdit({
 		style,
 		showFormatBadge,
 		formatBadgePosition,
+		formatBadgeFormats,
 	} = attributes;
 
 	const {
@@ -587,6 +588,7 @@ export default function ItemCoverEdit({
 								attributes={attributes}
 								setAttributes={setAttributes}
 								panelId={clientId}
+								queryType={context['vp/queryType']}
 							/>
 						</ToolsPanel>
 					</InspectorControls>
@@ -623,6 +625,7 @@ export default function ItemCoverEdit({
 						<ItemFormatBadge
 							format={itemFormat}
 							position={formatBadgePosition}
+							formats={formatBadgeFormats}
 						/>
 					)}
 				</div>

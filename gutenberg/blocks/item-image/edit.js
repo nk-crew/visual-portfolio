@@ -113,6 +113,7 @@ export default function ItemImageEdit({
 		scale,
 		showFormatBadge,
 		formatBadgePosition,
+		formatBadgeFormats,
 	} = attributes;
 
 	const {
@@ -505,6 +506,7 @@ export default function ItemImageEdit({
 								attributes={attributes}
 								setAttributes={setAttributes}
 								panelId={clientId}
+								queryType={context['vp/queryType']}
 							/>
 						</ToolsPanel>
 					</InspectorControls>
@@ -532,6 +534,7 @@ export default function ItemImageEdit({
 					<ItemFormatBadge
 						format={itemFormat}
 						position={formatBadgePosition}
+						formats={formatBadgeFormats}
 					/>
 				)}
 			</figure>
