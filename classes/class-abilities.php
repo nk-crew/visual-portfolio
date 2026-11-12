@@ -901,7 +901,7 @@ class Visual_Portfolio_Abilities {
 		$post = null;
 
 		if ( ! empty( $input['post_id'] ) ) {
-			$post = $this->get_target_post( $input['post_id'] );
+			$post = $this->check_saved_layout_target( $this->get_target_post( $input['post_id'] ), $input );
 
 			if ( is_wp_error( $post ) ) {
 				return $post;
@@ -964,7 +964,7 @@ class Visual_Portfolio_Abilities {
 			return $checked;
 		}
 
-		$post = $this->get_target_post( $input['post_id'] );
+		$post = $this->check_saved_layout_target( $this->get_target_post( $input['post_id'] ), $input );
 
 		if ( is_wp_error( $post ) ) {
 			return $post;
@@ -1177,6 +1177,26 @@ class Visual_Portfolio_Abilities {
 	}
 
 	/**
+	 * A post a gallery can be synced in: a Saved Layout's own gallery syncs
+	 * with none, as its editor offers no Saved Layout panel.
+	 *
+	 * @param WP_Post|WP_Error $post - target post.
+	 * @param array            $input - ability input.
+	 *
+	 * @return WP_Post|WP_Error
+	 */
+	private function check_saved_layout_target( $post, $input ) {
+		if ( $post instanceof WP_Post && Visual_Portfolio_Saved_Layouts::POST_TYPE === $post->post_type && ! empty( $input['saved_layout'] ) ) {
+			return new WP_Error(
+				'vpf_saved_layout_in_layout',
+				__( 'A gallery inside a Saved Layout cannot sync with a Saved Layout.', 'visual-portfolio' )
+			);
+		}
+
+		return $post;
+	}
+
+	/**
 	 * Post types whose content is edited as blocks.
 	 *
 	 * @return array
@@ -1231,8 +1251,7 @@ class Visual_Portfolio_Abilities {
 	}
 
 	/**
-	 * The Saved Layout a loop is synced with, titled when the current user
-	 * may read it to sync with, as the editor's Saved Layout panel shows it.
+	 * The Saved Layout a loop is synced with.
 	 *
 	 * @param array $loop - loop block.
 	 *
@@ -1245,11 +1264,9 @@ class Visual_Portfolio_Abilities {
 			return null;
 		}
 
-		$response = rest_do_request( new WP_REST_Request( 'GET', '/visual-portfolio/v1/saved-layouts/' . $id . '/sync-source' ) );
-
 		return array(
 			'id'    => $id,
-			'title' => $response->is_error() ? '' : (string) $response->get_data()['title'],
+			'title' => Visual_Portfolio_Loop_Gallery::get_saved_layout_title( $id ),
 		);
 	}
 

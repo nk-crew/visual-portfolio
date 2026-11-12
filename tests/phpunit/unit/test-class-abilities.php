@@ -295,7 +295,13 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 	public function test_galleries_sync_with_saved_layouts() {
 		// The test case resets the post types after every test.
 		if ( ! post_type_exists( Visual_Portfolio_Saved_Layouts::POST_TYPE ) ) {
-			register_post_type( Visual_Portfolio_Saved_Layouts::POST_TYPE, array( 'map_meta_cap' => true ) );
+			register_post_type(
+				Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				array(
+					'map_meta_cap' => true,
+					'show_in_rest' => true,
+				)
+			);
 		}
 
 		wp_set_current_user( self::$users['administrator'] );
@@ -396,6 +402,44 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 		$this->assertSame( 2, $updated['settings']['columns'] );
 		$this->assertSame( array( 'layoutColumnCount' ), array_values( $stored['attrs']['savedLayout']['overrides'] )[0] );
 		$this->assertStringContainsString( '--vp-layout-columns:2"', do_blocks( get_post( $post_id )->post_content ) );
+
+		// A layout the author may no longer read is named by its id alone.
+		wp_update_post(
+			array(
+				'ID'          => $layout,
+				'post_status' => 'draft',
+			)
+		);
+
+		$refused = $this->run_ability(
+			'update-gallery',
+			array(
+				'post_id'    => $post_id,
+				'gallery_id' => $gallery['gallery_id'],
+				'layout'     => 'visual-portfolio/gallery-tiles-mosaic',
+			),
+			'author'
+		);
+
+		$this->assertSame( 'vpf_synced_layout', $refused->get_error_code() );
+		$this->assertStringContainsString( 'Saved Layout #' . $layout . ',', $refused->get_error_message() );
+		$this->assertStringNotContainsString( 'Studio', $refused->get_error_message() );
+		$this->assertSame( '', $this->run_ability( 'get-gallery', array( 'post_id' => $post_id, 'gallery_id' => $gallery['gallery_id'] ), 'author' )['saved_layout']['title'] );
+
+		// A Saved Layout's own gallery syncs with no layout.
+		$own = Visual_Portfolio_Loop_Gallery::find_loops( parse_blocks( get_post( $draft )->post_content ) )[0]['gallery_id'];
+
+		$this->assertSame(
+			'vpf_saved_layout_in_layout',
+			$this->run_ability(
+				'update-gallery',
+				array(
+					'post_id'      => $draft,
+					'gallery_id'   => $own,
+					'saved_layout' => $layout,
+				)
+			)->get_error_code()
+		);
 
 		$detached = $this->run_ability(
 			'update-gallery',

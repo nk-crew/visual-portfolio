@@ -1064,8 +1064,9 @@ Over REST, `update-gallery` is annotated destructive and idempotent, so its
 the user can sync a gallery with (`saved_layouts`, each `{ id, title }`), the
 ones the editor's Saved Layout panel offers. `saved_layout` on
 `create-gallery` or `update-gallery` syncs the gallery with one of them: the
-loop takes the layout's item template and lightbox with no overrides, as the
-panel's link does, and keeps its own source, items per page and images.
+loop takes the layout's item template and lightbox with no overrides, and
+keeps its own source, items per page and images. A gallery inside a Saved
+Layout syncs with none.
 `saved_layout: null` on `update-gallery` detaches it through
 `Visual_Portfolio_Saved_Layout_Usage::detach_loop()`, so it keeps its current
 look; a query string carries no `null`, so `0` does the same there. The rest of
@@ -1080,8 +1081,10 @@ every attribute it changed under the item template, by its block's sync key,
 and the loop's `lightbox` under `loop`, joins `savedLayout.overrides`, and the
 loop is stored with the merged template. A source switch keeps the layout's
 click action, as it does in the editor. A locked layout refuses such a change
-with `vpf_saved_layout_locked`, and `layout` on a synced gallery is refused
-with `vpf_synced_layout` unless the same call passes `saved_layout: null`.
+with `vpf_saved_layout_locked`, and keeps the values of the overrides already
+stored for when it is unlocked. `layout` on a synced gallery is refused with
+`vpf_synced_layout` unless the same call passes `saved_layout: null`. An error
+names a layout the user may not read by its id alone.
 
 ### Extending the vocabulary
 

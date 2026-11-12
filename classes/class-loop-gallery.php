@@ -409,10 +409,9 @@ class Visual_Portfolio_Loop_Gallery {
 				return new WP_Error(
 					'vpf_synced_layout',
 					sprintf(
-						// translators: %1$s - Saved Layout title, %2$d - Saved Layout id.
-						__( 'This gallery is synced with the Saved Layout “%1$s” (%2$d), which provides its layout. To change the layout, pass `saved_layout: null` in the same call: the gallery then detaches, keeping its current look, and takes the new layout.', 'visual-portfolio' ),
-						self::get_saved_layout_title( $saved_layout ),
-						$saved_layout
+						// translators: %s - Saved Layout title and id, or its id.
+						__( 'This gallery is synced with the Saved Layout %s, which provides its layout. To change the layout, pass `saved_layout: null` in the same call: the gallery then detaches, keeping its current look, and takes the new layout.', 'visual-portfolio' ),
+						self::get_saved_layout_name( $saved_layout )
 					)
 				);
 			}
@@ -471,8 +470,9 @@ class Visual_Portfolio_Loop_Gallery {
 
 		// A synced loop changes the way the editor changes it: on what the
 		// page shows, each setting the layout provides that the call changed
-		// becoming an override.
-		$merged  = Visual_Portfolio_Saved_Layouts::apply_layout( $loop );
+		// becoming an override. A locked layout hides the overrides on the
+		// page; their values are kept for when it is unlocked.
+		$merged  = Visual_Portfolio_Saved_Layouts::apply_layout( $loop, null, false );
 		$changed = self::apply_input( $merged, $input, $action, $click_action, $before );
 
 		if ( is_wp_error( $changed ) ) {
@@ -489,9 +489,9 @@ class Visual_Portfolio_Loop_Gallery {
 			return new WP_Error(
 				'vpf_saved_layout_locked',
 				sprintf(
-					// translators: %s - Saved Layout title.
-					__( 'The Saved Layout “%s” is locked: a gallery synced with it cannot change the settings the layout provides, such as the columns, the lightbox and the item blocks. Edit the Saved Layout, or pass `saved_layout: null` in the same call to detach the gallery first.', 'visual-portfolio' ),
-					self::get_saved_layout_title( $id )
+					// translators: %s - Saved Layout title and id, or its id.
+					__( 'The Saved Layout %s is locked: a gallery synced with it cannot change the settings the layout provides, such as the columns, the lightbox and the item blocks. Edit the Saved Layout, or pass `saved_layout: null` in the same call to detach the gallery first.', 'visual-portfolio' ),
+					self::get_saved_layout_name( $id )
 				)
 			);
 		}
@@ -1057,22 +1057,39 @@ class Visual_Portfolio_Loop_Gallery {
 	}
 
 	/**
-	 * Title of a Saved Layout, as the editor shows it.
+	 * Title of a Saved Layout, when the current user may read it to sync
+	 * with, through the route the editor's Saved Layout panel reads.
+	 *
+	 * @param int $id - layout id.
+	 *
+	 * @return string empty when the user may not read it.
+	 */
+	public static function get_saved_layout_title( $id ) {
+		$response = rest_do_request( new WP_REST_Request( 'GET', '/visual-portfolio/v1/saved-layouts/' . (int) $id . '/sync-source' ) );
+
+		return $response->is_error() ? '' : (string) $response->get_data()['title'];
+	}
+
+	/**
+	 * A Saved Layout named in a message: its title and id, or its id alone
+	 * for a user who may not read it, as the editor's panel names it.
 	 *
 	 * @param int $id - layout id.
 	 *
 	 * @return string
 	 */
-	private static function get_saved_layout_title( $id ) {
-		return html_entity_decode( get_the_title( $id ), ENT_QUOTES, 'UTF-8' );
+	private static function get_saved_layout_name( $id ) {
+		$title = self::get_saved_layout_title( $id );
+
+		return '' === $title ? '#' . (int) $id : sprintf( '“%s” (%d)', $title, $id );
 	}
 
 	/**
 	 * A loop synced with a block-based Saved Layout, or detached from its own.
 	 *
-	 * Syncing takes the layout's item template and no overrides, as the
-	 * editor's Saved Layout panel links a gallery; the layout the loop already
-	 * follows keeps its overrides. Detaching keeps what the page shows.
+	 * Syncing takes the layout's item template and lightbox with no
+	 * overrides; the layout the loop already follows keeps its overrides.
+	 * Detaching keeps what the page shows.
 	 *
 	 * @param array    $loop - loop block.
 	 * @param int|null $id - layout id; null or 0 detaches.
@@ -1093,12 +1110,12 @@ class Visual_Portfolio_Loop_Gallery {
 
 		$layout = Visual_Portfolio_Saved_Layouts::get_layout_loop( $id );
 
-		if ( ! $layout || ! in_array( self::TEMPLATE, array_column( $layout['innerBlocks'], 'blockName' ), true ) ) {
+		if ( ! $layout ) {
 			return self::unknown_saved_layout( $id );
 		}
 
 		// A loop saved empty takes the layout's blocks, as a layout change does.
-		if ( ! in_array( self::TEMPLATE, array_column( $loop['innerBlocks'], 'blockName' ), true ) ) {
+		if ( ! self::find_block( $loop['innerBlocks'], self::TEMPLATE ) ) {
 			$loop = self::set_inner_blocks( $loop, $layout['innerBlocks'] );
 		}
 

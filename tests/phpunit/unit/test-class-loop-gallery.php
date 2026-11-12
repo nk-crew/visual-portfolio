@@ -96,6 +96,14 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 	 * @return int layout id.
 	 */
 	private function create_saved_layout( $status = 'publish' ) {
+		// The test case resets the post types after every test.
+		if ( ! post_type_exists( Visual_Portfolio_Saved_Layouts::POST_TYPE ) ) {
+			register_post_type( Visual_Portfolio_Saved_Layouts::POST_TYPE, array( 'map_meta_cap' => true ) );
+		}
+
+		// Messages name a layout the user may read by its title.
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
 		$loop = Visual_Portfolio_Loop_Gallery::create(
 			'visual-portfolio/gallery-masonry-classic',
 			array(
@@ -788,15 +796,19 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 
 	/**
 	 * A locked layout refuses a change to what it provides and lets the
-	 * loop's own settings change; a source switch keeps its click action.
+	 * loop's own settings change; a source switch keeps its click action,
+	 * and the overrides stored before the lock keep their values.
 	 */
 	public function test_locked_layout_refuses_synced_changes() {
 		$layout = $this->create_saved_layout();
 		$loop   = $this->synced_loop( $layout );
+		$loop   = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'settings' => array( 'columns' => 2 ) ), array( $loop ) );
 
 		update_post_meta( $layout, Visual_Portfolio_Saved_Layouts::LOCK_META, true );
 
-		$refused = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'settings' => array( 'columns' => 2 ) ), array( $loop ) );
+		$this->assertSame( 4, Visual_Portfolio_Loop_Gallery::describe( $loop )['settings']['columns'] );
+
+		$refused = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'settings' => array( 'columns' => 3 ) ), array( $loop ) );
 
 		$this->assertWPError( $refused );
 		$this->assertSame( 'vpf_saved_layout_locked', $refused->get_error_code() );
@@ -806,7 +818,11 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 
 		$this->assertSame( 'posts', $posts['attrs']['queryType'] );
 		$this->assertSame( 'popup', $this->attrs_of( $posts, 'visual-portfolio/item-image' )['clickAction'] );
-		$this->assertSame( array(), Visual_Portfolio_Saved_Layouts::sanitize_overrides( $posts['attrs']['savedLayout']['overrides'] ) );
+		$this->assertSame( $loop['attrs']['savedLayout'], $posts['attrs']['savedLayout'] );
+
+		delete_post_meta( $layout, Visual_Portfolio_Saved_Layouts::LOCK_META );
+
+		$this->assertSame( 2, Visual_Portfolio_Loop_Gallery::describe( $posts )['settings']['columns'] );
 	}
 
 	/**
@@ -859,5 +875,45 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 		}
 
 		$this->assertSame( $loop, Visual_Portfolio_Loop_Gallery::update( $loop, array( 'saved_layout' => null ), array( $loop ) ) );
+	}
+
+	/**
+	 * A layout saved before its pattern was picked can be synced with, and a
+	 * loop whose item template sits in a wrapper keeps its own blocks.
+	 */
+	public function test_sync_with_layouts_and_loops_of_any_shape() {
+		$this->create_saved_layout();
+
+		$empty = self::factory()->post->create(
+			array(
+				'post_type'    => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status'  => 'publish',
+				'post_content' => '<!-- wp:visual-portfolio/loop {"align":"wide"} /-->',
+			)
+		);
+		$loop  = Visual_Portfolio_Loop_Gallery::create( 'visual-portfolio/gallery-grid-classic', array( 'source' => $this->images_source( 1 ) ), array() );
+		$plain = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'saved_layout' => $empty ), array( $loop ) );
+
+		$this->assertSame( $empty, $plain['attrs']['savedLayout']['id'] );
+		$this->assertSame( $loop['innerBlocks'], $plain['innerBlocks'] );
+
+		$wrapped = $loop;
+		$wrapped = array_merge(
+			$wrapped,
+			array(
+				'innerBlocks' => array(
+					array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(),
+						'innerBlocks'  => array( $loop['innerBlocks'][0] ),
+						'innerHTML'    => '<div class="wp-block-group"></div>',
+						'innerContent' => array( '<div class="wp-block-group">', null, '</div>' ),
+					),
+				),
+			)
+		);
+		$synced  = Visual_Portfolio_Loop_Gallery::update( $wrapped, array( 'saved_layout' => $this->create_saved_layout() ), array( $wrapped ) );
+
+		$this->assertSame( array( 'core/group' ), array_column( $synced['innerBlocks'], 'blockName' ) );
 	}
 }
