@@ -89,6 +89,32 @@ class Test_Visual_Portfolio_Custom_Post_Type extends WP_UnitTestCase {
 	}
 
 	/**
+	 * With Pro active, disabling the portfolio post type keeps the
+	 * administrator's and editor's portfolio capabilities.
+	 *
+	 * @return void
+	 */
+	public function test_sync_roles_after_settings_update_keeps_portfolio_capabilities_with_pro() {
+		if ( ! visual_portfolio()->is_pro() ) {
+			$this->markTestSkipped( 'Runs with Pro active.' );
+		}
+
+		Visual_Portfolio_Custom_Post_Type::sync_roles_and_caps( true );
+		Visual_Portfolio_Custom_Post_Type::sync_roles_after_settings_update(
+			array(
+				'register_portfolio_post_type' => true,
+			),
+			array(
+				'register_portfolio_post_type' => false,
+			)
+		);
+
+		$this->assertTrue( get_role( 'administrator' )->has_cap( 'edit_portfolios' ) );
+		$this->assertTrue( get_role( 'editor' )->has_cap( 'edit_portfolios' ) );
+		$this->assertTrue( get_role( 'administrator' )->has_cap( 'edit_vp_lists' ) );
+	}
+
+	/**
 	 * Pro's Social Items and Proofing use the portfolio capabilities, so with the
 	 * Portfolio post type off the administrator keeps them while Pro is active
 	 * and loses them on the first sync after Pro is gone.
@@ -106,9 +132,6 @@ class Test_Visual_Portfolio_Custom_Post_Type extends WP_UnitTestCase {
 		$this->assertTrue( get_role( 'editor' )->has_cap( 'edit_portfolios' ) );
 		$this->assertTrue( get_role( 'portfolio_manager' )->has_cap( 'edit_portfolios' ) );
 		$this->assertNotNull( get_role( 'portfolio_author' ) );
-
-		$sync->invoke( null, false, true );
-		$this->assertTrue( get_role( 'administrator' )->has_cap( 'edit_portfolios' ) );
 
 		$sync->invoke( null, false, false );
 
