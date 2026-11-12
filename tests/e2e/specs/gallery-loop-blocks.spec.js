@@ -477,6 +477,13 @@ test.describe('Gallery Loop blocks', () => {
 			);
 			await editor.openDocumentSettingsSidebar();
 
+			// A filter opens on its List tab, and the note is in Settings.
+			const settingsTab = page.getByRole('tab', { name: 'Settings' });
+
+			if (await settingsTab.count()) {
+				await settingsTab.click();
+			}
+
 			await expect(page.getByText(note, { exact: true })).toBeVisible();
 		}
 
