@@ -1059,21 +1059,21 @@ class Visual_Portfolio_Loop_Gallery {
 	}
 
 	/**
-	 * Title of a Saved Layout, when the current user may read it to sync
-	 * with, through the route the editor's Saved Layout panel reads.
-	 *
-	 * The route holds the access rule, the private
-	 * `Visual_Portfolio_Saved_Layouts_REST::can_read_for_sync()`; a public
-	 * helper of that rule would replace the request.
+	 * Title of a block-based Saved Layout, when the current user may read it
+	 * to sync with.
 	 *
 	 * @param int $id - layout id.
 	 *
 	 * @return string empty when the user may not read it.
 	 */
 	public static function get_saved_layout_title( $id ) {
-		$response = rest_do_request( new WP_REST_Request( 'GET', '/visual-portfolio/v1/saved-layouts/' . (int) $id . '/sync-source' ) );
+		$post = get_post( (int) $id );
 
-		return $response->is_error() ? '' : (string) $response->get_data()['title'];
+		if ( ! $post || ! Visual_Portfolio_Saved_Layouts::is_block_layout( $post ) || ! Visual_Portfolio_Saved_Layouts_REST::can_read_for_sync( $post ) ) {
+			return '';
+		}
+
+		return html_entity_decode( get_the_title( $post ), ENT_QUOTES, 'UTF-8' );
 	}
 
 	/**

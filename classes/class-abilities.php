@@ -512,33 +512,8 @@ class Visual_Portfolio_Abilities {
 			'layouts'       => $layouts,
 			'sources'       => $sources,
 			'settings'      => $settings,
-			'saved_layouts' => $this->get_saved_layout_choices(),
+			'saved_layouts' => Visual_Portfolio_Saved_Layouts_REST::get_sync_choices(),
 		);
-	}
-
-	/**
-	 * Saved Layouts the current user can sync a gallery with, the ones the
-	 * editor's Saved Layout panel offers, from the route that holds the
-	 * private access rule `Visual_Portfolio_Saved_Layouts_REST::can_read_for_sync()`.
-	 *
-	 * @return array list of array( id, title ).
-	 */
-	private function get_saved_layout_choices() {
-		$response = rest_do_request( new WP_REST_Request( 'GET', '/visual-portfolio/v1/saved-layouts/choices' ) );
-		$choices  = array();
-
-		if ( $response->is_error() ) {
-			return $choices;
-		}
-
-		foreach ( (array) $response->get_data() as $choice ) {
-			$choices[] = array(
-				'id'    => (int) $choice['id'],
-				'title' => (string) $choice['title'],
-			);
-		}
-
-		return $choices;
 	}
 
 	/**
@@ -1136,7 +1111,7 @@ class Visual_Portfolio_Abilities {
 			);
 		}
 
-		if ( ! empty( $input['saved_layout'] ) && ! in_array( (int) $input['saved_layout'], array_column( $this->get_saved_layout_choices(), 'id' ), true ) ) {
+		if ( ! empty( $input['saved_layout'] ) && ! in_array( (int) $input['saved_layout'], array_column( Visual_Portfolio_Saved_Layouts_REST::get_sync_choices(), 'id' ), true ) ) {
 			return Visual_Portfolio_Loop_Gallery::unknown_saved_layout( $input['saved_layout'] );
 		}
 
