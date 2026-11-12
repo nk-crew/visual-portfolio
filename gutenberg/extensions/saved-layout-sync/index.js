@@ -17,6 +17,7 @@ import SavedLayoutPanel from './panel';
 import { useLayout } from './source';
 import {
 	getChangedNames,
+	getClearedKeys,
 	getOverrides,
 	getSyncKey,
 	LOOP_BLOCK,
@@ -106,8 +107,20 @@ function SyncedBlockEdit({ BlockEdit, loopId, editProps }) {
 		(next) => {
 			const capture = getCapture();
 
+			// A handler that writes an object as it is drops a key the page
+			// cleared, so it owns those keys.
+			const withCleared = (list) =>
+				list.flatMap((name) => [
+					name,
+					...getClearedKeys(
+						getOverrides(reference?.overrides)[key] || [],
+						name,
+						attributes
+					),
+				]);
+
 			if (capture) {
-				capture.push(...getChangedNames(next, attributes));
+				capture.push(...withCleared(getChangedNames(next, attributes)));
 				return;
 			}
 
@@ -121,10 +134,10 @@ function SyncedBlockEdit({ BlockEdit, loopId, editProps }) {
 			if (isResetting()) {
 				const value =
 					typeof next === 'function' ? next(attributes) : { ...next };
-				const resetNames = [
-					...names,
-					...getResetNames().filter(isSynced),
-				];
+				const owned = getResetNames().filter(isSynced);
+				const resetNames = owned.length
+					? [...names, ...owned]
+					: withCleared(names);
 				const attributeNames = getAttributes(resetNames);
 
 				attributeNames.forEach((attribute) => {

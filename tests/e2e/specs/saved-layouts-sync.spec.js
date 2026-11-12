@@ -551,6 +551,30 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 			autoplay: true,
 		});
 
+		// The page cleared a key the layout sets; the setting that drops it
+		// is marked, and its reset takes it back.
+		await expect(
+			autoplay.getByText('Changed on this gallery')
+		).toBeVisible();
+		await autoplay
+			.getByRole('button', { name: 'Reset to Saved Layout' })
+			.click();
+		await expect.poll(getState).toEqual({
+			overrides: { [key]: ['extensions.foo'] },
+			extensions: { foo: 'page', marquee: { speed: 1 } },
+			autoplay: true,
+		});
+
+		// The panel's Reset all takes a cleared key back too.
+		await open({ [key]: ['extensions.marquee'] }, { foo: 'layout' });
+		await page.getByRole('button', { name: 'Carousel options' }).click();
+		await page.getByRole('menuitem', { name: 'Reset all' }).click();
+		await expect.poll(getState).toEqual({
+			overrides: {},
+			extensions: { foo: 'layout', marquee: { speed: 1 } },
+			autoplay: true,
+		});
+
 		// A changed key marks the setting that owns it, and its reset takes
 		// that key back from the layout alone.
 		await open(
@@ -606,7 +630,7 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 				content: loopMarkup(
 					{ queryType: 'images' },
 					{ layoutType: 'masonry' },
-					'<!-- wp:visual-portfolio/item-image {"extensions":{"testFilter":"layout","testTilt":"layout"}} /-->'
+					'<!-- wp:visual-portfolio/item-image {"extensions":{"testFilter":"layout","testTilt":"layout","testBlend":"layout"}} /-->'
 				),
 			},
 		});
@@ -625,9 +649,9 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 
 		await admin.createNewPost({ title: 'Synced page with an extension' });
 
-		// Two settings of an extension, built on the plugin's own
-		// `ToolsPanelItem`: one tells its key by what its reset writes, the
-		// other names it.
+		// Settings of an extension, built on the plugin's own
+		// `ToolsPanelItem`: two tell their key by what their reset writes, one
+		// names it.
 		await page.evaluate(() => {
 			const { createElement } = window.wp.element;
 			const { ToolsPanelItem } = window.wp.data
@@ -668,6 +692,10 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 							'extensions.testTilt',
 						]),
 					},
+					{
+						name: 'testBlend',
+						Item: item('testBlend', 'Test blend'),
+					},
 				]
 			);
 		});
@@ -686,6 +714,7 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 							[imageKey]: [
 								'extensions.testFilter',
 								'extensions.testTilt',
+								'extensions.testBlend',
 							],
 						},
 					},
@@ -709,7 +738,7 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 				};
 			});
 
-		// The page cleared the tilt the layout sets.
+		// The page cleared the tilt and the blend the layout sets.
 		await expect
 			.poll(async () => (await getImage()).extensions)
 			.toEqual({
@@ -727,6 +756,9 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 		const tiltItem = page
 			.locator('.components-tools-panel-item')
 			.filter({ hasText: 'Test tilt control' });
+		const blendItem = page
+			.locator('.components-tools-panel-item')
+			.filter({ hasText: 'Test blend control' });
 
 		await expect(
 			filterItem.getByText('Changed on this gallery')
@@ -734,17 +766,37 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 		await expect(
 			tiltItem.getByText('Changed on this gallery')
 		).toBeVisible();
+		await expect(
+			blendItem.getByText('Changed on this gallery')
+		).toBeVisible();
 
 		await tiltItem
 			.getByRole('button', { name: 'Reset to Saved Layout' })
 			.click();
 		await expect.poll(getImage).toMatchObject({
-			overrides: { [imageKey]: ['extensions.testFilter'] },
+			overrides: {
+				[imageKey]: ['extensions.testFilter', 'extensions.testBlend'],
+			},
 			extensions: { testFilter: 'page', testTilt: 'layout' },
 		});
 		await expect(tiltItem.getByText('Changed on this gallery')).toHaveCount(
 			0
 		);
+		await expect(
+			blendItem.getByText('Changed on this gallery')
+		).toBeVisible();
+
+		await blendItem
+			.getByRole('button', { name: 'Reset to Saved Layout' })
+			.click();
+		await expect.poll(getImage).toMatchObject({
+			overrides: { [imageKey]: ['extensions.testFilter'] },
+			extensions: {
+				testFilter: 'page',
+				testTilt: 'layout',
+				testBlend: 'layout',
+			},
+		});
 		await expect(
 			filterItem.getByText('Changed on this gallery')
 		).toBeVisible();

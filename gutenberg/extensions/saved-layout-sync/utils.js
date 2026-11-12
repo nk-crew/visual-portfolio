@@ -203,7 +203,34 @@ export function withoutUnchanged(names) {
 }
 
 /**
- * Attributes of a block that differ from its block type's defaults.
+ * Overridden keys of an object attribute that a block does not set: settings
+ * cleared on the page. A handler that drops such a key writes the object as
+ * it is, so these are what it can be told to own.
+ *
+ * @param {string[]} names      - overridden names of the block.
+ * @param {string}   attribute  - object attribute.
+ * @param {Object}   attributes - the block's attributes.
+ * @return {string[]} names.
+ */
+export function getClearedKeys(names, attribute, attributes) {
+	const value = isObject(attributes?.[attribute])
+		? attributes[attribute]
+		: {};
+
+	return names.filter((name) => {
+		const { attribute: owner, key } = parseOverride(name);
+
+		return (
+			owner === attribute &&
+			key !== '' &&
+			typeof value[key] === 'undefined'
+		);
+	});
+}
+
+/**
+ * Settings of a block that differ from its block type's defaults, named as
+ * `getChangedNames()` names them.
  *
  * @param {Object} block - block.
  * @return {string[]} names.
@@ -211,20 +238,19 @@ export function withoutUnchanged(names) {
 export function getChangedFromDefaults(block) {
 	const definitions = getBlockType(block.name)?.attributes || {};
 
-	return Object.keys(block.attributes || {}).filter((name) => {
-		if (NOT_SETTINGS.includes(name)) {
-			return false;
-		}
-
+	return Object.keys(block.attributes || {}).flatMap((name) => {
 		const value = block.attributes[name];
+		const fallback = definitions[name]?.default;
 
-		if (typeof value === 'undefined') {
-			return false;
+		if (
+			NOT_SETTINGS.includes(name) ||
+			typeof value === 'undefined' ||
+			JSON.stringify(value) === JSON.stringify(fallback)
+		) {
+			return [];
 		}
 
-		return (
-			JSON.stringify(value) !== JSON.stringify(definitions[name]?.default)
-		);
+		return getChangedNames({ [name]: value }, { [name]: fallback });
 	});
 }
 
