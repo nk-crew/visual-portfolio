@@ -113,6 +113,7 @@ export default function ItemImageEdit({
 		scale,
 		showFormatBadge,
 		formatBadgePosition,
+		formatBadgeFormats,
 	} = attributes;
 
 	const {
@@ -532,6 +533,7 @@ export default function ItemImageEdit({
 					<ItemFormatBadge
 						format={itemFormat}
 						position={formatBadgePosition}
+						formats={formatBadgeFormats}
 					/>
 				)}
 			</figure>

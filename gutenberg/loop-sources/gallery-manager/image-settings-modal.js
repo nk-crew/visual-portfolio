@@ -11,7 +11,6 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -24,28 +23,11 @@ import LoopImageSettingsSlot, {
 } from '../../components/loop-image-settings-slot';
 import MediaPreviewCard from '../../components/media-preview-card';
 import { ToggleGroupButtonsControl } from '../../components/toggle-group-control';
+import { getLoopImageFormats } from '../../utils/loop-image-formats';
 import { getImageKey, prepareImage } from './prepare-images';
 import PreviewMedia from './preview-media';
 
 const { admin_url: adminUrl } = window.VPGutenbergVariables;
-
-const FORMAT_OPTIONS = [
-	{ value: 'standard', label: __('Standard', 'visual-portfolio') },
-	{ value: 'video', label: __('Video', 'visual-portfolio') },
-];
-
-/**
- * The formats an image can be given.
- *
- * Pro adds its formats through this filter, and the fields of a format through
- * the `VP.LoopImageSettings` slot. A saved format the list lacks stays on the
- * image until another one is picked.
- *
- * @return {Array} select options.
- */
-function getFormatOptions() {
-	return applyFilters('vpf.loopImageFormats', FORMAT_OPTIONS);
-}
 
 const STATE_OPTIONS = [
 	{ value: 'default', label: __('Default', 'visual-portfolio') },
@@ -419,7 +401,7 @@ export default function ImageSettingsModal({
 					<SelectControl
 						label={__('Format', 'visual-portfolio')}
 						value={image.format || 'standard'}
-						options={getFormatOptions()}
+						options={getLoopImageFormats()}
 						onChange={(format) => onChange({ format })}
 					/>
 

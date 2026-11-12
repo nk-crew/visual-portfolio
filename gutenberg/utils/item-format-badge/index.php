@@ -17,10 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @param string $format   - item format.
  * @param string $position - corner of the picture, as `top-right`.
+ * @param array  $formats  - formats that get a badge, every one when empty.
  *
  * @return string
  */
-function visual_portfolio_get_item_format_badge( $format, $position ) {
+function visual_portfolio_get_item_format_badge( $format, $position, $formats = array() ) {
 	$badges = array(
 		'video'   => array( 'icons/play', __( 'Video', 'visual-portfolio' ) ),
 		'audio'   => array( 'icons/music', __( 'Audio', 'visual-portfolio' ) ),
@@ -28,6 +29,12 @@ function visual_portfolio_get_item_format_badge( $format, $position ) {
 	);
 
 	if ( ! isset( $badges[ $format ] ) ) {
+		return '';
+	}
+
+	$formats = array_intersect( array_filter( (array) $formats, 'is_string' ), array_keys( $badges ) );
+
+	if ( ! empty( $formats ) && ! in_array( $format, $formats, true ) ) {
 		return '';
 	}
 

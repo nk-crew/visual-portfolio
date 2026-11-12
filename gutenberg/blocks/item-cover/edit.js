@@ -168,6 +168,7 @@ export default function ItemCoverEdit({
 		style,
 		showFormatBadge,
 		formatBadgePosition,
+		formatBadgeFormats,
 	} = attributes;
 
 	const {
@@ -623,6 +624,7 @@ export default function ItemCoverEdit({
 						<ItemFormatBadge
 							format={itemFormat}
 							position={formatBadgePosition}
+							formats={formatBadgeFormats}
 						/>
 					)}
 				</div>

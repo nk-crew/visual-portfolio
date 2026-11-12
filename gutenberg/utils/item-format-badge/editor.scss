@@ -1,0 +1,23 @@
+// The panel item zeroes the bottom margin of its fieldsets.
+.components-tools-panel-item > .vpf-format-badge-formats {
+	display: grid;
+	gap: 8px;
+	padding: 0;
+	margin: 16px 0;
+	border: 0;
+
+	> legend {
+		padding: 0;
+	}
+}
+
+.vpf-format-badge-formats__label {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+
+	.vp-svg-icon {
+		width: 16px;
+		height: 16px;
+	}
+}
