@@ -2046,6 +2046,8 @@ class Visual_Portfolio_Get {
 			$options['active_sort'] = $active_sort;
 		}
 
+		$options['loop_query_id'] = self::sanitize_query_id( $query_id );
+
 		$options    = apply_filters( 'vpf_extend_options_before_query_args', $options, $layout_id );
 		$query_opts = array();
 		$is_images  = 'images' === $options['content_source'];

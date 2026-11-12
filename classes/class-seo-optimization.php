@@ -219,7 +219,7 @@ class Visual_Portfolio_SEO_Optimization {
 				return true;
 			}
 
-			if ( ! preg_match( '/^vp[_-](?:[0-9]+-)?(filter|sort|search|page)$/', $name, $matches ) ) {
+			if ( ! preg_match( '/^vp_(filter|sort|search|page)$/', $name, $matches ) && ! preg_match( '/^vp-[0-9]+-([a-z0-9_-]+)$/', $name, $matches ) ) {
 				continue;
 			}
 
