@@ -10,6 +10,8 @@ import {
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -144,20 +146,48 @@ export function ItemFormatBadge({ format, position, formats = [] }) {
 }
 
 /**
- * A checkbox per format that has a badge, of the formats a gallery offers.
+ * The formats with a badge that items of a source can have: the post formats
+ * the theme supports for posts, the formats an image can be given otherwise.
+ *
+ * @param {string} queryType - query type of the loop.
+ * @return {Array} formats, as `{ value, label }`.
+ */
+function useBadgeFormats(queryType) {
+	const themeFormats = useSelect(
+		(select) =>
+			'posts' === queryType
+				? select(coreStore).getThemeSupports()?.formats
+				: null,
+		[queryType]
+	);
+
+	if ('posts' === queryType) {
+		return Object.keys(BADGES)
+			.filter(
+				(format) =>
+					Array.isArray(themeFormats) && themeFormats.includes(format)
+			)
+			.map((format) => ({ value: format, label: BADGES[format].label }));
+	}
+
+	return getLoopImageFormats().filter((format) => BADGES[format.value]);
+}
+
+/**
+ * A checkbox per format that has a badge, of the formats the loop's items can
+ * have.
  *
  * An empty list checks them all. Unchecking one writes the explicit list, and
  * the last checked one stays checked: an empty list would mean every format.
  *
- * @param {Object}   props          - component props.
- * @param {Array}    props.value    - formats picked, every one when empty.
- * @param {Function} props.onChange - formats setter.
+ * @param {Object}   props           - component props.
+ * @param {Array}    props.value     - formats picked, every one when empty.
+ * @param {Function} props.onChange  - formats setter.
+ * @param {string}   props.queryType - query type of the loop.
  * @return {Element|null} control.
  */
-function FormatBadgeFormatsControl({ value, onChange }) {
-	const offered = getLoopImageFormats().filter(
-		(format) => BADGES[format.value]
-	);
+function FormatBadgeFormatsControl({ value, onChange, queryType }) {
+	const offered = useBadgeFormats(queryType);
 	const offeredValues = offered.map((format) => format.value);
 	const picked = value.length ? value : offeredValues;
 
@@ -214,9 +244,15 @@ function FormatBadgeFormatsControl({ value, onChange }) {
  * @param {Object}   props.attributes    - block attributes.
  * @param {Function} props.setAttributes - block attribute setter.
  * @param {string}   props.panelId       - tools panel id.
+ * @param {string}   props.queryType     - query type of the loop.
  * @return {Element} panel items.
  */
-export function FormatBadgeSettings({ attributes, setAttributes, panelId }) {
+export function FormatBadgeSettings({
+	attributes,
+	setAttributes,
+	panelId,
+	queryType,
+}) {
 	const { showFormatBadge, formatBadgePosition, formatBadgeFormats } =
 		attributes;
 
@@ -239,6 +275,7 @@ export function FormatBadgeSettings({ attributes, setAttributes, panelId }) {
 			{showFormatBadge && (
 				<>
 					<FormatBadgeFormatsControl
+						queryType={queryType}
 						value={formatBadgeFormats || []}
 						onChange={(value) =>
 							setAttributes({ formatBadgeFormats: value })

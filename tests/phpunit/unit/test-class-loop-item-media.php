@@ -273,5 +273,10 @@ class ClassLoopItemMedia extends WP_UnitTestCase {
 
 		$this->assertSame( 1, substr_count( $cover, 'vp-item-format-badge' ) );
 		$this->assertStringContainsString( 'aria-label="Video"', $cover );
+
+		// A list of formats no item has badges none, as the editor shows it.
+		$unknown = $this->render_loop( $images, '<!-- wp:visual-portfolio/item-image {"showFormatBadge":true,"formatBadgeFormats":["unknown"]} /-->' );
+
+		$this->assertSame( 0, substr_count( $unknown, 'vp-item-format-badge' ) );
 	}
 }

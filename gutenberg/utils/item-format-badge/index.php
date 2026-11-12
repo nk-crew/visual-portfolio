@@ -32,7 +32,8 @@ function visual_portfolio_get_item_format_badge( $format, $position, $formats = 
 		return '';
 	}
 
-	$formats = array_intersect( array_filter( (array) $formats, 'is_string' ), array_keys( $badges ) );
+	// As the editor reads it: a list names the formats that get a badge.
+	$formats = array_filter( (array) $formats, 'is_string' );
 
 	if ( ! empty( $formats ) && ! in_array( $format, $formats, true ) ) {
 		return '';

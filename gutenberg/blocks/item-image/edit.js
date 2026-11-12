@@ -506,6 +506,7 @@ export default function ItemImageEdit({
 								attributes={attributes}
 								setAttributes={setAttributes}
 								panelId={clientId}
+								queryType={context['vp/queryType']}
 							/>
 						</ToolsPanel>
 					</InspectorControls>
