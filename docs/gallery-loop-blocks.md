@@ -18,6 +18,7 @@ and are not affected by anything on this page.
 - [Block context](#block-context)
 - [PHP hooks](#php-hooks)
 - [Content sources](#content-sources)
+- [Abilities for AI agents](#abilities-for-ai-agents)
 - [Block Bindings](#block-bindings)
 - [Interactivity stores](#interactivity-stores)
 - [URL parameters and caching](#url-parameters-and-caching)
@@ -1020,6 +1021,111 @@ columns and pattern editor filters. The notation itself — `parseTiles`,
 in the `visual-portfolio/components` store beside `TilesPresetsSelect`, with
 `getViewportBreakpoints()` for the breakpoints the editor previews a tablet and
 a phone at.
+
+## Abilities for AI agents
+
+On WordPress 7.1 and newer the plugin registers eight abilities with the
+Abilities API, in the category `visual-portfolio`. Each is `public`, so the
+REST API, the WordPress MCP Adapter and the agents behind it (Claude, Cursor,
+any MCP client) can call it, always as the logged-in user and only within
+that user's capabilities.
+
+| Ability | Permission | What it does |
+| --- | --- | --- |
+| `visual-portfolio/get-gallery-options` | `edit_posts` | Lists the layouts (the patterns registered for `visual-portfolio/loop`), the sources and the settings. |
+| `visual-portfolio/list-galleries` | `edit_posts` | Lists the loops in posts, pages and templates the user can edit. |
+| `visual-portfolio/find-images` | `upload_files` | Finds Media Library images by words and upload date, to use as a gallery's images. |
+| `visual-portfolio/find-posts` | `edit_posts` | Finds published posts of a type by words and terms. |
+| `visual-portfolio/find-terms` | `edit_posts` | Finds public terms by taxonomy and words. |
+| `visual-portfolio/get-gallery` | `edit_post` | Reads one loop. |
+| `visual-portfolio/create-gallery` | `edit_post`, or creating a page or a post | Adds a loop built from a layout to a post, or to a new draft: a page, or a post for a user who cannot create pages. |
+| `visual-portfolio/update-gallery` | `edit_post` | Changes the layout, source, settings or images of a loop. |
+
+A gallery is addressed by `post_id` and `gallery_id`, the loop's `block_id`. A
+loop saved without one, or with one an earlier loop of the post already holds,
+is `loop-<n>`, its position in the post. Its first change gives it an id of its
+own, and a gallery created at the start of the post moves the positions.
+
+The abilities speak a vocabulary of their own rather than block attributes:
+`layout` is a pattern slug, `source` is `{ type, ... }` (`images` with
+attachment ids, `posts` with a post type, ids, terms and an order), `settings`
+are `columns`, `per_page` and `lightbox`. A new loop starts the way the
+editor's setup starts it (`gutenberg/blocks/loop/layout-defaults.js`), with a
+fresh `block_id` and the lowest `queryId` free in the post. Writes go through
+`wp_update_post()`, so revisions and the Custom Query guard apply.
+
+Over REST, `update-gallery` is annotated destructive and idempotent, so its
+`run` endpoint answers `DELETE` with the input in the query string, the method
+`executeAbility()` of `@wordpress/abilities` picks for it.
+
+### Extending the vocabulary
+
+`vpf_gallery_ability_vocabulary` filters the sources and settings the
+abilities accept. A source is `type => array( label, description, available,
+requires_pro, schema, keys )`, where `schema` is a JSON schema whose
+`properties` join the input schema of `source`, and `keys` lists the
+`sourceQuery` keys `get-gallery` reports as the source's `settings`. A setting is `key => array( description,
+schema )`.
+
+```php
+add_filter(
+	'vpf_gallery_ability_vocabulary',
+	function ( $vocabulary ) {
+		$vocabulary['sources']['acme/instagram'] = array(
+			'label'        => 'Instagram',
+			'description'  => 'Photos of an Instagram account.',
+			'available'    => true,
+			'requires_pro' => false,
+			'schema'       => array(
+				'properties' => array(
+					'account' => array( 'type' => 'string' ),
+				),
+			),
+		);
+
+		return $vocabulary;
+	}
+);
+```
+
+A source of another type reads and writes its fields as `source.settings`,
+which the plugin merges into the loop's `sourceQuery`. `get-gallery` reports
+them the same way, so an agent can send a gallery back unchanged.
+
+`vpf_gallery_ability_apply` filters the parsed loop after the plugin applied
+what it knows, with the ability input, the action, `create` or `update`, and the
+loop before the change (on create, the layout's loop). A switch to another
+source keeps the keys `sourceQuery` held, as the editor's source picker does,
+so a source drops the keys of the source before it that it would misread.
+Fields declared at the top level of the source, and settings added above, are
+turned into attributes here.
+
+```php
+add_filter(
+	'vpf_gallery_ability_apply',
+	function ( $loop, $input, $action ) {
+		if ( 'acme/instagram' === ( $input['source']['type'] ?? '' ) ) {
+			// Merge: `sourceQuery` also holds fields of other features.
+			$loop['attrs']['sourceQuery'] = array_merge(
+				$loop['attrs']['sourceQuery'] ?? array(),
+				array( 'account' => $input['source']['account'] ?? '' )
+			);
+		}
+
+		return $loop;
+	},
+	10,
+	3
+);
+```
+
+`tests/phpunit/unit/test-class-abilities-coverage.php` fails when the loop gains
+an attribute, a layout type, a source or a setup default the abilities have not
+decided about, so the abilities change in the same diff as the blocks.
+
+Without Pro, `get-gallery-options` lists the Pro sources, Taxonomies and
+Social, with `requires_pro: true`, and asking for one returns the
+`vpf_requires_pro` error with a link to Pro.
 
 ## Block Bindings
 
