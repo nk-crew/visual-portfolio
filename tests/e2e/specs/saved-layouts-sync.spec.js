@@ -452,6 +452,304 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 		expect((await getParagraph()).className).toBe('layout-text');
 	});
 
+	test('a key of `extensions` is changed and reset on its own', async ({
+		admin,
+		page,
+		requestUtils,
+	}) => {
+		await requestUtils.rest({
+			method: 'POST',
+			path: `/wp/v2/vp_lists/${layoutId}`,
+			data: {
+				content: loopMarkup(
+					{ queryType: 'posts' },
+					{
+						layoutType: 'carousel',
+						carouselAutoplay: true,
+						extensions: { foo: 'layout', marquee: { speed: 1 } },
+					}
+				),
+			},
+		});
+		const raw = (
+			await requestUtils.rest({
+				path: `/wp/v2/vp_lists/${layoutId}`,
+				params: { context: 'edit' },
+			})
+		).content.raw;
+		const key = raw.match(
+			/wp:visual-portfolio\/item-template \{[^\n]*?"vpSyncKey":"([^"]+)"/
+		)[1];
+
+		await admin.createNewPost({ title: 'Synced page with extensions' });
+
+		const open = async (overrides, extensions) => {
+			await page.evaluate(
+				(content) =>
+					window.wp.data
+						.dispatch('core/block-editor')
+						.resetBlocks(window.wp.blocks.parse(content)),
+				loopMarkup(
+					{
+						queryType: 'posts',
+						savedLayout: { id: layoutId, overrides },
+					},
+					{
+						metadata: { vpSyncKey: key },
+						layoutType: 'carousel',
+						carouselAutoplay: true,
+						extensions,
+					}
+				)
+			);
+			await page.evaluate(() => {
+				const { select, dispatch } = window.wp.data;
+				const loop = select('core/block-editor').getBlocks()[0];
+
+				dispatch('core/block-editor').selectBlock(
+					loop.innerBlocks[0].clientId
+				);
+			});
+		};
+		const getState = () =>
+			page.evaluate(() => {
+				const loop = window.wp.data
+					.select('core/block-editor')
+					.getBlocks()[0];
+				const template = loop.innerBlocks[0];
+
+				return {
+					overrides: loop.attributes.savedLayout.overrides,
+					extensions: template.attributes.extensions,
+					autoplay: template.attributes.carouselAutoplay,
+				};
+			});
+		const autoplay = page
+			.locator('.components-tools-panel-item')
+			.filter({ hasText: 'Pauses while the visitor' });
+		const marks = page.getByText('Changed on this gallery');
+
+		// A change to one key records that key alone; the others stay as
+		// they were.
+		await open(
+			{ [key]: ['extensions.foo'] },
+			{ foo: 'page', marquee: { speed: 1 } }
+		);
+		await expect
+			.poll(async () => (await getState()).extensions)
+			.toEqual({
+				foo: 'page',
+				marquee: { speed: 1 },
+			});
+		await expect(marks).toHaveCount(0);
+		await autoplay
+			.getByRole('combobox', { name: 'Mode' })
+			.selectOption('step');
+		await expect.poll(getState).toEqual({
+			overrides: { [key]: ['extensions.foo', 'extensions.marquee'] },
+			extensions: { foo: 'page' },
+			autoplay: true,
+		});
+
+		// A changed key marks the setting that owns it, and its reset takes
+		// that key back from the layout alone.
+		await open(
+			{ [key]: ['extensions.foo', 'extensions.marquee'] },
+			{ foo: 'page', marquee: { speed: 2 } }
+		);
+		await expect(
+			autoplay.getByText('Changed on this gallery')
+		).toBeVisible();
+		await expect(marks).toHaveCount(1);
+		await autoplay
+			.getByRole('button', { name: 'Reset to Saved Layout' })
+			.click();
+		await expect.poll(getState).toEqual({
+			overrides: { [key]: ['extensions.foo'] },
+			extensions: { foo: 'page', marquee: { speed: 1 } },
+			autoplay: true,
+		});
+		await expect(marks).toHaveCount(0);
+
+		// A whole `extensions` stored before keeps its meaning: it marks the
+		// setting, and the reset takes the layout's object.
+		await open(
+			{ [key]: ['extensions'] },
+			{ foo: 'page', marquee: { speed: 2 } }
+		);
+		await expect(
+			autoplay.getByText('Changed on this gallery')
+		).toBeVisible();
+		await autoplay
+			.getByRole('button', { name: 'Reset to Saved Layout' })
+			.click();
+		await expect.poll(getState).toEqual({
+			overrides: {},
+			extensions: { foo: 'layout', marquee: { speed: 1 } },
+			autoplay: true,
+		});
+	});
+
+	test('an extension’s settings in `extensions` are marked one by one', async ({
+		admin,
+		page,
+		requestUtils,
+	}) => {
+		const image = await requestUtils.uploadMedia(
+			getFixturePath('image-800x600.png')
+		);
+
+		await requestUtils.rest({
+			method: 'POST',
+			path: `/wp/v2/vp_lists/${layoutId}`,
+			data: {
+				content: loopMarkup(
+					{ queryType: 'images' },
+					{ layoutType: 'masonry' },
+					'<!-- wp:visual-portfolio/item-image {"extensions":{"testFilter":"layout","testTilt":"layout"}} /-->'
+				),
+			},
+		});
+		const raw = (
+			await requestUtils.rest({
+				path: `/wp/v2/vp_lists/${layoutId}`,
+				params: { context: 'edit' },
+			})
+		).content.raw;
+		const templateKey = raw.match(
+			/wp:visual-portfolio\/item-template \{[^\n]*?"vpSyncKey":"([^"]+)"/
+		)[1];
+		const imageKey = raw.match(
+			/wp:visual-portfolio\/item-image \{[^\n]*?"vpSyncKey":"([^"]+)"/
+		)[1];
+
+		await admin.createNewPost({ title: 'Synced page with an extension' });
+
+		// Two settings of an extension, built on the plugin's own
+		// `ToolsPanelItem`: one tells its key by what its reset writes, the
+		// other names it.
+		await page.evaluate(() => {
+			const { createElement } = window.wp.element;
+			const { ToolsPanelItem } = window.wp.data
+				.select('visual-portfolio/components')
+				.get();
+			const item =
+				(name, label, attributeKeys) =>
+				({ attributes, setAttributes, clientId }) =>
+					createElement(
+						ToolsPanelItem,
+						{
+							label,
+							panelId: clientId,
+							attributeKeys,
+							hasValue: () => !!attributes.extensions?.[name],
+							onDeselect: () => {
+								const { [name]: previous, ...others } =
+									attributes.extensions || {};
+
+								setAttributes({ extensions: others });
+							},
+						},
+						createElement('p', null, `${label} control`)
+					);
+
+			window.wp.hooks.addFilter(
+				'vpf.itemImageSettingsItems',
+				'vpf-e2e/extension-items',
+				(items) => [
+					...items,
+					{
+						name: 'testFilter',
+						Item: item('testFilter', 'Test filter'),
+					},
+					{
+						name: 'testTilt',
+						Item: item('testTilt', 'Test tilt', [
+							'extensions.testTilt',
+						]),
+					},
+				]
+			);
+		});
+		await page.evaluate(
+			(content) =>
+				window.wp.data
+					.dispatch('core/block-editor')
+					.resetBlocks(window.wp.blocks.parse(content)),
+			loopMarkup(
+				{
+					queryType: 'images',
+					imagesQuery: { images: [{ id: image.id }] },
+					savedLayout: {
+						id: layoutId,
+						overrides: {
+							[imageKey]: [
+								'extensions.testFilter',
+								'extensions.testTilt',
+							],
+						},
+					},
+				},
+				{ metadata: { vpSyncKey: templateKey }, layoutType: 'masonry' },
+				`<!-- wp:visual-portfolio/item-image {"metadata":{"vpSyncKey":"${imageKey}"},"extensions":{"testFilter":"page"}} /-->`
+			)
+		);
+
+		const getImage = () =>
+			page.evaluate(() => {
+				const { getBlocks } =
+					window.wp.data.select('core/block-editor');
+				const loop = getBlocks()[0];
+				const image = loop.innerBlocks[0].innerBlocks[0];
+
+				return {
+					clientId: image.clientId,
+					overrides: loop.attributes.savedLayout.overrides,
+					extensions: image.attributes.extensions,
+				};
+			});
+
+		// The page cleared the tilt the layout sets.
+		await expect
+			.poll(async () => (await getImage()).extensions)
+			.toEqual({
+				testFilter: 'page',
+			});
+		await page.evaluate(
+			(id) =>
+				window.wp.data.dispatch('core/block-editor').selectBlock(id),
+			(await getImage()).clientId
+		);
+
+		const filterItem = page
+			.locator('.components-tools-panel-item')
+			.filter({ hasText: 'Test filter control' });
+		const tiltItem = page
+			.locator('.components-tools-panel-item')
+			.filter({ hasText: 'Test tilt control' });
+
+		await expect(
+			filterItem.getByText('Changed on this gallery')
+		).toBeVisible();
+		await expect(
+			tiltItem.getByText('Changed on this gallery')
+		).toBeVisible();
+
+		await tiltItem
+			.getByRole('button', { name: 'Reset to Saved Layout' })
+			.click();
+		await expect.poll(getImage).toMatchObject({
+			overrides: { [imageKey]: ['extensions.testFilter'] },
+			extensions: { testFilter: 'page', testTilt: 'layout' },
+		});
+		await expect(tiltItem.getByText('Changed on this gallery')).toHaveCount(
+			0
+		);
+		await expect(
+			filterItem.getByText('Changed on this gallery')
+		).toBeVisible();
+	});
+
 	test('the lock is saved with the layout', async ({
 		admin,
 		editor,

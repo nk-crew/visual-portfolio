@@ -44,6 +44,12 @@ class Visual_Portfolio_Saved_Layouts {
 	const LOOP_SYNCED_ATTRIBUTES = array( 'lightbox' );
 
 	/**
+	 * Object attributes whose keys are overridden one by one, listed as
+	 * `extensions.<key>`. A bare name still stands for the whole object.
+	 */
+	const PATH_ATTRIBUTES = array( 'extensions' );
+
+	/**
 	 * Layouts being rendered, outermost first.
 	 *
 	 * @var int[]
@@ -396,7 +402,13 @@ class Visual_Portfolio_Saved_Layouts {
 				$layout_block['attrs'] = $own['attrs'];
 			} else {
 				foreach ( $overrides[ $key ] as $name ) {
-					if ( array_key_exists( $name, $own['attrs'] ) ) {
+					$path = explode( '.', $name, 2 );
+
+					if ( isset( $path[1] ) ) {
+						if ( ! in_array( $path[0], $overrides[ $key ], true ) ) {
+							self::merge_path( $layout_block['attrs'], $own['attrs'], $path[0], $path[1] );
+						}
+					} elseif ( array_key_exists( $name, $own['attrs'] ) ) {
 						$layout_block['attrs'][ $name ] = $own['attrs'][ $name ];
 					} else {
 						unset( $layout_block['attrs'][ $name ] );
@@ -421,6 +433,33 @@ class Visual_Portfolio_Saved_Layouts {
 	}
 
 	/**
+	 * Take one key of an object attribute from the loop's block: its value,
+	 * or none when the loop's block no longer carries it.
+	 *
+	 * @param array  $attrs - the layout block's attributes, changed in place.
+	 * @param array  $own - the loop block's attributes.
+	 * @param string $attribute - object attribute.
+	 * @param string $path - key in it.
+	 */
+	private static function merge_path( &$attrs, $own, $attribute, $path ) {
+		$is_set = isset( $own[ $attribute ] ) && is_array( $own[ $attribute ] ) && array_key_exists( $path, $own[ $attribute ] );
+
+		if ( ! isset( $attrs[ $attribute ] ) || ! is_array( $attrs[ $attribute ] ) ) {
+			if ( $is_set ) {
+				$attrs[ $attribute ] = array( $path => $own[ $attribute ][ $path ] );
+			}
+
+			return;
+		}
+
+		if ( $is_set ) {
+			$attrs[ $attribute ][ $path ] = $own[ $attribute ][ $path ];
+		} else {
+			unset( $attrs[ $attribute ][ $path ] );
+		}
+	}
+
+	/**
 	 * The page's markup around the layout's inner block slots: what the editor
 	 * saves for the page's attributes once the layout's inner blocks changed.
 	 *
@@ -442,7 +481,8 @@ class Visual_Portfolio_Saved_Layouts {
 	}
 
 	/**
-	 * Overrides as a map of sync key to a list of attribute names.
+	 * Overrides as a map of sync key to a list of attribute names, and of
+	 * `attribute.key` paths for the attributes of `PATH_ATTRIBUTES`.
 	 *
 	 * @param mixed $overrides - value stored in the loop.
 	 *
@@ -460,10 +500,28 @@ class Visual_Portfolio_Saved_Layouts {
 				continue;
 			}
 
-			$result[ $key ] = array_values( array_filter( $names, 'is_string' ) );
+			$result[ $key ] = array_values( array_filter( $names, array( __CLASS__, 'is_override_name' ) ) );
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Whether a stored override names an attribute, or a key of one of
+	 * `PATH_ATTRIBUTES`.
+	 *
+	 * @param mixed $name - stored name.
+	 *
+	 * @return bool
+	 */
+	private static function is_override_name( $name ) {
+		if ( ! is_string( $name ) ) {
+			return false;
+		}
+
+		$path = explode( '.', $name, 2 );
+
+		return ! isset( $path[1] ) || ( in_array( $path[0], self::PATH_ATTRIBUTES, true ) && '' !== $path[1] );
 	}
 
 	/**

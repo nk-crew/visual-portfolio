@@ -11,7 +11,7 @@ import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
-import { getCapture, isResetting, SyncContext } from './context';
+import { getCapture, getResetNames, isResetting, SyncContext } from './context';
 import SyncController from './controller';
 import SavedLayoutPanel from './panel';
 import { useLayout } from './source';
@@ -22,12 +22,17 @@ import {
 	LOOP_BLOCK,
 	LOOP_KEY,
 	LOOP_SYNCED_ATTRIBUTES,
+	parseOverride,
 	TEMPLATE_BLOCK,
 	withOverrides,
 	withoutOverrides,
+	withoutUnchanged,
 } from './utils';
 
 const isLoopSetting = (name) => LOOP_SYNCED_ATTRIBUTES.includes(name);
+const getAttributes = (names) => [
+	...new Set(names.map((name) => parseOverride(name).attribute)),
+];
 const isAnySetting = () => true;
 
 /**
@@ -116,8 +121,13 @@ function SyncedBlockEdit({ BlockEdit, loopId, editProps }) {
 			if (isResetting()) {
 				const value =
 					typeof next === 'function' ? next(attributes) : { ...next };
+				const resetNames = [
+					...names,
+					...getResetNames().filter(isSynced),
+				];
+				const attributeNames = getAttributes(resetNames);
 
-				names.forEach((attribute) => {
+				attributeNames.forEach((attribute) => {
 					delete value[attribute];
 				});
 				registry.batch(() => {
@@ -127,7 +137,7 @@ function SyncedBlockEdit({ BlockEdit, loopId, editProps }) {
 							overrides: withoutOverrides(
 								reference?.overrides,
 								key,
-								names
+								[...resetNames, ...attributeNames]
 							),
 						},
 					});
@@ -140,11 +150,18 @@ function SyncedBlockEdit({ BlockEdit, loopId, editProps }) {
 				return;
 			}
 
+			const changed = withoutUnchanged(names);
+
+			if (!changed.length) {
+				setAttributes(next);
+				return;
+			}
+
 			if (locked) {
 				const value =
 					typeof next === 'function' ? next(attributes) : { ...next };
 
-				names.forEach((attribute) => {
+				getAttributes(changed).forEach((attribute) => {
 					delete value[attribute];
 				});
 				createWarningNotice(
@@ -170,7 +187,7 @@ function SyncedBlockEdit({ BlockEdit, loopId, editProps }) {
 						overrides: withOverrides(
 							reference?.overrides,
 							key,
-							names
+							changed
 						),
 					},
 				});

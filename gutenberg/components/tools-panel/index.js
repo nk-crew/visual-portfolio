@@ -12,6 +12,7 @@ import {
 	runAsReset,
 	SyncContext,
 } from '../../extensions/saved-layout-sync/context';
+import { isOverridden } from '../../extensions/saved-layout-sync/utils';
 
 /**
  * Core's `ToolsPanel`, whose *Reset all* returns the settings of a block
@@ -36,7 +37,8 @@ export function ToolsPanel({ resetAll, ...props }) {
  * the block changed is marked, and its reset returns it to the layout's value.
  *
  * The attributes a setting owns are the ones its `onDeselect` writes, or the
- * `attributeKeys` given when that handler does more than write them.
+ * `attributeKeys` given when that handler does more than write them. Of
+ * `extensions` it owns the keys that handler changes, as `extensions.<key>`.
  *
  * @param {Object} props - `ToolsPanelItem` props.
  * @return {Element} component.
@@ -71,8 +73,8 @@ export function ToolsPanelItem({
 		);
 	}
 
-	const changed = names.some((name) => sync.overrides.includes(name));
-	const reset = () => runAsReset(onDeselect);
+	const changed = names.some((name) => isOverridden(sync.overrides, name));
+	const reset = () => runAsReset(onDeselect, names);
 
 	return (
 		<CoreToolsPanelItem

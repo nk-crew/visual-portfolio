@@ -1430,7 +1430,11 @@ and the blocks around the item template. Blocks are matched by
 template and `save_post` fills in where it is missing, derived from the block's
 position. `overrides` lists, per sync key, the attributes the loop changed; their
 values are the loop's own, or the block default when the loop's block no longer
-carries one. A block that saves markup of its own, such as a paragraph, a
+carries one. `extensions`, the object several settings of the item blocks share,
+is listed key by key as `extensions.<key>`: that key takes the loop's value, or
+is dropped when the loop's block no longer carries it, and the other keys stay
+the layout's. A bare `extensions`, as loops synced before stored it, still takes
+the loop's whole object. A block that saves markup of its own, such as a paragraph, a
 heading or a group, keeps part of its settings in that markup, so once any of
 its attributes is overridden the loop's block is used whole, every attribute
 and its markup; the blocks inside it are still merged one by one. Item blocks
@@ -1447,9 +1451,12 @@ setting and reset it to the layout; a lint rule (`noRestrictedImports` in
 `biome.json`) keeps core's out of `gutenberg/`. An extension gets the same two
 components from `select( 'visual-portfolio/components' ).get()`. A panel built
 on core's components directly gets no marker, and its reset is recorded as a
-change. An item owns the attributes its `onDeselect` writes, so items that
-share one attribute, such as an object of several settings, are marked and
-reset together.
+change. An item owns the attributes its `onDeselect` writes, or the
+`attributeKeys` it is given, and of `extensions` the keys that handler changes.
+An item whose key is not set on the page cannot tell its key that way, so one
+that clears a key the layout sets passes `attributeKeys`, such as
+`[ 'extensions.tilt' ]`, to be marked. Items that share any other attribute are
+marked and reset together.
 
 A layout with `vp_saved_layout_locked` set ignores the overrides on the page and
 disables its item template in the editor. A trashed layout still syncs. Deleting
