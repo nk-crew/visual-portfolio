@@ -996,7 +996,7 @@ a phone at.
 
 ## Abilities for AI agents
 
-On WordPress 7.1 and newer the plugin registers five abilities with the
+On WordPress 7.1 and newer the plugin registers eight abilities with the
 Abilities API, in the category `visual-portfolio`. Each is `public`, so the
 REST API, the WordPress MCP Adapter and the agents behind it (Claude, Cursor,
 any MCP client) can call it, always as the logged-in user and only within
@@ -1006,6 +1006,9 @@ that user's capabilities.
 | --- | --- | --- |
 | `visual-portfolio/get-gallery-options` | `edit_posts` | Lists the layouts (the patterns registered for `visual-portfolio/loop`), the sources and the settings. |
 | `visual-portfolio/list-galleries` | `edit_posts` | Lists the loops in posts, pages and templates the user can edit. |
+| `visual-portfolio/find-images` | `upload_files` | Finds Media Library images by words and upload date, to use as a gallery's images. |
+| `visual-portfolio/find-posts` | `edit_posts` | Finds published posts of a type by words and terms. |
+| `visual-portfolio/find-terms` | `edit_posts` | Finds public terms by taxonomy and words. |
 | `visual-portfolio/get-gallery` | `edit_post` | Reads one loop. |
 | `visual-portfolio/create-gallery` | `edit_post`, or creating a page or a post | Adds a loop built from a layout to a post, or to a new draft: a page, or a post for a user who cannot create pages. |
 | `visual-portfolio/update-gallery` | `edit_post` | Changes the layout, source, settings or images of a loop. |

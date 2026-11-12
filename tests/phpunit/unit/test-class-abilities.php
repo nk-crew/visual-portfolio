@@ -118,7 +118,7 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 	 * and in the plugin's category.
 	 */
 	public function test_abilities_are_public() {
-		foreach ( array( 'get-gallery-options', 'list-galleries', 'get-gallery', 'create-gallery', 'update-gallery' ) as $name ) {
+		foreach ( array( 'get-gallery-options', 'list-galleries', 'find-images', 'find-posts', 'find-terms', 'get-gallery', 'create-gallery', 'update-gallery' ) as $name ) {
 			$ability = wp_get_ability( 'visual-portfolio/' . $name );
 
 			$this->assertNotNull( $ability, $name );
@@ -471,5 +471,82 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 		);
 
 		$this->assertCount( 1, $gallery['warnings'] );
+	}
+
+	/**
+	 * Images are found by their words and upload date, only those the user
+	 * may read, and not by a user who cannot browse the Media Library.
+	 */
+	public function test_find_images() {
+		$private_post = self::factory()->post->create(
+			array(
+				'post_author' => self::$users['administrator'],
+				'post_status' => 'private',
+			)
+		);
+		$hidden       = self::factory()->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png', $private_post );
+		$named        = self::factory()->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png' );
+
+		wp_update_post(
+			array(
+				'ID'         => $named,
+				'post_title' => 'Lisbon tram at dusk',
+			)
+		);
+
+		$found = $this->run_ability( 'find-images', array( 'search' => 'Lisbon tram' ), 'author' );
+
+		$this->assertSame( array( $named ), array_column( $found['images'], 'id' ) );
+		$this->assertSame( 'Lisbon tram at dusk', $found['images'][0]['title'] );
+		$this->assertSame( 'image.png', preg_replace( '/-\d+(\.png)$/', '$1', $found['images'][0]['filename'] ) );
+
+		$all = $this->run_ability( 'find-images', array( 'per_page' => 50 ), 'author' );
+		$this->assertNotContains( $hidden, array_column( $all['images'], 'id' ) );
+		$this->assertContains( $hidden, array_column( $this->run_ability( 'find-images', array( 'per_page' => 50 ) )['images'], 'id' ) );
+
+		$this->assertSame( array(), $this->run_ability( 'find-images', array( 'uploaded_after' => gmdate( 'Y-m-d', time() + DAY_IN_SECONDS * 2 ) ), 'author' )['images'] );
+		$this->assertWPError( $this->run_ability( 'find-images', array(), 'contributor' ) );
+	}
+
+	/**
+	 * Posts are found by type, words and terms; drafts are not shown in a
+	 * gallery, so they are not found.
+	 */
+	public function test_find_posts_and_terms() {
+		$term      = self::factory()->category->create( array( 'name' => 'Portugal trips' ) );
+		$in_term   = self::factory()->post->create(
+			array(
+				'post_title'    => 'Porto in spring',
+				'post_category' => array( $term ),
+			)
+		);
+		$elsewhere = self::factory()->post->create( array( 'post_title' => 'Porto at night' ) );
+		$draft     = self::factory()->post->create(
+			array(
+				'post_title'    => 'Porto draft',
+				'post_status'   => 'draft',
+				'post_category' => array( $term ),
+			)
+		);
+
+		$terms = $this->run_ability(
+			'find-terms',
+			array(
+				'taxonomy' => 'category',
+				'search'   => 'Portugal',
+			),
+			'author'
+		);
+		$this->assertSame( array( $term ), array_column( $terms['terms'], 'id' ) );
+
+		$posts = $this->run_ability( 'find-posts', array( 'terms' => array( $term ) ), 'author' );
+		$this->assertSame( array( $in_term ), array_column( $posts['posts'], 'id' ) );
+
+		$searched = $this->run_ability( 'find-posts', array( 'search' => 'Porto' ), 'author' );
+		$this->assertEqualsCanonicalizing( array( $in_term, $elsewhere ), array_column( $searched['posts'], 'id' ) );
+		$this->assertNotContains( $draft, array_column( $searched['posts'], 'id' ) );
+
+		$this->assertSame( 'vpf_invalid_post_type', $this->run_ability( 'find-posts', array( 'post_type' => 'nope' ), 'author' )->get_error_code() );
+		$this->assertSame( 'vpf_invalid_taxonomy', $this->run_ability( 'find-terms', array( 'taxonomy' => 'nope' ), 'author' )->get_error_code() );
 	}
 }

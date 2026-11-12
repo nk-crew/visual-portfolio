@@ -111,6 +111,142 @@ class Visual_Portfolio_Abilities {
 		);
 
 		$this->register(
+			'find-images',
+			array(
+				'label'               => __( 'Find images', 'visual-portfolio' ),
+				'description'         => __( 'Finds images in the Media Library, newest first, to use as the images of a gallery.', 'visual-portfolio' ),
+				'input_schema'        => array(
+					'type'                 => 'object',
+					'properties'           => array(
+						'search'          => array(
+							'type'        => 'string',
+							'description' => __( 'Words in the title, caption, description or file name.', 'visual-portfolio' ),
+						),
+						'uploaded_after'  => array(
+							'type'        => 'string',
+							'description' => __( 'Only images uploaded on or after this date, YYYY-MM-DD.', 'visual-portfolio' ),
+							'format'      => 'date',
+						),
+						'uploaded_before' => array(
+							'type'        => 'string',
+							'description' => __( 'Only images uploaded on or before this date, YYYY-MM-DD.', 'visual-portfolio' ),
+							'format'      => 'date',
+						),
+						'order'           => array(
+							'type'    => 'string',
+							'enum'    => array( 'newest', 'oldest' ),
+							'default' => 'newest',
+						),
+						'page'            => $this->get_page_schema(),
+						'per_page'        => $this->get_per_page_schema(),
+					),
+					'additionalProperties' => false,
+					'default'              => array(),
+				),
+				'output_schema'       => $this->get_found_schema(
+					'images',
+					array(
+						'id'       => array( 'type' => 'integer' ),
+						'title'    => array( 'type' => 'string' ),
+						'alt'      => array( 'type' => 'string' ),
+						'caption'  => array( 'type' => 'string' ),
+						'filename' => array( 'type' => 'string' ),
+						'url'      => array( 'type' => 'string' ),
+						'width'    => array( 'type' => 'integer' ),
+						'height'   => array( 'type' => 'integer' ),
+						'uploaded' => array( 'type' => 'string' ),
+					)
+				),
+				'execute_callback'    => array( $this, 'find_images' ),
+				'permission_callback' => array( $this, 'can_upload_files' ),
+			),
+			true
+		);
+
+		$this->register(
+			'find-posts',
+			array(
+				'label'               => __( 'Find posts', 'visual-portfolio' ),
+				'description'         => __( 'Finds published posts, pages or projects, newest first, to show in a gallery by their ids.', 'visual-portfolio' ),
+				'input_schema'        => array(
+					'type'                 => 'object',
+					'properties'           => array(
+						'post_type' => array(
+							'type'        => 'string',
+							'description' => __( 'Post type, such as post, page or portfolio.', 'visual-portfolio' ),
+							'default'     => 'post',
+						),
+						'search'    => array(
+							'type'        => 'string',
+							'description' => __( 'Words in the title or content.', 'visual-portfolio' ),
+						),
+						'terms'     => array(
+							'type'        => 'array',
+							'description' => __( 'Only posts in any of these term ids, from find-terms.', 'visual-portfolio' ),
+							'items'       => array( 'type' => 'integer' ),
+						),
+						'page'      => $this->get_page_schema(),
+						'per_page'  => $this->get_per_page_schema(),
+					),
+					'additionalProperties' => false,
+					'default'              => array(),
+				),
+				'output_schema'       => $this->get_found_schema(
+					'posts',
+					array(
+						'id'             => array( 'type' => 'integer' ),
+						'title'          => array( 'type' => 'string' ),
+						'post_type'      => array( 'type' => 'string' ),
+						'date'           => array( 'type' => 'string' ),
+						'url'            => array( 'type' => 'string' ),
+						'featured_image' => array( 'type' => array( 'integer', 'null' ) ),
+					)
+				),
+				'execute_callback'    => array( $this, 'find_posts' ),
+				'permission_callback' => array( $this, 'can_edit_posts' ),
+			),
+			true
+		);
+
+		$this->register(
+			'find-terms',
+			array(
+				'label'               => __( 'Find terms', 'visual-portfolio' ),
+				'description'         => __( 'Finds categories, tags and other public terms, to limit a posts gallery to them.', 'visual-portfolio' ),
+				'input_schema'        => array(
+					'type'                 => 'object',
+					'properties'           => array(
+						'taxonomy' => array(
+							'type'        => 'string',
+							'description' => __( 'Only terms of this taxonomy, such as category, post_tag or portfolio_category.', 'visual-portfolio' ),
+						),
+						'search'   => array(
+							'type'        => 'string',
+							'description' => __( 'Words in the term name.', 'visual-portfolio' ),
+						),
+						'page'     => $this->get_page_schema(),
+						'per_page' => $this->get_per_page_schema(),
+					),
+					'additionalProperties' => false,
+					'default'              => array(),
+				),
+				'output_schema'       => $this->get_found_schema(
+					'terms',
+					array(
+						'id'       => array( 'type' => 'integer' ),
+						'name'     => array( 'type' => 'string' ),
+						'slug'     => array( 'type' => 'string' ),
+						'taxonomy' => array( 'type' => 'string' ),
+						'count'    => array( 'type' => 'integer' ),
+					)
+				),
+				'execute_callback'    => array( $this, 'find_terms' ),
+				'permission_callback' => array( $this, 'can_edit_posts' ),
+			),
+			true
+		);
+
+		$this->register(
 			'get-gallery',
 			array(
 				'label'               => __( 'Get gallery', 'visual-portfolio' ),
@@ -426,6 +562,229 @@ class Visual_Portfolio_Abilities {
 			'galleries' => array_slice( $galleries, ( $page - 1 ) * $per_page, $per_page ),
 			'total'     => count( $galleries ),
 			'pages'     => (int) ceil( count( $galleries ) / $per_page ),
+		);
+	}
+
+	/**
+	 * Permission: may browse the Media Library.
+	 *
+	 * @return bool
+	 */
+	public function can_upload_files() {
+		return current_user_can( 'upload_files' );
+	}
+
+	/**
+	 * Execute `find-images`.
+	 *
+	 * @param array $input - ability input.
+	 *
+	 * @return array
+	 */
+	public function find_images( $input ) {
+		$input = (array) $input;
+		$date  = array();
+
+		if ( ! empty( $input['uploaded_after'] ) ) {
+			$date['after'] = $input['uploaded_after'];
+		}
+
+		if ( ! empty( $input['uploaded_before'] ) ) {
+			$date['before'] = $input['uploaded_before'];
+		}
+
+		$query = $this->find(
+			$input,
+			array(
+				'post_type'      => 'attachment',
+				'post_status'    => 'inherit',
+				'post_mime_type' => 'image',
+				's'              => $input['search'] ?? '',
+				'order'          => 'oldest' === ( $input['order'] ?? 'newest' ) ? 'ASC' : 'DESC',
+				'date_query'     => empty( $date ) ? array() : array( array_merge( $date, array( 'inclusive' => true ) ) ),
+			)
+		);
+
+		$images = array();
+
+		foreach ( $query['posts'] as $image ) {
+			$meta     = wp_get_attachment_metadata( $image->ID );
+			$images[] = array(
+				'id'       => $image->ID,
+				'title'    => $image->post_title,
+				'alt'      => (string) get_post_meta( $image->ID, '_wp_attachment_image_alt', true ),
+				'caption'  => $image->post_excerpt,
+				'filename' => wp_basename( (string) get_attached_file( $image->ID ) ),
+				'url'      => (string) wp_get_attachment_url( $image->ID ),
+				'width'    => (int) ( $meta['width'] ?? 0 ),
+				'height'   => (int) ( $meta['height'] ?? 0 ),
+				'uploaded' => get_post_time( 'Y-m-d', true, $image ),
+			);
+		}
+
+		return array(
+			'images'   => $images,
+			'has_more' => $query['has_more'],
+		);
+	}
+
+	/**
+	 * Execute `find-posts`.
+	 *
+	 * @param array $input - ability input.
+	 *
+	 * @return array|WP_Error
+	 */
+	public function find_posts( $input ) {
+		$input     = (array) $input;
+		$post_type = $input['post_type'] ?? 'post';
+
+		if ( ! post_type_exists( $post_type ) || ! is_post_type_viewable( $post_type ) ) {
+			return new WP_Error(
+				'vpf_invalid_post_type',
+				// translators: %s - post type.
+				sprintf( __( 'Post type `%s` does not exist or has no public pages.', 'visual-portfolio' ), $post_type )
+			);
+		}
+
+		$args = array(
+			'post_type'   => $post_type,
+			'post_status' => 'publish',
+			's'           => $input['search'] ?? '',
+		);
+
+		if ( ! empty( $input['terms'] ) ) {
+			$terms     = array_map( 'intval', $input['terms'] );
+			$tax_query = array( 'relation' => 'OR' );
+
+			foreach ( get_object_taxonomies( $post_type ) as $taxonomy ) {
+				$tax_query[] = array(
+					'taxonomy' => $taxonomy,
+					'field'    => 'term_id',
+					'terms'    => $terms,
+				);
+			}
+
+			$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		}
+
+		$query = $this->find( $input, $args );
+		$posts = array();
+
+		foreach ( $query['posts'] as $post ) {
+			$posts[] = array(
+				'id'             => $post->ID,
+				'title'          => get_post_field( 'post_title', $post, 'raw' ),
+				'post_type'      => $post->post_type,
+				'date'           => get_post_time( 'Y-m-d', true, $post ),
+				'url'            => (string) get_permalink( $post ),
+				'featured_image' => get_post_thumbnail_id( $post ) ? (int) get_post_thumbnail_id( $post ) : null,
+			);
+		}
+
+		return array(
+			'posts'    => $posts,
+			'has_more' => $query['has_more'],
+		);
+	}
+
+	/**
+	 * Execute `find-terms`.
+	 *
+	 * @param array $input - ability input.
+	 *
+	 * @return array|WP_Error
+	 */
+	public function find_terms( $input ) {
+		$input      = (array) $input;
+		$taxonomies = get_taxonomies( array( 'public' => true ) );
+
+		if ( ! empty( $input['taxonomy'] ) ) {
+			if ( ! isset( $taxonomies[ $input['taxonomy'] ] ) ) {
+				return new WP_Error(
+					'vpf_invalid_taxonomy',
+					sprintf(
+						// translators: %1$s - taxonomy, %2$s - list of taxonomies.
+						__( 'Unknown taxonomy `%1$s`. Taxonomies of this site: %2$s.', 'visual-portfolio' ),
+						$input['taxonomy'],
+						implode( ', ', array_keys( $taxonomies ) )
+					)
+				);
+			}
+
+			$taxonomies = array( $input['taxonomy'] );
+		}
+
+		$page     = max( 1, (int) ( $input['page'] ?? 1 ) );
+		$per_page = min( self::MAX_PER_PAGE, max( 1, (int) ( $input['per_page'] ?? 20 ) ) );
+		$found    = get_terms(
+			array(
+				'taxonomy'   => array_values( $taxonomies ),
+				'hide_empty' => false,
+				'search'     => $input['search'] ?? '',
+				'number'     => $per_page + 1,
+				'offset'     => ( $page - 1 ) * $per_page,
+				'orderby'    => 'name',
+			)
+		);
+		$found    = is_wp_error( $found ) ? array() : $found;
+		$terms    = array();
+
+		foreach ( array_slice( $found, 0, $per_page ) as $term ) {
+			$terms[] = array(
+				'id'       => $term->term_id,
+				'name'     => $term->name,
+				'slug'     => $term->slug,
+				'taxonomy' => $term->taxonomy,
+				'count'    => (int) $term->count,
+			);
+		}
+
+		return array(
+			'terms'    => $terms,
+			'has_more' => count( $found ) > $per_page,
+		);
+	}
+
+	/**
+	 * One page of a query, of the items the user can read.
+	 *
+	 * @param array $input - ability input with `page` and `per_page`.
+	 * @param array $args - `WP_Query` arguments.
+	 *
+	 * @return array `posts` and `has_more`.
+	 */
+	private function find( $input, $args ) {
+		$page     = max( 1, (int) ( $input['page'] ?? 1 ) );
+		$per_page = min( self::MAX_PER_PAGE, max( 1, (int) ( $input['per_page'] ?? 20 ) ) );
+		$query    = new WP_Query(
+			array_merge(
+				array(
+					'posts_per_page'      => $per_page,
+					'paged'               => $page,
+					'orderby'             => 'date',
+					'order'               => 'DESC',
+					'ignore_sticky_posts' => true,
+				),
+				array_filter(
+					$args,
+					static function ( $value ) {
+						return '' !== $value && array() !== $value;
+					}
+				)
+			)
+		);
+
+		return array(
+			'posts'    => array_values(
+				array_filter(
+					$query->posts,
+					function ( $post ) {
+						return current_user_can( 'read_post', $post->ID );
+					}
+				)
+			),
+			'has_more' => $page < (int) $query->max_num_pages,
 		);
 	}
 
@@ -838,6 +1197,57 @@ class Visual_Portfolio_Abilities {
 				empty( $ids ) ? __( 'none', 'visual-portfolio' ) : implode( ', ', $ids )
 			),
 			array( 'status' => 404 )
+		);
+	}
+
+	/**
+	 * Schema of a page number input.
+	 *
+	 * @return array
+	 */
+	private function get_page_schema() {
+		return array(
+			'type'    => 'integer',
+			'minimum' => 1,
+			'default' => 1,
+		);
+	}
+
+	/**
+	 * Schema of a page size input.
+	 *
+	 * @return array
+	 */
+	private function get_per_page_schema() {
+		return array(
+			'type'    => 'integer',
+			'minimum' => 1,
+			'maximum' => self::MAX_PER_PAGE,
+			'default' => 20,
+		);
+	}
+
+	/**
+	 * Schema of a page of found items.
+	 *
+	 * @param string $key - key of the list.
+	 * @param array  $properties - properties of an item.
+	 *
+	 * @return array
+	 */
+	private function get_found_schema( $key, $properties ) {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				$key       => array(
+					'type'  => 'array',
+					'items' => array(
+						'type'       => 'object',
+						'properties' => $properties,
+					),
+				),
+				'has_more' => array( 'type' => 'boolean' ),
+			),
 		);
 	}
 
