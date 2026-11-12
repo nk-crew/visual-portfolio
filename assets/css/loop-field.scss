@@ -1,0 +1,61 @@
+// The look a loop control's field shares, in the theme's type and colors: a
+// select, a text, search, date or number field, and a disclosure's summary.
+.vp-loop-field {
+	box-sizing: border-box;
+	min-height: 2.5em;
+	padding: 0.4em 0.8em;
+	margin: 0;
+	font: inherit;
+	line-height: 1.5;
+	color: inherit;
+	background-color: transparent;
+	border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+	border-radius: 4px;
+	transition: border-color 0.15s ease;
+
+	&:hover {
+		border-color: color-mix(in srgb, currentColor 45%, transparent);
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 1px;
+	}
+
+	&::placeholder {
+		color: inherit;
+		opacity: 0.55;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+	}
+}
+
+// A select draws its own chevron in the text color, as a disclosure does.
+select.vp-loop-field {
+	padding-inline-end: 2.4em;
+	cursor: pointer;
+	background-image:
+		linear-gradient(45deg, transparent calc(50% - 0.75px), currentColor calc(50% - 0.75px), currentColor calc(50% + 0.75px), transparent calc(50% + 0.75px)),
+		linear-gradient(-45deg, transparent calc(50% - 0.75px), currentColor calc(50% - 0.75px), currentColor calc(50% + 0.75px), transparent calc(50% + 0.75px));
+	background-repeat: no-repeat;
+	background-position: right 1.12em center, right 0.8em center;
+	background-size: 0.32em 0.32em;
+	appearance: none;
+
+	&:dir(rtl) {
+		background-position: left 0.8em center, left 1.12em center;
+	}
+
+	// The list opens in the browser's own colors, which the field's color
+	// would otherwise turn unreadable on a dark theme.
+	option {
+		color: CanvasText;
+		background-color: Canvas;
+	}
+}
+
+input.vp-loop-field[type="date"] {
+	min-width: 0;
+}

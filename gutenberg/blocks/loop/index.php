@@ -63,6 +63,10 @@ class Visual_Portfolio_Block_Loop {
 			$asset['version']
 		);
 
+		// The look the fields of the control blocks share, Pro's included.
+		Visual_Portfolio_Assets::register_style( 'visual-portfolio-loop-field', 'build/assets/css/loop-field' );
+		wp_style_add_data( 'visual-portfolio-loop-field', 'rtl', 'replace' );
+
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/loop'
 		);
@@ -405,7 +409,7 @@ class Visual_Portfolio_Block_Loop {
 		}
 
 		return sprintf(
-			'<form method="get" action="%1$s" data-wp-interactive="%2$s">%3$s<select name="%4$s" aria-label="%5$s" data-wp-on--change="actions.navigate">%6$s</select><button type="submit" class="%7$s__submit" data-wp-bind--hidden="state.isEnhanced">%8$s</button></form>',
+			'<form method="get" action="%1$s" data-wp-interactive="%2$s">%3$s<select class="vp-loop-field" name="%4$s" aria-label="%5$s" data-wp-on--change="actions.navigate">%6$s</select><button type="submit" class="%7$s__submit" data-wp-bind--hidden="state.isEnhanced">%8$s</button></form>',
 			esc_url( $action[0] ),
 			esc_attr( self::STORE ),
 			$hidden,

@@ -557,7 +557,11 @@ export default function BlockEdit({
 		content = (
 			<div {...blockProps}>
 				<Disabled>
-					<select value={allOption?.clientId ?? ''} readOnly>
+					<select
+						className="vp-loop-field"
+						value={allOption?.clientId ?? ''}
+						readOnly
+					>
 						{!allOption && (
 							<option value="" disabled>
 								{label.trim() ||

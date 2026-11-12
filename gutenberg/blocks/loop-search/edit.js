@@ -109,7 +109,7 @@ export default function LoopSearchEdit({ attributes, setAttributes, context }) {
 				<Disabled>
 					<input
 						type="search"
-						className="vp-block-loop-search__input"
+						className="vp-block-loop-search__input vp-loop-field"
 						aria-label={
 							label.trim() || __('Search', 'visual-portfolio')
 						}

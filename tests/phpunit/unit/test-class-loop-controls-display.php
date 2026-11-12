@@ -111,7 +111,7 @@ class ClassLoopControlsDisplay extends WP_UnitTestCase {
 	 * @return array Options as `[ value, text, selected ]`.
 	 */
 	private function get_options( $html, $name ) {
-		preg_match( '/<select name="' . preg_quote( $name, '/' ) . '"[^>]*>(.*?)<\/select>/s', $html, $select );
+		preg_match( '/<select[^>]* name="' . preg_quote( $name, '/' ) . '"[^>]*>(.*?)<\/select>/s', $html, $select );
 		preg_match_all( '/<option [^>]*value="([^"]*)"([^>]*)>([^<]*)<\/option>/', $select[1] ?? '', $matches, PREG_SET_ORDER );
 
 		return array_map(
