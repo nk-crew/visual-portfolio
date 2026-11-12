@@ -391,28 +391,33 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 	 * An overridden block the page saved empty wraps the blocks the layout
 	 * later put in it with the page's markup, and a detached loop saves it
 	 * that way, the markup the editor saves for the page's attributes. Where
-	 * the layout has other markup after its inner blocks, such as a quote's
-	 * citation, the layout's markup stays, since only the block's save()
-	 * knows where its inner blocks go.
+	 * the two markups have different tags, such as a media and text the page
+	 * turned around, the layout's markup stays, since only the block's save()
+	 * knows where its inner blocks go then.
 	 */
 	public function test_overridden_empty_block_wraps_layout_blocks() {
 		$template = array( 'metadata' => array( 'vpSyncKey' => 'template' ) );
 		$text     = '<!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Layout text</p><!-- /wp:paragraph -->';
 		$rows     = array(
-			'group' => array(
+			'group'      => array(
 				'<!-- wp:group {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><div class="wp-block-group layout-box">' . $text . '</div><!-- /wp:group -->',
 				'<!-- wp:group {"metadata":{"vpSyncKey":"box"},"className":"page-box","tagName":"section"} --><section class="wp-block-group page-box"></section><!-- /wp:group -->',
 				'<!-- wp:group {"metadata":{"vpSyncKey":"box"},"className":"page-box","tagName":"section"} --><section class="wp-block-group page-box">' . $text . '</section><!-- /wp:group -->',
 			),
-			'cover' => array(
-				'<!-- wp:cover {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><div class="wp-block-cover layout-box"><span aria-hidden="true" class="wp-block-cover__background"></span><div class="wp-block-cover__inner-container">' . $text . '</div></div><!-- /wp:cover -->',
-				'<!-- wp:cover {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><div class="wp-block-cover page-box"><span aria-hidden="true" class="wp-block-cover__background"></span><div class="wp-block-cover__inner-container"></div></div><!-- /wp:cover -->',
-				'<!-- wp:cover {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><div class="wp-block-cover page-box"><span aria-hidden="true" class="wp-block-cover__background"></span><div class="wp-block-cover__inner-container">' . $text . '</div></div><!-- /wp:cover -->',
+			'cover'      => array(
+				'<!-- wp:cover {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><div class="wp-block-cover layout-box"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container">' . $text . '</div></div><!-- /wp:cover -->',
+				'<!-- wp:cover {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><div class="wp-block-cover page-box"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"></div></div><!-- /wp:cover -->',
+				'<!-- wp:cover {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><div class="wp-block-cover page-box"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container">' . $text . '</div></div><!-- /wp:cover -->',
 			),
-			'quote' => array(
+			'quote'      => array(
 				'<!-- wp:quote {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><blockquote class="wp-block-quote layout-box">' . $text . '<cite>Cite</cite></blockquote><!-- /wp:quote -->',
 				'<!-- wp:quote {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><blockquote class="wp-block-quote page-box"><cite>Cite</cite></blockquote><!-- /wp:quote -->',
-				'<!-- wp:quote {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><blockquote class="wp-block-quote layout-box">' . $text . '<cite>Cite</cite></blockquote><!-- /wp:quote -->',
+				'<!-- wp:quote {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><blockquote class="wp-block-quote page-box">' . $text . '<cite>Cite</cite></blockquote><!-- /wp:quote -->',
+			),
+			'media-text' => array(
+				'<!-- wp:media-text {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><div class="wp-block-media-text layout-box"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content">' . $text . '</div></div><!-- /wp:media-text -->',
+				'<!-- wp:media-text {"metadata":{"vpSyncKey":"box"},"className":"page-box","mediaPosition":"right"} --><div class="wp-block-media-text has-media-on-the-right page-box"><div class="wp-block-media-text__content"></div><figure class="wp-block-media-text__media"></figure></div><!-- /wp:media-text -->',
+				'<!-- wp:media-text {"metadata":{"vpSyncKey":"box"},"className":"page-box","mediaPosition":"right"} --><div class="wp-block-media-text layout-box"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content">' . $text . '</div></div><!-- /wp:media-text -->',
 			),
 		);
 

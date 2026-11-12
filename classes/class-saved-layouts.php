@@ -486,11 +486,10 @@ class Visual_Portfolio_Saved_Layouts {
 
 	/**
 	 * The markup of a block the loop saved with no inner blocks, with a slot
-	 * where the layout's inner blocks go: right after an opening tag and
-	 * before as many closing tags as the layout has after its last slot.
-	 * Null when the layout has other markup after that slot, such as a
-	 * quote's citation, or the loop's markup opens no element there, since
-	 * only the block's save() knows where its inner blocks go then.
+	 * at the tag the layout's inner blocks follow. Null unless both markups
+	 * have the same tags in the same order, apart from the name of the outer
+	 * one, which a block's `tagName` changes: where they differ, only the
+	 * block's save() knows where its inner blocks go.
 	 *
 	 * @param array $own - the loop block's inner content, without a slot.
 	 * @param array $layout - the layout block's inner content, with at least one slot.
@@ -498,19 +497,46 @@ class Visual_Portfolio_Saved_Layouts {
 	 * @return array|null
 	 */
 	private static function open_slot( $own, $layout ) {
-		$after = implode( '', array_slice( $layout, max( array_keys( $layout, null, true ) ) + 1 ) );
+		$slots  = array_keys( $layout, null, true );
+		$before = self::get_tags( implode( '', array_slice( $layout, 0, $slots[0] ) ) );
+		$tags   = array_merge( $before, self::get_tags( implode( '', array_slice( $layout, end( $slots ) + 1 ) ) ) );
+		$html   = 1 === count( $own ) ? $own[0] : '';
+		$page   = self::get_tags( $html );
+		$last   = count( $tags ) - 1;
 
-		if ( 1 !== count( $own ) || ! preg_match( '/^(?:\s*<\/[a-z][a-z0-9-]*>)+\s*$/i', $after ) ) {
+		if ( ! $before || count( $page ) !== count( $tags ) ) {
 			return null;
 		}
 
-		$closing = '(?:\s*<\/[a-z][a-z0-9-]*>){' . substr_count( $after, '</' ) . '}\s*';
-
-		if ( ! preg_match( '/^(.*<[a-z][^>]*(?<!\/)>)(' . $closing . ')$/is', $own[0], $parts ) ) {
-			return null;
+		foreach ( $tags as $index => $tag ) {
+			if ( $tag[1] !== $page[ $index ][1] || ( $index && $index < $last && $tag[2] !== $page[ $index ][2] ) ) {
+				return null;
+			}
 		}
 
-		return array( $parts[1], null, $parts[2] );
+		$open  = $page[ count( $before ) - 1 ][0];
+		$split = $open[1] + strlen( $open[0] );
+
+		return array( substr( $html, 0, $split ), null, substr( $html, $split ) );
+	}
+
+	/**
+	 * Tags of markup, each as its match with offset, `/` for a closing tag,
+	 * and its lowercase name.
+	 *
+	 * @param string $html - markup.
+	 *
+	 * @return array
+	 */
+	private static function get_tags( $html ) {
+		preg_match_all( '/<(\/?)([a-z][a-z0-9-]*)[^>]*>/i', $html, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE );
+
+		return array_map(
+			function ( $tag ) {
+				return array( $tag[0], $tag[1][0], strtolower( $tag[2][0] ) );
+			},
+			$matches
+		);
 	}
 
 	/**
