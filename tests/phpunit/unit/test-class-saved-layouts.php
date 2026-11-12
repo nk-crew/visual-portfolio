@@ -388,6 +388,42 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An overridden group the page saved empty wraps the blocks the layout
+	 * later put in it with the page's markup, and a detached loop saves it
+	 * that way, the markup the editor saves for the page's attributes.
+	 */
+	public function test_overridden_empty_group_wraps_layout_blocks() {
+		$template = array( 'metadata' => array( 'vpSyncKey' => 'template' ) );
+		$layout   = parse_blocks(
+			$this->loop_markup(
+				array(),
+				$template,
+				'<!-- wp:group {"metadata":{"vpSyncKey":"group"},"className":"layout-group"} --><div class="wp-block-group layout-group"><!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Layout text</p><!-- /wp:paragraph --></div><!-- /wp:group -->'
+			)
+		)[0];
+		$own      = '<!-- wp:group {"metadata":{"vpSyncKey":"group"},"className":"page-group","tagName":"section"} --><section class="wp-block-group page-group"></section><!-- /wp:group -->';
+		$loop     = parse_blocks(
+			$this->loop_markup(
+				array( 'savedLayout' => array( 'overrides' => array( 'group' => array( 'className' ) ) ) ),
+				$template,
+				$own
+			)
+		)[0];
+
+		$merged = Visual_Portfolio_Saved_Layouts::find_block( Visual_Portfolio_Saved_Layouts::apply_layout( $loop, $layout, false )['innerBlocks'], 'core/group' );
+
+		$this->assertSame( parse_blocks( $own )[0]['attrs'], $merged['attrs'] );
+		$this->assertMatchesRegularExpression( '/^<section class="wp-block-group page-group">.*Layout text.*<\/section>$/s', render_block( $merged ) );
+
+		$detached = Visual_Portfolio_Saved_Layouts::find_block( Visual_Portfolio_Saved_Layout_Usage::detach_loop( $loop, $layout, false )['innerBlocks'], 'core/group' );
+
+		$this->assertSame(
+			'<!-- wp:group {"metadata":{"vpSyncKey":"group"},"className":"page-group","tagName":"section"} --><section class="wp-block-group page-group"><!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Layout text</p><!-- /wp:paragraph --></section><!-- /wp:group -->',
+			serialize_block( $detached )
+		);
+	}
+
+	/**
 	 * Merged attributes of the item image of a loop synced with a layout.
 	 *
 	 * @param array $layout_extensions - the layout's image extensions.
