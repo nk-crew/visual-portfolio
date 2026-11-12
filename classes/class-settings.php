@@ -31,6 +31,13 @@ class Visual_Portfolio_Settings {
 	public static $cached_settings_fields;
 
 	/**
+	 * Plugin name the cached settings fields were built with.
+	 *
+	 * @var string|null
+	 */
+	private static $cached_settings_fields_plugin_name;
+
+	/**
 	 * Visual_Portfolio_Settings constructor.
 	 */
 	public function __construct() {
@@ -418,7 +425,9 @@ class Visual_Portfolio_Settings {
 	 * @return array settings fields
 	 */
 	public static function get_settings_fields() {
-		if ( ! empty( self::$cached_settings_fields ) ) {
+		$plugin_name = visual_portfolio()->plugin_name;
+
+		if ( ! empty( self::$cached_settings_fields ) && self::$cached_settings_fields_plugin_name === $plugin_name ) {
 			return self::$cached_settings_fields;
 		}
 
@@ -963,7 +972,8 @@ class Visual_Portfolio_Settings {
 			}
 		}
 
-		self::$cached_settings_fields = apply_filters( 'vpf_settings_fields', $settings_fields );
+		self::$cached_settings_fields             = apply_filters( 'vpf_settings_fields', $settings_fields );
+		self::$cached_settings_fields_plugin_name = $plugin_name;
 
 		return self::$cached_settings_fields;
 	}
