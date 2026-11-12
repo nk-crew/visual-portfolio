@@ -6,7 +6,9 @@ Primary settings stay visible. Advanced or infrequently changed settings use col
 
 Use the labels, descriptions, defaults and limits registered by the settings API. Keep Pro controls disabled in Free and show their existing upgrade links. Use the corrected group name Controls.
 
-Hidden and collapsed controls preserve pending values and submit them through the existing form. Numeric controls allow intermediate typing and use native final validity. Dependency changes never reset values. Group disclosure uses native keyboard behavior. Controls stack at narrow widths, and size fields may share a responsive grid.
+Hidden and collapsed controls preserve pending values and submit them through the existing form. Numeric controls allow intermediate typing and use native final validity. Dependency changes never reset values. Group disclosure uses native keyboard behavior.
+
+Each setting is one row in its group's card, with a 1px divider between rows. The name and description sit on the left and the control on the right: a toggle at the right edge, any other control filling a 280px column. The control centers on the name and description together; a textarea or an image aligns to the top instead. Size fields (image sizes, breakpoints) stay a responsive grid with name, field and description stacked. Below 783px every row stacks in that same order.
 
 Watermarks and the Social Feeds preview are outside this design change.
 

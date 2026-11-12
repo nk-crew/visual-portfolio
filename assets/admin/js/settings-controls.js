@@ -1,12 +1,11 @@
 import {
-	BaseControl,
 	Button,
 	ColorPicker,
 	Dropdown,
+	FormToggle,
 	SelectControl,
 	TextareaControl,
 	TextControl,
-	ToggleControl,
 } from '@wordpress/components';
 import {
 	createRoot,
@@ -31,17 +30,11 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 		})
 	);
 	const disabled = !!field.is_pro && !isPro;
-	const label = (
-		<>
-			{decodeEntities(field.label)}
-			{disabled && (
-				<RawHTML className="vpf-settings-upgrade">{upgrade}</RawHTML>
-			)}
-		</>
-	);
+	const id = field.type === 'number' ? source.id : `vpf-${source.name}`;
+	const helpId = field.desc ? `${id}__help` : undefined;
 	const props = {
-		label,
-		help: field.desc ? <RawHTML>{field.desc}</RawHTML> : undefined,
+		id,
+		'aria-describedby': helpId,
 		disabled,
 		value,
 		onChange: setValue,
@@ -62,10 +55,12 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 	let control;
 	if (field.type === 'toggle') {
 		control = (
-			<ToggleControl
-				{...props}
+			<FormToggle
+				id={id}
+				aria-describedby={helpId}
+				disabled={disabled}
 				checked={value === 'on'}
-				onChange={(checked) => {
+				onChange={({ target: { checked } }) => {
 					if (
 						field.name === 'register_portfolio_post_type' &&
 						!checked &&
@@ -80,7 +75,17 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 			/>
 		);
 	} else if (field.type === 'select') {
-		control = <SelectControl {...props} options={options} />;
+		control = (
+			<SelectControl
+				{...props}
+				options={options}
+				// SelectControl sets aria-describedby to its own help's id, and this row renders the help outside it.
+				ref={(node) => {
+					if (node && helpId)
+						node.setAttribute('aria-describedby', helpId);
+				}}
+			/>
+		);
 	} else if (field.type === 'color') {
 		control = (
 			<div className="vpf-settings-color">
@@ -118,11 +123,7 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 		);
 	} else if (field.type === 'image') {
 		control = (
-			<BaseControl
-				label={label}
-				help={props.help}
-				__nextHasNoMarginBottom
-			>
+			<>
 				{image && (
 					<img className="vpf-settings-image" src={image} alt="" />
 				)}
@@ -163,7 +164,7 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 						</Button>
 					)}
 				</div>
-			</BaseControl>
+			</>
 		);
 	} else {
 		control = (
@@ -174,7 +175,6 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 							value: undefined,
 							defaultValue: initialValue,
 							name: source.name,
-							id: source.id,
 						}
 					: {})}
 				ref={
@@ -193,7 +193,29 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 			/>
 		);
 	}
-	return control;
+	return (
+		<div className="vpf-settings-row">
+			{field.label && (
+				<label
+					className="vpf-settings-field-label"
+					htmlFor={field.type === 'image' ? undefined : id}
+				>
+					{decodeEntities(field.label)}
+					{disabled && (
+						<RawHTML className="vpf-settings-upgrade">
+							{upgrade}
+						</RawHTML>
+					)}
+				</label>
+			)}
+			<div className="vpf-settings-field-control">{control}</div>
+			{field.desc && (
+				<RawHTML id={helpId} className="vpf-settings-field-help">
+					{field.desc}
+				</RawHTML>
+			)}
+		</div>
+	);
 }
 
 const groups = {
@@ -478,11 +500,28 @@ $(() => {
 				}
 				container.append(originals);
 			} else {
+				const settingRow = document.createElement('div');
+				settingRow.className = 'vpf-settings-row';
 				const label = row.querySelector('th');
 				if (label?.textContent.trim()) {
-					container.append(...label.childNodes);
+					const name = document.createElement('div');
+					name.className = 'vpf-settings-field-label';
+					name.append(...label.childNodes);
+					settingRow.append(name);
 				}
-				container.append(...row.querySelector('td').childNodes);
+				const control = document.createElement('div');
+				control.className = 'vpf-settings-field-control';
+				control.append(...row.querySelector('td').childNodes);
+				const help = control.querySelector(':scope > .description');
+				help?.remove();
+				if (control.textContent.trim() || control.children.length) {
+					settingRow.append(control);
+				}
+				if (help) {
+					help.classList.add('vpf-settings-field-help');
+					settingRow.append(help);
+				}
+				container.append(settingRow);
 				if (
 					field.name === 'portfolio_archive_page' &&
 					field.type === 'select' &&
