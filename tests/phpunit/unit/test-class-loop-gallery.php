@@ -771,6 +771,7 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 			Visual_Portfolio_Loop_Gallery::describe( $changed )['settings']
 		);
 		$this->assertStringContainsString( '--vp-layout-columns:2"', render_block( $changed ) );
+
 		$this->assertSame( $changed, Visual_Portfolio_Loop_Gallery::update( $changed, $input, array( $changed ) ) );
 
 		// Items per page are the loop's own and stay out of the overrides.
@@ -902,6 +903,36 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 
 		$this->assertSame( $empty, $plain['attrs']['savedLayout']['id'] );
 		$this->assertSame( $loop['innerBlocks'], $plain['innerBlocks'] );
+
+		// Such a layout provides no item template, so a locked one leaves the gallery's own to change.
+		update_post_meta( $empty, Visual_Portfolio_Saved_Layouts::LOCK_META, true );
+		$columns = Visual_Portfolio_Loop_Gallery::update( $plain, array( 'settings' => array( 'columns' => 2 ) ), array( $plain ) );
+		$this->assertSame( 2, Visual_Portfolio_Loop_Gallery::describe( $columns )['settings']['columns'] );
+
+		// A count the layout leaves to the block default, sent back as the page shows it, is no change.
+		$defaults = self::factory()->post->create(
+			array(
+				'post_type'    => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status'  => 'publish',
+				'post_content' => '<!-- wp:visual-portfolio/loop --><div class="vp-block-loop"><!-- wp:visual-portfolio/item-template {"layoutColumnsMode":"manual"} /--></div><!-- /wp:visual-portfolio/loop -->',
+			)
+		);
+		$follows  = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'saved_layout' => $defaults ), array( $loop ) );
+		update_post_meta( $defaults, Visual_Portfolio_Saved_Layouts::LOCK_META, true );
+		$echoed = Visual_Portfolio_Loop_Gallery::update( $follows, array( 'settings' => Visual_Portfolio_Loop_Gallery::describe( $follows )['settings'] ), array( $follows ) );
+		$this->assertNotWPError( $echoed );
+		$this->assertSame( 3, Visual_Portfolio_Loop_Gallery::describe( $echoed )['settings']['columns'] );
+
+		// A layout whose item template sits in a wrapper cannot fill an empty gallery.
+		$grouped = self::factory()->post->create(
+			array(
+				'post_type'    => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status'  => 'publish',
+				'post_content' => '<!-- wp:visual-portfolio/loop --><div class="vp-block-loop"><!-- wp:group --><div class="wp-block-group"><!-- wp:visual-portfolio/item-template /--></div><!-- /wp:group --></div><!-- /wp:visual-portfolio/loop -->',
+			)
+		);
+		$bare    = parse_blocks( '<!-- wp:visual-portfolio/loop {"queryType":"images"} --><div class="vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->' )[0];
+		$this->assertSame( 'vpf_saved_layout_nested_template', Visual_Portfolio_Loop_Gallery::update( $bare, array( 'saved_layout' => $grouped ), array( $bare ) )->get_error_code() );
 
 		$wrapped = $loop;
 		$wrapped = array_merge(

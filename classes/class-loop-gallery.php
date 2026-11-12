@@ -1135,6 +1135,17 @@ class Visual_Portfolio_Loop_Gallery {
 				);
 			}
 
+			if ( self::find_block( $layout['innerBlocks'], self::TEMPLATE ) && ! in_array( self::TEMPLATE, array_column( $layout['innerBlocks'], 'blockName' ), true ) ) {
+				return new WP_Error(
+					'vpf_saved_layout_nested_template',
+					sprintf(
+						// translators: %s - Saved Layout title and id, or its id.
+						__( 'The Saved Layout %s keeps its item template inside another block, so it cannot fill this empty gallery. Give the gallery a layout first, then sync it.', 'visual-portfolio' ),
+						self::get_saved_layout_name( $id )
+					)
+				);
+			}
+
 			// A loop saved empty takes the layout's blocks, as a layout change does.
 			$loop = self::set_inner_blocks( $loop, $layout['innerBlocks'] );
 		}
@@ -1148,7 +1159,8 @@ class Visual_Portfolio_Loop_Gallery {
 	}
 
 	/**
-	 * A loop with the item template and lightbox of another state of it.
+	 * A loop with the lightbox of another state of it, and its item template
+	 * when the layout provides one.
 	 *
 	 * @param array $loop - loop block.
 	 * @param array $from - the loop to take them from.
@@ -1164,7 +1176,8 @@ class Visual_Portfolio_Loop_Gallery {
 			}
 		}
 
-		$templates = wp_list_filter( $from['innerBlocks'], array( 'blockName' => self::TEMPLATE ) );
+		$layout    = Visual_Portfolio_Saved_Layouts::get_layout_loop( self::get_saved_layout_id( $loop ) );
+		$templates = $layout && self::find_block( $layout['innerBlocks'], self::TEMPLATE ) ? wp_list_filter( $from['innerBlocks'], array( 'blockName' => self::TEMPLATE ) ) : array();
 
 		foreach ( $loop['innerBlocks'] as $index => $inner ) {
 			if ( self::TEMPLATE === $inner['blockName'] && $templates ) {
@@ -1190,7 +1203,7 @@ class Visual_Portfolio_Loop_Gallery {
 		$names = array();
 
 		foreach ( Visual_Portfolio_Saved_Layouts::LOOP_SYNCED_ATTRIBUTES as $name ) {
-			if ( wp_json_encode( $before['attrs'][ $name ] ?? null ) !== wp_json_encode( $after['attrs'][ $name ] ?? null ) ) {
+			if ( wp_json_encode( self::get_attribute( $before, $name ) ) !== wp_json_encode( self::get_attribute( $after, $name ) ) ) {
 				$names[ Visual_Portfolio_Saved_Layouts::LOOP_KEY ][] = $name;
 			}
 		}
@@ -1207,13 +1220,32 @@ class Visual_Portfolio_Loop_Gallery {
 					continue;
 				}
 
-				if ( wp_json_encode( $old[ $key ]['attrs'][ $name ] ?? null ) !== wp_json_encode( $block['attrs'][ $name ] ?? null ) ) {
+				if ( wp_json_encode( self::get_attribute( $old[ $key ], $name ) ) !== wp_json_encode( self::get_attribute( $block, $name ) ) ) {
 					$names[ $key ][] = $name;
 				}
 			}
 		}
 
 		return $names;
+	}
+
+	/**
+	 * An attribute of a block, its block type's default when the block
+	 * leaves it out, as the editor holds it.
+	 *
+	 * @param array  $block - block.
+	 * @param string $name - attribute name.
+	 *
+	 * @return mixed
+	 */
+	private static function get_attribute( $block, $name ) {
+		if ( array_key_exists( $name, $block['attrs'] ) ) {
+			return $block['attrs'][ $name ];
+		}
+
+		$type = WP_Block_Type_Registry::get_instance()->get_registered( (string) $block['blockName'] );
+
+		return $type ? ( $type->attributes[ $name ]['default'] ?? null ) : null;
 	}
 
 	/**
