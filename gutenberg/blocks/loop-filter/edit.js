@@ -638,6 +638,7 @@ export default function BlockEdit({
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 							isBlock
+							isAdaptiveWidth
 							label={__('Display as', 'visual-portfolio')}
 							value={displayValue}
 							onChange={(value) => {
