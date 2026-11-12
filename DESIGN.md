@@ -24,4 +24,4 @@ Grid is the default view and table the dense one. A card shows a preview, the ti
 
 New layouts are added from one split button whose menu holds the legacy editor. Below the medium breakpoint the button reads Add New and Import becomes an icon button.
 
-In the editor, a setting a synced gallery changed shows a dot, "Changed on this gallery" and a reset icon above its control, in the theme color. The Saved Layout panel sits first in the loop's inspector.
+In the editor, a setting a synced gallery changed shows a dot, "Changed on this gallery" and a reset icon above its control, in the theme color. A gallery that is not synced shows nothing of Saved Layouts in its inspector: Sync with Saved Layout… and Save as Saved Layout… live in the block's menu, as core's Create pattern does, since few galleries are synced. A synced gallery shows one status line at the top of the inspector, with no card around it: the synced-pattern icon, the layout's name, how many settings the gallery changed with an inline Reset, and a menu with Edit, Sync with another and Detach.

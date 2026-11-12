@@ -1,15 +1,4 @@
-.vpf-saved-layout-panel {
-	.components-select-control,
-	.components-notice {
-		margin-bottom: 16px;
-	}
-
-	.components-notice {
-		margin-right: 0;
-		margin-left: 0;
-	}
-}
-
+// Help lines of the Saved Layout editor's panels.
 .vpf-saved-layout-panel__help {
 	margin: 12px 0;
 	color: #757575;
@@ -17,18 +6,46 @@
 	line-height: 1.5;
 }
 
-.vpf-saved-layout-panel__status {
-	padding: 12px;
-	background: #f0f0f0;
-	border-radius: 2px;
+// A synced gallery's status line at the top of the inspector.
+.vpf-saved-layout-status {
+	display: grid;
+	grid-template-columns: 24px minmax(0, 1fr) auto;
+	gap: 4px 8px;
+	align-items: start;
+	padding: 16px;
+	border-bottom: 1px solid #e0e0e0;
+}
 
-	> p:first-child {
-		margin: 0 0 8px;
+// The color the editor gives synced patterns.
+.vpf-saved-layout-status__icon {
+	fill: var(--wp-block-synced-color, #7a00df);
+}
+
+.vpf-saved-layout-status__text {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+	padding-top: 2px;
+
+	strong {
+		font-weight: 500;
+		overflow-wrap: anywhere;
 	}
 
-	.vpf-saved-layout-panel__help {
-		margin-bottom: 0;
+	span {
+		color: #757575;
+		font-size: 12px;
 	}
+
+	.components-button.is-link {
+		font-size: 12px;
+	}
+}
+
+.vpf-saved-layout-status__notice.components-notice {
+	grid-column: 1 / -1;
+	margin: 8px 0 0;
 }
 
 .vpf-synced-setting {
