@@ -371,10 +371,13 @@ class Visual_Portfolio_Saved_Layouts {
 	/**
 	 * A layout block with the loop's overridden attributes on top.
 	 *
-	 * Item blocks are dynamic, but a block that saves markup keeps the loop's
-	 * markup once one of its attributes is overridden, so the markup matches
-	 * the attributes. The structure under the item template is the layout's
-	 * on both sides, so the markup's inner block slots still line up.
+	 * A block that saves markup of its own, such as a paragraph or a group,
+	 * holds part of its settings in that markup, so once any of its attributes
+	 * is overridden it is the loop's block whole: attributes and markup. Its
+	 * inner blocks are still merged one by one. Markup is tested rather than
+	 * `is_dynamic()`, because core's heading, button and image save markup and
+	 * also have a render callback. Item blocks save none, so an override takes
+	 * only the attributes it lists.
 	 *
 	 * @param array $layout_block - block from the layout.
 	 * @param array $own_blocks - the loop's blocks, keyed by sync key.
@@ -386,19 +389,27 @@ class Visual_Portfolio_Saved_Layouts {
 		$key = $layout_block['attrs']['metadata']['vpSyncKey'] ?? '';
 
 		if ( $key && ! empty( $overrides[ $key ] ) && isset( $own_blocks[ $key ] ) ) {
-			$own = $own_blocks[ $key ];
+			$own          = $own_blocks[ $key ];
+			$saves_markup = '' !== trim( $layout_block['innerHTML'] );
 
-			foreach ( $overrides[ $key ] as $name ) {
-				if ( array_key_exists( $name, $own['attrs'] ) ) {
-					$layout_block['attrs'][ $name ] = $own['attrs'][ $name ];
-				} else {
-					unset( $layout_block['attrs'][ $name ] );
+			if ( $saves_markup ) {
+				$layout_block['attrs'] = $own['attrs'];
+			} else {
+				foreach ( $overrides[ $key ] as $name ) {
+					if ( array_key_exists( $name, $own['attrs'] ) ) {
+						$layout_block['attrs'][ $name ] = $own['attrs'][ $name ];
+					} else {
+						unset( $layout_block['attrs'][ $name ] );
+					}
 				}
 			}
 
 			if ( count( $own['innerBlocks'] ) === count( $layout_block['innerBlocks'] ) ) {
 				$layout_block['innerHTML']    = $own['innerHTML'];
 				$layout_block['innerContent'] = $own['innerContent'];
+			} elseif ( $saves_markup && in_array( null, $own['innerContent'], true ) ) {
+				$layout_block['innerContent'] = self::wrap_slots( $own['innerContent'], $layout_block['innerContent'] );
+				$layout_block['innerHTML']    = implode( '', array_filter( $layout_block['innerContent'], 'is_string' ) );
 			}
 		}
 
@@ -407,6 +418,27 @@ class Visual_Portfolio_Saved_Layouts {
 		}
 
 		return $layout_block;
+	}
+
+	/**
+	 * The page's markup around the layout's inner block slots: what the editor
+	 * saves for the page's attributes once the layout's inner blocks changed.
+	 *
+	 * @param array $own - the loop block's inner content, with at least one slot.
+	 * @param array $layout - the layout block's inner content.
+	 *
+	 * @return array
+	 */
+	private static function wrap_slots( $own, $layout ) {
+		$own_slots    = array_keys( $own, null, true );
+		$layout_slots = array_keys( $layout, null, true );
+		$inner        = $layout_slots ? array_slice( $layout, $layout_slots[0], end( $layout_slots ) - $layout_slots[0] + 1 ) : array();
+
+		return array_merge(
+			array_slice( $own, 0, $own_slots[0] ),
+			$inner,
+			array_slice( $own, end( $own_slots ) + 1 )
+		);
 	}
 
 	/**

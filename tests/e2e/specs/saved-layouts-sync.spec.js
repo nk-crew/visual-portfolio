@@ -324,6 +324,134 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 		expect(await getDate()).toBe('modified');
 	});
 
+	test('a paragraph typed on a synced page stays the page’s own when the layout changes', async ({
+		admin,
+		editor,
+		page,
+		requestUtils,
+	}) => {
+		const image = await requestUtils.uploadMedia(
+			getFixturePath('image-800x600.png')
+		);
+		const layout = await requestUtils.rest({
+			method: 'POST',
+			path: `/wp/v2/vp_lists/${layoutId}`,
+			data: {
+				content: loopMarkup(
+					{ queryType: 'images' },
+					{ layoutType: 'masonry' },
+					'<!-- wp:paragraph {"className":"layout-text"} --><p class="layout-text">Layout text</p><!-- /wp:paragraph -->'
+				),
+			},
+		});
+		const raw = (
+			await requestUtils.rest({
+				path: `/wp/v2/vp_lists/${layout.id}`,
+				params: { context: 'edit' },
+			})
+		).content.raw;
+		const textKey = raw.match(
+			/wp:paragraph \{"className":"layout-text","metadata":\{"vpSyncKey":"([^"]+)"/
+		)[1];
+		const post = await requestUtils.rest({
+			method: 'POST',
+			path: '/wp/v2/pages',
+			data: {
+				title: 'Synced page with its own text',
+				status: 'publish',
+				content: raw.replace(
+					'<!-- wp:visual-portfolio/loop {',
+					`<!-- wp:visual-portfolio/loop {"savedLayout":{"id":${layoutId},"overrides":{}},"imagesQuery":{"images":[{"id":${image.id}}]},`
+				),
+			},
+		});
+
+		await admin.visitAdminPage('post.php', `post=${post.id}&action=edit`);
+
+		if (!page.url().includes('post.php')) {
+			await admin.visitAdminPage(
+				'post.php',
+				`post=${post.id}&action=edit`
+			);
+		}
+
+		await editor.setPreferences('core/edit-post', { welcomeGuide: false });
+
+		const getParagraph = () =>
+			page.evaluate(() => {
+				const find = (blocks) =>
+					blocks.reduce(
+						(found, block) =>
+							found ||
+							(block.name === 'core/paragraph'
+								? block
+								: find(block.innerBlocks)),
+						null
+					);
+				const blocks = window.wp.data
+					.select('core/block-editor')
+					.getBlocks();
+				const paragraph = find(blocks);
+
+				return {
+					content: String(paragraph?.attributes.content ?? ''),
+					className: paragraph?.attributes.className,
+					overrides: blocks[0].attributes.savedLayout.overrides,
+				};
+			});
+
+		const text = editor.canvas
+			.locator('p.layout-text', { hasText: 'Layout text' })
+			.first();
+
+		await text.click();
+		await page.keyboard.press('End');
+		await page.keyboard.type(' on the page');
+
+		await expect.poll(getParagraph).toEqual({
+			content: 'Layout text on the page',
+			className: 'layout-text',
+			overrides: { [textKey]: ['content'] },
+		});
+
+		await page.getByRole('button', { name: 'Save', exact: true }).click();
+		await expect(
+			page.locator('.components-snackbar', { hasText: /updated/ })
+		).toBeVisible();
+
+		await requestUtils.rest({
+			method: 'POST',
+			path: `/wp/v2/vp_lists/${layoutId}`,
+			data: {
+				content: raw
+					.replaceAll('layout-text', 'layout-new')
+					.replace(
+						'"className":"layout-new",',
+						'"className":"layout-new","style":{"elements":{"link":{"color":{"text":"#ff0000"}}}},'
+					),
+			},
+		});
+
+		await page.goto(post.link);
+		const front = page.locator(
+			'.wp-block-visual-portfolio-item-template p'
+		);
+
+		await expect(front.first()).toHaveText('Layout text on the page');
+		await expect(front.first()).toHaveClass(/layout-text/);
+		await expect(front.first()).not.toHaveClass(/wp-elements-/);
+		await expect(page.locator('.layout-new')).toHaveCount(0);
+
+		await admin.visitAdminPage('post.php', `post=${post.id}&action=edit`);
+		await expect.poll(getParagraph).toEqual({
+			content: 'Layout text on the page',
+			className: 'layout-text',
+			overrides: { [textKey]: ['content'] },
+		});
+		await page.waitForTimeout(1500);
+		expect((await getParagraph()).className).toBe('layout-text');
+	});
+
 	test('the lock is saved with the layout', async ({
 		admin,
 		editor,
