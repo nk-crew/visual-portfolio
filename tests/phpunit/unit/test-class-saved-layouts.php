@@ -318,7 +318,7 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 	public function test_overridden_static_block_renders_page_markup() {
 		$layout = $this->create_layout(
 			array(),
-			'<!-- wp:paragraph {"metadata":{"vpSyncKey":"text"},"className":"layout-text","style":{"elements":{"link":{"color":{"text":"#ff0000"}}}}} --><p class="layout-text">Layout text</p><!-- /wp:paragraph --><!-- wp:heading {"metadata":{"vpSyncKey":"heading"}} --><h2 class="wp-block-heading">Layout heading</h2><!-- /wp:heading -->'
+			'<!-- wp:paragraph {"metadata":{"vpSyncKey":"text"},"className":"layout-text","style":{"elements":{"link":{"color":{"text":"#ff0000"}}}}} --><p class="layout-text">Layout text</p><!-- /wp:paragraph --><!-- wp:heading {"metadata":{"vpSyncKey":"heading"},"style":{"elements":{"link":{"color":{"text":"#00ff00"}}}}} --><h2 class="wp-block-heading">Layout heading</h2><!-- /wp:heading -->'
 		);
 		$items  = '<!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Page text</p><!-- /wp:paragraph --><!-- wp:heading {"metadata":{"vpSyncKey":"heading"}} --><h2 class="wp-block-heading">Page heading</h2><!-- /wp:heading -->';
 
@@ -340,13 +340,14 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 
 		$synced = $this->render_synced( $layout, array(), array(), $items );
 		$this->assertMatchesRegularExpression( '/<p class="[^"]*layout-text[^"]*wp-elements-[^"]*">Layout text</', $synced );
-		$this->assertStringContainsString( 'Layout heading', $synced );
+		$this->assertMatchesRegularExpression( '/<h2 class="[^"]*wp-elements-[^"]*">Layout heading</', $synced );
 		$this->assertStringNotContainsString( 'Page text', $synced );
 	}
 
 	/**
 	 * An overridden group is the page's block, every attribute and its markup,
-	 * while the blocks inside it still follow the layout.
+	 * while the blocks inside it still follow the layout, also once the layout
+	 * adds one.
 	 */
 	public function test_overridden_group_keeps_merging_inner_blocks() {
 		$template = array( 'metadata' => array( 'vpSyncKey' => 'template' ) );
@@ -372,6 +373,18 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 		$this->assertSame( $own['innerContent'], $merged['innerContent'] );
 		$this->assertSame( '<p>Layout text</p>', $merged['innerBlocks'][0]['innerHTML'] );
 		$this->assertMatchesRegularExpression( '/^<section class="wp-block-group page-group">.*Layout text/', render_block( $merged ) );
+
+		$grown_layout = parse_blocks(
+			$this->loop_markup(
+				array(),
+				$template,
+				'<!-- wp:group {"metadata":{"vpSyncKey":"group"},"className":"layout-group"} --><div class="wp-block-group layout-group"><!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Layout text</p><!-- /wp:paragraph --><!-- wp:paragraph {"metadata":{"vpSyncKey":"added"}} --><p>Added text</p><!-- /wp:paragraph --></div><!-- /wp:group -->'
+			)
+		)[0];
+		$grown        = Visual_Portfolio_Saved_Layouts::find_block( Visual_Portfolio_Saved_Layouts::apply_layout( $loop, $grown_layout, false )['innerBlocks'], 'core/group' );
+
+		$this->assertSame( $own['attrs'], $grown['attrs'] );
+		$this->assertMatchesRegularExpression( '/^<section class="wp-block-group page-group">.*Layout text.*Added text.*<\/section>$/s', render_block( $grown ) );
 	}
 
 	/**
