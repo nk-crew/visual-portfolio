@@ -15,16 +15,24 @@
 		font-size: inherit;
 	}
 
+	// The items of a dropdown in the editor: kept for their settings, drawn
+	// over the select and never seen.
+	&:has(> &__options) {
+		position: relative;
+	}
+
+	&__options {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		visibility: hidden;
+		pointer-events: none;
+	}
+
 	// Only ever seen where the script module is not. With it the select
 	// navigates on its own and the button is bound away.
 	&__submit {
 		font-size: inherit;
-	}
-
-	// The items of a dropdown, which the editor lists under it while they are
-	// edited, laid out like the filter itself.
-	&__options {
-		width: 100%;
 	}
 }
 

@@ -104,6 +104,54 @@ test.describe('Gallery Filter settings', () => {
 		);
 	});
 
+	test('a dropdown lists its items in the List tab, where they are renamed', async ({
+		editor,
+		page,
+	}) => {
+		await editor.insertBlock(
+			getLoopBlock({ displayAsDropdown: true, showAllItem: false })
+		);
+
+		const filter = editor.canvas.locator(
+			'[data-type="visual-portfolio/loop-filter"]'
+		);
+
+		await expect(filter.locator('option')).toContainText([
+			'Settings Zebra',
+		]);
+		await editor.selectBlocks(filter);
+		await editor.openDocumentSettingsSidebar();
+
+		// The canvas shows the select alone.
+		await expect(
+			filter
+				.locator('[data-type="visual-portfolio/loop-filter-item"]')
+				.first()
+		).toBeHidden();
+
+		const sidebar = page.getByRole('region', { name: 'Editor settings' });
+
+		await sidebar.getByRole('tab', { name: 'List' }).click();
+
+		// The items come from the terms; none is added by hand.
+		await expect(
+			sidebar.getByRole('button', { name: 'Add block' })
+		).toHaveCount(0);
+		await sidebar
+			.getByRole('link', { name: 'Settings Zebra', exact: true })
+			.click();
+		// The item is invisible in the canvas, so its label takes the focus.
+		const labelField = sidebar.getByRole('textbox', { name: 'Label' });
+
+		await expect(labelField).toBeFocused();
+		await labelField.fill('Zebra');
+
+		await expect(filter.locator('option')).toContainText(['Zebra']);
+		await expect(filter.locator('option')).not.toContainText([
+			'Settings Zebra',
+		]);
+	});
+
 	test('a filter sorted by name keeps its items where the order puts them', async ({
 		editor,
 		page,
@@ -184,6 +232,8 @@ test.describe('Gallery Filter settings', () => {
 
 		const sidebar = page.getByRole('region', { name: 'Editor settings' });
 
+		// The filter opens on its List tab.
+		await sidebar.getByRole('tab', { name: 'Settings' }).click();
 		await expect(sidebar.getByText('Filter by (Pro)')).toHaveCount(0);
 
 		await sidebar.getByRole('button', { name: 'Settings options' }).click();
