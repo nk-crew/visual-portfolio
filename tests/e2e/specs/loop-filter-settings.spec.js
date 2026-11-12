@@ -129,7 +129,7 @@ test.describe('Gallery Filter settings', () => {
 		expect(movable).not.toContain(true);
 	});
 
-	test('a filter set up in Pro shows a note in the editor and nothing on the page', async ({
+	test('a filter set up in Pro falls back to the plain filter without Pro', async ({
 		editor,
 		page,
 	}) => {
@@ -138,24 +138,32 @@ test.describe('Gallery Filter settings', () => {
 			'Pro draws the filter itself.'
 		);
 
-		await editor.insertBlock(
-			getLoopBlock({
-				extensions: { facet: { by: 'category', multiple: true } },
-			})
-		);
+		const block = getLoopBlock({
+			extensions: { facet: { by: 'category', multiple: true } },
+		});
 
-		await expect(
-			editor.canvas.locator('.vpf-pro-block-note__title')
-		).toHaveText('ProThis filter is set up in Pro');
+		block.innerBlocks[0].innerBlocks = [
+			{
+				name: 'visual-portfolio/loop-filter-item',
+				attributes: { text: 'Kept label', filter: 'kept' },
+			},
+		];
 
+		await editor.insertBlock(block);
 		await editor.publishPost();
+
+		// Without Pro the editor adds no default terms to the saved items.
+		await expect(
+			editor.canvas.locator(
+				'[data-type="visual-portfolio/loop-filter-item"]'
+			)
+		).toHaveText(['Kept label']);
 
 		const frontend = await openPublishedPage(page);
 
 		await expect(
-			frontend.locator('.wp-block-visual-portfolio-item-title').first()
+			frontend.locator('.vp-block-loop-filter a').first()
 		).toBeVisible();
-		await expect(frontend.locator('.vp-block-loop-filter')).toHaveCount(0);
 	});
 
 	test('the Settings panel lists the Pro settings in its menu only', async ({

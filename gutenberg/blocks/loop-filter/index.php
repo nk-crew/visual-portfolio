@@ -242,10 +242,6 @@ class Visual_Portfolio_Block_Loop_Filter {
 			return '';
 		}
 
-		if ( ! empty( $attributes['extensions']['facet'] ) && is_array( $attributes['extensions']['facet'] ) ) {
-			return '';
-		}
-
 		$options = Visual_Portfolio_Gutenberg::transform_context_to_attributes( $block->context );
 		$terms   = $options ? Visual_Portfolio_Filter_Terms::get( $options, Visual_Portfolio_Block_Loop::get_query_id( $block->context ) ) : array();
 

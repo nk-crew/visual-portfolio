@@ -659,8 +659,9 @@ key every cached count of terms carries, is public, so a count an extension cach
 is forgotten with them.
 
 **A filter set up by an extension.** A filter block whose `extensions.facet` is a
-non-empty object lists what only an extension can read: its render callback
-returns nothing, and the editor shows a note in its place. The extension
+non-empty object lists what only an extension can read. Without the extension it
+renders as a plain filter of the loop, and the editor leaves its saved items as
+they are. The extension
 replaces the render callbacks of the filter and its items through
 `register_block_type_args` and builds on `Visual_Portfolio_Block_Loop_Filter::get_items()`
 and `sort_items()`, which merge the saved items with the terms and sort them.

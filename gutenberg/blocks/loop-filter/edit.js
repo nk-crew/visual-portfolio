@@ -27,7 +27,6 @@ import classnames from 'classnames/dedupe';
 /**
  * Internal dependencies
  */
-import ProBlockNote from '../../components/pro-block-note';
 import { getMissingTeasers } from '../../components/pro-teaser';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import { loopSourceSupports } from '../../utils/loop-source-supports';
@@ -548,24 +547,7 @@ export default function BlockEdit({
 
 	let content = <div {...innerBlocksProps} />;
 
-	if (hasFacet && !isProPlugin) {
-		content = (
-			<div {...blockProps}>
-				<ProBlockNote
-					title={__(
-						'This filter is set up in Pro',
-						'visual-portfolio'
-					)}
-					campaign="teaser_loop_filter_note"
-				>
-					{__(
-						'Visitors see nothing here until Visual Portfolio Pro is active. Its settings are kept.',
-						'visual-portfolio'
-					)}
-				</ProBlockNote>
-			</div>
-		);
-	} else if (isLoading) {
+	if (isLoading) {
 		content = (
 			<div {...blockProps}>
 				<Spinner />
