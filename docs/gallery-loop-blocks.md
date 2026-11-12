@@ -1041,7 +1041,7 @@ that user's capabilities.
 | `visual-portfolio/find-terms` | `edit_posts` | Finds public terms by taxonomy and words. |
 | `visual-portfolio/get-gallery` | `edit_post` | Reads one loop. |
 | `visual-portfolio/create-gallery` | `edit_post`, or creating a page or a post | Adds a loop built from a layout to a post, or to a new draft: a page, or a post for a user who cannot create pages. |
-| `visual-portfolio/update-gallery` | `edit_post` | Changes the layout, source, settings or images of a loop. |
+| `visual-portfolio/update-gallery` | `edit_post` | Changes the Saved Layout, layout, source, settings or images of a loop. |
 
 A gallery is addressed by `post_id` and `gallery_id`, the loop's `block_id`. A
 loop saved without one, or with one an earlier loop of the post already holds,
@@ -1059,6 +1059,33 @@ fresh `block_id` and the lowest `queryId` free in the post. Writes go through
 Over REST, `update-gallery` is annotated destructive and idempotent, so its
 `run` endpoint answers `DELETE` with the input in the query string, the method
 `executeAbility()` of `@wordpress/abilities` picks for it.
+
+**Saved Layouts.** `get-gallery-options` lists the block-based Saved Layouts
+the user can sync a gallery with (`saved_layouts`, each `{ id, title }`), the
+ones the editor's Saved Layout panel offers. `saved_layout` on
+`create-gallery` or `update-gallery` syncs the gallery with one of them: the
+loop takes the layout's item template and lightbox with no overrides, and
+keeps its own source, items per page and images. A gallery inside a Saved
+Layout syncs with none, and neither does one whose item template sits inside
+another block, which the layout's merge does not reach.
+`saved_layout: null` on `update-gallery` detaches it through
+`Visual_Portfolio_Saved_Layout_Usage::detach_loop()`, so it keeps its current
+look; a query string carries no `null`, so `0` does the same there. The rest of
+the call applies after the sync or the detach.
+
+A synced gallery is read and changed as the page renders it, through
+`Visual_Portfolio_Saved_Layouts::apply_layout()`, and `get-gallery` reports
+`saved_layout: { id, title }`, or `null`. A setting that changes what the
+layout provides, `columns` and `lightbox` or a setting added through
+`vpf_gallery_ability_apply`, is recorded the way the editor records an edit:
+every attribute it changed under the item template, by its block's sync key,
+and the loop's `lightbox` under `loop`, joins `savedLayout.overrides`, and the
+loop is stored with the merged template. A source switch keeps the layout's
+click action, as it does in the editor. A locked layout refuses such a change
+with `vpf_saved_layout_locked`, and keeps the values of the overrides already
+stored for when it is unlocked. `layout` on a synced gallery is refused with
+`vpf_synced_layout` unless the same call passes `saved_layout: null`. An error
+names a layout the user may not read by its id alone.
 
 ### Extending the vocabulary
 

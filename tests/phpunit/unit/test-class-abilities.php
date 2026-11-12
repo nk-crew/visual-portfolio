@@ -288,6 +288,175 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An agent syncs a gallery with a Saved Layout it may read, changes a
+	 * setting the layout provides as an override the page renders, and
+	 * detaches it; a layout it may not read is refused.
+	 */
+	public function test_galleries_sync_with_saved_layouts() {
+		// The test case resets the post types after every test.
+		if ( ! post_type_exists( Visual_Portfolio_Saved_Layouts::POST_TYPE ) ) {
+			register_post_type(
+				Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				array(
+					'map_meta_cap' => true,
+					'show_in_rest' => true,
+				)
+			);
+		}
+
+		wp_set_current_user( self::$users['administrator'] );
+
+		$layout  = self::factory()->post->create(
+			array(
+				'post_type'    => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status'  => 'publish',
+				'post_title'   => 'Studio',
+				'post_content' => serialize_block(
+					Visual_Portfolio_Loop_Gallery::create(
+						'visual-portfolio/gallery-masonry-classic',
+						array(
+							'source'   => $this->images_source( array( 0 ) ),
+							'settings' => array( 'columns' => 4 ),
+						),
+						array()
+					)
+				),
+			)
+		);
+		$draft   = self::factory()->post->create(
+			array(
+				'post_type'    => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status'  => 'draft',
+				'post_title'   => 'Unfinished',
+				'post_content' => get_post( $layout )->post_content,
+			)
+		);
+		$legacy  = self::factory()->post->create(
+			array(
+				'post_type'   => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status' => 'publish',
+			)
+		);
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$users['author'] ) );
+
+		$choices = $this->run_ability( 'get-gallery-options', null, 'author' )['saved_layouts'];
+
+		$this->assertSame(
+			array(
+				array(
+					'id'    => $layout,
+					'title' => 'Studio',
+				),
+			),
+			$choices
+		);
+
+		foreach ( array( $draft, $legacy ) as $id ) {
+			$refused = $this->run_ability(
+				'create-gallery',
+				array(
+					'post_id'      => $post_id,
+					'layout'       => 'visual-portfolio/gallery-grid-classic',
+					'source'       => $this->images_source( array( 1, 2 ) ),
+					'saved_layout' => $id,
+				),
+				'author'
+			);
+
+			$this->assertSame( 'vpf_unknown_saved_layout', $refused->get_error_code() );
+		}
+
+		$gallery = $this->run_ability(
+			'create-gallery',
+			array(
+				'post_id'      => $post_id,
+				'layout'       => 'visual-portfolio/gallery-grid-classic',
+				'source'       => $this->images_source( array( 1, 2 ) ),
+				'saved_layout' => $layout,
+			),
+			'author'
+		);
+
+		$this->assertSame(
+			array(
+				'id'    => $layout,
+				'title' => 'Studio',
+			),
+			$gallery['saved_layout']
+		);
+		$this->assertSame( 'masonry', $gallery['layout_type'] );
+		$this->assertSame( 4, $gallery['settings']['columns'] );
+		$this->assertSame( array( self::$image_ids[1], self::$image_ids[2] ), array_column( $gallery['source']['images'], 'id' ) );
+
+		$updated = $this->run_ability(
+			'update-gallery',
+			array(
+				'post_id'    => $post_id,
+				'gallery_id' => $gallery['gallery_id'],
+				'settings'   => array( 'columns' => 2 ),
+			),
+			'author'
+		);
+		$stored  = Visual_Portfolio_Loop_Gallery::find_loop( parse_blocks( get_post( $post_id )->post_content ), $gallery['gallery_id'] )['block'];
+
+		$this->assertSame( 2, $updated['settings']['columns'] );
+		$this->assertSame( array( 'layoutColumnCount' ), array_values( $stored['attrs']['savedLayout']['overrides'] )[0] );
+		$this->assertStringContainsString( '--vp-layout-columns:2"', do_blocks( get_post( $post_id )->post_content ) );
+
+		// A layout the author may no longer read is named by its id alone.
+		wp_update_post(
+			array(
+				'ID'          => $layout,
+				'post_status' => 'draft',
+			)
+		);
+
+		$refused = $this->run_ability(
+			'update-gallery',
+			array(
+				'post_id'    => $post_id,
+				'gallery_id' => $gallery['gallery_id'],
+				'layout'     => 'visual-portfolio/gallery-tiles-mosaic',
+			),
+			'author'
+		);
+
+		$this->assertSame( 'vpf_synced_layout', $refused->get_error_code() );
+		$this->assertStringContainsString( 'Saved Layout #' . $layout . ',', $refused->get_error_message() );
+		$this->assertStringNotContainsString( 'Studio', $refused->get_error_message() );
+		$this->assertSame( '', $this->run_ability( 'get-gallery', array( 'post_id' => $post_id, 'gallery_id' => $gallery['gallery_id'] ), 'author' )['saved_layout']['title'] );
+
+		// A Saved Layout's own gallery syncs with no layout.
+		$own = Visual_Portfolio_Loop_Gallery::find_loops( parse_blocks( get_post( $draft )->post_content ) )[0]['gallery_id'];
+
+		$this->assertSame(
+			'vpf_saved_layout_in_layout',
+			$this->run_ability(
+				'update-gallery',
+				array(
+					'post_id'      => $draft,
+					'gallery_id'   => $own,
+					'saved_layout' => $layout,
+				)
+			)->get_error_code()
+		);
+
+		$detached = $this->run_ability(
+			'update-gallery',
+			array(
+				'post_id'      => $post_id,
+				'gallery_id'   => $gallery['gallery_id'],
+				'saved_layout' => null,
+			),
+			'author'
+		);
+
+		$this->assertNull( $detached['saved_layout'] );
+		$this->assertSame( 'masonry', $detached['layout_type'] );
+		$this->assertSame( 2, $detached['settings']['columns'] );
+	}
+
+	/**
 	 * The list holds galleries nested in other blocks, and only of posts the
 	 * user can edit.
 	 */

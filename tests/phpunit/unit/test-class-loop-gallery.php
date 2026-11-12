@@ -88,6 +88,75 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A published block-based Saved Layout: a masonry of four columns whose
+	 * pictures open the lightbox.
+	 *
+	 * @param string $status - post status.
+	 *
+	 * @return int layout id.
+	 */
+	private function create_saved_layout( $status = 'publish' ) {
+		// The test case resets the post types after every test.
+		if ( ! post_type_exists( Visual_Portfolio_Saved_Layouts::POST_TYPE ) ) {
+			register_post_type( Visual_Portfolio_Saved_Layouts::POST_TYPE, array( 'map_meta_cap' => true ) );
+		}
+
+		// Messages name a layout the user may read by its title.
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		$loop = Visual_Portfolio_Loop_Gallery::create(
+			'visual-portfolio/gallery-masonry-classic',
+			array(
+				'source'   => $this->images_source( 1 ),
+				'settings' => array( 'columns' => 4 ),
+			),
+			array()
+		);
+
+		// Saving gives the item blocks their sync keys.
+		return self::factory()->post->create(
+			array(
+				'post_type'    => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status'  => $status,
+				'post_title'   => 'Studio & Co',
+				'post_content' => serialize_block( $loop ),
+			)
+		);
+	}
+
+	/**
+	 * A grid loop of three columns synced with a layout.
+	 *
+	 * @param int $layout - layout id.
+	 *
+	 * @return array loop block.
+	 */
+	private function synced_loop( $layout ) {
+		$loop = Visual_Portfolio_Loop_Gallery::create(
+			'visual-portfolio/gallery-grid-classic',
+			array(
+				'source'   => $this->images_source( 2 ),
+				'settings' => array( 'columns' => 3 ),
+			),
+			array()
+		);
+
+		return Visual_Portfolio_Loop_Gallery::update( $loop, array( 'saved_layout' => $layout ), array( $loop ) );
+	}
+
+	/**
+	 * The attributes of the first block of a name in a loop.
+	 *
+	 * @param array  $loop - loop block.
+	 * @param string $name - block name.
+	 *
+	 * @return array
+	 */
+	private function attrs_of( $loop, $name ) {
+		return array_values( wp_list_filter( $this->flatten( $loop['innerBlocks'] ), array( 'blockName' => $name ) ) )[0]['attrs'];
+	}
+
+	/**
 	 * Loops are found inside groups and columns, and one saved without an id
 	 * is named by its position.
 	 */
@@ -658,5 +727,231 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 			),
 			Visual_Portfolio_Loop_Gallery::describe( $loop )['source']
 		);
+	}
+
+	/**
+	 * Syncing takes the layout's item template with no overrides; settings
+	 * changed on the page become overrides, render, and the same call twice
+	 * equals one call.
+	 */
+	public function test_synced_loop_changes_become_overrides() {
+		$layout = $this->create_saved_layout();
+		$loop   = $this->synced_loop( $layout );
+
+		$this->assertSame( $layout, $loop['attrs']['savedLayout']['id'] );
+		$this->assertSame( array(), Visual_Portfolio_Saved_Layouts::sanitize_overrides( $loop['attrs']['savedLayout']['overrides'] ) );
+		$this->assertSame( 'masonry', $this->attrs_of( $loop, Visual_Portfolio_Loop_Gallery::TEMPLATE )['layoutType'] );
+		$this->assertSame( $this->image_ids( $loop ), array_slice( self::$image_ids, 0, 2 ) );
+
+		$input   = array(
+			'settings' => array(
+				'columns'  => 2,
+				'lightbox' => false,
+			),
+		);
+		$changed = Visual_Portfolio_Loop_Gallery::update( $loop, $input, array( $loop ) );
+		$keys    = array(
+			'template' => $this->attrs_of( $changed, Visual_Portfolio_Loop_Gallery::TEMPLATE )['metadata']['vpSyncKey'],
+			'image'    => $this->attrs_of( $changed, 'visual-portfolio/item-image' )['metadata']['vpSyncKey'],
+		);
+
+		$this->assertSame(
+			array(
+				$keys['template'] => array( 'layoutColumnCount' ),
+				$keys['image']    => array( 'clickAction' ),
+			),
+			$changed['attrs']['savedLayout']['overrides']
+		);
+		$this->assertSame(
+			array(
+				'per_page' => -1,
+				'lightbox' => false,
+				'columns'  => 2,
+			),
+			Visual_Portfolio_Loop_Gallery::describe( $changed )['settings']
+		);
+		$this->assertStringContainsString( '--vp-layout-columns:2"', render_block( $changed ) );
+
+		$this->assertSame( $changed, Visual_Portfolio_Loop_Gallery::update( $changed, $input, array( $changed ) ) );
+
+		// Items per page are the loop's own and stay out of the overrides.
+		$paged = Visual_Portfolio_Loop_Gallery::update( $changed, array( 'settings' => array( 'per_page' => 8 ) ), array( $changed ) );
+		$this->assertSame( $changed['attrs']['savedLayout'], $paged['attrs']['savedLayout'] );
+	}
+
+	/**
+	 * A synced loop is described as the page renders it, whatever its own
+	 * blocks hold.
+	 */
+	public function test_synced_loop_is_described_as_rendered() {
+		$layout = $this->create_saved_layout();
+		$loop   = Visual_Portfolio_Loop_Gallery::create( 'visual-portfolio/gallery-grid-classic', array( 'source' => $this->images_source( 2 ) ), array() );
+
+		$loop['attrs']['savedLayout'] = array( 'id' => $layout );
+
+		$described = Visual_Portfolio_Loop_Gallery::describe( $loop );
+
+		$this->assertSame( 'masonry', $described['layout_type'] );
+		$this->assertSame( 4, $described['settings']['columns'] );
+	}
+
+	/**
+	 * A locked layout refuses a change to what it provides and lets the
+	 * loop's own settings change; a source switch keeps its click action,
+	 * and the overrides stored before the lock keep their values.
+	 */
+	public function test_locked_layout_refuses_synced_changes() {
+		$layout = $this->create_saved_layout();
+		$loop   = $this->synced_loop( $layout );
+		$loop   = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'settings' => array( 'columns' => 2 ) ), array( $loop ) );
+
+		update_post_meta( $layout, Visual_Portfolio_Saved_Layouts::LOCK_META, true );
+
+		$this->assertSame( 4, Visual_Portfolio_Loop_Gallery::describe( $loop )['settings']['columns'] );
+
+		// What the page shows is accepted back; the hidden override value is not.
+		$echoed = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'settings' => Visual_Portfolio_Loop_Gallery::describe( $loop )['settings'] ), array( $loop ) );
+		$this->assertSame( 2, $this->attrs_of( $echoed, Visual_Portfolio_Loop_Gallery::TEMPLATE )['layoutColumnCount'] );
+		$this->assertWPError( Visual_Portfolio_Loop_Gallery::update( $loop, array( 'settings' => array( 'columns' => 2 ) ), array( $loop ) ) );
+
+		$refused = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'settings' => array( 'columns' => 3 ) ), array( $loop ) );
+
+		$this->assertWPError( $refused );
+		$this->assertSame( 'vpf_saved_layout_locked', $refused->get_error_code() );
+		$this->assertStringContainsString( '“Studio & Co”', $refused->get_error_message() );
+
+		$posts = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'source' => array( 'type' => 'posts' ) ), array( $loop ) );
+
+		$this->assertSame( 'posts', $posts['attrs']['queryType'] );
+		$this->assertSame( 'popup', $this->attrs_of( $posts, 'visual-portfolio/item-image' )['clickAction'] );
+		$this->assertSame( $loop['attrs']['savedLayout'], $posts['attrs']['savedLayout'] );
+
+		delete_post_meta( $layout, Visual_Portfolio_Saved_Layouts::LOCK_META );
+
+		$this->assertSame( 2, Visual_Portfolio_Loop_Gallery::describe( $posts )['settings']['columns'] );
+	}
+
+	/**
+	 * A layout change on a synced loop is refused unless the same call
+	 * detaches it; detaching keeps what the page showed.
+	 */
+	public function test_layout_change_needs_detach() {
+		$layout = $this->create_saved_layout();
+		$loop   = $this->synced_loop( $layout );
+		$loop   = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'settings' => array( 'columns' => 2 ) ), array( $loop ) );
+
+		$refused = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'layout' => 'visual-portfolio/gallery-tiles-mosaic' ), array( $loop ) );
+
+		$this->assertWPError( $refused );
+		$this->assertSame( 'vpf_synced_layout', $refused->get_error_code() );
+		$this->assertStringContainsString( '“Studio & Co” (' . $layout . ')', $refused->get_error_message() );
+		$this->assertStringContainsString( '`saved_layout: null`', $refused->get_error_message() );
+
+		$detached = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'saved_layout' => null ), array( $loop ) );
+
+		$this->assertArrayNotHasKey( 'savedLayout', $detached['attrs'] );
+		$this->assertSame( 'masonry', Visual_Portfolio_Loop_Gallery::describe( $detached )['layout_type'] );
+		$this->assertSame( 2, Visual_Portfolio_Loop_Gallery::describe( $detached )['settings']['columns'] );
+
+		$relaid = Visual_Portfolio_Loop_Gallery::update(
+			$loop,
+			array(
+				'saved_layout' => null,
+				'layout'       => 'visual-portfolio/gallery-tiles-mosaic',
+			),
+			array( $loop )
+		);
+
+		$this->assertArrayNotHasKey( 'savedLayout', $relaid['attrs'] );
+		$this->assertSame( 'tiles', Visual_Portfolio_Loop_Gallery::describe( $relaid )['layout_type'] );
+	}
+
+	/**
+	 * Only a block-based layout can be synced with.
+	 */
+	public function test_sync_needs_a_block_layout() {
+		$legacy = self::factory()->post->create( array( 'post_type' => Visual_Portfolio_Saved_Layouts::POST_TYPE ) );
+		$loop   = Visual_Portfolio_Loop_Gallery::create( 'visual-portfolio/gallery-grid-classic', array( 'source' => $this->images_source( 1 ) ), array() );
+
+		foreach ( array( $legacy, $legacy + 1000 ) as $id ) {
+			$result = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'saved_layout' => $id ), array( $loop ) );
+
+			$this->assertWPError( $result );
+			$this->assertSame( 'vpf_unknown_saved_layout', $result->get_error_code() );
+		}
+
+		$this->assertSame( $loop, Visual_Portfolio_Loop_Gallery::update( $loop, array( 'saved_layout' => null ), array( $loop ) ) );
+	}
+
+	/**
+	 * A layout saved before its pattern was picked can be synced with; a
+	 * loop whose item template sits in a wrapper, which the layout cannot
+	 * reach, is refused.
+	 */
+	public function test_sync_with_layouts_and_loops_of_any_shape() {
+		$this->create_saved_layout();
+
+		$empty = self::factory()->post->create(
+			array(
+				'post_type'    => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status'  => 'publish',
+				'post_content' => '<!-- wp:visual-portfolio/loop {"align":"wide"} /-->',
+			)
+		);
+		$loop  = Visual_Portfolio_Loop_Gallery::create( 'visual-portfolio/gallery-grid-classic', array( 'source' => $this->images_source( 1 ) ), array() );
+		$plain = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'saved_layout' => $empty ), array( $loop ) );
+
+		$this->assertSame( $empty, $plain['attrs']['savedLayout']['id'] );
+		$this->assertSame( $loop['innerBlocks'], $plain['innerBlocks'] );
+
+		// Such a layout provides no item template, so a locked one leaves the gallery's own to change.
+		update_post_meta( $empty, Visual_Portfolio_Saved_Layouts::LOCK_META, true );
+		$columns = Visual_Portfolio_Loop_Gallery::update( $plain, array( 'settings' => array( 'columns' => 2 ) ), array( $plain ) );
+		$this->assertSame( 2, Visual_Portfolio_Loop_Gallery::describe( $columns )['settings']['columns'] );
+
+		// A count the layout leaves to the block default, sent back as the page shows it, is no change.
+		$defaults = self::factory()->post->create(
+			array(
+				'post_type'    => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status'  => 'publish',
+				'post_content' => '<!-- wp:visual-portfolio/loop --><div class="vp-block-loop"><!-- wp:visual-portfolio/item-template {"layoutColumnsMode":"manual"} /--></div><!-- /wp:visual-portfolio/loop -->',
+			)
+		);
+		$follows  = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'saved_layout' => $defaults ), array( $loop ) );
+		update_post_meta( $defaults, Visual_Portfolio_Saved_Layouts::LOCK_META, true );
+		$echoed = Visual_Portfolio_Loop_Gallery::update( $follows, array( 'settings' => Visual_Portfolio_Loop_Gallery::describe( $follows )['settings'] ), array( $follows ) );
+		$this->assertNotWPError( $echoed );
+		$this->assertSame( 3, Visual_Portfolio_Loop_Gallery::describe( $echoed )['settings']['columns'] );
+
+		// A layout whose item template sits in a wrapper cannot fill an empty gallery.
+		$grouped = self::factory()->post->create(
+			array(
+				'post_type'    => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status'  => 'publish',
+				'post_content' => '<!-- wp:visual-portfolio/loop --><div class="vp-block-loop"><!-- wp:group --><div class="wp-block-group"><!-- wp:visual-portfolio/item-template /--></div><!-- /wp:group --></div><!-- /wp:visual-portfolio/loop -->',
+			)
+		);
+		$bare    = parse_blocks( '<!-- wp:visual-portfolio/loop {"queryType":"images"} --><div class="vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->' )[0];
+		$this->assertSame( 'vpf_saved_layout_nested_template', Visual_Portfolio_Loop_Gallery::update( $bare, array( 'saved_layout' => $grouped ), array( $bare ) )->get_error_code() );
+
+		$wrapped = $loop;
+		$wrapped = array_merge(
+			$wrapped,
+			array(
+				'innerBlocks' => array(
+					array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(),
+						'innerBlocks'  => array( $loop['innerBlocks'][0] ),
+						'innerHTML'    => '<div class="wp-block-group"></div>',
+						'innerContent' => array( '<div class="wp-block-group">', null, '</div>' ),
+					),
+				),
+			)
+		);
+		$refused = Visual_Portfolio_Loop_Gallery::update( $wrapped, array( 'saved_layout' => $this->create_saved_layout() ), array( $wrapped ) );
+
+		$this->assertWPError( $refused );
+		$this->assertSame( 'vpf_saved_layout_nested_template', $refused->get_error_code() );
 	}
 }

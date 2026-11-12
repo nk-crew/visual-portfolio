@@ -300,7 +300,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 	 *
 	 * @return bool
 	 */
-	private static function can_read_for_sync( $post ) {
+	public static function can_read_for_sync( $post ) {
 		if ( ! $post || Visual_Portfolio_Saved_Layouts::POST_TYPE !== $post->post_type ) {
 			return false;
 		}
@@ -319,6 +319,15 @@ class Visual_Portfolio_Saved_Layouts_REST {
 	 * @return WP_REST_Response
 	 */
 	public function get_choices() {
+		return rest_ensure_response( self::get_sync_choices() );
+	}
+
+	/**
+	 * Block-based layouts the current user can sync a gallery with.
+	 *
+	 * @return array list of array( id, title ).
+	 */
+	public static function get_sync_choices() {
 		$posts   = get_posts(
 			array(
 				'post_type'      => Visual_Portfolio_Saved_Layouts::POST_TYPE,
@@ -339,7 +348,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 			}
 		}
 
-		return rest_ensure_response( $choices );
+		return $choices;
 	}
 
 	/**
