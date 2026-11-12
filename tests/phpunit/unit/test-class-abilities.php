@@ -161,8 +161,8 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Without a post, the gallery goes into a new draft page, for a user who
-	 * may create pages.
+	 * Without a post, the gallery goes into a new draft page, or a draft post
+	 * for a user who may not create pages.
 	 */
 	public function test_create_gallery_makes_a_draft_page() {
 		$input = array(
@@ -171,7 +171,12 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 			'source' => $this->images_source( array( 0 ) ),
 		);
 
-		$this->assertWPError( $this->run_ability( 'create-gallery', $input, 'author' ) );
+		// An author, who may not create pages, gets a draft post instead.
+		$drafted = $this->run_ability( 'create-gallery', $input, 'author' );
+
+		$this->assertSame( 'post', $drafted['post_type'] );
+		$this->assertSame( 'draft', $drafted['post_status'] );
+		$this->assertWPError( $this->run_ability( 'create-gallery', $input, 'subscriber' ) );
 
 		$gallery = $this->run_ability( 'create-gallery', $input );
 

@@ -235,6 +235,7 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 		$updated = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'source' => array( 'type' => 'posts' ) ), array( $loop ) );
 
 		$this->assertSame( 6, $updated['attrs']['baseQuery']['perPage'] );
+		$this->assertContains( Visual_Portfolio_Loop_Gallery::PAGINATION, array_column( $updated['innerBlocks'], 'blockName' ) );
 		$this->assertSame( 'post', $updated['attrs']['postsQuery']['source'] );
 		$this->assertSame( $this->image_ids( $loop ), $this->image_ids( $updated ) );
 	}
@@ -365,6 +366,11 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 
 		$content = Visual_Portfolio_Loop_Gallery::replace_in_content( $markup . $markup, 1, $second['block'], $renamed );
 		$this->assertStringStartsWith( $markup, $content );
+
+		// The legacy gallery block holds ids the same way.
+		$legacy  = parse_blocks( '<!-- wp:visual-portfolio/block {"block_id":"same"} /-->' . $markup );
+		$counted = Visual_Portfolio_Loop_Gallery::update( $legacy[1], array( 'settings' => array( 'per_page' => 3 ) ), $legacy, 0 );
+		$this->assertNotSame( 'same', $counted['attrs']['block_id'] );
 	}
 
 	/**
@@ -517,6 +523,12 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 				'available'    => true,
 				'requires_pro' => false,
 			);
+			$vocabulary['sources']['beta'] = array(
+				'label'        => 'Beta',
+				'description'  => 'Beta feed.',
+				'available'    => true,
+				'requires_pro' => false,
+			);
 
 			return $vocabulary;
 		};
@@ -542,6 +554,17 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 			array()
 		);
 
+		$switched = Visual_Portfolio_Loop_Gallery::update(
+			$loop,
+			array(
+				'source' => array(
+					'type'     => 'beta',
+					'settings' => array( 'size' => 2 ),
+				),
+			),
+			array( $loop )
+		);
+
 		$changed = Visual_Portfolio_Loop_Gallery::update(
 			$loop,
 			array(
@@ -557,6 +580,9 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 		remove_filter( 'vpf_gallery_ability_apply', $apply );
 
 		$this->assertSame( array( 'feed' => 'sport' ), $changed['attrs']['sourceQuery'] );
+
+		// Another source starts from its own fields only.
+		$this->assertSame( array( 'size' => 2 ), $switched['attrs']['sourceQuery'] );
 
 		$this->assertSame( 'acme', $loop['attrs']['queryType'] );
 		$this->assertSame( array( 'feed' => 'news' ), $loop['attrs']['sourceQuery'] );

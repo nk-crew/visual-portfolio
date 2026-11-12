@@ -135,18 +135,18 @@ class Visual_Portfolio_Abilities {
 			'create-gallery',
 			array(
 				'label'               => __( 'Create gallery', 'visual-portfolio' ),
-				'description'         => __( 'Adds a gallery to a post, or creates a draft page holding it. The gallery starts from a layout (see get-gallery-options), takes a source and optional settings. A published post is updated at once.', 'visual-portfolio' ),
+				'description'         => __( 'Adds a gallery to a post, or creates a draft holding it: a page, or a post for a user who cannot create pages. The gallery starts from a layout (see get-gallery-options), takes a source and optional settings. A published post is updated at once.', 'visual-portfolio' ),
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
 						'post_id'  => array(
 							'type'        => 'integer',
-							'description' => __( 'Post to add the gallery to. Leave out to create a draft page.', 'visual-portfolio' ),
+							'description' => __( 'Post to add the gallery to. Leave out to create a draft.', 'visual-portfolio' ),
 							'minimum'     => 1,
 						),
 						'title'    => array(
 							'type'        => 'string',
-							'description' => __( 'Title of the draft page created when `post_id` is left out.', 'visual-portfolio' ),
+							'description' => __( 'Title of the draft created when `post_id` is left out.', 'visual-portfolio' ),
 						),
 						'position' => array(
 							'type'        => 'string',
@@ -287,9 +287,25 @@ class Visual_Portfolio_Abilities {
 			return $this->can_edit_target_post( $input );
 		}
 
-		$page = get_post_type_object( 'page' );
+		return null !== $this->get_new_post_type();
+	}
 
-		return $page && current_user_can( $page->cap->create_posts );
+	/**
+	 * Post type of the draft a gallery without a post goes into: a page, or
+	 * a post for a user who may write posts but not pages.
+	 *
+	 * @return string|null
+	 */
+	private function get_new_post_type() {
+		foreach ( array( 'page', 'post' ) as $post_type ) {
+			$object = get_post_type_object( $post_type );
+
+			if ( $object && current_user_can( $object->cap->create_posts ) ) {
+				return $post_type;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -485,7 +501,7 @@ class Visual_Portfolio_Abilities {
 		$saved = wp_insert_post(
 			wp_slash(
 				array(
-					'post_type'    => 'page',
+					'post_type'    => $this->get_new_post_type(),
 					'post_status'  => 'draft',
 					'post_title'   => $input['title'] ?? __( 'Gallery', 'visual-portfolio' ),
 					'post_content' => $built['content'],

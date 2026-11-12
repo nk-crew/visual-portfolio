@@ -335,16 +335,18 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @return array|WP_Error loop block.
 	 */
 	public static function update( $loop, $input, $blocks, $index = 0 ) {
-		// Content written outside the editor can hold two loops with one id.
+		// Content written outside the editor can hold two blocks with one id.
 		// As in the editor, the first holder keeps it and a later one gets
-		// its own, so the id keeps naming the same gallery on a retry.
-		$earlier = array_column( array_column( array_slice( self::find_loops( $blocks ), 0, $index ), 'block' ), 'attrs' );
+		// its own, so the id keeps naming the same gallery on a retry. The
+		// editor counts the legacy gallery block in, see `gutenberg/extensions/block-id.js`.
+		$earlier_block_ids = array_map( 'strval', array_column( self::get_attributes_before( $blocks, $index ), 'block_id' ) );
+		$earlier_query_ids = array_map( 'intval', array_column( array_column( array_column( array_slice( self::find_loops( $blocks ), 0, $index ), 'block' ), 'attrs' ), 'queryId' ) );
 
-		if ( empty( $loop['attrs']['block_id'] ) || in_array( (string) $loop['attrs']['block_id'], array_map( 'strval', array_column( $earlier, 'block_id' ) ), true ) ) {
+		if ( empty( $loop['attrs']['block_id'] ) || in_array( (string) $loop['attrs']['block_id'], $earlier_block_ids, true ) ) {
 			$loop['attrs']['block_id'] = self::get_free_block_id( $blocks );
 		}
 
-		if ( empty( $loop['attrs']['queryId'] ) || in_array( (int) $loop['attrs']['queryId'], array_map( 'intval', array_column( $earlier, 'queryId' ) ), true ) ) {
+		if ( empty( $loop['attrs']['queryId'] ) || in_array( (int) $loop['attrs']['queryId'], $earlier_query_ids, true ) ) {
 			$loop['attrs']['queryId'] = self::get_free_query_id( $blocks );
 		}
 
@@ -400,7 +402,7 @@ class Visual_Portfolio_Loop_Gallery {
 		$previous = $loop['attrs']['queryType'] ?? 'posts';
 
 		if ( $source ) {
-			$loop = self::apply_source( $loop, $source, 'update' === $action && 'posts' === $previous ? 'portfolio' : 'post' );
+			$loop = self::apply_source( $loop, $source, $previous, 'update' === $action && 'posts' === $previous ? 'portfolio' : 'post' );
 
 			if ( is_wp_error( $loop ) ) {
 				return $loop;
@@ -447,11 +449,12 @@ class Visual_Portfolio_Loop_Gallery {
 	 *
 	 * @param array  $loop - loop block.
 	 * @param array  $source - source input.
+	 * @param string $previous - source type of the loop before the change.
 	 * @param string $default_type - post type of a posts source that names none.
 	 *
 	 * @return array|WP_Error
 	 */
-	private static function apply_source( $loop, $source, $default_type ) {
+	private static function apply_source( $loop, $source, $previous, $default_type ) {
 		$type    = $source['type'];
 		$sources = self::get_vocabulary()['sources'];
 
@@ -497,6 +500,9 @@ class Visual_Portfolio_Loop_Gallery {
 			// A loop that already shows posts without a stored post type shows
 			// the block's default, which a partial update keeps.
 			$attrs['postsQuery'] = self::merge_posts_query( $attrs['postsQuery'] ?? array(), $source, $default_type );
+		} elseif ( $previous !== $type ) {
+			// `sourceQuery` belongs to one source; another source's keys would be read as its own.
+			$attrs['sourceQuery'] = $source['settings'] ?? array();
 		} elseif ( isset( $source['settings'] ) ) {
 			$attrs['sourceQuery'] = array_merge( $attrs['sourceQuery'] ?? array(), $source['settings'] );
 		}
@@ -596,9 +602,16 @@ class Visual_Portfolio_Loop_Gallery {
 		}
 
 		// "Every item on one page" is an images default; on posts it would
-		// put every post of the type on one page.
+		// put every post of the type on one page. The pages get the
+		// pagination the images default took away.
 		if ( -1 === (int) ( $loop['attrs']['baseQuery']['perPage'] ?? 0 ) ) {
 			$loop['attrs']['baseQuery']['perPage'] = 6;
+
+			$pagination = self::get_layout_pagination();
+
+			if ( $pagination && ! self::find_block( $loop['innerBlocks'], self::PAGINATION ) ) {
+				$loop = self::set_inner_blocks( $loop, array_merge( $loop['innerBlocks'], array( $pagination ) ) );
+			}
 		}
 
 		return self::set_click_action(
@@ -607,6 +620,23 @@ class Visual_Portfolio_Loop_Gallery {
 				return 'popup' === $current ? 'url' : $current;
 			}
 		);
+	}
+
+	/**
+	 * The pagination of the first layout that pages its items.
+	 *
+	 * @return array|null
+	 */
+	private static function get_layout_pagination() {
+		foreach ( self::get_layouts() as $layout ) {
+			foreach ( $layout['loop']['innerBlocks'] as $block ) {
+				if ( self::PAGINATION === $block['blockName'] ) {
+					return $block;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -910,6 +940,38 @@ class Visual_Portfolio_Loop_Gallery {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Attributes of every block before the n-th loop, in document order.
+	 *
+	 * @param array $blocks - parsed blocks of the post.
+	 * @param int   $index - 0-based position of the loop among the loops of the post.
+	 *
+	 * @return array
+	 */
+	private static function get_attributes_before( $blocks, $index ) {
+		$before = array();
+		$loops  = 0;
+		$walk   = function ( $blocks ) use ( &$walk, &$before, &$loops, $index ) {
+			foreach ( $blocks as $block ) {
+				if ( self::LOOP === $block['blockName'] && $loops++ === $index ) {
+					return true;
+				}
+
+				$before[] = $block['attrs'];
+
+				if ( ! empty( $block['innerBlocks'] ) && $walk( $block['innerBlocks'] ) ) {
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		$walk( $blocks );
+
+		return $before;
 	}
 
 	/**
