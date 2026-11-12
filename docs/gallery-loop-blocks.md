@@ -1001,7 +1001,7 @@ that user's capabilities.
 | `visual-portfolio/get-gallery-options` | `edit_posts` | Lists the layouts (the patterns registered for `visual-portfolio/loop`), the sources and the settings. |
 | `visual-portfolio/list-galleries` | `edit_posts` | Lists the loops in posts, pages and templates the user can edit. |
 | `visual-portfolio/get-gallery` | `edit_post` | Reads one loop. |
-| `visual-portfolio/create-gallery` | `edit_post`, or creating a page | Adds a loop built from a layout to a post, or to a new draft page. |
+| `visual-portfolio/create-gallery` | `edit_post`, or creating a page or a post | Adds a loop built from a layout to a post, or to a new draft: a page, or a post for a user who cannot create pages. |
 | `visual-portfolio/update-gallery` | `edit_post` | Changes the layout, source, settings or images of a loop. |
 
 A gallery is addressed by `post_id` and `gallery_id`, the loop's `block_id`. A
@@ -1075,6 +1075,10 @@ add_filter(
 	3
 );
 ```
+
+`tests/phpunit/unit/test-class-abilities-coverage.php` fails when the loop gains
+an attribute, a layout type, a source or a setup default the abilities have not
+decided about, so the abilities change in the same diff as the blocks.
 
 Without Pro, `get-gallery-options` lists the Pro sources, Taxonomies and
 Social, with `requires_pro: true`, and asking for one returns the
