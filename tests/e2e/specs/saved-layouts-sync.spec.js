@@ -135,6 +135,7 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 					layoutType: 'grid',
 					layoutColumnsMode: 'manual',
 					layoutColumnCount: 2,
+					extensions: { foo: 'page' },
 				},
 				'<!-- wp:visual-portfolio/item-title /-->'
 			)
@@ -175,7 +176,7 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 		await expect(
 			page.locator('.components-snackbar', {
 				hasText:
-					'Synced with “Synced Masonry”. 2 settings changed on this gallery stay.',
+					'Synced with “Synced Masonry”. 3 settings changed on this gallery stay.',
 			})
 		).toBeVisible();
 
@@ -192,6 +193,9 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 		]);
 		expect(state.layoutType).toBe('masonry');
 		expect(state.columns).toBe(2);
+		expect(Object.values(state.savedLayout.overrides).flat()).toContain(
+			'extensions.foo'
+		);
 
 		// Nothing can be added to a synced item template.
 		expect(
@@ -204,7 +208,7 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 			)
 		).toBe(false);
 
-		await expect(page.getByText('2 settings changed here')).toBeVisible();
+		await expect(page.getByText('3 settings changed here')).toBeVisible();
 		await page.getByRole('button', { name: 'Reset', exact: true }).click();
 		await expect
 			.poll(async () => (await getLoopState(page)).columns)
@@ -673,6 +677,14 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 
 								setAttributes({ extensions: others });
 							},
+							resetAllFilter: (values) => {
+								const { [name]: previous, ...others } =
+									values.extensions ||
+									attributes.extensions ||
+									{};
+
+								return { extensions: others };
+							},
 						},
 						createElement('p', null, `${label} control`)
 					);
@@ -699,29 +711,36 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 				]
 			);
 		});
-		await page.evaluate(
-			(content) =>
-				window.wp.data
-					.dispatch('core/block-editor')
-					.resetBlocks(window.wp.blocks.parse(content)),
-			loopMarkup(
-				{
-					queryType: 'images',
-					imagesQuery: { images: [{ id: image.id }] },
-					savedLayout: {
-						id: layoutId,
-						overrides: {
-							[imageKey]: [
-								'extensions.testFilter',
-								'extensions.testTilt',
-								'extensions.testBlend',
-							],
+		const open = (overrides, extensions) =>
+			page.evaluate(
+				(content) =>
+					window.wp.data
+						.dispatch('core/block-editor')
+						.resetBlocks(window.wp.blocks.parse(content)),
+				loopMarkup(
+					{
+						queryType: 'images',
+						imagesQuery: { images: [{ id: image.id }] },
+						savedLayout: {
+							id: layoutId,
+							overrides: { [imageKey]: overrides },
 						},
 					},
-				},
-				{ metadata: { vpSyncKey: templateKey }, layoutType: 'masonry' },
-				`<!-- wp:visual-portfolio/item-image {"metadata":{"vpSyncKey":"${imageKey}"},"extensions":{"testFilter":"page"}} /-->`
-			)
+					{
+						metadata: { vpSyncKey: templateKey },
+						layoutType: 'masonry',
+					},
+					`<!-- wp:visual-portfolio/item-image ${JSON.stringify({ metadata: { vpSyncKey: imageKey }, extensions })} /-->`
+				)
+			);
+
+		await open(
+			[
+				'extensions.testFilter',
+				'extensions.testTilt',
+				'extensions.testBlend',
+			],
+			{ testFilter: 'page' }
 		);
 
 		const getImage = () =>
@@ -800,6 +819,30 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 		await expect(
 			filterItem.getByText('Changed on this gallery')
 		).toBeVisible();
+
+		// Reset all takes back a key the page set and one it cleared.
+		await open(['extensions.testFilter', 'extensions.testBlend'], {
+			testFilter: 'page',
+			testTilt: 'layout',
+		});
+		await expect
+			.poll(async () => (await getImage()).extensions)
+			.toEqual({ testFilter: 'page', testTilt: 'layout' });
+		await page.evaluate(
+			(id) =>
+				window.wp.data.dispatch('core/block-editor').selectBlock(id),
+			(await getImage()).clientId
+		);
+		await page.getByRole('button', { name: 'Settings options' }).click();
+		await page.getByRole('menuitem', { name: 'Reset all' }).click();
+		await expect.poll(getImage).toMatchObject({
+			overrides: {},
+			extensions: {
+				testFilter: 'layout',
+				testTilt: 'layout',
+				testBlend: 'layout',
+			},
+		});
 	});
 
 	test('the lock is saved with the layout', async ({
