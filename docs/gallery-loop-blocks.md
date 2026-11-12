@@ -1293,10 +1293,16 @@ carries one. The reserved key `loop` holds the loop's own synced attributes.
 The merge runs on `render_block_data`, so a change to the layout reaches every
 page on its next render. In the editor the same merge is applied when the page
 opens and whenever the overrides change, and the structure of a synced item
-template is locked (`templateLock: 'all'`). The settings panels of the family
-import `ToolsPanel` and `ToolsPanelItem` from `gutenberg/components/tools-panel`,
-which mark a changed setting and reset it to the layout; a panel built on core's
-components directly gets no marker.
+template is locked (`templateLock: 'all'`), and *Change layout* leaves the
+toolbar. The settings panels of the family import `ToolsPanel` and
+`ToolsPanelItem` from `gutenberg/components/tools-panel`, which mark a changed
+setting and reset it to the layout; a lint rule (`noRestrictedImports` in
+`biome.json`) keeps core's out of `gutenberg/`. An extension gets the same two
+components from `select( 'visual-portfolio/components' ).get()`. A panel built
+on core's components directly gets no marker, and its reset is recorded as a
+change. An item owns the attributes its `onDeselect` writes, so items that
+share one attribute, such as an object of several settings, are marked and
+reset together.
 
 A layout with `vp_saved_layout_locked` set ignores the overrides on the page and
 disables its item template in the editor. A trashed layout still syncs. Deleting
@@ -1314,8 +1320,8 @@ indexed in batches, from WP-Cron and from every library request, until
 **Library.** `Saved Layouts` in the plugin menu is a `@wordpress/build` page
 (`wpPlugin.pages` in `package.json`, route in `routes/saved-layouts-home/`)
 booted by core's `@wordpress/boot`. It reads `wp/v2/vp_lists`, which carries a
-`vpf_layout` field (kind, source, preview settings, usage, shortcode, edit
-link), and uses these routes of `visual-portfolio/v1`:
+`vpf_layout` field (kind, source, preview settings and URL, usage, shortcode,
+edit link), and uses these routes of `visual-portfolio/v1`:
 
 | Route | Does |
 |---|---|
@@ -1323,6 +1329,13 @@ link), and uses these routes of `visual-portfolio/v1`:
 | `POST saved-layouts/<id>/duplicate` | Copies the content and the `vp_*` meta into "<title> (copy)" |
 | `GET saved-layouts/export?ids[]=` | The export file, `{ "type": "visual-portfolio/saved-layouts", "version": 1, "layouts": [ … ] }` |
 | `POST saved-layouts/import` | Creates layouts from an export file, dropping images the site does not have |
+
+A card's preview is the layout rendered on the front end at
+`/?vp_layout_preview=<id>&_wpnonce=…` (nonce `vp-layout-preview`, for users who
+can edit the layout), with the theme's styles and the gallery's scripts, at
+1200px wide and scaled into the card. The page reports to the library whether
+the layout has items and how tall it is; one without items, a row of the table
+or the list, and a card still loading show a schematic drawn from the settings.
 
 ## Legacy hooks with no equivalent
 
