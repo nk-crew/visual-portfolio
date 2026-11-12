@@ -214,7 +214,7 @@ export default function LoopSortEdit({
 					<Disabled>
 						{/* The default order is selected, as on the page, and
 						 without it the page asks for an order. */}
-						<select value="" readOnly>
+						<select className="vp-loop-field" value="" readOnly>
 							{!shown.some(({ value }) => !value) && (
 								<option value="" disabled>
 									{__('Select sorting', 'visual-portfolio')}

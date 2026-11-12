@@ -1,0 +1,59 @@
+// The look a loop control's field shares: a select, a text, search, date or
+// number field, and a disclosure's summary. It takes the theme's type, and the
+// browser's own field colors, which keep a date field's empty parts grey and
+// its calendar icon visible on a dark page.
+//
+// The class is doubled to outrank a theme's form rules, such as
+// `input[type="date"]`, which load after the plugin; otherwise the fields of
+// one row would take two looks.
+.vp-loop-field.vp-loop-field {
+	box-sizing: border-box;
+	min-height: 2.5em;
+	padding: 0.4em 0.8em;
+	margin: 0;
+	font: inherit;
+	line-height: 1.5;
+	color: FieldText;
+	background-color: Field;
+	border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+	border-radius: 4px;
+	box-shadow: none;
+	transition: border-color 0.15s ease;
+
+	&:hover {
+		border-color: color-mix(in srgb, currentColor 45%, transparent);
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 1px;
+	}
+
+	&::placeholder {
+		color: inherit;
+		opacity: 0.55;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+	}
+}
+
+// A select draws its own chevron in the text color, as a disclosure does: two
+// lines in one box, from its top corners to the middle of its bottom, so the
+// RTL build only moves the box to the other side.
+select.vp-loop-field.vp-loop-field {
+	padding-right: 2.4em;
+	cursor: pointer;
+	background-image:
+		linear-gradient(45deg, transparent calc(100% / 3 - 0.75px), currentColor calc(100% / 3 - 0.75px), currentColor calc(100% / 3 + 0.75px), transparent calc(100% / 3 + 0.75px)),
+		linear-gradient(-45deg, transparent calc(100% / 3 - 0.75px), currentColor calc(100% / 3 - 0.75px), currentColor calc(100% / 3 + 0.75px), transparent calc(100% / 3 + 0.75px));
+	background-repeat: no-repeat;
+	background-position: right 0.8em center;
+	background-size: 0.64em 0.32em;
+	appearance: none;
+}
+
+input.vp-loop-field.vp-loop-field[type="date"] {
+	min-width: 0;
+}

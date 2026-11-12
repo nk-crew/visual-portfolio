@@ -367,7 +367,7 @@ class Visual_Portfolio_Filter_Terms {
 	 *
 	 * @return string
 	 */
-	private static function get_version() {
+	public static function get_version() {
 		$version = get_transient( self::VERSION_KEY );
 
 		if ( ! $version ) {
