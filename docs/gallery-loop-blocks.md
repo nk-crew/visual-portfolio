@@ -82,8 +82,13 @@ stays in sight; the gallery manager in the sidebar moves an image further.
 **Format badge.** The Item Image and Item Cover blocks can mark an item that is
 not a still picture. *Format badge* puts the video, audio or gallery icon of the
 classic gallery in a corner of the picture, and *Badge position* picks the
-corner. It is off by default, and a standard item gets no badge. The badge
-carries the name of the format for screen readers.
+corner. *Formats* under the switch picks which formats get one, with a checkbox
+for each format of the gallery manager that has an icon: the `vpf.loopImageFormats`
+list, so Pro adds Audio and Gallery beside Video. All are checked until one is
+unchecked; `formatBadgeFormats` then holds the formats left, and an empty list
+means every format. A list of Gallery alone marks albums the way the legacy
+gallery did. The badge is off by default, and a standard item gets no badge. The
+badge carries the name of the format for screen readers.
 
 **Layouts.** The item template offers grid, masonry, tiles, justified and
 carousel — a block variation each, the way the Group block offers Group, Row,

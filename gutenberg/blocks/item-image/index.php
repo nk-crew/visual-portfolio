@@ -224,7 +224,7 @@ class Visual_Portfolio_Block_Item_Image {
 		// Beside the link rather than in it: the link is named by its label, and
 		// the badge names the format on its own.
 		if ( ! empty( $attributes['showFormatBadge'] ) ) {
-			$image .= visual_portfolio_get_item_format_badge( $context['vp/itemFormat'] ?? '', $attributes['formatBadgePosition'] ?? '' );
+			$image .= visual_portfolio_get_item_format_badge( $context['vp/itemFormat'] ?? '', $attributes['formatBadgePosition'] ?? '', $attributes['formatBadgeFormats'] ?? array() );
 		}
 
 		// The width goes on the figure, the way core's Featured Image sets it,
