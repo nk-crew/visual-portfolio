@@ -707,6 +707,13 @@ const newConfig = {
 		clean: {
 			keep: shouldKeepOnClean,
 		},
+		// webpack derives these from the browserslist target and would put
+		// `Object.hasOwn` and `||=` into the runtime of bundles Babel keeps ES5.
+		environment: {
+			...defaultConfig.output.environment,
+			hasOwn: false,
+			logicalAssignment: false,
+		},
 	},
 	infrastructureLogging: isQuietBuild
 		? {
@@ -922,18 +929,9 @@ const adminPagesConfig = {
 	plugins: [
 		...defaultConfig.plugins.filter(
 			(plugin) =>
-				!['DependencyExtractionWebpackPlugin', 'DefinePlugin'].includes(
-					plugin?.constructor?.name
-				)
+				plugin?.constructor?.name !==
+				'DependencyExtractionWebpackPlugin'
 		),
-		// `@wordpress/scripts` builds its plugins with its own copy of webpack,
-		// newer than the root one that runs the build, and its DefinePlugin
-		// calls a parser method the root one lacks once it meets the packages'
-		// `.mjs` files. Drop once the lockfile resolves a single webpack.
-		new (require('webpack').DefinePlugin)({
-			'globalThis.SCRIPT_DEBUG': JSON.stringify(!isProduction),
-			SCRIPT_DEBUG: JSON.stringify(!isProduction),
-		}),
 		new DependencyExtractionWebpackPlugin({
 			requestToExternal: (request) =>
 				ADMIN_PAGE_BUNDLED.some(
