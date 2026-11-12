@@ -3,7 +3,13 @@ import {
 	__experimentalToolsPanel as CoreToolsPanel,
 	__experimentalToolsPanelItem as CoreToolsPanelItem,
 } from '@wordpress/components';
-import { useContext } from '@wordpress/element';
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { rotateLeft } from '@wordpress/icons';
 
@@ -14,22 +20,38 @@ import {
 } from '../../extensions/saved-layout-sync/context';
 import { isOverridden } from '../../extensions/saved-layout-sync/utils';
 
+const PanelContext = createContext(null);
+
 /**
  * Core's `ToolsPanel`, whose *Reset all* returns the settings of a block
- * synced with a Saved Layout to the layout's values.
+ * synced with a Saved Layout to the layout's values: the settings its own
+ * items own, so another panel's stay as the page set them.
  *
  * @param {Object} props - `ToolsPanel` props.
  * @return {Element} component.
  */
-export function ToolsPanel({ resetAll, ...props }) {
+export function ToolsPanel({ resetAll, children, ...props }) {
 	const sync = useContext(SyncContext);
+	const items = useRef(new Set());
+	const register = useCallback((names) => {
+		items.current.add(names);
+
+		return () => items.current.delete(names);
+	}, []);
 	let onResetAll = resetAll;
 
 	if (sync && resetAll) {
-		onResetAll = (filters) => runAsReset(() => resetAll(filters));
+		onResetAll = (filters) =>
+			runAsReset(() => resetAll(filters), [...items.current].flat());
 	}
 
-	return <CoreToolsPanel {...props} resetAll={onResetAll} />;
+	return (
+		<CoreToolsPanel {...props} resetAll={onResetAll}>
+			<PanelContext.Provider value={register}>
+				{children}
+			</PanelContext.Provider>
+		</CoreToolsPanel>
+	);
 }
 
 /**
@@ -52,6 +74,7 @@ export function ToolsPanelItem({
 	...props
 }) {
 	const sync = useContext(SyncContext);
+	const register = useContext(PanelContext);
 	let names = [];
 
 	if (sync) {
@@ -59,6 +82,13 @@ export function ToolsPanelItem({
 			sync.isSynced
 		);
 	}
+
+	const namesKey = names.join(',');
+
+	useEffect(
+		() => register?.(namesKey ? namesKey.split(',') : []),
+		[register, namesKey]
+	);
 
 	if (!names.length) {
 		return (

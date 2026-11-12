@@ -134,12 +134,10 @@ function SyncedBlockEdit({ BlockEdit, loopId, editProps }) {
 			if (isResetting()) {
 				const value =
 					typeof next === 'function' ? next(attributes) : { ...next };
-				const owned = getResetNames().filter(isSynced);
-				// A reset that names nothing, the panel's Reset all, resets
-				// every key cleared in an object it writes.
-				const resetNames = owned.length
-					? [...names, ...owned]
-					: [...names, ...withCleared(getAttributes(names))];
+				const resetNames = [
+					...names,
+					...getResetNames().filter(isSynced),
+				];
 				const attributeNames = getAttributes(resetNames);
 
 				attributeNames.forEach((attribute) => {
