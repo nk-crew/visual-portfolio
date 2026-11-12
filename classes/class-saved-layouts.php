@@ -486,10 +486,12 @@ class Visual_Portfolio_Saved_Layouts {
 
 	/**
 	 * The markup of a block the loop saved with no inner blocks, with a slot
-	 * at the tag the layout's inner blocks follow. Null unless both markups
-	 * have the same tags in the same order, apart from the name of the outer
-	 * one, which a block's `tagName` changes: where they differ, only the
-	 * block's save() knows where its inner blocks go.
+	 * at the tag the layout's inner blocks follow, and the loop's text there
+	 * on the side the layout keeps its own, such as a list item's. Null unless
+	 * both markups have the same tags in the same order, apart from the name
+	 * of the outer one, which a block's `tagName` changes, and the layout has
+	 * text on one side of its slot at most: otherwise only the block's save()
+	 * knows where its inner blocks go.
 	 *
 	 * @param array $own - the loop block's inner content, without a slot.
 	 * @param array $layout - the layout block's inner content, with at least one slot.
@@ -498,8 +500,11 @@ class Visual_Portfolio_Saved_Layouts {
 	 */
 	private static function open_slot( $own, $layout ) {
 		$slots  = array_keys( $layout, null, true );
-		$before = self::get_tags( implode( '', array_slice( $layout, 0, $slots[0] ) ) );
-		$tags   = array_merge( $before, self::get_tags( implode( '', array_slice( $layout, end( $slots ) + 1 ) ) ) );
+		$prefix = implode( '', array_slice( $layout, 0, $slots[0] ) );
+		$suffix = implode( '', array_slice( $layout, end( $slots ) + 1 ) );
+		$before = self::get_tags( $prefix );
+		$after  = self::get_tags( $suffix );
+		$tags   = array_merge( $before, $after );
 		$html   = 1 === count( $own ) ? $own[0] : '';
 		$page   = self::get_tags( $html );
 		$last   = count( $tags ) - 1;
@@ -514,22 +519,36 @@ class Visual_Portfolio_Saved_Layouts {
 			}
 		}
 
-		$open  = $page[ count( $before ) - 1 ][0];
-		$split = $open[1] + strlen( $open[0] );
+		$slot        = count( $before );
+		$text_before = '' !== trim( substr( $prefix, self::tag_end( end( $before ) ) ) );
+		$text_after  = '' !== trim( substr( $suffix, 0, $after ? $after[0][0][1] : strlen( $suffix ) ) );
+		$start       = self::tag_end( $page[ $slot - 1 ] );
+		$end         = isset( $page[ $slot ] ) ? $page[ $slot ][0][1] : strlen( $html );
+
+		if ( $text_before && $text_after ) {
+			return null;
+		}
+
+		if ( ! $text_before && ! $text_after && '' !== trim( substr( $html, $start, $end - $start ) ) ) {
+			return null;
+		}
+
+		$split = $text_before ? $end : $start;
 
 		return array( substr( $html, 0, $split ), null, substr( $html, $split ) );
 	}
 
 	/**
 	 * Tags of markup, each as its match with offset, `/` for a closing tag,
-	 * and its lowercase name.
+	 * and its lowercase name. Not `WP_HTML_Tag_Processor`, which gives no
+	 * offsets, and the split needs them.
 	 *
 	 * @param string $html - markup.
 	 *
 	 * @return array
 	 */
 	private static function get_tags( $html ) {
-		preg_match_all( '/<(\/?)([a-z][a-z0-9-]*)[^>]*>/i', $html, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE );
+		preg_match_all( '/<(\/?)([a-z][a-z0-9-]*)(?:[^>"\']|"[^"]*"|\'[^\']*\')*>/i', $html, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE );
 
 		return array_map(
 			function ( $tag ) {
@@ -537,6 +556,17 @@ class Visual_Portfolio_Saved_Layouts {
 			},
 			$matches
 		);
+	}
+
+	/**
+	 * Offset right after a tag from `get_tags()`.
+	 *
+	 * @param array $tag - tag.
+	 *
+	 * @return int
+	 */
+	private static function tag_end( $tag ) {
+		return $tag[0][1] + strlen( $tag[0][0] );
 	}
 
 	/**

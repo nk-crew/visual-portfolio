@@ -398,6 +398,7 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 	public function test_overridden_empty_block_wraps_layout_blocks() {
 		$template = array( 'metadata' => array( 'vpSyncKey' => 'template' ) );
 		$text     = '<!-- wp:paragraph {"metadata":{"vpSyncKey":"text"}} --><p>Layout text</p><!-- /wp:paragraph -->';
+		$list     = '<!-- wp:list --><ul class="wp-block-list"><!-- wp:list-item --><li>Nested</li><!-- /wp:list-item --></ul><!-- /wp:list -->';
 		$rows     = array(
 			'group'      => array(
 				'<!-- wp:group {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><div class="wp-block-group layout-box">' . $text . '</div><!-- /wp:group -->',
@@ -413,6 +414,11 @@ class ClassSavedLayouts extends WP_UnitTestCase {
 				'<!-- wp:quote {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><blockquote class="wp-block-quote layout-box">' . $text . '<cite>Cite</cite></blockquote><!-- /wp:quote -->',
 				'<!-- wp:quote {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><blockquote class="wp-block-quote page-box"><cite>Cite</cite></blockquote><!-- /wp:quote -->',
 				'<!-- wp:quote {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><blockquote class="wp-block-quote page-box">' . $text . '<cite>Cite</cite></blockquote><!-- /wp:quote -->',
+			),
+			'list-item'  => array(
+				'<!-- wp:list-item {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><li class="layout-box">Layout item' . $list . '</li><!-- /wp:list-item -->',
+				'<!-- wp:list-item {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><li class="page-box">Page item</li><!-- /wp:list-item -->',
+				'<!-- wp:list-item {"metadata":{"vpSyncKey":"box"},"className":"page-box"} --><li class="page-box">Page item' . $list . '</li><!-- /wp:list-item -->',
 			),
 			'media-text' => array(
 				'<!-- wp:media-text {"metadata":{"vpSyncKey":"box"},"className":"layout-box"} --><div class="wp-block-media-text layout-box"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content">' . $text . '</div></div><!-- /wp:media-text -->',
