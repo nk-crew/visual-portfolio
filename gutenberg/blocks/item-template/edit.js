@@ -1469,6 +1469,11 @@ export default function BlockEdit({
 			<ToolsPanelItem
 				hasValue={() => carouselAutoplay || 5 !== carouselAutoplayDelay}
 				label={__('Autoplay', 'visual-portfolio')}
+				attributeKeys={[
+					'carouselAutoplay',
+					'carouselAutoplayDelay',
+					'extensions.marquee',
+				]}
 				onDeselect={() =>
 					setAttributes({
 						carouselAutoplay: false,

@@ -569,6 +569,25 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 			autoplay: true,
 		});
 
+		// The page cleared two keys; the reset of the setting that names one
+		// takes back that key alone.
+		await open({ [key]: ['extensions.foo', 'extensions.marquee'] }, {});
+		await expect
+			.poll(async () => (await getState()).extensions)
+			.toEqual({});
+		await expect(
+			autoplay.getByText('Changed on this gallery')
+		).toBeVisible();
+		await expect(marks).toHaveCount(1);
+		await autoplay
+			.getByRole('button', { name: 'Reset to Saved Layout' })
+			.click();
+		await expect.poll(getState).toEqual({
+			overrides: { [key]: ['extensions.foo'] },
+			extensions: { marquee: { speed: 1 } },
+			autoplay: true,
+		});
+
 		// The panel's Reset all takes a cleared key back too.
 		await open({ [key]: ['extensions.marquee'] }, { foo: 'layout' });
 		await page.getByRole('button', { name: 'Carousel options' }).click();
