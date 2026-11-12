@@ -248,11 +248,12 @@ and are applied where it applies them:
 | `authors` (user ids) | `posts_authors` | A post type, a post types set and the current query |
 | `formats` (`standard`, `image`, …) | `posts_formats` | A post type and a post types set. `standard` is a post with no format, and formats join by OR |
 | `excludeTaxonomies` (term ids) | `posts_excluded_taxonomies` | A post type and a post types set. Joined to `taxonomies` and `formats` by AND |
-| `sticky` (`''`, `ignore`, `exclude`, `only`) | `posts_sticky` | The Posts source alone. `''` includes sticky posts first on the first page, as WordPress does |
+| `sticky` (`''`, `ignore`, `exclude`, `only`) | `posts_sticky` | The Posts source and a post types set that includes posts. `''` includes sticky posts first on the first page, as WordPress does for a set too |
 
 Formats is offered where the core Query block offers it: for a post type that
 supports post formats, while the theme declares one beside `standard`. Sticky
-posts is offered for the Posts source only, and leaving that source clears it.
+posts is offered where posts are queried: the Posts source, or a post types set
+that includes them. A source or a set without posts clears it.
 None of these reaches a manual selection or a custom query.
 
 *Avoid duplicates* hides what the page has already shown — another gallery, or
