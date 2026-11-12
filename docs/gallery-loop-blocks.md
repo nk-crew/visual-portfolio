@@ -1025,8 +1025,9 @@ Over REST, `update-gallery` is annotated destructive and idempotent, so its
 
 `vpf_gallery_ability_vocabulary` filters the sources and settings the
 abilities accept. A source is `type => array( label, description, available,
-requires_pro, schema )`, where `schema` is a JSON schema whose `properties`
-join the input schema of `source`. A setting is `key => array( description,
+requires_pro, schema, keys )`, where `schema` is a JSON schema whose
+`properties` join the input schema of `source`, and `keys` lists the
+`sourceQuery` keys `get-gallery` reports as the source's `settings`. A setting is `key => array( description,
 schema )`.
 
 ```php
@@ -1067,8 +1068,10 @@ add_filter(
 	'vpf_gallery_ability_apply',
 	function ( $loop, $input, $action ) {
 		if ( 'acme/instagram' === ( $input['source']['type'] ?? '' ) ) {
-			$loop['attrs']['sourceQuery'] = array(
-				'account' => $input['source']['account'] ?? '',
+			// Merge: `sourceQuery` also holds fields of other features.
+			$loop['attrs']['sourceQuery'] = array_merge(
+				$loop['attrs']['sourceQuery'] ?? array(),
+				array( 'account' => $input['source']['account'] ?? '' )
 			);
 		}
 

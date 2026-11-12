@@ -109,8 +109,9 @@ class Visual_Portfolio_Loop_Gallery {
 		 * Filter the sources and settings the gallery abilities accept.
 		 *
 		 * A source is `type => array( label, description, available,
-		 * requires_pro, schema )`, `schema` being the JSON schema of the
-		 * fields it takes besides `type`. A setting is `key => array(
+		 * requires_pro, schema, keys )`, `schema` being the JSON schema of the
+		 * fields it takes besides `type`, and `keys` the `sourceQuery` keys
+		 * get-gallery reports as its `settings`. A setting is `key => array(
 		 * description, schema )`. Whatever is added here is applied through
 		 * `vpf_gallery_ability_apply`.
 		 *
@@ -188,7 +189,7 @@ class Visual_Portfolio_Loop_Gallery {
 				$found[] = array(
 					'path'       => $block_path,
 					'block'      => $block,
-					'gallery_id' => '' === $block_id || isset( $seen[ $block_id ] ) ? 'loop-' . ( count( $found ) + 1 ) : $block_id,
+					'gallery_id' => self::is_own_id( $block_id ) && ! isset( $seen[ $block_id ] ) ? $block_id : 'loop-' . ( count( $found ) + 1 ),
 				);
 			}
 
@@ -200,6 +201,18 @@ class Visual_Portfolio_Loop_Gallery {
 				self::collect_loops( $block['innerBlocks'], $block_path, $found, $seen );
 			}
 		}
+	}
+
+	/**
+	 * Whether a `block_id` can name a gallery: not empty, and not one of the
+	 * positional ids the abilities give loops without one.
+	 *
+	 * @param string $block_id - block id.
+	 *
+	 * @return bool
+	 */
+	private static function is_own_id( $block_id ) {
+		return '' !== $block_id && ! preg_match( '/^loop-\d+$/', $block_id );
 	}
 
 	/**
@@ -249,7 +262,13 @@ class Visual_Portfolio_Loop_Gallery {
 			$source['order_by'] = $posts_query['orderBy'] ?? 'post_date';
 			$source['order']    = $posts_query['order'] ?? 'desc';
 		} else {
+			$keys               = self::get_vocabulary()['sources'][ $query_type ]['keys'] ?? null;
 			$source['settings'] = $attrs['sourceQuery'] ?? array();
+
+			// Fields other sources and features keep there are not this source's settings.
+			if ( is_array( $keys ) ) {
+				$source['settings'] = array_intersect_key( $source['settings'], array_flip( $keys ) );
+			}
 		}
 
 		$settings = array(
@@ -319,7 +338,7 @@ class Visual_Portfolio_Loop_Gallery {
 		$loop['attrs']['block_id'] = self::get_free_block_id( $blocks );
 		$loop['attrs']['queryId']  = self::get_free_query_id( $blocks );
 
-		return self::apply( $loop, $input, 'create' );
+		return self::apply( $loop, $input, 'create', null, $loop );
 	}
 
 	/**
@@ -333,6 +352,8 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @return array|WP_Error loop block.
 	 */
 	public static function update( $loop, $input, $blocks, $index = 0 ) {
+		$before = $loop;
+
 		// Content written outside the editor can hold two blocks with one id.
 		// As in the editor, the first holder keeps it and a later one gets
 		// its own, so the id keeps naming the same gallery on a retry. The
@@ -340,7 +361,7 @@ class Visual_Portfolio_Loop_Gallery {
 		$earlier_block_ids = array_map( 'strval', array_column( self::get_attributes_before( $blocks, $index ), 'block_id' ) );
 		$earlier_query_ids = array_map( 'intval', array_column( array_column( array_column( array_slice( self::find_loops( $blocks ), 0, $index ), 'block' ), 'attrs' ), 'queryId' ) );
 
-		if ( empty( $loop['attrs']['block_id'] ) || in_array( (string) $loop['attrs']['block_id'], $earlier_block_ids, true ) ) {
+		if ( ! self::is_own_id( (string) ( $loop['attrs']['block_id'] ?? '' ) ) || in_array( (string) $loop['attrs']['block_id'], $earlier_block_ids, true ) ) {
 			$loop['attrs']['block_id'] = self::get_free_block_id( $blocks );
 		}
 
@@ -382,7 +403,7 @@ class Visual_Portfolio_Loop_Gallery {
 			}
 		}
 
-		return self::apply( $loop, $input, 'update', $click_action );
+		return self::apply( $loop, $input, 'update', $click_action, $before );
 	}
 
 	/**
@@ -392,11 +413,11 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @param array       $input - ability input.
 	 * @param string      $action - `create` or `update`.
 	 * @param string|null $click_action - click action to keep over the layout's.
+	 * @param array       $before - the loop before the change; on create, the layout's loop.
 	 *
 	 * @return array|WP_Error loop block.
 	 */
-	private static function apply( $loop, $input, $action, $click_action = null ) {
-		$before   = $loop;
+	private static function apply( $loop, $input, $action, $click_action, $before ) {
 		$source   = $input['source'] ?? null;
 		$previous = $loop['attrs']['queryType'] ?? 'posts';
 
@@ -421,13 +442,21 @@ class Visual_Portfolio_Loop_Gallery {
 			);
 		}
 
+		$leaves_images = 'images' === $previous && 'images' !== $loop['attrs']['queryType'];
+
+		// "Every item on one page" is an images default; on another source it
+		// would put every post of the type on one page.
+		if ( $leaves_images && -1 === (int) ( $loop['attrs']['baseQuery']['perPage'] ?? 0 ) ) {
+			$loop['attrs']['baseQuery']['perPage'] = 6;
+		}
+
 		$loop = self::apply_images( $loop, $input );
 		$loop = self::apply_settings( $loop, $input['settings'] ?? array() );
 
 		// An images gallery has no pagination; the pages a gallery of
 		// another source now has get one, unless the call picked a layout,
 		// which brings its own.
-		if ( 'images' === $previous && 'images' !== $loop['attrs']['queryType'] && ! isset( $input['layout'] ) && -1 !== (int) ( $loop['attrs']['baseQuery']['perPage'] ?? 0 ) && ! self::find_block( $loop['innerBlocks'], self::PAGINATION ) ) {
+		if ( $leaves_images && ! isset( $input['layout'] ) && -1 !== (int) ( $loop['attrs']['baseQuery']['perPage'] ?? 0 ) && ! self::find_block( $loop['innerBlocks'], self::PAGINATION ) ) {
 			$pagination = self::get_layout_pagination();
 
 			if ( $pagination ) {
@@ -608,12 +637,6 @@ class Visual_Portfolio_Loop_Gallery {
 			$loop['attrs']['baseQuery']['perPage'] = -1;
 
 			return $loop;
-		}
-
-		// "Every item on one page" is an images default; on posts it would
-		// put every post of the type on one page.
-		if ( -1 === (int) ( $loop['attrs']['baseQuery']['perPage'] ?? 0 ) ) {
-			$loop['attrs']['baseQuery']['perPage'] = 6;
 		}
 
 		return self::set_click_action(

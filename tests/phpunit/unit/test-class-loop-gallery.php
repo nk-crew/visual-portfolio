@@ -390,12 +390,17 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 		$this->assertStringStartsWith( $markup, $content );
 
 		// The legacy gallery block holds ids the same way, so the loop after it
-		// is named by its position, and keeps that name after a write.
+		// is named by its position until a write gives it an id of its own.
 		$legacy = parse_blocks( '<!-- wp:visual-portfolio/block {"block_id":"same"} /-->' . $markup );
 		$this->assertSame( 'loop-1', Visual_Portfolio_Loop_Gallery::find_loops( $legacy )[0]['gallery_id'] );
 
 		$counted = Visual_Portfolio_Loop_Gallery::update( $legacy[1], array( 'settings' => array( 'per_page' => 3 ) ), $legacy, 0 );
 		$this->assertNotSame( 'same', $counted['attrs']['block_id'] );
+
+		// A stored id that reads like a position is a position.
+		$literal = parse_blocks( str_replace( '"same"', '"loop-2"', $markup ) . '<!-- wp:visual-portfolio/loop {"queryType":"posts"} --><div class="vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->' );
+		$this->assertSame( array( 'loop-1', 'loop-2' ), array_column( Visual_Portfolio_Loop_Gallery::find_loops( $literal ), 'gallery_id' ) );
+		$this->assertSame( 1, Visual_Portfolio_Loop_Gallery::find_loop( $literal, 'loop-2' )['index'] );
 	}
 
 	/**
@@ -547,6 +552,7 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 				'description'  => 'Acme feed.',
 				'available'    => true,
 				'requires_pro' => false,
+				'keys'         => array( 'feed' ),
 			);
 			$vocabulary['sources']['beta'] = array(
 				'label'        => 'Beta',
@@ -619,6 +625,29 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 			$switched['attrs']['sourceQuery']
 		);
 		$this->assertSame( 'acme', $before_type );
+
+		// get-gallery reports the fields the source declares, not what other
+		// features keep beside them.
+		$guarded                                       = $changed;
+		$guarded['attrs']['sourceQuery']['protection'] = array( 'rightClick' => true );
+		add_filter( 'vpf_gallery_ability_vocabulary', $vocabulary );
+		$described = Visual_Portfolio_Loop_Gallery::describe( $guarded );
+		remove_filter( 'vpf_gallery_ability_vocabulary', $vocabulary );
+		$this->assertSame( array( 'feed' => 'sport' ), $described['source']['settings'] );
+
+		// A posts loop showing every item keeps doing so on another source.
+		$all  = Visual_Portfolio_Loop_Gallery::create(
+			'visual-portfolio/gallery-posts-classic',
+			array(
+				'source'   => array( 'type' => 'posts' ),
+				'settings' => array( 'per_page' => -1 ),
+			),
+			array()
+		);
+		add_filter( 'vpf_gallery_ability_vocabulary', $vocabulary );
+		$moved = Visual_Portfolio_Loop_Gallery::update( $all, array( 'source' => array( 'type' => 'acme' ) ), array( $all ) );
+		remove_filter( 'vpf_gallery_ability_vocabulary', $vocabulary );
+		$this->assertSame( -1, $moved['attrs']['baseQuery']['perPage'] );
 
 		$this->assertSame( 'acme', $loop['attrs']['queryType'] );
 		$this->assertSame( array( 'feed' => 'news' ), $loop['attrs']['sourceQuery'] );
