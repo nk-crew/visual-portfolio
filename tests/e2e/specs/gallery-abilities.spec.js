@@ -7,6 +7,7 @@
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
+import { deleteAllSavedLayouts } from '../utils/delete-all-saved-layouts';
 import { getFixturePath } from '../utils/fixture-path';
 import { getPluginSlug } from '../utils/plugin-slug';
 
@@ -108,6 +109,7 @@ test.describe('Gallery abilities', () => {
 	test.afterAll(async ({ requestUtils }) => {
 		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllMedia();
+		await deleteAllSavedLayouts({ requestUtils });
 	});
 
 	test('are listed for agents', async ({ requestUtils }) => {
@@ -187,5 +189,123 @@ test.describe('Gallery abilities', () => {
 			);
 
 		expect(order).toEqual([...ids].reverse());
+	});
+
+	test('change a gallery synced with a Saved Layout the way the editor does', async ({
+		admin,
+		page,
+		requestUtils,
+	}) => {
+		const layout = await requestUtils.rest({
+			method: 'POST',
+			path: '/wp/v2/vp_lists',
+			data: {
+				title: 'Synced by an agent',
+				status: 'publish',
+				content:
+					'<!-- wp:visual-portfolio/loop {"queryType":"images"} --><div class="wp-block-visual-portfolio-loop vp-block-loop"><!-- wp:visual-portfolio/item-template {"layoutType":"masonry","layoutColumnsMode":"manual","layoutColumnCount":4} --><!-- wp:visual-portfolio/item-image {"clickAction":"popup"} /--><!-- /wp:visual-portfolio/item-template --></div><!-- /wp:visual-portfolio/loop -->',
+			},
+		});
+		const target = await requestUtils.rest({
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: { title: 'Synced gallery', status: 'publish' },
+		});
+
+		const options = await requestUtils.rest({
+			path: '/wp-abilities/v1/abilities/visual-portfolio/get-gallery-options/run',
+		});
+
+		expect(options.saved_layouts).toContainEqual({
+			id: layout.id,
+			title: 'Synced by an agent',
+		});
+
+		const gallery = await runAbility(requestUtils, 'create-gallery', {
+			post_id: target.id,
+			layout: 'visual-portfolio/gallery-grid-classic',
+			source: {
+				type: 'images',
+				images: images.map(({ id }) => ({ id })),
+			},
+			saved_layout: layout.id,
+		});
+
+		expect(gallery.saved_layout).toEqual({
+			id: layout.id,
+			title: 'Synced by an agent',
+		});
+		expect(gallery.layout_type).toBe('masonry');
+
+		const input = {
+			post_id: target.id,
+			gallery_id: gallery.gallery_id,
+		};
+		const changed = await runAbility(
+			requestUtils,
+			'update-gallery',
+			{ ...input, settings: { columns: 2, lightbox: false } },
+			'DELETE'
+		);
+
+		expect(changed.settings).toMatchObject({ columns: 2, lightbox: false });
+
+		await page.goto(target.link);
+		await expect(page.locator(ITEM)).toHaveCount(3);
+		expect(
+			await page
+				.locator('.wp-block-visual-portfolio-item-template')
+				.evaluate((node) =>
+					getComputedStyle(node)
+						.getPropertyValue('--vp-layout-columns')
+						.trim()
+				)
+		).toBe('2');
+		await expect(page.locator(`${ITEM} [data-vp-popup]`)).toHaveCount(0);
+
+		// The editor keeps the changes as this gallery's own.
+		await admin.editPost(target.id);
+		await expect
+			.poll(() => readBlocks(page))
+			.toEqual({ invalid: [], loops: 1 });
+		await expect
+			.poll(() =>
+				page.evaluate(() => {
+					const loop = window.wp.data
+						.select('core/block-editor')
+						.getBlocks()
+						.find(({ name }) => 'visual-portfolio/loop' === name);
+
+					return loop.innerBlocks[0].attributes.layoutColumnCount;
+				})
+			)
+			.toBe(2);
+
+		await expect(
+			runAbility(
+				requestUtils,
+				'update-gallery',
+				{ ...input, layout: 'visual-portfolio/gallery-tiles-mosaic' },
+				'DELETE'
+			)
+		).rejects.toMatchObject({
+			code: 'vpf_synced_layout',
+			message: expect.stringContaining('`saved_layout: null`'),
+		});
+
+		// A query string carries no null, so 0 detaches there.
+		const detached = await runAbility(
+			requestUtils,
+			'update-gallery',
+			{
+				...input,
+				saved_layout: 0,
+				layout: 'visual-portfolio/gallery-tiles-mosaic',
+			},
+			'DELETE'
+		);
+
+		expect(detached.saved_layout).toBeNull();
+		expect(detached.layout_type).toBe('tiles');
 	});
 });

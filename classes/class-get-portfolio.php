@@ -470,7 +470,17 @@ class Visual_Portfolio_Get {
 			$class .= ' vp-portfolio__stretch';
 		}
 
-		// Filter to replace the main layout with custom. Particularly needed for password protection or age verification.
+		/**
+		 * Replace the output of a legacy gallery, for example with a password form.
+		 *
+		 * Runs only for legacy galleries: the shortcode, the legacy block and
+		 * legacy Saved Layouts. A Gallery Loop uses `vpf_loop_custom_output`.
+		 *
+		 * @param false|string $custom_output Output to print instead of the gallery, false to keep it.
+		 * @param string       $uid           Gallery uid.
+		 * @param string       $class         Gallery class names.
+		 * @param array        $options       Gallery options.
+		 */
 		$custom_output = apply_filters( 'vpf_custom_output', false, $uid, $class, $options );
 
 		if ( $custom_output ) {

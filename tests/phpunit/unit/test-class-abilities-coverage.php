@@ -37,7 +37,7 @@ class Test_Class_Abilities_Coverage extends WP_UnitTestCase {
 			'preview_image_example' => 'editor preview only',
 			'previewLayout'         => 'editor preview only',
 			'extensions'            => 'Pro and extensions, through vpf_gallery_ability_apply',
-			'savedLayout'           => 'Saved Layout sync, set from the block menu; an agent keeps it as it is',
+			'savedLayout'           => 'saved_layout; overrides follow the settings a call changes',
 		),
 		'item-template' => array(
 			'layoutType'                  => 'layout (a pattern); reported as layout_type',
