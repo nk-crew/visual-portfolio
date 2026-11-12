@@ -226,7 +226,102 @@
 	transform: translateX(-50%);
 }
 
-// DataViews pads its grid but leaves its select-all bar to the page.
+// The page header and content set the gutters, so DataViews adds none.
+.vpf-library .dataviews-view-grid,
+.vpf-library .dataviews-view-list,
+.vpf-library .dataviews-footer,
+.vpf-library .dataviews-filters__container {
+	padding-right: 0;
+	padding-left: 0;
+}
+
+.vpf-library .dataviews-view-table tr td:first-child,
+.vpf-library .dataviews-view-table tr th:first-child {
+	padding-left: 0;
+}
+
+.vpf-library .dataviews-view-table tr td:last-child,
+.vpf-library .dataviews-view-table tr th:last-child {
+	padding-right: 0;
+}
+
+.vpf-library-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 12px;
+	align-items: center;
+	margin-bottom: 16px;
+
+	.dataviews-search {
+		width: 280px;
+		max-width: 100%;
+	}
+}
+
+.vpf-library-toolbar__end {
+	display: flex;
+	gap: 4px;
+	align-items: center;
+	margin-left: auto;
+}
+
+.vpf-library-toolbar__bulk {
+	flex: 1 1 200px;
+	align-self: stretch;
+	min-height: 40px;
+}
+
+// The grid's select-all bar, with the selection's bulk actions, sits over the
+// toolbar's slot (see `useBulkSlot()`) instead of on a row of its own.
+.vpf-library .dataviews-wrapper {
+	position: relative;
+}
+
 .vpf-library .dataviews-view-grid__bulk-actions-header {
-	padding: 0 24px;
+	position: absolute;
+	top: var(--vpf-bulk-top, 0);
+	left: var(--vpf-bulk-left, 0);
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	width: var(--vpf-bulk-width, auto);
+	height: 40px;
+	padding: 0 0 0 12px;
+	margin: 0;
+	background: transparent;
+	border-left: 1px solid #e0e0e0;
+
+	@media (max-width: 600px) {
+		padding-left: 0;
+		border-left: 0;
+	}
+
+	> * {
+		width: 100%;
+		min-height: 0;
+		padding: 0;
+		background: transparent;
+		border: 0;
+	}
+}
+
+// A card's title keeps to one line and ends in an ellipsis.
+.vpf-library .dataviews-view-grid .vpf-library-title {
+	flex-wrap: nowrap;
+	max-width: 100%;
+}
+
+.vpf-library .dataviews-view-grid .vpf-library-title__link {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+// WordPress's @wordpress/components fills every svg in a clickable `Item`, while the
+// check of DataViews 22 is drawn with a stroke, so the filled path turns into
+// a wedge. Not scoped to the page: the menu renders in a popover outside it.
+// Drop once the two packages agree on the icon.
+.components-item svg[stroke],
+.components-item svg[stroke] path {
+	fill: none;
 }

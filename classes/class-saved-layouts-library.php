@@ -12,15 +12,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class Visual_Portfolio_Saved_Layouts_Library
  *
- * The screen is a `@wordpress/build` page (`wpPlugin.pages` in `package.json`)
- * booted by core's `@wordpress/boot` module, the way core builds Fonts and
- * Connectors. Its routes live in `routes/`.
+ * The screen is a React page, `assets/admin/pages/saved-layouts/`.
  */
 class Visual_Portfolio_Saved_Layouts_Library {
 	/**
-	 * Admin page slug the build generates for the page in wp-admin mode.
+	 * Admin page slug.
 	 */
-	const PAGE = 'vpf-saved-layouts-wp-admin';
+	const PAGE = 'vpf-saved-layouts';
+
+	/**
+	 * Script and style handle.
+	 */
+	const HANDLE = 'visual-portfolio-saved-layouts';
+
+	/**
+	 * Hook suffix of the page.
+	 *
+	 * @var string
+	 */
+	private $hook_suffix = '';
 
 	/**
 	 * Constructor.
@@ -30,41 +40,34 @@ class Visual_Portfolio_Saved_Layouts_Library {
 			return;
 		}
 
-		require_once visual_portfolio()->plugin_path . 'build/build.php';
-
 		// menu.
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), 13 );
 		add_filter( 'submenu_file', array( $this, 'highlight_menu' ) );
 		add_action( 'load-edit.php', array( $this, 'redirect_list_table' ) );
 
-		// translations.
-		add_action( 'admin_enqueue_scripts', array( $this, 'set_translations' ), 20 );
+		// assets.
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
+		add_filter( 'admin_body_class', array( $this, 'body_class' ) );
 	}
 
 	/**
 	 * Whether the library replaces the post type list on this site.
 	 *
-	 * New Saved Layouts are Gallery Loop blocks, which need WordPress 7.1, and
-	 * the page boots through `@wordpress/boot`, which core ships since 7.0.
+	 * New Saved Layouts are Gallery Loop blocks, which need WordPress 7.1.
 	 *
 	 * @return bool
 	 */
 	public static function is_available() {
-		return visual_portfolio()->supports_loop_blocks()
-			&& file_exists( visual_portfolio()->plugin_path . 'build/build.php' );
+		return visual_portfolio()->supports_loop_blocks();
 	}
 
 	/**
-	 * URL of the library, optionally at one of its routes.
-	 *
-	 * @param string $route - route path, such as `/`.
+	 * URL of the library.
 	 *
 	 * @return string
 	 */
-	public static function get_url( $route = '' ) {
-		$url = admin_url( 'admin.php?page=' . self::PAGE );
-
-		return $route ? add_query_arg( 'p', rawurlencode( $route ), $url ) : $url;
+	public static function get_url() {
+		return admin_url( 'admin.php?page=' . self::PAGE );
 	}
 
 	/**
@@ -85,27 +88,63 @@ class Visual_Portfolio_Saved_Layouts_Library {
 
 		remove_submenu_page( $parent, 'edit.php?post_type=vp_lists' );
 
-		add_submenu_page(
+		$this->hook_suffix = (string) add_submenu_page(
 			$parent,
 			esc_html__( 'Saved Layouts', 'visual-portfolio' ),
 			esc_html__( 'Saved Layouts', 'visual-portfolio' ),
 			'edit_vp_lists',
 			self::PAGE,
-			'visual_portfolio_vpf_saved_layouts_wp_admin_render_page',
+			array( $this, 'render' ),
 			$position
 		);
 	}
 
 	/**
-	 * Load the plugin's translations into the library route, a script module
-	 * the build registers under its own handle.
+	 * Mount point of the page.
 	 */
-	public function set_translations() {
-		wp_set_script_module_translations(
-			',/routes/saved-layouts-home/content',
-			'visual-portfolio',
-			visual_portfolio()->plugin_path . 'languages'
+	public function render() {
+		echo '<div id="vpf-saved-layouts"></div>';
+	}
+
+	/**
+	 * Load the page's script and styles on the page only.
+	 *
+	 * @param string $hook_suffix - current admin page.
+	 */
+	public function enqueue( $hook_suffix ) {
+		if ( ! $this->hook_suffix || $hook_suffix !== $this->hook_suffix ) {
+			return;
+		}
+
+		$asset = require visual_portfolio()->plugin_path . 'build/assets/admin/pages/saved-layouts.asset.php';
+
+		wp_enqueue_script(
+			self::HANDLE,
+			visual_portfolio()->plugin_url . 'build/assets/admin/pages/saved-layouts.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
 		);
+		wp_set_script_translations( self::HANDLE, 'visual-portfolio', visual_portfolio()->plugin_path . 'languages' );
+		wp_enqueue_style(
+			self::HANDLE,
+			visual_portfolio()->plugin_url . 'build/assets/admin/pages/saved-layouts.css',
+			array( 'wp-components' ),
+			$asset['version']
+		);
+	}
+
+	/**
+	 * Mark the page, so plugin pages share one frame.
+	 *
+	 * @param string $classes - body classes.
+	 *
+	 * @return string
+	 */
+	public function body_class( $classes ) {
+		global $plugin_page;
+
+		return self::PAGE === $plugin_page ? $classes . ' vpf-admin-page-screen' : $classes;
 	}
 
 	/**
@@ -132,7 +171,10 @@ class Visual_Portfolio_Saved_Layouts_Library {
 			return;
 		}
 
-		wp_safe_redirect( self::get_url() );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only reads which list to open.
+		$is_trash = isset( $_GET['post_status'] ) && 'trash' === $_GET['post_status'];
+
+		wp_safe_redirect( $is_trash ? add_query_arg( 'status', 'trash', self::get_url() ) : self::get_url() );
 		exit;
 	}
 }

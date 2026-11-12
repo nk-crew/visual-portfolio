@@ -10,7 +10,7 @@ import { deleteAllSavedLayouts } from '../utils/delete-all-saved-layouts';
 import { getFixturePath } from '../utils/fixture-path';
 import { getPluginSlug } from '../utils/plugin-slug';
 
-const LIBRARY = ['admin.php', 'page=vpf-saved-layouts-wp-admin'];
+const LIBRARY = ['admin.php', 'page=vpf-saved-layouts'];
 
 /**
  * Serialized Gallery Loop.
@@ -88,7 +88,7 @@ test.describe('Saved Layouts library', () => {
 	test('the post type list opens the library', async ({ admin, page }) => {
 		await admin.visitAdminPage('edit.php', 'post_type=vp_lists');
 
-		await expect(page).toHaveURL(/page=vpf-saved-layouts-wp-admin/);
+		await expect(page).toHaveURL(/page=vpf-saved-layouts/);
 		await expect(
 			page.getByRole('heading', { name: 'Saved Layouts', level: 1 })
 		).toBeVisible();
@@ -161,6 +161,26 @@ test.describe('Saved Layouts library', () => {
 				.locator('.wp-block-visual-portfolio-item-template__item img')
 		).toHaveCount(1);
 
+		// Select all and the bulk actions sit in the row of the search.
+		const selectAll = page.getByRole('checkbox', { name: 'Select all' });
+		const middle = async (locator) => {
+			const box = await locator.boundingBox();
+
+			return box.y + box.height / 2;
+		};
+
+		await selectAll.check();
+		await expect(page.getByText('3 items selected')).toBeVisible();
+		expect(
+			Math.abs(
+				(await middle(page.getByRole('searchbox'))) -
+					(await middle(
+						page.getByRole('button', { name: 'Move to trash' })
+					))
+			)
+		).toBeLessThan(4);
+		await page.getByRole('checkbox', { name: 'Deselect all' }).uncheck();
+
 		// A layout with no items keeps the schematic.
 		await expect(
 			page
@@ -175,6 +195,20 @@ test.describe('Saved Layouts library', () => {
 		url.searchParams.set('_wpnonce', 'invalid');
 
 		expect((await page.request.get(url.href)).status()).toBe(403);
+	});
+
+	test('the view options check the properties shown', async ({ page }) => {
+		await page.getByRole('button', { name: 'View options' }).click();
+
+		// A filled check is the stroke of the icon drawn as a wedge.
+		const fills = await page
+			.locator('.components-popover [role="listitem"] svg[stroke] path')
+			.evaluateAll((paths) =>
+				paths.map((path) => window.getComputedStyle(path).fill)
+			);
+
+		expect(fills.length).toBeGreaterThan(0);
+		expect(new Set(fills)).toEqual(new Set(['none']));
 	});
 
 	test('duplicates a layout', async ({ page }) => {
@@ -210,7 +244,8 @@ test.describe('Saved Layouts library', () => {
 			page.getByRole('row', { name: /Library Masonry/ })
 		).toHaveCount(0);
 
-		await page.getByRole('link', { name: 'Trash (1)' }).click();
+		await page.getByRole('link', { name: 'Trash 1' }).click();
+		await expect(page).toHaveURL(/status=trash/);
 
 		const trashed = page.getByRole('row', { name: /Library Masonry/ });
 

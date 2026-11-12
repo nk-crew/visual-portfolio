@@ -1,0 +1,154 @@
+// Plugin pages sit on white, edge to edge, the way the Site Editor's screens
+// do. Values are the gray scale and theme color of @wordpress/components.
+$gray-900: #1e1e1e;
+$gray-700: #757575;
+$gray-100: #f0f0f0;
+
+body.vpf-admin-page-screen {
+	background: #fff;
+
+	#wpcontent {
+		padding-left: 0;
+	}
+
+	#wpbody-content {
+		padding-bottom: 0;
+	}
+
+	#wpfooter {
+		display: none;
+	}
+
+	#wpbody-content > .notice,
+	#wpbody-content > .error,
+	#wpbody-content > .updated {
+		margin: 16px 32px 0;
+	}
+}
+
+.vpf-admin-page {
+	color: $gray-900;
+}
+
+.vpf-admin-page__header {
+	padding: 32px 32px 0;
+	border-bottom: 1px solid $gray-100;
+}
+
+.vpf-admin-page__heading {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px 24px;
+	align-items: flex-start;
+	justify-content: space-between;
+	padding-bottom: 24px;
+}
+
+.vpf-admin-page__titles {
+	min-width: 0;
+
+	h1 {
+		padding: 0;
+		margin: 0;
+		font-size: 23px;
+		font-weight: 600;
+		line-height: 32px;
+		color: $gray-900;
+	}
+
+	p {
+		max-width: 640px;
+		margin: 4px 0 0;
+		font-size: 13px;
+		color: $gray-700;
+	}
+}
+
+.vpf-admin-page__actions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.vpf-admin-page__sections {
+	display: flex;
+	gap: 8px;
+	margin: -12px -12px 0;
+	overflow-x: auto;
+	scrollbar-width: none;
+
+	a {
+		position: relative;
+		display: inline-flex;
+		gap: 6px;
+		align-items: center;
+		min-height: 48px;
+		padding: 0 12px;
+		font-size: 13px;
+		font-weight: 500;
+		color: $gray-700;
+		text-decoration: none;
+		white-space: nowrap;
+
+		&:hover {
+			color: $gray-900;
+		}
+
+		&:focus {
+			outline: none;
+			box-shadow: none;
+		}
+
+		&:focus-visible {
+			border-radius: 2px;
+			outline: 2px solid var(--wp-admin-theme-color, #3858e9);
+			outline-offset: -2px;
+		}
+
+		&[aria-current] {
+			color: $gray-900;
+
+			&::after {
+				position: absolute;
+				right: 12px;
+				bottom: 0;
+				left: 12px;
+				height: 2px;
+				content: "";
+				background: var(--wp-admin-theme-color, #3858e9);
+			}
+		}
+	}
+}
+
+.vpf-admin-page__count {
+	min-width: 18px;
+	padding: 0 6px;
+	font-size: 11px;
+	line-height: 18px;
+	color: $gray-700;
+	text-align: center;
+	background: $gray-100;
+	border-radius: 9px;
+}
+
+.vpf-admin-page__content {
+	padding: 24px 32px 48px;
+}
+
+@media (max-width: 782px) {
+	body.vpf-admin-page-screen #wpbody-content > .notice,
+	body.vpf-admin-page-screen #wpbody-content > .error,
+	body.vpf-admin-page-screen #wpbody-content > .updated {
+		margin-right: 16px;
+		margin-left: 16px;
+	}
+
+	.vpf-admin-page__header {
+		padding: 24px 16px 0;
+	}
+
+	.vpf-admin-page__content {
+		padding: 16px 16px 32px;
+	}
+}

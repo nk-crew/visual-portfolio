@@ -1317,11 +1317,14 @@ builders in their own meta are not counted. Content saved before the index is
 indexed in batches, from WP-Cron and from every library request, until
 `vpf_saved_layout_usage_indexed` is set.
 
-**Library.** `Saved Layouts` in the plugin menu is a `@wordpress/build` page
-(`wpPlugin.pages` in `package.json`, route in `routes/saved-layouts-home/`)
-booted by core's `@wordpress/boot`. It reads `wp/v2/vp_lists`, which carries a
-`vpf_layout` field (kind, source, preview settings and URL, usage, shortcode,
-edit link), and uses these routes of `visual-portfolio/v1`:
+**Library.** `Saved Layouts` in the plugin menu (`admin.php?page=vpf-saved-layouts`)
+is a React page, `assets/admin/pages/saved-layouts/`, in the plugin's admin
+page frame (`assets/admin/pages/components/page.js`), built by the admin
+pages compilation of `webpack.config.js`, which bundles DataViews and uses
+WordPress's own components. It reads
+`wp/v2/vp_lists`, which carries a `vpf_layout` field (kind, source, preview
+settings and URL, usage, shortcode, edit
+link), and uses these routes of `visual-portfolio/v1`:
 
 | Route | Does |
 |---|---|

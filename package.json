@@ -6,9 +6,9 @@
 	"license": "GPL-2.0",
 	"author": "Visual Portfolio Team <https://www.visualportfolio.com>",
 	"scripts": {
-		"dev": "concurrently \"wp-scripts start -- inline --hot --progress\" \"wp-build --watch\"",
-		"build": "wp-scripts build --progress && wp-build",
-		"build:quiet": "cross-env VP_QUIET=1 wp-scripts build --stats=errors-warnings && wp-build",
+		"dev": "concurrently \"wp-scripts start -- inline --hot --progress\"",
+		"build": "wp-scripts build --progress",
+		"build:quiet": "cross-env VP_QUIET=1 wp-scripts build --stats=errors-warnings",
 		"build:prod": "npm run make-pot && npm run make-json && npm run build && npm run zip",
 		"bump:patch": "gulp bump --type patch",
 		"bump:minor": "gulp bump --type minor",
@@ -53,9 +53,8 @@
 		"@biomejs/biome": "2.5.7",
 		"@nk-crew/plugin-toolkit": "^0.6.0",
 		"@playwright/test": "^1.57.0",
-		"@wordpress/admin-ui": "3.1.0",
 		"@wordpress/api-fetch": "8.1.0",
-		"@wordpress/build": "0.27.0",
+		"@wordpress/components": "44.0.0",
 		"@wordpress/core-data": "9.1.0",
 		"@wordpress/data": "11.1.0",
 		"@wordpress/dataviews": "22.0.0",
@@ -63,10 +62,8 @@
 		"@wordpress/e2e-test-utils-playwright": "^1.37.0",
 		"@wordpress/env": "^11.13.0",
 		"@wordpress/notices": "6.1.0",
-		"@wordpress/route": "0.25.0",
 		"@wordpress/scripts": "^34.1.0",
 		"@wordpress/stylelint-config": "^23.29.0",
-		"@wordpress/theme": "4.0.0",
 		"@wordpress/url": "5.1.0",
 		"@wp-playground/cli": "^3.1.48",
 		"ajv": "8.17.1",
@@ -122,16 +119,6 @@
 			"visual-portfolio",
 			"gutenberg-test-plugin-disables-the-css-animations",
 			"vpf-test-carousel-effect"
-		]
-	},
-	"wpPlugin": {
-		"name": "visual_portfolio",
-		"scriptGlobal": false,
-		"pages": [
-			{
-				"id": "vpf-saved-layouts",
-				"capability": "edit_vp_lists"
-			}
 		]
 	}
 }

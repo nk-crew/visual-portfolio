@@ -1,7 +1,6 @@
 import '@wordpress/dataviews/build-style/style.css';
 import './style.scss';
 
-import { Page } from '@wordpress/admin-ui';
 import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
@@ -17,14 +16,20 @@ import { useViewportMatch } from '@wordpress/compose';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { useMemo, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { chevronDown, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { useNavigate, useSearch } from '@wordpress/route';
 
-import { getActions, POST_TYPE } from './library/actions';
-import { fields } from './library/fields';
+import { Page, PageSections } from '../components/page';
+import { getActions, POST_TYPE } from './actions';
+import { fields } from './fields';
 
 const NEW_URL = 'post-new.php?post_type=vp_lists';
 const NEW_LEGACY_URL = 'post-new.php?post_type=vp_lists&vp_layout=legacy';
@@ -310,28 +315,82 @@ function EmptyLibrary() {
 }
 
 /**
- * Navigation link that switches the list without reloading the page.
+ * Which list the page shows, kept in the `status` parameter of its URL.
  *
- * @param {Object} props      - anchor props.
- * @param {string} props.href - `#all` or `#trash`.
- * @return {Element} component.
+ * @return {Array} `[ isTrash, setIsTrash ]`.
  */
-function SectionLink({ href, ...props }) {
-	const navigate = useNavigate();
+function useTrashParam() {
+	const read = () =>
+		'trash' === new URLSearchParams(window.location.search).get('status');
+	const [isTrash, setIsTrash] = useState(read);
 
-	return (
-		<a
-			{...props}
-			href={href}
-			onClick={(event) => {
-				event.preventDefault();
-				navigate({
-					to: '/',
-					search: href === '#trash' ? { status: 'trash' } : {},
-				});
-			}}
-		/>
-	);
+	useEffect(() => {
+		const onPopState = () => setIsTrash(read());
+
+		window.addEventListener('popstate', onPopState);
+
+		return () => window.removeEventListener('popstate', onPopState);
+	}, []);
+
+	const update = (next) => {
+		const url = new URL(window.location.href);
+
+		if (next) {
+			url.searchParams.set('status', 'trash');
+		} else {
+			url.searchParams.delete('status');
+		}
+
+		window.history.pushState(null, '', url);
+		setIsTrash(next);
+	};
+
+	return [isTrash, update];
+}
+
+/**
+ * Where the grid's select-all bar goes: a slot in the toolbar row. The bar is
+ * part of DataViews' grid, with the selection's bulk actions, and would take
+ * a row of its own above the cards; the stylesheet places it over the slot.
+ *
+ * @return {Function} ref callback of the slot.
+ */
+function useBulkSlot() {
+	const cleanup = useRef();
+
+	return useCallback((element) => {
+		cleanup.current?.();
+		cleanup.current = null;
+
+		const wrapper = element?.closest('.dataviews-wrapper');
+
+		if (!wrapper) {
+			return;
+		}
+
+		const place = () => {
+			const box = element.getBoundingClientRect();
+			const frame = wrapper.getBoundingClientRect();
+
+			wrapper.style.setProperty(
+				'--vpf-bulk-top',
+				`${box.top - frame.top}px`
+			);
+			wrapper.style.setProperty(
+				'--vpf-bulk-left',
+				`${box.left - frame.left}px`
+			);
+			wrapper.style.setProperty('--vpf-bulk-width', `${box.width}px`);
+		};
+
+		const observer = new window.ResizeObserver(place);
+
+		observer.observe(wrapper);
+		observer.observe(element);
+		place();
+
+		cleanup.current = () => observer.disconnect();
+	}, []);
 }
 
 /**
@@ -340,8 +399,8 @@ function SectionLink({ href, ...props }) {
  * @return {Element} component.
  */
 function SavedLayoutsLibrary() {
-	const search = useSearch({ strict: false });
-	const isTrash = search?.status === 'trash';
+	const [isTrash, setIsTrash] = useTrashParam();
+	const bulkSlot = useBulkSlot();
 	const [view, setView] = useStoredView();
 	const [selection, setSelection] = useState([]);
 	const { invalidateResolutionForStoreSelector } = useDispatch(coreStore);
@@ -354,15 +413,16 @@ function SavedLayoutsLibrary() {
 		context: 'edit',
 		_fields: 'id,title,status,modified,vpf_layout',
 	});
-	const { totalItems: trashCount = 0 } = useEntityRecords(
-		'postType',
-		POST_TYPE,
-		{
-			per_page: 1,
-			status: ['trash'],
-			_fields: 'id',
-		}
-	);
+	const { totalItems: liveCount } = useEntityRecords('postType', POST_TYPE, {
+		per_page: 1,
+		status: LIVE_STATUSES,
+		_fields: 'id',
+	});
+	const { totalItems: trashCount } = useEntityRecords('postType', POST_TYPE, {
+		per_page: 1,
+		status: ['trash'],
+		_fields: 'id',
+	});
 
 	const refresh = () =>
 		invalidateResolutionForStoreSelector('getEntityRecords');
@@ -391,35 +451,40 @@ function SavedLayoutsLibrary() {
 		<Page
 			className="vpf-library"
 			title={__('Saved Layouts', 'visual-portfolio')}
-			subTitle={__(
+			description={__(
 				'Galleries you build once. Insert one on a page, or sync a Gallery Loop with it.',
 				'visual-portfolio'
 			)}
 			actions={
-				<HStack spacing={2}>
+				<>
 					<ImportButton onImport={refresh} />
 					<AddNewButton />
-				</HStack>
+				</>
 			}
-			navigation={{
-				ariaLabel: __('Saved Layouts', 'visual-portfolio'),
-				items: [
-					{ label: __('All', 'visual-portfolio'), href: '#all' },
-					{
-						label: trashCount
-							? sprintf(
-									// translators: %d - number of layouts in the trash.
-									__('Trash (%d)', 'visual-portfolio'),
-									trashCount
-								)
-							: __('Trash', 'visual-portfolio'),
-						href: '#trash',
-					},
-				],
-				currentHref: isTrash ? '#trash' : '#all',
-			}}
-			components={{ link: SectionLink }}
-			showSidebarToggle={false}
+			sections={
+				<PageSections
+					label={__('Saved Layouts', 'visual-portfolio')}
+					current={isTrash ? 'trash' : 'all'}
+					onSelect={(id) => {
+						setSelection([]);
+						setIsTrash('trash' === id);
+					}}
+					items={[
+						{
+							id: 'all',
+							label: __('All', 'visual-portfolio'),
+							href: '?page=vpf-saved-layouts',
+							count: liveCount,
+						},
+						{
+							id: 'trash',
+							label: __('Trash', 'visual-portfolio'),
+							href: '?page=vpf-saved-layouts&status=trash',
+							count: trashCount,
+						},
+					]}
+				/>
+			}
 		>
 			{isEmpty ? (
 				<EmptyLibrary />
@@ -448,11 +513,29 @@ function SavedLayoutsLibrary() {
 								: __('No layouts match.', 'visual-portfolio')}
 						</Text>
 					}
-				/>
+				>
+					<div className="vpf-library-toolbar">
+						<DataViews.Search
+							label={__('Search layouts', 'visual-portfolio')}
+						/>
+						<DataViews.FiltersToggle />
+						<div
+							ref={bulkSlot}
+							className="vpf-library-toolbar__bulk"
+						/>
+						<div className="vpf-library-toolbar__end">
+							<DataViews.LayoutSwitcher />
+							<DataViews.ViewConfig />
+						</div>
+					</div>
+					<DataViews.FiltersToggled />
+					<DataViews.Layout />
+					<DataViews.Footer />
+				</DataViews>
 			)}
 			<Snackbars />
 		</Page>
 	);
 }
 
-export const stage = SavedLayoutsLibrary;
+export default SavedLayoutsLibrary;
