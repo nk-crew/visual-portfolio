@@ -808,6 +808,11 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 
 		$this->assertSame( 4, Visual_Portfolio_Loop_Gallery::describe( $loop )['settings']['columns'] );
 
+		// What the page shows is accepted back; the hidden override value is not.
+		$echoed = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'settings' => Visual_Portfolio_Loop_Gallery::describe( $loop )['settings'] ), array( $loop ) );
+		$this->assertSame( 2, $this->attrs_of( $echoed, Visual_Portfolio_Loop_Gallery::TEMPLATE )['layoutColumnCount'] );
+		$this->assertWPError( Visual_Portfolio_Loop_Gallery::update( $loop, array( 'settings' => array( 'columns' => 2 ) ), array( $loop ) ) );
+
 		$refused = Visual_Portfolio_Loop_Gallery::update( $loop, array( 'settings' => array( 'columns' => 3 ) ), array( $loop ) );
 
 		$this->assertWPError( $refused );
@@ -878,8 +883,9 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A layout saved before its pattern was picked can be synced with, and a
-	 * loop whose item template sits in a wrapper keeps its own blocks.
+	 * A layout saved before its pattern was picked can be synced with; a
+	 * loop whose item template sits in a wrapper, which the layout cannot
+	 * reach, is refused.
 	 */
 	public function test_sync_with_layouts_and_loops_of_any_shape() {
 		$this->create_saved_layout();
@@ -912,8 +918,9 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 				),
 			)
 		);
-		$synced  = Visual_Portfolio_Loop_Gallery::update( $wrapped, array( 'saved_layout' => $this->create_saved_layout() ), array( $wrapped ) );
+		$refused = Visual_Portfolio_Loop_Gallery::update( $wrapped, array( 'saved_layout' => $this->create_saved_layout() ), array( $wrapped ) );
 
-		$this->assertSame( array( 'core/group' ), array_column( $synced['innerBlocks'], 'blockName' ) );
+		$this->assertWPError( $refused );
+		$this->assertSame( 'vpf_saved_layout_nested_template', $refused->get_error_code() );
 	}
 }

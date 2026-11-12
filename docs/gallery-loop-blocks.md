@@ -1066,7 +1066,8 @@ ones the editor's Saved Layout panel offers. `saved_layout` on
 `create-gallery` or `update-gallery` syncs the gallery with one of them: the
 loop takes the layout's item template and lightbox with no overrides, and
 keeps its own source, items per page and images. A gallery inside a Saved
-Layout syncs with none.
+Layout syncs with none, and neither does one whose item template sits inside
+another block, which the layout's merge does not reach.
 `saved_layout: null` on `update-gallery` detaches it through
 `Visual_Portfolio_Saved_Layout_Usage::detach_loop()`, so it keeps its current
 look; a query string carries no `null`, so `0` does the same there. The rest of

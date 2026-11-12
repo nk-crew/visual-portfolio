@@ -470,9 +470,9 @@ class Visual_Portfolio_Loop_Gallery {
 
 		// A synced loop changes the way the editor changes it: on what the
 		// page shows, each setting the layout provides that the call changed
-		// becoming an override. A locked layout hides the overrides on the
-		// page; their values are kept for when it is unlocked.
-		$merged  = Visual_Portfolio_Saved_Layouts::apply_layout( $loop, null, false );
+		// becoming an override.
+		$locked  = Visual_Portfolio_Saved_Layouts::is_locked( $id );
+		$merged  = Visual_Portfolio_Saved_Layouts::apply_layout( $loop, null, $locked );
 		$changed = self::apply_input( $merged, $input, $action, $click_action, $before );
 
 		if ( is_wp_error( $changed ) ) {
@@ -481,11 +481,13 @@ class Visual_Portfolio_Loop_Gallery {
 
 		$names = self::get_changed_synced_names( $merged, $changed );
 
+		// A locked layout hides the overrides on the page; their stored
+		// values stay for when it is unlocked.
 		if ( empty( $names ) ) {
-			return $changed;
+			return $locked ? self::with_synced_blocks( $changed, Visual_Portfolio_Saved_Layouts::apply_layout( $loop, null, false ) ) : $changed;
 		}
 
-		if ( Visual_Portfolio_Saved_Layouts::is_locked( $id ) ) {
+		if ( $locked ) {
 			return new WP_Error(
 				'vpf_saved_layout_locked',
 				sprintf(
@@ -1060,6 +1062,10 @@ class Visual_Portfolio_Loop_Gallery {
 	 * Title of a Saved Layout, when the current user may read it to sync
 	 * with, through the route the editor's Saved Layout panel reads.
 	 *
+	 * The route holds the access rule, the private
+	 * `Visual_Portfolio_Saved_Layouts_REST::can_read_for_sync()`; a public
+	 * helper of that rule would replace the request.
+	 *
 	 * @param int $id - layout id.
 	 *
 	 * @return string empty when the user may not read it.
@@ -1081,7 +1087,13 @@ class Visual_Portfolio_Loop_Gallery {
 	private static function get_saved_layout_name( $id ) {
 		$title = self::get_saved_layout_title( $id );
 
-		return '' === $title ? '#' . (int) $id : sprintf( '“%s” (%d)', $title, $id );
+		if ( '' === $title ) {
+			// translators: %d - Saved Layout id.
+			return sprintf( __( '#%d', 'visual-portfolio' ), $id );
+		}
+
+		// translators: %1$s - Saved Layout title, %2$d - Saved Layout id.
+		return sprintf( __( '“%1$s” (%2$d)', 'visual-portfolio' ), $title, $id );
 	}
 
 	/**
@@ -1114,8 +1126,16 @@ class Visual_Portfolio_Loop_Gallery {
 			return self::unknown_saved_layout( $id );
 		}
 
-		// A loop saved empty takes the layout's blocks, as a layout change does.
-		if ( ! self::find_block( $loop['innerBlocks'], self::TEMPLATE ) ) {
+		if ( ! in_array( self::TEMPLATE, array_column( $loop['innerBlocks'], 'blockName' ), true ) ) {
+			// The layout replaces only an item template placed right in the loop.
+			if ( self::find_block( $loop['innerBlocks'], self::TEMPLATE ) ) {
+				return new WP_Error(
+					'vpf_saved_layout_nested_template',
+					__( 'This gallery keeps its item template inside another block, where a Saved Layout cannot provide it. Move the item template out of that block in the editor, then sync the gallery.', 'visual-portfolio' )
+				);
+			}
+
+			// A loop saved empty takes the layout's blocks, as a layout change does.
 			$loop = self::set_inner_blocks( $loop, $layout['innerBlocks'] );
 		}
 
@@ -1125,6 +1145,35 @@ class Visual_Portfolio_Loop_Gallery {
 		);
 
 		return Visual_Portfolio_Saved_Layouts::apply_layout( $loop, $layout, false );
+	}
+
+	/**
+	 * A loop with the item template and lightbox of another state of it.
+	 *
+	 * @param array $loop - loop block.
+	 * @param array $from - the loop to take them from.
+	 *
+	 * @return array
+	 */
+	private static function with_synced_blocks( $loop, $from ) {
+		foreach ( Visual_Portfolio_Saved_Layouts::LOOP_SYNCED_ATTRIBUTES as $name ) {
+			if ( array_key_exists( $name, $from['attrs'] ) ) {
+				$loop['attrs'][ $name ] = $from['attrs'][ $name ];
+			} else {
+				unset( $loop['attrs'][ $name ] );
+			}
+		}
+
+		$templates = wp_list_filter( $from['innerBlocks'], array( 'blockName' => self::TEMPLATE ) );
+
+		foreach ( $loop['innerBlocks'] as $index => $inner ) {
+			if ( self::TEMPLATE === $inner['blockName'] && $templates ) {
+				$loop['innerBlocks'][ $index ] = reset( $templates );
+				break;
+			}
+		}
+
+		return $loop;
 	}
 
 	/**

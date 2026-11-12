@@ -518,7 +518,8 @@ class Visual_Portfolio_Abilities {
 
 	/**
 	 * Saved Layouts the current user can sync a gallery with, the ones the
-	 * editor's Saved Layout panel offers.
+	 * editor's Saved Layout panel offers, from the route that holds the
+	 * private access rule `Visual_Portfolio_Saved_Layouts_REST::can_read_for_sync()`.
 	 *
 	 * @return array list of array( id, title ).
 	 */
