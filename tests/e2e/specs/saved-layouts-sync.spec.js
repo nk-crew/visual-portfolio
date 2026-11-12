@@ -653,7 +653,7 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 				content: loopMarkup(
 					{ queryType: 'images' },
 					{ layoutType: 'masonry' },
-					'<!-- wp:visual-portfolio/item-image {"extensions":{"testFilter":"layout","testTilt":"layout","testBlend":"layout"}} /-->'
+					'<!-- wp:visual-portfolio/item-image {"extensions":{"testFilter":"layout","testTilt":"layout","testBlend":"layout","testMark":"layout"}} /-->'
 				),
 			},
 		});
@@ -729,6 +729,48 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 					},
 				]
 			);
+
+			// A second panel of the block, like Pro's Protection.
+			const { ToolsPanel } = window.wp.data
+				.select('visual-portfolio/components')
+				.get();
+			const Mark = item('testMark', 'Test mark');
+
+			window.wp.hooks.addFilter(
+				'editor.BlockEdit',
+				'vpf-e2e/extension-panel',
+				(BlockEdit) => (props) =>
+					createElement(
+						window.wp.element.Fragment,
+						null,
+						createElement(BlockEdit, props),
+						props.name === 'visual-portfolio/item-image' &&
+							props.isSelected &&
+							createElement(
+								window.wp.blockEditor.InspectorControls,
+								null,
+								createElement(
+									ToolsPanel,
+									{
+										label: 'Test protection',
+										panelId: props.clientId,
+										resetAll: (filters) => {
+											const values = {};
+
+											filters.forEach((filter) => {
+												Object.assign(
+													values,
+													filter(values)
+												);
+											});
+											props.setAttributes(values);
+										},
+									},
+									createElement(Mark, props)
+								)
+							)
+					)
+			);
 		});
 		const open = (overrides, extensions) =>
 			page.evaluate(
@@ -781,6 +823,7 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 			.poll(async () => (await getImage()).extensions)
 			.toEqual({
 				testFilter: 'page',
+				testMark: 'layout',
 			});
 		await page.evaluate(
 			(id) =>
@@ -846,7 +889,11 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 		});
 		await expect
 			.poll(async () => (await getImage()).extensions)
-			.toEqual({ testFilter: 'page', testTilt: 'layout' });
+			.toEqual({
+				testFilter: 'page',
+				testTilt: 'layout',
+				testMark: 'layout',
+			});
 		await page.evaluate(
 			(id) =>
 				window.wp.data.dispatch('core/block-editor').selectBlock(id),
@@ -862,6 +909,41 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 				testBlend: 'layout',
 			},
 		});
+
+		// Reset all of one panel leaves a key the page cleared in another.
+		await open(['extensions.testFilter', 'extensions.testMark'], {
+			testFilter: 'page',
+			testTilt: 'layout',
+			testBlend: 'layout',
+		});
+		await expect
+			.poll(async () => (await getImage()).extensions)
+			.toEqual({
+				testFilter: 'page',
+				testTilt: 'layout',
+				testBlend: 'layout',
+			});
+		await page.evaluate(
+			(id) =>
+				window.wp.data.dispatch('core/block-editor').selectBlock(id),
+			(await getImage()).clientId
+		);
+		await page.getByRole('button', { name: 'Settings options' }).click();
+		await page.getByRole('menuitem', { name: 'Reset all' }).click();
+		await expect
+			.poll(async () => {
+				const { overrides, extensions } = await getImage();
+
+				return { overrides, extensions };
+			})
+			.toEqual({
+				overrides: { [imageKey]: ['extensions.testMark'] },
+				extensions: {
+					testFilter: 'layout',
+					testTilt: 'layout',
+					testBlend: 'layout',
+				},
+			});
 	});
 
 	test('the lock is saved with the layout', async ({
