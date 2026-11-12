@@ -652,11 +652,14 @@ export default function BlockEdit(props) {
 
 	return (
 		<div {...blockProps}>
-			<ChangeLayout
-				attributes={attributes}
-				setAttributes={setAttributes}
-				clientId={clientId}
-			/>
+			{/* A synced loop takes its items from the Saved Layout. */}
+			{!attributes.savedLayout?.id && (
+				<ChangeLayout
+					attributes={attributes}
+					setAttributes={setAttributes}
+					clientId={clientId}
+				/>
+			)}
 			{/* The order is the one the core Query block uses, and it is an
 			    argument rather than a habit: what the gallery is made of,
 			    then how it is cut into pages, then what narrows it. */}

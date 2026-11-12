@@ -147,6 +147,12 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 			loopId
 		);
 
+		const changeLayout = page
+			.getByRole('toolbar', { name: 'Block tools' })
+			.getByRole('button', { name: 'Change layout' });
+
+		await expect(changeLayout).toBeVisible();
+
 		await page
 			.getByRole('combobox', { name: 'Sync settings with' })
 			.selectOption(String(layoutId));
@@ -157,6 +163,9 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 					'Synced with “Synced Masonry”. 2 settings changed on this gallery stay.',
 			})
 		).toBeVisible();
+
+		// A synced loop takes its items from the layout.
+		await expect(changeLayout).toHaveCount(0);
 
 		let state = await getLoopState(page);
 
@@ -219,6 +228,7 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 
 		state = await getLoopState(page);
 		expect(state.savedLayout).toBeUndefined();
+		await expect(changeLayout).toBeVisible();
 		expect(state.layoutType).toBe('masonry');
 		expect(state.columns).toBe(5);
 
