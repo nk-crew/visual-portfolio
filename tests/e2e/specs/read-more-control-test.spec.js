@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
-
+import { createLegacySavedLayout } from '../utils/create-legacy-saved-layout';
 /**
  * Internal dependencies
  */
@@ -48,12 +48,7 @@ test.describe('Read More Control in Saved Layout Posts', () => {
 	 * @param {string} title  Layout title
 	 */
 	async function setupSavedLayoutWithPosts(admin, page, editor, title) {
-		await admin.createNewPost({
-			title,
-			postType: 'vp_lists',
-			showWelcomeGuide: false,
-			legacyCanvas: true,
-		});
+		await createLegacySavedLayout(admin, editor, { title });
 
 		const canvas = getEditorCanvas(page, editor);
 

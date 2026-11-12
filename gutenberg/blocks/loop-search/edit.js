@@ -2,18 +2,14 @@
  * WordPress dependencies
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import {
-	Disabled,
-	TextControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { Disabled, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { ProLine } from '../../components/pro-teaser';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import { loopSourceSupports } from '../../utils/loop-source-supports';
 import {

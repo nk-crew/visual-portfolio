@@ -1376,6 +1376,18 @@ class Visual_Portfolio_Get {
 	 * @return string
 	 */
 	public static function get( $atts = array() ) {
+		if ( ! empty( $atts['id'] ) && empty( $atts['block_id'] ) && Visual_Portfolio_Saved_Layouts::is_block_layout( (int) $atts['id'] ) ) {
+			self::$used_layouts[] = (int) $atts['id'];
+
+			$class = $atts['class'] ?? '';
+
+			if ( function_exists( 'vc_shortcode_custom_css_class' ) && isset( $atts['vc_css'] ) ) {
+				$class .= ' ' . vc_shortcode_custom_css_class( $atts['vc_css'] );
+			}
+
+			return Visual_Portfolio_Saved_Layouts::render( $atts['id'], trim( $class ) );
+		}
+
 		$config = self::get_output_config( $atts );
 
 		if ( ! $config ) {

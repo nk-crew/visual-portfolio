@@ -9,9 +9,10 @@ blocks are the controls around them.
 Every block of the family, apart from the children of the filter and the
 pagination, is marked **(Experimental)**. Every one is registered only on
 **WordPress 7.1 and newer**. Below it a saved loop, and any block of the family
-saved outside one, prints nothing on the page. The legacy `visual-portfolio/block`,
-`visual-portfolio/saved`, the shortcodes and Saved Layouts are a separate world
-and are not affected by anything on this page.
+saved outside one, prints nothing on the page. The legacy `visual-portfolio/block`
+and legacy Saved Layouts are a separate world and are not affected by anything on
+this page. Saved Layouts built from these blocks are described under
+[Saved Layouts](#saved-layouts).
 
 - [For users](#for-users)
 - [Anatomy](#anatomy)
@@ -23,6 +24,7 @@ and are not affected by anything on this page.
 - [Interactivity stores](#interactivity-stores)
 - [URL parameters and caching](#url-parameters-and-caching)
 - [Images](#images)
+- [Saved Layouts](#saved-layouts)
 - [Legacy hooks with no equivalent](#legacy-hooks-with-no-equivalent)
 
 ## For users
@@ -1398,6 +1400,87 @@ left to `wp_get_loading_optimization_attributes()`, which counts the images
 before the gallery on the page as well, so a loop under a hero image does not
 steal its priority. `fetchpriority="high"` doubles as the marker that keeps the
 plugin's own lazy loading off the largest-paint candidate.
+
+## Saved Layouts
+
+On WordPress 7.1 and newer a new Saved Layout (`vp_lists`) holds a Gallery Loop
+in its content. *Add New Saved Layout* opens the block editor on it, and
+`post-new.php?post_type=vp_lists&vp_layout=legacy` opens the legacy settings
+editor. A layout is block-based when its content holds a
+`visual-portfolio/loop`; every other layout, an empty one included, is legacy
+and keeps its settings in `vp_*` meta. Legacy layouts are never converted.
+
+**Inserting.** The Saved Layout block and `[visual_portfolio id="…"]` render a
+block-based layout's content through `Visual_Portfolio_Saved_Layouts::render()`.
+A layout reached again while it renders, directly or through another layout,
+renders nothing at that level. A draft renders only for users who can edit it.
+
+**Syncing.** A loop syncs with a block-based layout through its `savedLayout`
+attribute:
+
+```json
+{ "savedLayout": { "id": 128, "overrides": { "k3f2a9c10": [ "layoutColumnCount" ], "loop": [ "lightbox" ] } } }
+```
+
+The layout provides the item template, every block inside it and the loop's
+`lightbox`. The loop keeps its source and query (`queryType`, `baseQuery`,
+`postsQuery`, `imagesQuery`, `sourceQuery`), its ids, its own block supports
+and the blocks around the item template. Blocks are matched by
+`metadata.vpSyncKey`, which the layout editor gives every block of the item
+template and `save_post` fills in where it is missing, derived from the block's
+position. `overrides` lists, per sync key, the attributes the loop changed; their
+values are the loop's own, or the block default when the loop's block no longer
+carries one. The reserved key `loop` holds the loop's own synced attributes.
+
+The merge runs on `render_block_data`, so a change to the layout reaches every
+page on its next render. In the editor the same merge is applied when the page
+opens and whenever the overrides change, and the structure of a synced item
+template is locked (`templateLock: 'all'`), and *Change layout* leaves the
+toolbar. The settings panels of the family import `ToolsPanel` and
+`ToolsPanelItem` from `gutenberg/components/tools-panel`, which mark a changed
+setting and reset it to the layout; a lint rule (`noRestrictedImports` in
+`biome.json`) keeps core's out of `gutenberg/`. An extension gets the same two
+components from `select( 'visual-portfolio/components' ).get()`. A panel built
+on core's components directly gets no marker, and its reset is recorded as a
+change. An item owns the attributes its `onDeselect` writes, so items that
+share one attribute, such as an object of several settings, are marked and
+reset together.
+
+A layout with `vp_saved_layout_locked` set ignores the overrides on the page and
+disables its item template in the editor. A trashed layout still syncs. Deleting
+a layout for good writes the values each synced loop rendered with into that
+loop and removes `savedLayout`, in background batches through
+`wp_update_post()`, so a revision keeps the earlier content.
+
+**Usage.** Saving a post records the layouts it syncs with and inserts in the
+non-unique meta `_vpf_saved_layout_synced` and `_vpf_saved_layout_inserted`.
+Legacy shortcodes in `post_content` count as inserted; shortcodes kept by page
+builders in their own meta are not counted. Content saved before the index is
+indexed in batches, from WP-Cron and from every library request, until
+`vpf_saved_layout_usage_indexed` is set.
+
+**Library.** `Saved Layouts` in the plugin menu (`admin.php?page=vpf-saved-layouts`)
+is a React page, `assets/admin/pages/saved-layouts/`, in the plugin's admin
+page frame (`assets/admin/pages/components/page.js`), built by the admin
+pages compilation of `webpack.config.js`, which bundles DataViews and uses
+WordPress's own components. It reads
+`wp/v2/vp_lists`, which carries a `vpf_layout` field (kind, source, preview
+settings and URL, usage, shortcode, edit
+link), and uses these routes of `visual-portfolio/v1`:
+
+| Route | Does |
+|---|---|
+| `GET saved-layouts/<id>/usage` | Posts that use the layout, with how and with how many changed settings |
+| `POST saved-layouts/<id>/duplicate` | Copies the content and the `vp_*` meta into "<title> (copy)" |
+| `GET saved-layouts/export?ids[]=` | The export file, `{ "type": "visual-portfolio/saved-layouts", "version": 1, "layouts": [ … ] }` |
+| `POST saved-layouts/import` | Creates layouts from an export file, dropping images the site does not have |
+
+A card's preview is the layout rendered on the front end at
+`/?vp_layout_preview=<id>&_wpnonce=…` (nonce `vp-layout-preview`, for users who
+can edit the layout), with the theme's styles and the gallery's scripts, at
+1200px wide and scaled into the card. The page reports to the library whether
+the layout has items and how tall it is; one without items, a row of the table
+or the list, and a card still loading show a schematic drawn from the settings.
 
 ## Legacy hooks with no equivalent
 

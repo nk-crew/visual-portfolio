@@ -35,6 +35,8 @@ import './extensions/block-id';
 import './extensions/classic-icon-with-overlay';
 import './extensions/items-count-all';
 import './extensions/link-rel';
+import './extensions/saved-layout-sync';
+import './extensions/saved-layout-editor';
 import './extensions/stretch-for-saved-only';
 import './store';
 import './components/dropdown';

@@ -8,17 +8,14 @@
  * WordPress dependencies
  */
 import { InspectorControls } from '@wordpress/block-editor';
-import {
-	ExternalLink,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { ExternalLink } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../../utils/tools-panel';
+import { ToolsPanel, ToolsPanelItem } from '../tools-panel';
 
 const { plugin_version: pluginVersion, pro: isProPlugin } =
 	window.VPGutenbergVariables;

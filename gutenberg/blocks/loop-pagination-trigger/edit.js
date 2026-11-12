@@ -6,11 +6,7 @@ import {
 	PlainText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import {
-	TextControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -21,6 +17,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { ProTeaserPanel } from '../../components/pro-teaser';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,

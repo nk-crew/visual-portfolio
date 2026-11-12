@@ -8,5 +8,33 @@
 				"useValidAnchor": "off"
 			}
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": [
+				"gutenberg/**",
+				"!gutenberg/components/tools-panel/**"
+			],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"paths": {
+									"@wordpress/components": {
+										"importNames": [
+											"__experimentalToolsPanel",
+											"__experimentalToolsPanelItem"
+										],
+										"message": "Import ToolsPanel and ToolsPanelItem from gutenberg/components/tools-panel, which marks and resets a setting of a gallery synced with a Saved Layout."
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	]
 }

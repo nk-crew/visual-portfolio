@@ -676,8 +676,15 @@ const moduleOutputFiles = moduleEntryNames.flatMap((name) => [
 	`${name}.asset.php`,
 ]);
 
+// Written by the admin pages compilation, see `adminPagesConfig`.
+const ADMIN_PAGES_OUTPUT = /^assets\/admin\/pages\//;
+
 function shouldKeepOnClean(asset) {
-	return /^(fonts|images)\//.test(asset) || moduleOutputFiles.includes(asset);
+	return (
+		/^(fonts|images)\//.test(asset) ||
+		ADMIN_PAGES_OUTPUT.test(asset) ||
+		moduleOutputFiles.includes(asset)
+	);
 }
 
 const defaultRules = patchPostCssLoaderOptions(
@@ -873,4 +880,76 @@ const moduleConfig = {
 	devServer: false,
 };
 
-module.exports = [newConfig, moduleConfig];
+// Plugin admin pages are React pages on WordPress's own components. DataViews
+// and the packages it is built on are not scripts WordPress registers, so
+// they are bundled; a dependency on an unregistered handle would keep
+// WordPress from loading the page's script at all.
+const ADMIN_PAGE_BUNDLED = [
+	'@wordpress/dataviews',
+	'@wordpress/react-inert-value',
+	'@wordpress/theme',
+	'@wordpress/ui',
+];
+
+const adminPagesConfig = {
+	...defaultConfig,
+	entry: {
+		'assets/admin/pages/saved-layouts':
+			'./assets/admin/pages/saved-layouts/index.js',
+	},
+	output: {
+		...defaultConfig.output,
+		// The script compilation cleans `build/`, see `shouldKeepOnClean()`.
+		clean: false,
+	},
+	infrastructureLogging: newConfig.infrastructureLogging,
+	stats: 'minimal',
+	performance: {
+		assetFilter: shouldIgnorePerformanceHint,
+	},
+	module: {
+		...defaultConfig.module,
+		rules: [
+			...defaultRules,
+			// DataViews marks itself free of side effects, so an import of its
+			// built stylesheet would be dropped.
+			{
+				test: /[\\/]@wordpress[\\/][^\\/]+[\\/]build-style[\\/][^\\/]+\.css$/,
+				sideEffects: true,
+			},
+		],
+	},
+	plugins: [
+		...defaultConfig.plugins.filter(
+			(plugin) =>
+				!['DependencyExtractionWebpackPlugin', 'DefinePlugin'].includes(
+					plugin?.constructor?.name
+				)
+		),
+		// `@wordpress/scripts` builds its plugins with its own copy of webpack,
+		// newer than the root one that runs the build, and its DefinePlugin
+		// calls a parser method the root one lacks once it meets the packages'
+		// `.mjs` files. Drop once the lockfile resolves a single webpack.
+		new (require('webpack').DefinePlugin)({
+			'globalThis.SCRIPT_DEBUG': JSON.stringify(!isProduction),
+			SCRIPT_DEBUG: JSON.stringify(!isProduction),
+		}),
+		new DependencyExtractionWebpackPlugin({
+			requestToExternal: (request) =>
+				ADMIN_PAGE_BUNDLED.some(
+					(name) => request === name || request.startsWith(`${name}/`)
+				)
+					? false
+					: undefined,
+		}),
+	],
+	optimization: {
+		...defaultConfig.optimization,
+		...(isProduction ? { minimizer: createProductionMinimizers() } : {}),
+		splitChunks: false,
+		runtimeChunk: false,
+	},
+	devServer: false,
+};
+
+module.exports = [newConfig, moduleConfig, adminPagesConfig];

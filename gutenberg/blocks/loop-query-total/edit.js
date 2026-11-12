@@ -6,14 +6,10 @@ import {
 	useBlockEditingMode,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import {
-	SelectControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 /**
  * Internal dependencies
  */

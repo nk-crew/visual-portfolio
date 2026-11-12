@@ -697,6 +697,12 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function get_layout( $request ) {
+		// A layout built from blocks has no legacy settings to convert; a
+		// Gallery Loop syncs with it instead.
+		if ( Visual_Portfolio_Saved_Layouts::is_block_layout( (int) $request['id'] ) ) {
+			return $this->success( false );
+		}
+
 		return $this->success( Visual_Portfolio_Get::get_options( array( 'id' => (int) $request['id'] ) ) );
 	}
 

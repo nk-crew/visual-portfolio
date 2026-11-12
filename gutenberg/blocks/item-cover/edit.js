@@ -18,8 +18,6 @@ import {
 	SelectControl,
 	TextControl,
 	ToggleControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -33,6 +31,8 @@ import classnames from 'classnames/dedupe';
  * Internal dependencies
  */
 import { getMissingTeasers } from '../../components/pro-teaser';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
+import { useIsInSyncedTemplate } from '../../extensions/saved-layout-sync/context';
 import { getScreenBlockGaps } from '../../utils/block-gap';
 import { followsLink, getClickActions } from '../../utils/click-actions';
 import { AspectRatioTool, ScaleTool } from '../../utils/dimensions-tools';
@@ -184,6 +184,7 @@ export default function ItemCoverEdit({
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
 	useImageSizeOnInsert(clientId, layoutColumns, setAttributes);
+	const isSynced = useIsInSyncedTemplate(clientId);
 
 	const imageSizeOptions = useImageSizeOptions();
 
@@ -276,7 +277,13 @@ export default function ItemCoverEdit({
 				}).style,
 			},
 		},
-		{ template: TEMPLATE, allowedBlocks: ALLOWED_BLOCKS }
+		{
+			// With the structure locked, core would reset the blocks to the
+			// template; a synced template's structure is the layout's.
+			template: isSynced ? undefined : TEMPLATE,
+			allowedBlocks: ALLOWED_BLOCKS,
+			templateLock: isSynced ? 'all' : undefined,
+		}
 	);
 
 	return (

@@ -9,3 +9,19 @@ Use the labels, descriptions, defaults and limits registered by the settings API
 Hidden and collapsed controls preserve pending values and submit them through the existing form. Numeric controls allow intermediate typing and use native final validity. Dependency changes never reset values. Group disclosure uses native keyboard behavior. Controls stack at narrow widths, and size fields may share a responsive grid.
 
 Watermarks and the Social Feeds preview are outside this design change.
+
+# Plugin admin pages
+
+Screens the plugin draws itself are React pages in one frame (`assets/admin/pages/components/page.js`), modeled on the Site Editor's screens: white edge to edge, no gray canvas and no plugin navigation bar, since the WordPress sidebar already lists every page. A page header holds the title, one line on what the page is for, the page's actions on the right, and its sections as underline tabs with counts where a count helps choose. Sections change the URL, so they can be bookmarked and the back button works. Content starts under the header at the same 32px gutter.
+
+Core list screens (Projects, Categories, Tags) keep WordPress's rendering, since other plugins extend them, and get only a light refresh.
+
+# Saved Layouts library
+
+The Saved Layouts screen is a plugin admin page (see Plugin admin pages) with DataViews. It takes its type, spacing and colors from WordPress's components and adds no values of its own beyond the layout preview and the Legacy badge. Search, filters and, in the grid and list, Select all share one toolbar row; the grid has no select-all row of its own.
+
+Grid is the default view and table the dense one. A card shows a preview, the title, one summary line (source · layout) and usage. A card's preview is the layout as a page renders it, scaled from a 1200px page and centred when it is shorter than the card. While it loads, in table and list rows, and for a layout with no items, the preview draws the arrangement from the settings in neutral placeholder tones. Legacy layouts carry a yellow Legacy badge; drafts carry their status. Rare actions live in the item menu; destructive ones open a dialog that names the pages a layout is used on.
+
+New layouts are added from one split button whose menu holds the legacy editor. Below the medium breakpoint the button reads Add New and Import becomes an icon button.
+
+In the editor, a setting a synced gallery changed shows a dot, "Changed on this gallery" and a reset icon above its control, in the theme color. A gallery that is not synced shows nothing of Saved Layouts in its inspector: Sync with Saved Layout… and Save as Saved Layout… live in the block's menu, as core's Create pattern does, since few galleries are synced. A synced gallery shows one status line at the top of the inspector, with no card around it: the synced-pattern icon, the layout's name, how many settings the gallery changed with an inline Reset, and a menu with Edit, Sync with another and Detach.

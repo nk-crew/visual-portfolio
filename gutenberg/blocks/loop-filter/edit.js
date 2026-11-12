@@ -14,8 +14,6 @@ import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -23,11 +21,11 @@ import { applyFilters } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
 import { create } from '@wordpress/rich-text';
 import classnames from 'classnames/dedupe';
-
 /**
  * Internal dependencies
  */
 import { getMissingTeasers } from '../../components/pro-teaser';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 import { useLoopOrphanWarning } from '../../utils/loop-orphan-warning';
 import { loopSourceSupports } from '../../utils/loop-source-supports';
 import {

@@ -8,11 +8,11 @@ import {
 	CheckboxControl,
 	SelectControl,
 	ToggleControl,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { ToolsPanelItem } from '../../components/tools-panel';
 
 /**
  * Internal dependencies

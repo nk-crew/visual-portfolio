@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
-
+import { createLegacySavedLayout } from '../utils/create-legacy-saved-layout';
 import { getEditorCanvas } from '../utils/editor-canvas';
 import { findAsyncSequential } from '../utils/find-async-sequential';
 import { getWordpressImages } from '../utils/get-wordpress-images';
@@ -53,11 +53,8 @@ test.describe('click action gallery images (saved layout)', () => {
 			alternativeSetting,
 		});
 
-		await admin.createNewPost({
+		await createLegacySavedLayout(admin, editor, {
 			title: 'Test Saved Layout',
-			postType: 'vp_lists',
-			showWelcomeGuide: false,
-			legacyCanvas: true,
 		});
 
 		const canvas = getEditorCanvas(page, editor);

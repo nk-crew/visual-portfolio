@@ -229,6 +229,23 @@ class Visual_Portfolio_Sitemap {
 	}
 
 	/**
+	 * Images a Gallery Loop shows from an images source.
+	 *
+	 * @param array $block - parsed loop block.
+	 *
+	 * @return array
+	 */
+	private function get_loop_images( $block ) {
+		if ( ! $this->loop_renders_images( $block ) ) {
+			return array();
+		}
+
+		$options = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $block['attrs'] ?? array(), true );
+
+		return 'images' === ( $options['content_source'] ?? '' ) ? $this->get_source_images( $options['images'] ?? array() ) : array();
+	}
+
+	/**
 	 * Parse block images.
 	 *
 	 * @param  int $post_id - Post ID.
@@ -257,14 +274,17 @@ class Visual_Portfolio_Sitemap {
 			// pictures that belong to the posts themselves, and those posts are
 			// in the sitemap already with the very same featured images.
 			if ( 'visual-portfolio/loop' === $block['blockName'] ) {
-				if ( ! $this->loop_renders_images( $block ) ) {
-					continue;
-				}
+				$block_images = array_merge( $block_images, $this->get_loop_images( Visual_Portfolio_Saved_Layouts::apply_layout( $block ) ) );
 
-				$options = Visual_Portfolio_Convert_Attributes::modern_to_legacy( $block_attrs, true );
+				continue;
+			}
 
-				if ( 'images' === ( $options['content_source'] ?? '' ) ) {
-					$block_images = array_merge( $block_images, $this->get_source_images( $options['images'] ?? array() ) );
+			// A Saved Layout built from blocks shows the images of its loop.
+			if ( 'visual-portfolio/block' !== $block['blockName'] && Visual_Portfolio_Saved_Layouts::is_block_layout( (int) ( $block_attrs['id'] ?? 0 ) ) ) {
+				$layout_loop = Visual_Portfolio_Saved_Layouts::get_layout_loop( (int) $block_attrs['id'] );
+
+				if ( $layout_loop ) {
+					$block_images = array_merge( $block_images, $this->get_loop_images( $layout_loop ) );
 				}
 
 				continue;

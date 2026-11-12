@@ -86,6 +86,9 @@
 		"extensions": {
 			"type": "object",
 			"default": {}
+		},
+		"savedLayout": {
+			"type": "object"
 		}
 	},
 	"viewScriptModule": "visual-portfolio-block-loop-view",

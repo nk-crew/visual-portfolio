@@ -13,14 +13,13 @@ import {
 	RangeControl,
 	ToggleControl,
 	ToolbarButton,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { ProTeaserPanel } from '../../components/pro-teaser';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 import { useLoopSource } from '../../loop-sources/registry';
 import SourcePicker from '../../loop-sources/source-picker';
 import {
@@ -653,11 +652,14 @@ export default function BlockEdit(props) {
 
 	return (
 		<div {...blockProps}>
-			<ChangeLayout
-				attributes={attributes}
-				setAttributes={setAttributes}
-				clientId={clientId}
-			/>
+			{/* A synced loop takes its items from the Saved Layout. */}
+			{!attributes.savedLayout?.id && (
+				<ChangeLayout
+					attributes={attributes}
+					setAttributes={setAttributes}
+					clientId={clientId}
+				/>
+			)}
 			{/* The order is the one the core Query block uses, and it is an
 			    argument rather than a habit: what the gallery is made of,
 			    then how it is cut into pages, then what narrows it. */}
