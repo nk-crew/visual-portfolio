@@ -227,7 +227,6 @@ export default function BlockEdit({
 	setAttributes,
 	context,
 	clientId,
-	isSelected,
 	__unstableLayoutClassNames: layoutClassNames,
 }) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -500,16 +499,9 @@ export default function BlockEdit({
 		__unstableMarkNextChangeAsNotPersistent,
 	]);
 
-	// What a dropdown lists, and whether its items are being edited.
-	const { itemBlocks, isEditingItems } = useSelect(
-		(select) => {
-			const store = select(blockEditorStore);
-
-			return {
-				itemBlocks: store.getBlocks(clientId),
-				isEditingItems: store.hasSelectedInnerBlock(clientId, true),
-			};
-		},
+	// What a dropdown lists.
+	const itemBlocks = useSelect(
+		(select) => select(blockEditorStore).getBlocks(clientId),
 		[clientId]
 	);
 
@@ -522,16 +514,20 @@ export default function BlockEdit({
 		),
 	});
 
-	// A dropdown shows its items under the select while the filter or one of
-	// them is selected, so their labels and order can still be edited.
+	// A dropdown's items are edited in the List tab of the sidebar. They stay
+	// mounted in the canvas, since a selected item draws its settings from
+	// there, as an invisible layer over the select, where the toolbar of a
+	// selected item then appears. Inert, so the caret and Tab pass them by.
 	const innerBlocksProps = useInnerBlocksProps(
 		displayAsDropdown
-			? { className: 'vp-block-loop-filter__options' }
+			? { className: 'vp-block-loop-filter__options', inert: '' }
 			: blockProps,
 		{
 			orientation: 'horizontal',
 			renderAppender: false,
-			templateLock: false,
+			// The items come from the terms: an item added by hand would be
+			// a second "All", the only one the page prints. They still move.
+			templateLock: 'insert',
 		}
 	);
 
@@ -573,9 +569,7 @@ export default function BlockEdit({
 						))}
 					</select>
 				</Disabled>
-				{(isSelected || isEditingItems) && (
-					<div {...innerBlocksProps} />
-				)}
+				<div {...innerBlocksProps} />
 			</div>
 		);
 	}

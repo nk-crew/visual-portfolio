@@ -9,6 +9,7 @@
 	"allowedBlocks": ["visual-portfolio/loop-filter-item"],
 	"textdomain": "visual-portfolio",
 	"supports": {
+		"listView": true,
 		"html": false,
 		"className": false,
 		"anchor": true,
