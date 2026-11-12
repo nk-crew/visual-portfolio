@@ -153,9 +153,24 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 
 		await expect(changeLayout).toBeVisible();
 
+		// A gallery that is not synced has no Saved Layout panel; it syncs
+		// from the block's menu.
+		await expect(
+			page.getByRole('button', { name: 'Saved Layout options' })
+		).toHaveCount(0);
+		await editor.clickBlockToolbarButton('Options');
 		await page
-			.getByRole('combobox', { name: 'Sync settings with' })
+			.getByRole('menuitem', { name: 'Sync with Saved Layout…' })
+			.click();
+
+		const dialog = page.getByRole('dialog', {
+			name: 'Sync with Saved Layout',
+		});
+
+		await dialog
+			.getByRole('combobox', { name: 'Saved Layout' })
 			.selectOption(String(layoutId));
+		await dialog.getByRole('button', { name: 'Sync' }).click();
 
 		await expect(
 			page.locator('.components-snackbar', {
@@ -189,7 +204,8 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 			)
 		).toBe(false);
 
-		await page.getByRole('button', { name: 'Reset all' }).click();
+		await expect(page.getByText('2 settings changed here')).toBeVisible();
+		await page.getByRole('button', { name: 'Reset', exact: true }).click();
 		await expect
 			.poll(async () => (await getLoopState(page)).columns)
 			.toBe(4);
@@ -223,8 +239,11 @@ test.describe('Saved Layouts synced with Gallery Loops', () => {
 			state.loopId
 		);
 		await page
-			.getByRole('combobox', { name: 'Sync settings with' })
-			.selectOption('');
+			.getByRole('button', { name: 'Saved Layout options' })
+			.click();
+		await page
+			.getByRole('menuitem', { name: 'Detach from Saved Layout' })
+			.click();
 
 		state = await getLoopState(page);
 		expect(state.savedLayout).toBeUndefined();
