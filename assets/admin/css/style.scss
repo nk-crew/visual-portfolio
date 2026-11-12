@@ -513,8 +513,9 @@ $escaped-svg-characters: (
 		position: relative;
 	}
 
+	// Not narrowed as a whole: a tab Pro draws, such as Watermarks, lays out
+	// columns of its own by the width it gets.
 	.metabox-holder {
-		max-width: 800px;
 		padding: 0;
 
 		form {
@@ -555,6 +556,7 @@ $escaped-svg-characters: (
 		// Tabs whose fields the Settings API draws itself, Pro's among them.
 		.form-table {
 			display: block;
+			max-width: 800px;
 			padding: 24px;
 			margin: 0;
 			background: #fff;
@@ -698,7 +700,9 @@ $escaped-svg-characters: (
 
 	// A tab Pro adds: one line with the link, and Pro's fields greyed out.
 	.vpf-settings-pro-note {
+		box-sizing: border-box;
 		display: flex;
+		max-width: 800px;
 		flex-wrap: wrap;
 		gap: 12px;
 		align-items: center;
