@@ -598,7 +598,7 @@ it reads — no hook involved:
 | `vpf_after_loop_items` | action `( $options )` | Per-render teardown |
 | `vpf_loop_items` | filter `( $result, $options )` | Post-process `{ items, max_pages, found_items, per_page, start_page, options }`. `found_items` is the count over all pages, or null where the source does not say, and Query Total prints nothing then. A source that knows its count sets it here |
 | `vpf_loop_item_context` | filter `( $context, $item, $options )` | Add context keys to one item |
-| `vpf_loop_custom_output` | filter `( false\|string, $options, $block )` | Replace the whole item template output, before a single item is rendered. Content protection uses this |
+| `vpf_loop_custom_output` | filter `( false\|string, $options, $block )` | Replace the whole item template output, before a single item is rendered. Content protection uses this. The legacy `vpf_custom_output` runs only for legacy galleries, never for a loop |
 | `vpf_loop_sort_options` | filter `( $options, $loop_options )` | Sort options a loop offers, `slug => label` |
 | `vpf_loop_search` | filter `( false, $options )` | Whether an extension applies the visitor search of a loop. Until one returns true the term reaches no query. The search block renders nothing by itself either way, see below |
 | `vpf_loop_source_supports` | filter `( $supports )` | Which controls each source leaves out, `queryType => array( 'sort'\|'filter'\|'search' => bool )`. A control missing from the map is supported. The sort and filter blocks render nothing where it is false, the search block reads the loop's `content_source` instead, and the editor reads the same map for its note |
