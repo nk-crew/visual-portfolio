@@ -447,9 +447,7 @@ test.describe('Contextual settings controls', () => {
 			window.location.hash = 'vp_images';
 		});
 		await expect(page.locator('#vp_images')).toBeVisible();
-		await page
-			.getByRole('link', { name: 'Watermarks', exact: true })
-			.click();
+		await page.getByRole('link', { name: /^Watermarks/ }).click();
 		await expect(page.locator('#vp_watermarks form')).toBeVisible();
 		await expect(
 			page.locator('#vp_watermarks .vpf-settings-modern')

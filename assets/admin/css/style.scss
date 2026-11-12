@@ -50,8 +50,7 @@ $escaped-svg-characters: (
 @import "../../../gutenberg/components/pro-note/style.scss";
 
 #adminmenu .wp-submenu a[href*="https://www.visualportfolio.com/pricing/"],
-.wp-list-table.plugins a[href*="https://www.visualportfolio.com/pricing/"],
-.vpf-admin-toolbar a[href*="https://www.visualportfolio.com/pricing/"] {
+.wp-list-table.plugins a[href*="https://www.visualportfolio.com/pricing/"] {
 	font-weight: 700;
 	color: #11b916;
 
@@ -233,60 +232,37 @@ $escaped-svg-characters: (
 /*
  * Admin Toolbar.
  */
-.vpf-admin-toolbar {
-	background-color: #fff;
-	border-bottom: 1px solid #d7dbde;
+/**
+ * The plugin's WordPress list screens, refreshed: white, like its own pages,
+ * with WordPress's markup and behavior left as they are.
+ */
+.post-type-portfolio.edit-php,
+.post-type-portfolio.edit-tags-php,
+.post-type-portfolio.term-php,
+.post-type-vp_proofing.edit-php {
+	background: #fff;
 
-	@media screen and (max-width: 600px) {
-		display: none;
+	.wrap h1.wp-heading-inline,
+	.wrap > h1 {
+		font-size: 23px;
+		font-weight: 600;
 	}
 
-	#wpcontent & {
-		padding-left: 20px;
-		margin-left: -20px;
-	}
+	.wp-list-table {
+		border-color: #e0e0e0;
+		border-radius: 8px;
+		box-shadow: none;
 
-	h2 {
-		display: inline-block;
-		padding: 5px 0;
-		margin: 0 10px 0 0;
-		font-size: 14px;
-		line-height: 2.5714;
-
-		i {
-			display: inline-block;
-			width: 20px;
-			height: 20px;
-			margin-top: -5px;
-			margin-right: 5px;
-			vertical-align: middle;
-			filter: invert(1);
-			opacity: 1;
+		thead th,
+		thead td,
+		tfoot th,
+		tfoot td {
+			border-color: #e0e0e0;
 		}
 	}
 
-	.vpf-admin-toolbar-tab {
-		display: inline-block;
-		padding: 5px 10px;
-		margin: 0 2px;
-		font-size: 14px;
-		line-height: 2.5714;
-		color: inherit;
-		text-decoration: none;
-
-		&.is-active {
-			padding-bottom: 2px;
-			border-bottom: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) solid 3px;
-		}
-
-		&:hover,
-		&:focus {
-			color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
-		}
-
-		.dashicons {
-			line-height: 2;
-		}
+	.striped > tbody > :nth-child(odd) {
+		background-color: #fafafa;
 	}
 }
 
@@ -518,8 +494,6 @@ $escaped-svg-characters: (
  */
 .portfolio_page_visual-portfolio-settings,
 .toplevel_page_visual-portfolio-settings {
-	$settings_nav_width: 220px !default;
-	$settings_content_height: 340px !default;
 	// Align settings controls with modern WP admin (forms / components).
 	$vp-settings-control-border: #949494;
 	$vp-settings-control-border-focus: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
@@ -527,89 +501,70 @@ $escaped-svg-characters: (
 	$vp-settings-control-height: 40px;
 	$vp-settings-control-padding-x: 12px;
 
-	// Navigation.
-	@media (min-width: 782px) {
-		h2.nav-tab-wrapper {
-			position: relative;
-			margin-right: -1px;
-			border: none;
-		}
-
-		.nav-tab-wrapper {
-			display: flex;
-			flex-direction: column;
-			float: left;
-			width: $settings_nav_width;
-
-			.nav-tab {
-				padding: 10px 15px;
-				margin-bottom: -1px;
-				margin-left: 0;
-				background: none;
-				border: 1px solid transparent;
-				border-right: none;
-				border-left: 2px solid transparent;
-			}
-
-			.nav-tab:hover,
-			.nav-tab:focus,
-			.nav-tab-active {
-				background: #fff;
-				border-color: #d7dbde;
-				border-left-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
-			}
-		}
-
-		.metabox-holder {
-			float: left;
-			width: calc(100% - #{$settings_nav_width + 2});
-			// Compensate 10px padding + 2px border.
-			min-height: $settings_content_height + 22px;
-			margin-top: 9px;
-
-			> div,
-			> div > form {
-				min-height: $settings_content_height;
-			}
-		}
+	// Settings info Pro.
+	.social_pro_info > th {
+		display: none;
 	}
 
-	.nav-tab-wrapper {
-		svg {
-			width: 1.2em;
-			height: 1.2em;
-			margin-right: 0.5em;
-			vertical-align: -0.2em;
-		}
+	// Content with settings: each group a card on the white page. Only the
+	// section on screen shows, so its own Save button takes the place of the
+	// page's action in the header; on a narrow screen it stays at the bottom.
+	.vpf-settings-page {
+		position: relative;
 	}
 
-	// Content with settings.
+	// Not narrowed as a whole: a tab Pro draws, such as Watermarks, lays out
+	// columns of its own by the width it gets.
 	.metabox-holder {
-		box-sizing: border-box;
-		padding: 10px 20px;
-		background-color: #fff;
-		border: 1px solid #d7dbde;
+		padding: 0;
 
 		form {
 			display: flex;
 			flex-direction: column;
 		}
 
-		// Footer with save button.
 		.metabox-holder-footer {
 			position: sticky;
 			bottom: 0;
-			padding: 15px 20px;
-			margin-top: auto;
-			margin-right: -20px;
-			margin-bottom: -10px;
-			margin-left: -20px;
-			background-color: #f5f5f5;
-			border-top: 1px solid #ddd;
+			z-index: 1;
+			padding: 16px 0;
+			margin-top: 8px;
+			background: #fff;
 
 			> p {
 				padding: 0;
 				margin: 0;
+			}
+
+			@media (min-width: 783px) {
+				position: absolute;
+				top: 32px;
+				right: 32px;
+				padding: 0;
+				margin: 0;
+				background: none;
+			}
+		}
+
+		.vpf-settings-submit {
+			min-height: 40px;
+			padding: 0 16px;
+			font-size: 13px;
+			border-radius: 2px;
+		}
+
+		// Tabs whose fields the Settings API draws itself, Pro's among them.
+		.form-table {
+			display: block;
+			max-width: 800px;
+			padding: 24px;
+			margin: 0;
+			background: #fff;
+			border: 1px solid #e0e0e0;
+			border-radius: 8px;
+
+			tbody {
+				display: block;
 			}
 		}
 	}
@@ -745,13 +700,16 @@ $escaped-svg-characters: (
 
 	// A tab Pro adds: one line with the link, and Pro's fields greyed out.
 	.vpf-settings-pro-note {
+		box-sizing: border-box;
 		display: flex;
+		max-width: 800px;
 		flex-wrap: wrap;
 		gap: 12px;
 		align-items: center;
-		padding: 12px 20px;
-		margin: -10px -20px 20px;
-		border-bottom: 1px solid #d7dbde;
+		padding: 16px 20px;
+		margin: 0 0 16px;
+		background: #f6f7f7;
+		border-radius: 8px;
 
 		p {
 			flex: 1;
@@ -986,7 +944,7 @@ $escaped-svg-characters: (
 
 		.select2-selection--single {
 			box-sizing: border-box;
-			width: 350px;
+			width: 100%;
 			max-width: 100%;
 			height: auto !important;
 			min-height: $vp-settings-control-height;
@@ -1030,18 +988,6 @@ $escaped-svg-characters: (
 
 	.select2-container--default .select2-results__option--highlighted[aria-selected] {
 		background-color: $vp-settings-control-border-focus;
-	}
-}
-
-/**
- * PRO Notices.
- */
-.portfolio_page_visual-portfolio-settings,
-.toplevel_page_visual-portfolio-settings,
-.portfolio_page_vpf_proofing_page {
-	// Settings info Pro.
-	.social_pro_info > th {
-		display: none;
 	}
 }
 

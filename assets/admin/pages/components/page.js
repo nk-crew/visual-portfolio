@@ -1,5 +1,3 @@
-import './page.scss';
-
 /**
  * A plugin admin page: a header with the title, what the page is for, its
  * actions and its sections, above the content, on white.

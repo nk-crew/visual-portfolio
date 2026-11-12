@@ -26,6 +26,49 @@ body.vpf-admin-page-screen {
 	}
 }
 
+// WordPress's list screens of the plugin's content: the frame's header above
+// WordPress's own markup, at the same gutter.
+body.vpf-admin-list-screen {
+	background: #fff;
+
+	#wpcontent {
+		padding-left: 0;
+	}
+
+	#wpbody-content > .wrap {
+		margin: 24px 32px 0;
+	}
+
+	#screen-meta,
+	#screen-meta-links {
+		margin-right: 32px;
+		margin-left: 32px;
+	}
+
+	.wrap > .wp-heading-inline,
+	.wrap > .page-title-action {
+		display: none;
+	}
+
+	#wpbody-content > .notice,
+	#wpbody-content > .error,
+	#wpbody-content > .updated {
+		margin: 16px 32px 0;
+	}
+
+	// The header comes before `#wpbody`, which WordPress pushes below its
+	// scrolling admin bar on a phone.
+	@media (max-width: 600px) {
+		#wpcontent > .vpf-admin-page {
+			padding-top: 46px;
+		}
+
+		#wpbody {
+			padding-top: 0;
+		}
+	}
+}
+
 .vpf-admin-page {
 	color: $gray-900;
 }
@@ -105,7 +148,8 @@ body.vpf-admin-page-screen {
 			outline-offset: -2px;
 		}
 
-		&[aria-current] {
+		&[aria-current],
+		&.nav-tab-active {
 			color: $gray-900;
 
 			&::after {
@@ -119,6 +163,32 @@ body.vpf-admin-page-screen {
 			}
 		}
 	}
+}
+
+// The Settings API prints its sections as WordPress tabs.
+.vpf-admin-page__sections.nav-tab-wrapper {
+	float: none;
+	padding: 0;
+	border: 0;
+
+	.nav-tab {
+		float: none;
+		margin: 0;
+		font-size: 13px;
+		line-height: inherit;
+		background: none;
+		border: 0;
+	}
+}
+
+.vpf-admin-page__badge {
+	padding: 0 6px;
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 18px;
+	color: $gray-900;
+	background: $gray-100;
+	border-radius: 2px;
 }
 
 .vpf-admin-page__count {
@@ -136,7 +206,33 @@ body.vpf-admin-page-screen {
 	padding: 24px 32px 48px;
 }
 
+// What a page offers in Pro, in place of its content.
+.vpf-admin-page__upsell {
+	max-width: 640px;
+	padding: 32px;
+	background: #f6f7f7;
+	border-radius: 8px;
+
+	h2 {
+		margin: 0 0 8px;
+		font-size: 17px;
+		font-weight: 600;
+		color: $gray-900;
+	}
+
+	p {
+		margin: 0 0 20px;
+		font-size: 13px;
+		color: $gray-700;
+	}
+}
+
 @media (max-width: 782px) {
+	body.vpf-admin-list-screen #wpbody-content > .wrap {
+		margin-right: 16px;
+		margin-left: 16px;
+	}
+
 	body.vpf-admin-page-screen #wpbody-content > .notice,
 	body.vpf-admin-page-screen #wpbody-content > .error,
 	body.vpf-admin-page-screen #wpbody-content > .updated {

@@ -1,6 +1,6 @@
 # Settings screens
 
-General, Images and Popup & Lightbox use WordPress Gutenberg controls within the existing plugin navigation, white content area and sticky Save Changes footer. Other settings tabs retain their existing renderer and styling.
+Settings is a framed page (see Plugin admin pages). Its tabs are the header's sections, each group of settings is a card on the white page, and the tab on screen puts its own Save Changes button where the header's action goes; below 783px it stays at the bottom of the screen. General, Images and Popup & Lightbox use WordPress Gutenberg controls with one label style; the tabs the Settings API draws itself, Pro's among them, keep their renderer inside a card.
 
 Primary settings stay visible. Advanced or infrequently changed settings use collapsed groups. General groups custom taxonomies, performance and responsive breakpoints. Images groups independent layout and lightbox image sizes. Popup shows Behavior, Controls and Appearance before thumbnails, Albums, Quick View and Advanced.
 
@@ -14,7 +14,7 @@ Watermarks and the Social Feeds preview are outside this design change.
 
 Screens the plugin draws itself are React pages in one frame (`assets/admin/pages/components/page.js`), modeled on the Site Editor's screens: white edge to edge, no gray canvas and no plugin navigation bar, since the WordPress sidebar already lists every page. A page header holds the title, one line on what the page is for, the page's actions on the right, and its sections as underline tabs with counts where a count helps choose. Sections change the URL, so they can be bookmarked and the back button works. Content starts under the header at the same 32px gutter.
 
-Core list screens (Projects, Categories, Tags) keep WordPress's rendering, since other plugins extend them, and get only a light refresh.
+Core list screens (Projects, Categories, Tags, and Pro's Proofing list) keep WordPress's rendering, since other plugins extend them. They get the frame's header above it, with Projects, Categories and Tags as its sections and the Add New link as its action, and WordPress's own title is hidden.
 
 # Saved Layouts library
 

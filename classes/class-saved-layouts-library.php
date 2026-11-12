@@ -47,7 +47,6 @@ class Visual_Portfolio_Saved_Layouts_Library {
 
 		// assets.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
-		add_filter( 'admin_body_class', array( $this, 'body_class' ) );
 	}
 
 	/**
@@ -129,22 +128,9 @@ class Visual_Portfolio_Saved_Layouts_Library {
 		wp_enqueue_style(
 			self::HANDLE,
 			visual_portfolio()->plugin_url . 'build/assets/admin/pages/saved-layouts.css',
-			array( 'wp-components' ),
+			array( 'wp-components', 'visual-portfolio-admin-page' ),
 			$asset['version']
 		);
-	}
-
-	/**
-	 * Mark the page, so plugin pages share one frame.
-	 *
-	 * @param string $classes - body classes.
-	 *
-	 * @return string
-	 */
-	public function body_class( $classes ) {
-		global $plugin_page;
-
-		return self::PAGE === $plugin_page ? $classes . ' vpf-admin-page-screen' : $classes;
 	}
 
 	/**
