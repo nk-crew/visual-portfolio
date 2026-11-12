@@ -65,19 +65,91 @@
 		}
 	}
 
-	// One look for every label on the page; some controls print theirs in
-	// the inspector's small caps.
-	// Specific enough to outweigh the component's tripled-class styles.
-	.components-base-control__label,
-	.vpf-settings-section .components-input-control__label.components-input-control__label {
-		font-size: 13px;
-		font-weight: 500;
-		text-transform: none;
-	}
-
 	.vpf-settings-fields {
 		display: grid;
 		gap: 24px;
+	}
+
+	.vpf-settings-field {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 8px;
+		align-content: start;
+	}
+
+	.vpf-settings-field-label {
+		font-size: 13px;
+		font-weight: 500;
+		line-height: 1.4;
+		color: #1e1e1e;
+	}
+
+	.vpf-settings-field > .vpf-settings-field-help {
+		max-width: 640px;
+		margin: 0;
+		font-size: 12px;
+		line-height: 1.5;
+		color: #757575;
+		opacity: 1;
+	}
+
+	// One row per setting, divided by the group's background showing
+	// through a 1px gap, so a hidden row leaves no line of its own.
+	.vpf-settings-section > .vpf-settings-fields:not(.vpf-settings-size-grid) {
+		gap: 1px;
+		padding: 0;
+		margin: 4px 24px 8px;
+		background: #f0f0f0;
+
+		> .vpf-settings-field {
+			padding: 16px 0;
+			background: #fff;
+		}
+
+		@media (min-width: 783px) {
+			> .vpf-settings-field {
+				grid-template-columns: minmax(0, 1fr) 280px;
+				gap: 4px 32px;
+				align-items: center;
+			}
+
+			.vpf-settings-field-control {
+				grid-row: 1;
+				grid-column: 2;
+			}
+
+			.vpf-settings-field-control:first-child {
+				grid-column: 1 / -1;
+			}
+
+			> :has(> .vpf-settings-field-help) {
+				> .vpf-settings-field-label {
+					align-self: end;
+				}
+
+				> .vpf-settings-field-help {
+					align-self: start;
+				}
+
+				> .vpf-settings-field-control {
+					grid-row: 1 / span 2;
+				}
+			}
+
+			.vpf-setting-type-toggle > .vpf-settings-field-control {
+				justify-self: end;
+			}
+
+			.vpf-setting-type-textarea,
+			.vpf-setting-type-image {
+				grid-template-rows: auto 1fr;
+				align-items: start;
+
+				> .vpf-settings-field-control {
+					grid-row: 1 / span 2;
+				}
+			}
+		}
 	}
 
 	.vpf-settings-size-grid {
@@ -98,31 +170,13 @@
 		font-size: 13px;
 	}
 
-	.components-base-control__help {
-		max-width: 640px;
-		margin-bottom: 0;
-	}
-
 	.components-base-control__field {
 		margin-bottom: 0;
 	}
 
-	.components-text-control__input,
-	.components-select-control__input {
-		max-width: 420px;
-	}
-
 	.portfolio_archive_page {
-		min-width: 0;
-
-		> label {
-			display: block;
-			margin-bottom: 8px;
-		}
-
 		.select2-container {
 			width: 100% !important;
-			max-width: 420px;
 		}
 
 		.select2-selection--single {
@@ -174,17 +228,5 @@
 		width: 24px;
 		height: 24px;
 		border: 1px solid #757575;
-	}
-
-	@media (min-width: 1100px) {
-		[data-group="enable_on_wordpress_images"] > .vpf-settings-fields,
-		[data-group="show_arrows"] > .vpf-settings-fields {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
-		.enable_on_wordpress_images,
-		.deep_linking_url_to_share_images {
-			grid-column: 1 / -1;
-		}
 	}
 }

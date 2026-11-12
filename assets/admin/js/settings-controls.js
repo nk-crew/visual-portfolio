@@ -1,12 +1,11 @@
 import {
-	BaseControl,
 	Button,
 	ColorPicker,
 	Dropdown,
+	FormToggle,
 	SelectControl,
 	TextareaControl,
 	TextControl,
-	ToggleControl,
 } from '@wordpress/components';
 import {
 	createRoot,
@@ -31,17 +30,11 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 		})
 	);
 	const disabled = !!field.is_pro && !isPro;
-	const label = (
-		<>
-			{decodeEntities(field.label)}
-			{disabled && (
-				<RawHTML className="vpf-settings-upgrade">{upgrade}</RawHTML>
-			)}
-		</>
-	);
+	const id = field.type === 'number' ? source.id : `vpf-${source.name}`;
+	const helpId = field.desc ? `${id}__help` : undefined;
 	const props = {
-		label,
-		help: field.desc ? <RawHTML>{field.desc}</RawHTML> : undefined,
+		id,
+		'aria-describedby': helpId,
 		disabled,
 		value,
 		onChange: setValue,
@@ -62,10 +55,12 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 	let control;
 	if (field.type === 'toggle') {
 		control = (
-			<ToggleControl
-				{...props}
+			<FormToggle
+				id={id}
+				aria-describedby={helpId}
+				disabled={disabled}
 				checked={value === 'on'}
-				onChange={(checked) => {
+				onChange={({ target: { checked } }) => {
 					if (
 						field.name === 'register_portfolio_post_type' &&
 						!checked &&
@@ -118,11 +113,7 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 		);
 	} else if (field.type === 'image') {
 		control = (
-			<BaseControl
-				label={label}
-				help={props.help}
-				__nextHasNoMarginBottom
-			>
+			<>
 				{image && (
 					<img className="vpf-settings-image" src={image} alt="" />
 				)}
@@ -163,7 +154,7 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 						</Button>
 					)}
 				</div>
-			</BaseControl>
+			</>
 		);
 	} else {
 		control = (
@@ -193,7 +184,29 @@ function Field({ field, source, initialValue, preview, upgrade, refresh }) {
 			/>
 		);
 	}
-	return control;
+	return (
+		<>
+			{field.label && (
+				<label
+					className="vpf-settings-field-label"
+					htmlFor={field.type === 'image' ? undefined : id}
+				>
+					{decodeEntities(field.label)}
+					{disabled && (
+						<RawHTML className="vpf-settings-upgrade">
+							{upgrade}
+						</RawHTML>
+					)}
+				</label>
+			)}
+			<div className="vpf-settings-field-control">{control}</div>
+			{field.desc && (
+				<RawHTML id={helpId} className="vpf-settings-field-help">
+					{field.desc}
+				</RawHTML>
+			)}
+		</>
+	);
 }
 
 const groups = {
@@ -480,9 +493,20 @@ $(() => {
 			} else {
 				const label = row.querySelector('th');
 				if (label?.textContent.trim()) {
-					container.append(...label.childNodes);
+					const name = document.createElement('div');
+					name.className = 'vpf-settings-field-label';
+					name.append(...label.childNodes);
+					container.append(name);
 				}
-				container.append(...row.querySelector('td').childNodes);
+				const control = document.createElement('div');
+				control.className = 'vpf-settings-field-control';
+				control.append(...row.querySelector('td').childNodes);
+				container.append(control);
+				const help = control.querySelector(':scope > .description');
+				if (help) {
+					help.classList.add('vpf-settings-field-help');
+					container.append(help);
+				}
 				if (
 					field.name === 'portfolio_archive_page' &&
 					field.type === 'select' &&

@@ -438,6 +438,51 @@ test.describe('Contextual settings controls', () => {
 		}
 	});
 
+	test('a setting is one row with its control beside the name, stacked on narrow screens', async ({
+		admin,
+		page,
+	}) => {
+		await page.setViewportSize({ width: 1280, height: 900 });
+		let form = await openTab(admin, page, 'vp_popup_gallery');
+		let toggle = form.getByRole('checkbox', { name: 'Display Arrows' });
+		await expect(toggle).toHaveAccessibleDescription(
+			'Arrows to navigate between images.'
+		);
+		const row = form.locator('.vpf-settings-field.show_arrows');
+		const rowBox = await row.boundingBox();
+		let name = await row.locator('.vpf-settings-field-label').boundingBox();
+		let control = await toggle.locator('..').boundingBox();
+		expect(control.x).toBeGreaterThan(name.x + name.width);
+		expect(
+			rowBox.x + rowBox.width - (control.x + control.width)
+		).toBeLessThan(2);
+		expect(control.y).toBeLessThan(name.y + name.height + 24);
+
+		form = await openTab(admin, page, 'vp_general');
+		await form
+			.locator('summary')
+			.filter({ hasText: 'Responsive Breakpoints' })
+			.click();
+		const xl = await form
+			.locator('.breakpoint_xl input[type="number"]')
+			.boundingBox();
+		const lg = await form
+			.locator('.breakpoint_lg input[type="number"]')
+			.boundingBox();
+		expect(lg.y).toBe(xl.y);
+		expect(lg.x).toBeGreaterThan(xl.x + xl.width);
+
+		await page.setViewportSize({ width: 390, height: 844 });
+		form = await openTab(admin, page, 'vp_popup_gallery');
+		toggle = form.getByRole('checkbox', { name: 'Display Arrows' });
+		name = await form
+			.locator('.show_arrows .vpf-settings-field-label')
+			.boundingBox();
+		control = await toggle.locator('..').boundingBox();
+		expect(control.y).toBeGreaterThanOrEqual(name.y + name.height);
+		expect(Math.abs(control.x - name.x)).toBeLessThan(2);
+	});
+
 	test('incoming target hashes activate their tab without enhancing legacy tabs', async ({
 		admin,
 		page,
