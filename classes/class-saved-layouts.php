@@ -419,7 +419,7 @@ class Visual_Portfolio_Saved_Layouts {
 			if ( count( $own['innerBlocks'] ) === count( $layout_block['innerBlocks'] ) ) {
 				$layout_block['innerHTML']    = $own['innerHTML'];
 				$layout_block['innerContent'] = $own['innerContent'];
-			} elseif ( $saves_markup && in_array( null, $own['innerContent'], true ) ) {
+			} elseif ( $saves_markup && $own['innerContent'] ) {
 				$layout_block['innerContent'] = self::wrap_slots( $own['innerContent'], $layout_block['innerContent'] );
 				$layout_block['innerHTML']    = implode( '', array_filter( $layout_block['innerContent'], 'is_string' ) );
 			}
@@ -463,13 +463,21 @@ class Visual_Portfolio_Saved_Layouts {
 	 * The page's markup around the layout's inner block slots: what the editor
 	 * saves for the page's attributes once the layout's inner blocks changed.
 	 *
-	 * @param array $own - the loop block's inner content, with at least one slot.
+	 * @param array $own - the loop block's inner content, not empty.
 	 * @param array $layout - the layout block's inner content.
 	 *
 	 * @return array
 	 */
 	private static function wrap_slots( $own, $layout ) {
-		$own_slots    = array_keys( $own, null, true );
+		$own_slots = array_keys( $own, null, true );
+
+		// A block saved with no inner blocks is one chunk, the wrapper opened and closed.
+		if ( ! $own_slots ) {
+			$split     = (int) strrpos( $own[0], '</' );
+			$own       = array( substr( $own[0], 0, $split ), null, substr( $own[0], $split ) );
+			$own_slots = array( 1 );
+		}
+
 		$layout_slots = array_keys( $layout, null, true );
 		$inner        = $layout_slots ? array_slice( $layout, $layout_slots[0], end( $layout_slots ) - $layout_slots[0] + 1 ) : array();
 
