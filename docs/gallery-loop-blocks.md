@@ -660,8 +660,8 @@ is forgotten with them.
 
 **A filter set up by an extension.** A filter block whose `extensions.facet` is a
 non-empty object lists what only an extension can read. Without the extension it
-renders as a plain filter of the loop, and the editor leaves its saved items as
-they are. The extension
+renders nothing on the page, and the editor shows its saved items as they are,
+with no note. The extension
 replaces the render callbacks of the filter and its items through
 `register_block_type_args` and builds on `Visual_Portfolio_Block_Loop_Filter::get_items()`
 and `sort_items()`, which merge the saved items with the terms and sort them.

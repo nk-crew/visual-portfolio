@@ -308,20 +308,19 @@ class ClassLoopControlsDisplay extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A filter an extension set up falls back to the plain filter without that
-	 * extension.
+	 * A filter an extension set up prints nothing without that extension.
 	 *
 	 * @return void
 	 */
-	public function test_a_filter_set_up_by_an_extension_falls_back_to_the_plain_filter() {
+	public function test_a_filter_set_up_by_an_extension_prints_nothing_alone() {
 		if ( class_exists( 'Visual_Portfolio_Pro_Loop_Filter_Block' ) ) {
 			$this->markTestSkipped( 'Pro renders the filter it set up.' );
 		}
 
 		$html = $this->render_loop( '<!-- wp:visual-portfolio/loop-filter {"extensions":{"facet":{"by":"chosen","chosen":["nature"]}}} /-->' );
 
-		$this->assertSame( $this->render_loop( '<!-- wp:visual-portfolio/loop-filter /-->' ), $html );
-		$this->assertStringContainsString( 'vp-block-loop-filter', $html );
+		$this->assertStringNotContainsString( 'vp-block-loop-filter', $html );
+		$this->assertStringContainsString( 'vp-block-loop-filter', $this->render_loop( '<!-- wp:visual-portfolio/loop-filter {"extensions":{"facet":[]}} /-->' ) );
 	}
 
 	/**

@@ -129,7 +129,7 @@ test.describe('Gallery Filter settings', () => {
 		expect(movable).not.toContain(true);
 	});
 
-	test('a filter set up in Pro falls back to the plain filter without Pro', async ({
+	test('a filter set up in Pro keeps its items in the editor and shows nothing on the page', async ({
 		editor,
 		page,
 	}) => {
@@ -162,8 +162,9 @@ test.describe('Gallery Filter settings', () => {
 		const frontend = await openPublishedPage(page);
 
 		await expect(
-			frontend.locator('.vp-block-loop-filter a').first()
+			frontend.locator('.wp-block-visual-portfolio-item-title').first()
 		).toBeVisible();
+		await expect(frontend.locator('.vp-block-loop-filter')).toHaveCount(0);
 	});
 
 	test('the Settings panel lists the Pro settings in its menu only', async ({
