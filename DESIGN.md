@@ -16,7 +16,7 @@ Screens the plugin draws itself are React pages in one frame (`assets/admin/page
 
 Core list screens (Projects, Categories, Tags, and Pro's Proofing list) keep WordPress's rendering, since other plugins extend them. They get the frame's header above it, with Projects, Categories and Tags as its sections and the Add New link as its action, and WordPress's own title is hidden.
 
-A list screen gets this header by an entry in the `vpf_admin_list_screens` filter (`classes/class-admin.php`): its post type or taxonomy, a title (the name label by default), one line on what it is for, its sections, and its actions (Add New on a post type's list by default). Lists that belong together, such as a post type and its taxonomy, carry the same sections, so they read as one page with tabs. Pro registers its own screens there.
+A list screen gets this header through the `vpf_admin_list_screens` filter, whose docblock in `classes/class-admin.php` holds its shape; that is how Pro's list screens join the frame. Lists that belong together, such as a post type and its taxonomy, carry the same sections, so they read as one page with tabs.
 
 # Saved Layouts library
 

@@ -181,6 +181,42 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An entry or a section naming a taxonomy and its post type, as the
+	 * taxonomy's list URL does, stands for the taxonomy's list.
+	 */
+	public function test_taxonomy_wins_over_post_type_in_one_entry() {
+		add_filter(
+			'vpf_admin_list_screens',
+			function ( $screens ) {
+				$sections                = $this->test_sections();
+				$sections[1]['post_type'] = 'vpf_test_item';
+
+				$screens[] = array(
+					'post_type'   => 'vpf_test_item',
+					'description' => 'Items line.',
+					'sections'    => $sections,
+				);
+				$screens[] = array(
+					'taxonomy'    => 'vpf_test_group',
+					'post_type'   => 'vpf_test_item',
+					'description' => 'Groups line.',
+					'sections'    => $sections,
+				);
+
+				return $screens;
+			}
+		);
+
+		$items  = $this->header_on( 'edit-vpf_test_item' );
+		$groups = $this->header_on( 'edit-vpf_test_group' );
+
+		$this->assertStringContainsString( '<p>Items line.</p>', $items );
+		$this->assertSame( 1, substr_count( $items, 'aria-current' ) );
+		$this->assertStringContainsString( '<p>Groups line.</p>', $groups );
+		$this->assertStringContainsString( 'taxonomy=vpf_test_group" aria-current="page">Groups</a>', $groups );
+	}
+
+	/**
 	 * A later entry replaces an earlier one, and its actions replace Add New:
 	 * the first primary, the rest secondary, none for an empty list.
 	 */
@@ -229,7 +265,8 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Entries that do not fit the shape are left out without a notice; a
+	 * Entries, sections and actions that do not fit the shape are left out
+	 * without a notice, `actions` that is not a list keeps Add New, and a
 	 * screen no entry names gets no frame.
 	 */
 	public function test_malformed_entries_are_left_out() {
@@ -238,6 +275,7 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 			function () {
 				return array(
 					'not a screen',
+					(object) array( 'post_type' => 'vpf_test_item' ),
 					array( 'description' => 'No post type.' ),
 					array( 'post_type' => 'vpf_unregistered' ),
 					array(
@@ -246,6 +284,11 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 						'description' => 42,
 						'sections'    => array(
 							'not a section',
+							(object) array(
+								'label'     => 'An object',
+								'url'       => 'http://example.org/object',
+								'post_type' => 'vpf_test_item',
+							),
 							array( 'label' => 'No target' ),
 							array(
 								'label'     => 'No url',
@@ -254,16 +297,29 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 						),
 						'actions'     => 'not a list',
 					),
+					array(
+						'taxonomy' => 'vpf_test_group',
+						'actions'  => array(
+							(object) array(
+								'label' => 'An object',
+								'url'   => 'http://example.org/object',
+							),
+						),
+					),
 				);
 			}
 		);
 
-		$items = $this->header_on( 'edit-vpf_test_item' );
+		$items  = $this->header_on( 'edit-vpf_test_item' );
+		$groups = $this->header_on( 'edit-vpf_test_group' );
 
 		$this->assertStringContainsString( '<h1>Test Items</h1>', $items );
 		$this->assertStringNotContainsString( '<p>', $items );
 		$this->assertStringNotContainsString( 'vpf-admin-page__sections', $items );
-		$this->assertStringNotContainsString( 'vpf-admin-page__actions', $items );
+		$this->assertStringContainsString( '">Add Post</a>', $items );
+
+		$this->assertStringContainsString( '<h1>Test Groups</h1>', $groups );
+		$this->assertStringNotContainsString( 'vpf-admin-page__actions', $groups );
 
 		$this->assertSame( '', $this->header_on( 'edit-portfolio_category' ) );
 		$this->assertSame( '', $this->body_class_on( 'edit-portfolio_category' ) );

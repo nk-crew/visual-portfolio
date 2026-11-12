@@ -233,35 +233,25 @@ class Visual_Portfolio_Admin {
 		 * white and hides WordPress's own title and Add New link.
 		 *
 		 * Each screen is an array with:
-		 * - `post_type` (string) or `taxonomy` (string): the post type's list
-		 *   (`edit.php`) or the taxonomy's list (`edit-tags.php`) it frames.
+		 * - `taxonomy` (string) or `post_type` (string): the taxonomy's list
+		 *   (`edit-tags.php`) or the post type's list (`edit.php`) it frames. An
+		 *   entry with both frames the taxonomy's list.
 		 * - `title` (string, optional): the post type's or taxonomy's name label
 		 *   by default.
 		 * - `description` (string, optional): one line on what the screen is for.
 		 * - `sections` (array, optional): the underline tabs under the title, each
-		 *   with `label`, `url`, and the `post_type` or `taxonomy` of the screen it
+		 *   with `label`, `url`, and the `taxonomy` or `post_type` of the screen it
 		 *   opens, which marks the tab of the screen on view. Screens that share
-		 *   tabs list the same sections. The tabs are named after the title of the
-		 *   first section's screen.
+		 *   tabs list the same sections. The tab bar's accessible name is the
+		 *   title of the first section's screen.
 		 * - `actions` (array, optional): buttons on the right of the title, each
-		 *   with `label` and `url`, the first one primary. The caller checks that
-		 *   the user may use them. By default a post type's list gets its Add New
-		 *   link when the user can create posts of that type; an empty array
-		 *   leaves no action.
+		 *   with `label` and `url`, the first one primary. They are printed as
+		 *   given, so add only actions the current user may use. Without this key
+		 *   a post type's list gets its Add New link when the user can create
+		 *   posts of that type; an empty array leaves no action.
 		 *
-		 * A later entry for the same post type or taxonomy replaces an earlier one.
-		 *
-		 * Example, a post type list and a taxonomy list under one header:
-		 *
-		 *     add_filter( 'vpf_admin_list_screens', function( $screens ) {
-		 *         $sections = array(
-		 *             array( 'label' => 'Items', 'url' => admin_url( 'edit.php?post_type=my_item' ), 'post_type' => 'my_item' ),
-		 *             array( 'label' => 'Groups', 'url' => admin_url( 'edit-tags.php?taxonomy=my_group&post_type=my_item' ), 'taxonomy' => 'my_group' ),
-		 *         );
-		 *         $screens[] = array( 'post_type' => 'my_item', 'description' => 'What the items are for.', 'sections' => $sections );
-		 *         $screens[] = array( 'taxonomy' => 'my_group', 'description' => 'What the groups are for.', 'sections' => $sections );
-		 *         return $screens;
-		 *     } );
+		 * A later entry for the same post type or taxonomy replaces an earlier one
+		 * whole.
 		 *
 		 * @param array $screens List screens.
 		 */
@@ -320,11 +310,11 @@ class Visual_Portfolio_Admin {
 				}
 			}
 
-			if ( isset( $entry['actions'] ) ) {
+			if ( is_array( $entry['actions'] ?? null ) ) {
 				$actions = array();
 
-				foreach ( (array) $entry['actions'] as $action ) {
-					if ( is_string( $action['label'] ?? null ) && is_string( $action['url'] ?? null ) ) {
+				foreach ( $entry['actions'] as $action ) {
+					if ( is_array( $action ) && is_string( $action['label'] ?? null ) && is_string( $action['url'] ?? null ) ) {
 						$actions[] = array(
 							'label' => $action['label'],
 							'url'   => $action['url'],
@@ -354,12 +344,16 @@ class Visual_Portfolio_Admin {
 	 * @return string|null `post:<post type>`, `term:<taxonomy>`, or null when the entry names neither.
 	 */
 	private static function get_list_screen_key( $entry ) {
-		if ( is_string( $entry['post_type'] ?? null ) ) {
-			return 'post:' . $entry['post_type'];
+		if ( ! is_array( $entry ) ) {
+			return null;
 		}
 
 		if ( is_string( $entry['taxonomy'] ?? null ) ) {
 			return 'term:' . $entry['taxonomy'];
+		}
+
+		if ( is_string( $entry['post_type'] ?? null ) ) {
+			return 'post:' . $entry['post_type'];
 		}
 
 		return null;
