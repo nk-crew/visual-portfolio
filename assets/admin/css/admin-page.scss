@@ -26,6 +26,49 @@ body.vpf-admin-page-screen {
 	}
 }
 
+// WordPress's list screens of the plugin's content: the frame's header above
+// WordPress's own markup, at the same gutter.
+body.vpf-admin-list-screen {
+	background: #fff;
+
+	#wpcontent {
+		padding-left: 0;
+	}
+
+	#wpbody-content > .wrap {
+		margin: 24px 32px 0;
+	}
+
+	#screen-meta,
+	#screen-meta-links {
+		margin-right: 32px;
+		margin-left: 32px;
+	}
+
+	.wrap > .wp-heading-inline,
+	.wrap > .page-title-action {
+		display: none;
+	}
+
+	#wpbody-content > .notice,
+	#wpbody-content > .error,
+	#wpbody-content > .updated {
+		margin: 16px 32px 0;
+	}
+
+	// The header comes before `#wpbody`, which WordPress pushes below its
+	// scrolling admin bar on a phone.
+	@media (max-width: 600px) {
+		#wpcontent > .vpf-admin-page {
+			padding-top: 46px;
+		}
+
+		#wpbody {
+			padding-top: 0;
+		}
+	}
+}
+
 .vpf-admin-page {
 	color: $gray-900;
 }
@@ -185,6 +228,11 @@ body.vpf-admin-page-screen {
 }
 
 @media (max-width: 782px) {
+	body.vpf-admin-list-screen #wpbody-content > .wrap {
+		margin-right: 16px;
+		margin-left: 16px;
+	}
+
 	body.vpf-admin-page-screen #wpbody-content > .notice,
 	body.vpf-admin-page-screen #wpbody-content > .error,
 	body.vpf-admin-page-screen #wpbody-content > .updated {

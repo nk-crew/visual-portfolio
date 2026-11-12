@@ -20,6 +20,7 @@ class Visual_Portfolio_Admin {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'enqueue_block_assets', array( $this, 'saved_layouts_editor_enqueue_scripts' ) );
 		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
+		add_action( 'in_admin_header', array( $this, 'print_list_header' ) );
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ) );
 
 		// Pro link.
@@ -74,7 +75,7 @@ class Visual_Portfolio_Admin {
 
 		global $plugin_page;
 
-		if ( in_array( $plugin_page, self::FRAMED_PAGES, true ) ) {
+		if ( in_array( $plugin_page, self::FRAMED_PAGES, true ) || self::get_list_screen() ) {
 			Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-admin-page', 'build/assets/admin/css/admin-page', array( 'wp-components' ) );
 			wp_style_add_data( 'visual-portfolio-admin-page', 'rtl', 'replace' );
 		}
@@ -159,7 +160,105 @@ class Visual_Portfolio_Admin {
 	public function admin_body_class( $classes ) {
 		global $plugin_page;
 
-		return in_array( $plugin_page, self::FRAMED_PAGES, true ) ? $classes . ' vpf-admin-page-screen' : $classes;
+		if ( in_array( $plugin_page, self::FRAMED_PAGES, true ) ) {
+			return $classes . ' vpf-admin-page-screen';
+		}
+
+		return self::get_list_screen() ? $classes . ' vpf-admin-list-screen' : $classes;
+	}
+
+	/**
+	 * WordPress list screens of the plugin's content, which get the frame's
+	 * header above WordPress's own markup.
+	 *
+	 * @return array|null `type` (`post` or `term`) and `name` of the screen's
+	 *                    post type or taxonomy.
+	 */
+	private static function get_list_screen() {
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return null;
+		}
+
+		$screen = get_current_screen();
+
+		if ( ! $screen ) {
+			return null;
+		}
+
+		if ( 'edit' === $screen->base && in_array( $screen->post_type, array( 'portfolio', 'vp_proofing' ), true ) ) {
+			return array(
+				'type' => 'post',
+				'name' => $screen->post_type,
+			);
+		}
+
+		if ( 'edit-tags' === $screen->base && in_array( $screen->taxonomy, array( 'portfolio_category', 'portfolio_tag' ), true ) ) {
+			return array(
+				'type' => 'term',
+				'name' => $screen->taxonomy,
+			);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Print the frame's header on the plugin's WordPress list screens. The
+	 * screen's own title and Add New link are hidden by the stylesheet.
+	 */
+	public function print_list_header() {
+		$list = self::get_list_screen();
+
+		if ( ! $list ) {
+			return;
+		}
+
+		$descriptions = array(
+			'portfolio'          => __( 'The works your galleries show.', 'visual-portfolio' ),
+			'portfolio_category' => __( 'Group projects, so a gallery can show or filter by them.', 'visual-portfolio' ),
+			'portfolio_tag'      => __( 'Label projects, so a gallery can show or filter by them.', 'visual-portfolio' ),
+		);
+		$object       = 'post' === $list['type'] ? get_post_type_object( $list['name'] ) : get_taxonomy( $list['name'] );
+		$actions      = '';
+		$sections     = '';
+
+		if ( 'post' === $list['type'] && current_user_can( $object->cap->create_posts ) ) {
+			$actions = sprintf(
+				'<a class="components-button is-primary is-next-40px-default-size" href="%s">%s</a>',
+				esc_url( admin_url( 'post-new.php?post_type=' . $list['name'] ) ),
+				esc_html( $object->labels->add_new_item )
+			);
+		}
+
+		if ( 'vp_proofing' !== $list['name'] ) {
+			$links = array(
+				'portfolio'          => array( __( 'All projects', 'visual-portfolio' ), 'edit.php?post_type=portfolio' ),
+				'portfolio_category' => array( __( 'Categories', 'visual-portfolio' ), 'edit-tags.php?taxonomy=portfolio_category&post_type=portfolio' ),
+				'portfolio_tag'      => array( __( 'Tags', 'visual-portfolio' ), 'edit-tags.php?taxonomy=portfolio_tag&post_type=portfolio' ),
+			);
+
+			foreach ( $links as $name => $link ) {
+				$sections .= sprintf(
+					'<a href="%1$s"%2$s>%3$s</a>',
+					esc_url( admin_url( $link[1] ) ),
+					$name === $list['name'] ? ' aria-current="page"' : '',
+					esc_html( $link[0] )
+				);
+			}
+
+			$sections = '<nav class="vpf-admin-page__sections" aria-label="' . esc_attr__( 'Projects', 'visual-portfolio' ) . '">' . $sections . '</nav>';
+		}
+
+		echo '<div class="vpf-admin-page">';
+		self::print_page_header(
+			array(
+				'title'       => 'portfolio' === $list['name'] ? __( 'Projects', 'visual-portfolio' ) : $object->labels->name,
+				'description' => $descriptions[ $list['name'] ] ?? '',
+				'actions'     => $actions,
+				'sections'    => $sections,
+			)
+		);
+		echo '</div>';
 	}
 
 	/**
