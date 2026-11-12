@@ -379,7 +379,7 @@ class Visual_Portfolio_Admin {
 	 *
 	 * @param string $key - `post:<post type>` or `term:<taxonomy>`.
 	 *
-	 * @return WP_Post_Type|WP_Taxonomy|null
+	 * @return WP_Post_Type|WP_Taxonomy|null|false Null or false when the post type or taxonomy is not registered.
 	 */
 	private static function get_list_screen_object( $key ) {
 		list( $type, $name ) = explode( ':', $key, 2 );
