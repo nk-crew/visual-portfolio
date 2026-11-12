@@ -36,6 +36,12 @@ async function globalSetup(config) {
 		requestUtils.resetPreferences(),
 	]);
 
+	// Activating the plugin makes the next admin page its welcome screen
+	// (`Visual_Portfolio_Welcome_Screen::redirect_to_welcome_screen()`). Open
+	// one here, so the first spec that opens the editor gets the editor.
+	const adminPage = await requestContext.get('wp-admin/');
+	await adminPage.dispose();
+
 	await requestContext.dispose();
 }
 
