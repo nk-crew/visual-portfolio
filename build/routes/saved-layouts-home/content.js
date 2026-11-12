@@ -42,10 +42,10 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 }) : target, mod));
 
 // routes/saved-layouts-home/style.scss
-if (typeof document !== "undefined" && !document.head.querySelector("style[data-wp-hash='a18af3bac7']")) {
+if (typeof document !== "undefined" && !document.head.querySelector("style[data-wp-hash='f1ea176226']")) {
 	const style = document.createElement("style");
-	style.setAttribute("data-wp-hash", "a18af3bac7");
-	style.appendChild(document.createTextNode(".vpf-library-preview{aspect-ratio:1;background:#f6f6f6;box-sizing:border-box;overflow:hidden;padding:10%;width:100%}.vpf-library-preview>div{height:100%}.vpf-library-preview__tile{background:#e2e2e2;border-radius:2px;display:block;min-height:0}.vpf-library-preview__tile:nth-child(3n+2){background:#d6d6d6}.vpf-library-preview__tile:nth-child(4n+3){background:#ebebeb}.vpf-library-preview__grid{display:grid;gap:6%;grid-auto-rows:1fr}.vpf-library-preview__masonry{column-gap:6%}.vpf-library-preview__masonry .vpf-library-preview__tile{break-inside:avoid;margin-bottom:6%}.vpf-library-preview__justified{align-content:stretch;display:flex;flex-wrap:wrap;gap:6%}.vpf-library-preview__justified .vpf-library-preview__tile{height:28%}.vpf-library-preview__tiles{display:grid;gap:6%;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr)}.vpf-library-preview__tiles .vpf-library-preview__tile:first-child{grid-column:span 2;grid-row:span 2}.vpf-library-preview__tiles .vpf-library-preview__tile:nth-child(4){grid-column:span 2}.vpf-library-preview__carousel{align-items:stretch;display:flex;gap:6%;margin-right:-30%}.vpf-library-preview__carousel .vpf-library-preview__tile{flex:0 0 45%}.vpf-library-title{align-items:center;display:inline-flex;flex-wrap:wrap;gap:4px 8px;min-width:0}.vpf-library-title__link{color:inherit;font-weight:500;min-width:0;overflow-wrap:anywhere;text-decoration:none}.vpf-library-title__link:focus,.vpf-library-title__link:hover{color:var(--wp-admin-theme-color,#3858e9)}.vpf-library-badge{background:#f0f0f0;border-radius:2px;color:#2f2f2f;font-size:11px;font-weight:500;line-height:20px;padding:0 6px;white-space:nowrap}.vpf-library-badge.is-legacy{background:#fcf9e8;color:#6e5b00}.vpf-library-muted{color:#757575}.vpf-library-code{background:#f0f0f0;border-radius:2px;font-size:12px;padding:2px 4px;white-space:nowrap}.vpf-library-add{width:auto}.vpf-library-add>.components-button:first-child{border-bottom-right-radius:0;border-top-right-radius:0}.vpf-library-add .vpf-library-add__toggle{border-bottom-left-radius:0;border-top-left-radius:0;box-shadow:inset 1px 0 0 hsla(0,0%,100%,.3);min-width:32px;padding:0 4px}.vpf-library-empty{margin:64px auto;max-width:480px;text-align:center}.vpf-library-usage{list-style:none;margin:0;max-height:200px;overflow:auto;padding:0}.vpf-library-usage li{border-bottom:1px solid #f0f0f0;display:flex;gap:12px;justify-content:space-between;margin:0;padding:8px 0}.vpf-library-usage li>:first-child{min-width:0;overflow-wrap:anywhere}.vpf-library-usage li>:last-child{flex:none}.vpf-library-snackbars{bottom:24px;left:50%;max-width:calc(100vw - 32px);position:fixed;transform:translateX(-50%);width:max-content;z-index:100000}.vpf-library .dataviews-view-grid__bulk-actions-header{padding:0 24px}"));
+	style.setAttribute("data-wp-hash", "f1ea176226");
+	style.appendChild(document.createTextNode(".vpf-library-preview{aspect-ratio:1;background:#f6f6f6;box-sizing:border-box;overflow:hidden;position:relative;width:100%}.vpf-library-preview.is-ready{background:#fff}.vpf-library-preview__schematic{box-sizing:border-box;inset:0;padding:10%;position:absolute}.vpf-library-preview__schematic>div{height:100%}.is-ready>.vpf-library-preview__schematic{transition:visibility 0s .2s;visibility:hidden}.vpf-library-preview__frame{background:#fff;border:0;left:0;opacity:0;pointer-events:none;position:absolute;top:0;transform-origin:0 0;transition:opacity .2s ease-out}.is-ready>.vpf-library-preview__frame{opacity:1}@media (prefers-reduced-motion:reduce){.vpf-library-preview__frame{transition:none}}.vpf-library-preview__tile{background:#e2e2e2;border-radius:2px;display:block;min-height:0}.vpf-library-preview__tile:nth-child(3n+2){background:#d6d6d6}.vpf-library-preview__tile:nth-child(4n+3){background:#ebebeb}.vpf-library-preview__grid{display:grid;gap:6%;grid-auto-rows:1fr}.vpf-library-preview__masonry{column-gap:6%}.vpf-library-preview__masonry .vpf-library-preview__tile{break-inside:avoid;margin-bottom:6%}.vpf-library-preview__justified{align-content:stretch;display:flex;flex-wrap:wrap;gap:6%}.vpf-library-preview__justified .vpf-library-preview__tile{height:28%}.vpf-library-preview__tiles{display:grid;gap:6%;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr)}.vpf-library-preview__tiles .vpf-library-preview__tile:first-child{grid-column:span 2;grid-row:span 2}.vpf-library-preview__tiles .vpf-library-preview__tile:nth-child(4){grid-column:span 2}.vpf-library-preview__carousel{align-items:stretch;display:flex;gap:6%;margin-right:-30%}.vpf-library-preview__carousel .vpf-library-preview__tile{flex:0 0 45%}.vpf-library-title{align-items:center;display:inline-flex;flex-wrap:wrap;gap:4px 8px;min-width:0}.vpf-library-title__link{color:inherit;font-weight:500;min-width:0;overflow-wrap:anywhere;text-decoration:none}.vpf-library-title__link:focus,.vpf-library-title__link:hover{color:var(--wp-admin-theme-color,#3858e9)}.vpf-library-badge{background:#f0f0f0;border-radius:2px;color:#2f2f2f;font-size:11px;font-weight:500;line-height:20px;padding:0 6px;white-space:nowrap}.vpf-library-badge.is-legacy{background:#fcf9e8;color:#6e5b00}.vpf-library-muted{color:#757575}.vpf-library-code{background:#f0f0f0;border-radius:2px;font-size:12px;padding:2px 4px;white-space:nowrap}.vpf-library-add{width:auto}.vpf-library-add>.components-button:first-child{border-bottom-right-radius:0;border-top-right-radius:0}.vpf-library-add .vpf-library-add__toggle{border-bottom-left-radius:0;border-top-left-radius:0;box-shadow:inset 1px 0 0 hsla(0,0%,100%,.3);min-width:32px;padding:0 4px}.vpf-library-empty{margin:64px auto;max-width:480px;text-align:center}.vpf-library-usage{list-style:none;margin:0;max-height:200px;overflow:auto;padding:0}.vpf-library-usage li{border-bottom:1px solid #f0f0f0;display:flex;gap:12px;justify-content:space-between;margin:0;padding:8px 0}.vpf-library-usage li>:first-child{min-width:0;overflow-wrap:anywhere}.vpf-library-usage li>:last-child{flex:none}.vpf-library-snackbars{bottom:24px;left:50%;max-width:calc(100vw - 32px);position:fixed;transform:translateX(-50%);width:max-content;z-index:100000}.vpf-library .dataviews-view-grid__bulk-actions-header{padding:0 24px}"));
 	document.head.appendChild(style);
 }
 
@@ -52341,6 +52341,8 @@ var import_core_data = require_core_data();
 var import_notices = require_notices();
 var import_url = require_url();
 var import_html_entities = require_html_entities();
+const VIEWPORT_WIDTH = 1200;
+const MIN_LIVE_WIDTH = 120;
 const MASONRY = [
 	1.35,
 	.8,
@@ -52383,7 +52385,7 @@ function tiles(count, styles = () => void 0) {
 * @param {Object} props.preview - `{ type, columns }` of the layout.
 * @return {Element} component.
 */
-function LayoutPreview({ preview }) {
+function LayoutSchematic({ preview }) {
 	const type = preview?.type || "grid";
 	const columns = Math.min(Math.max(parseInt(preview?.columns, 10) || 3, 1), 6);
 	let content;
@@ -52421,9 +52423,77 @@ function LayoutPreview({ preview }) {
 		});
 	}
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: "vpf-library-preview",
-		"aria-hidden": "true",
+		className: "vpf-library-preview__schematic",
 		children: content
+	});
+}
+/**
+* Width of an element, followed as it resizes.
+*
+* @return {Array} `[ ref, width ]`.
+*/
+function useWidth() {
+	const ref = (0, import_element.useRef)(null);
+	const [width, setWidth] = (0, import_element.useState)(0);
+	(0, import_element.useEffect)(() => {
+		const element = ref.current;
+		if (!element) return;
+		const observer = new window.ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
+		observer.observe(element);
+		return () => observer.disconnect();
+	}, []);
+	return [ref, width];
+}
+/**
+* Preview of a layout: the gallery as a page renders it, scaled to the
+* preview, over its schematic until it loads. A layout that shows no items
+* keeps the schematic.
+*
+* @param {Object} props      - component props.
+* @param {Object} props.item - layout record.
+* @return {Element} component.
+*/
+function LayoutPreview({ item }) {
+	const layout = item.vpf_layout;
+	const [ref, width] = useWidth();
+	const frame = (0, import_element.useRef)(null);
+	const [state, setState] = (0, import_element.useState)("loading");
+	const [height, setHeight] = (0, import_element.useState)(VIEWPORT_WIDTH);
+	const url = layout?.previewUrl;
+	const isLive = !!url && width >= MIN_LIVE_WIDTH;
+	const scale = width / VIEWPORT_WIDTH;
+	const offset = Math.max(0, (width - height * scale) / 2);
+	(0, import_element.useEffect)(() => {
+		setState("loading");
+	}, [url]);
+	(0, import_element.useEffect)(() => {
+		if (!isLive) return;
+		const onMessage = (event) => {
+			if (event.source === frame.current?.contentWindow && "vpf-layout-preview" === event.data?.type) {
+				setState(event.data.empty ? "empty" : "ready");
+				setHeight(event.data.height || VIEWPORT_WIDTH);
+			}
+		};
+		window.addEventListener("message", onMessage);
+		return () => window.removeEventListener("message", onMessage);
+	}, [isLive]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		ref,
+		className: `vpf-library-preview is-${isLive ? state : "schematic"}`,
+		"aria-hidden": "true",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LayoutSchematic, { preview: layout?.preview }), isLive && "empty" !== state && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("iframe", {
+			ref: frame,
+			className: "vpf-library-preview__frame",
+			src: url,
+			title: (0, import_i18n.sprintf)((0, import_i18n.__)("Preview of %s", "visual-portfolio"), item.title?.raw || item.title?.rendered || ""),
+			loading: "lazy",
+			tabIndex: -1,
+			style: {
+				width: VIEWPORT_WIDTH,
+				height: VIEWPORT_WIDTH,
+				transform: `translateY(${offset}px) scale(${scale})`
+			}
+		})]
 	});
 }
 
@@ -52577,7 +52647,7 @@ const fields = [
 	{
 		id: "preview",
 		label: (0, import_i18n.__)("Preview", "visual-portfolio"),
-		render: ({ item }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LayoutPreview, { preview: item.vpf_layout?.preview }),
+		render: ({ item }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LayoutPreview, { item }),
 		enableSorting: false,
 		enableHiding: false
 	},
