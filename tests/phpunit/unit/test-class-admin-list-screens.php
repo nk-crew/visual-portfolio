@@ -29,8 +29,21 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 			$this->registered_portfolio = true;
 		}
 
-		register_post_type( 'vpf_test_item', array( 'label' => 'Test Items' ) );
-		register_taxonomy( 'vpf_test_group', 'vpf_test_item', array( 'label' => 'Test Groups' ) );
+		register_post_type(
+			'vpf_test_item',
+			array(
+				'label'   => 'Test Items',
+				'show_ui' => true,
+			)
+		);
+		register_taxonomy(
+			'vpf_test_group',
+			'vpf_test_item',
+			array(
+				'label'   => 'Test Groups',
+				'show_ui' => true,
+			)
+		);
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 	}
 
@@ -186,7 +199,8 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 
 	/**
 	 * A user who can edit the items but cannot manage the groups gets no
-	 * Groups tab, unless the groups are the screen on view.
+	 * Groups tab, unless the groups are the screen on view, and no tab for a
+	 * taxonomy WordPress shows no screen for.
 	 */
 	public function test_tabs_leave_out_screens_the_user_cannot_open() {
 		register_taxonomy(
@@ -194,6 +208,16 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 			'vpf_test_item',
 			array(
 				'label'        => 'Test Labels',
+				'show_ui'      => true,
+				'capabilities' => array( 'manage_terms' => 'edit_posts' ),
+			)
+		);
+		register_taxonomy(
+			'vpf_test_hidden',
+			'vpf_test_item',
+			array(
+				'label'        => 'Test Hidden',
+				'show_ui'      => false,
 				'capabilities' => array( 'manage_terms' => 'edit_posts' ),
 			)
 		);
@@ -205,6 +229,11 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 					'label'    => 'Labels',
 					'url'      => 'http://example.org/wp-admin/edit-tags.php?taxonomy=vpf_test_label',
 					'taxonomy' => 'vpf_test_label',
+				);
+				$sections[] = array(
+					'label'    => 'Hidden',
+					'url'      => 'http://example.org/wp-admin/edit-tags.php?taxonomy=vpf_test_hidden',
+					'taxonomy' => 'vpf_test_hidden',
 				);
 
 				$screens[] = array(
@@ -225,6 +254,7 @@ class Test_Visual_Portfolio_Admin_List_Screens extends WP_UnitTestCase {
 		$groups = $this->header_on( 'edit-vpf_test_group' );
 
 		unregister_taxonomy( 'vpf_test_label' );
+		unregister_taxonomy( 'vpf_test_hidden' );
 
 		$this->assertStringContainsString( 'aria-current="page">Items</a><a href="http://example.org/wp-admin/edit-tags.php?taxonomy=vpf_test_label">Labels</a></nav>', $items );
 		$this->assertStringNotContainsString( 'Groups', $items );

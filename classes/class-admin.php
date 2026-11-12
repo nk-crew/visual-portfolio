@@ -243,8 +243,8 @@ class Visual_Portfolio_Admin {
 		 *   with `label`, `url`, and the `taxonomy` or `post_type` of the screen it
 		 *   opens, which marks the tab of the screen on view. Screens that share
 		 *   tabs list the same sections. A tab is printed only for the screen on
-		 *   view and for screens the current user can open (the post type's
-		 *   `edit_posts` or the taxonomy's `manage_terms` capability), and the tab
+		 *   view and for screens the current user can open (`show_ui`, and the
+		 *   post type's `edit_posts` or the taxonomy's `manage_terms`), and the tab
 		 *   bar only when two tabs or more remain. Its accessible name is the
 		 *   title of the first section's screen.
 		 * - `actions` (array, optional): buttons on the right of the title, each
@@ -286,13 +286,7 @@ class Visual_Portfolio_Admin {
 
 		foreach ( (array) $screens as $entry ) {
 			$key    = self::get_list_screen_key( $entry );
-			$object = null;
-
-			if ( $key ) {
-				list( $type, $name ) = explode( ':', $key, 2 );
-
-				$object = 'post' === $type ? get_post_type_object( $name ) : get_taxonomy( $name );
-			}
+			$object = $key ? self::get_list_screen_object( $key ) : null;
 
 			if ( ! $object ) {
 				continue;
@@ -371,15 +365,26 @@ class Visual_Portfolio_Admin {
 	 * @return bool
 	 */
 	private static function current_user_can_open( $key ) {
-		list( $type, $name ) = explode( ':', $key, 2 );
+		$object = self::get_list_screen_object( $key );
 
-		$object = 'post' === $type ? get_post_type_object( $name ) : get_taxonomy( $name );
-
-		if ( ! $object ) {
+		if ( ! $object || ! $object->show_ui ) {
 			return false;
 		}
 
-		return current_user_can( 'post' === $type ? $object->cap->edit_posts : $object->cap->manage_terms );
+		return current_user_can( $object instanceof WP_Post_Type ? $object->cap->edit_posts : $object->cap->manage_terms );
+	}
+
+	/**
+	 * The post type or taxonomy of a list screen key.
+	 *
+	 * @param string $key - `post:<post type>` or `term:<taxonomy>`.
+	 *
+	 * @return WP_Post_Type|WP_Taxonomy|null
+	 */
+	private static function get_list_screen_object( $key ) {
+		list( $type, $name ) = explode( ':', $key, 2 );
+
+		return 'post' === $type ? get_post_type_object( $name ) : get_taxonomy( $name );
 	}
 
 	/**
