@@ -154,7 +154,8 @@ class Visual_Portfolio_Loop_Gallery {
 	 * leads to it and the id the abilities name it by.
 	 *
 	 * The id is the loop's `block_id`. A loop without one, or holding one an
-	 * earlier loop already holds, is `loop-<n>`, its 1-based position; a
+	 * earlier block already holds (another loop or the legacy gallery block,
+	 * as the editor counts them), is `loop-<n>`, its 1-based position; a
 	 * gallery created at the start of the post moves those numbers.
 	 *
 	 * @param array $blocks - parsed blocks of the post.
@@ -162,15 +163,10 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @return array list of array( path, block, gallery_id ).
 	 */
 	public static function find_loops( $blocks ) {
-		$found = self::collect_loops( $blocks, array() );
+		$found = array();
 		$seen  = array();
 
-		foreach ( $found as $index => $loop ) {
-			$block_id = (string) ( $loop['block']['attrs']['block_id'] ?? '' );
-
-			$found[ $index ]['gallery_id'] = '' === $block_id || isset( $seen[ $block_id ] ) ? 'loop-' . ( $index + 1 ) : $block_id;
-			$seen[ $block_id ]             = true;
-		}
+		self::collect_loops( $blocks, array(), $found, $seen );
 
 		return $found;
 	}
@@ -180,28 +176,30 @@ class Visual_Portfolio_Loop_Gallery {
 	 *
 	 * @param array $blocks - parsed blocks.
 	 * @param array $path - path of the blocks given.
-	 *
-	 * @return array list of array( path, block ).
+	 * @param array $found - loops found so far.
+	 * @param array $seen - `block_id`s of the blocks walked so far.
 	 */
-	private static function collect_loops( $blocks, $path ) {
-		$found = array();
-
+	private static function collect_loops( $blocks, $path, &$found, &$seen ) {
 		foreach ( $blocks as $index => $block ) {
 			$block_path = array_merge( $path, array( $index ) );
+			$block_id   = (string) ( $block['attrs']['block_id'] ?? '' );
 
 			if ( self::LOOP === $block['blockName'] ) {
 				$found[] = array(
-					'path'  => $block_path,
-					'block' => $block,
+					'path'       => $block_path,
+					'block'      => $block,
+					'gallery_id' => '' === $block_id || isset( $seen[ $block_id ] ) ? 'loop-' . ( count( $found ) + 1 ) : $block_id,
 				);
 			}
 
+			if ( '' !== $block_id ) {
+				$seen[ $block_id ] = true;
+			}
+
 			if ( ! empty( $block['innerBlocks'] ) ) {
-				$found = array_merge( $found, self::collect_loops( $block['innerBlocks'], $block_path ) );
+				self::collect_loops( $block['innerBlocks'], $block_path, $found, $seen );
 			}
 		}
-
-		return $found;
 	}
 
 	/**
@@ -398,11 +396,12 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @return array|WP_Error loop block.
 	 */
 	private static function apply( $loop, $input, $action, $click_action = null ) {
+		$before   = $loop;
 		$source   = $input['source'] ?? null;
 		$previous = $loop['attrs']['queryType'] ?? 'posts';
 
 		if ( $source ) {
-			$loop = self::apply_source( $loop, $source, $previous, 'update' === $action && 'posts' === $previous ? 'portfolio' : 'post' );
+			$loop = self::apply_source( $loop, $source, 'update' === $action && 'posts' === $previous ? 'portfolio' : 'post' );
 
 			if ( is_wp_error( $loop ) ) {
 				return $loop;
@@ -425,18 +424,32 @@ class Visual_Portfolio_Loop_Gallery {
 		$loop = self::apply_images( $loop, $input );
 		$loop = self::apply_settings( $loop, $input['settings'] ?? array() );
 
+		// An images gallery has no pagination; the pages a gallery of
+		// another source now has get one, unless the call picked a layout,
+		// which brings its own.
+		if ( 'images' === $previous && 'images' !== $loop['attrs']['queryType'] && ! isset( $input['layout'] ) && -1 !== (int) ( $loop['attrs']['baseQuery']['perPage'] ?? 0 ) && ! self::find_block( $loop['innerBlocks'], self::PAGINATION ) ) {
+			$pagination = self::get_layout_pagination();
+
+			if ( $pagination ) {
+				$loop = self::set_inner_blocks( $loop, array_merge( $loop['innerBlocks'], array( $pagination ) ) );
+			}
+		}
+
 		/**
 		 * Filter a loop an ability built or changed.
 		 *
 		 * Runs after the free plugin applied what it knows of the input, so a
 		 * source type or a setting added through
-		 * `vpf_gallery_ability_vocabulary` is applied here.
+		 * `vpf_gallery_ability_vocabulary` is applied here. `sourceQuery`
+		 * keeps the keys of the source a loop leaves, as the editor's source
+		 * picker does; a source drops what it cannot read from `$before`.
 		 *
 		 * @param array  $loop   Parsed loop block.
 		 * @param array  $input  Ability input.
 		 * @param string $action `create` or `update`.
+		 * @param array  $before The loop before the change; on create, the layout's loop.
 		 */
-		$loop = apply_filters( 'vpf_gallery_ability_apply', $loop, $input, $action );
+		$loop = apply_filters( 'vpf_gallery_ability_apply', $loop, $input, $action, $before );
 
 		return $loop;
 	}
@@ -449,12 +462,11 @@ class Visual_Portfolio_Loop_Gallery {
 	 *
 	 * @param array  $loop - loop block.
 	 * @param array  $source - source input.
-	 * @param string $previous - source type of the loop before the change.
 	 * @param string $default_type - post type of a posts source that names none.
 	 *
 	 * @return array|WP_Error
 	 */
-	private static function apply_source( $loop, $source, $previous, $default_type ) {
+	private static function apply_source( $loop, $source, $default_type ) {
 		$type    = $source['type'];
 		$sources = self::get_vocabulary()['sources'];
 
@@ -500,9 +512,6 @@ class Visual_Portfolio_Loop_Gallery {
 			// A loop that already shows posts without a stored post type shows
 			// the block's default, which a partial update keeps.
 			$attrs['postsQuery'] = self::merge_posts_query( $attrs['postsQuery'] ?? array(), $source, $default_type );
-		} elseif ( $previous !== $type ) {
-			// `sourceQuery` belongs to one source; another source's keys would be read as its own.
-			$attrs['sourceQuery'] = $source['settings'] ?? array();
 		} elseif ( isset( $source['settings'] ) ) {
 			$attrs['sourceQuery'] = array_merge( $attrs['sourceQuery'] ?? array(), $source['settings'] );
 		}
@@ -602,16 +611,9 @@ class Visual_Portfolio_Loop_Gallery {
 		}
 
 		// "Every item on one page" is an images default; on posts it would
-		// put every post of the type on one page. The pages get the
-		// pagination the images default took away.
+		// put every post of the type on one page.
 		if ( -1 === (int) ( $loop['attrs']['baseQuery']['perPage'] ?? 0 ) ) {
 			$loop['attrs']['baseQuery']['perPage'] = 6;
-
-			$pagination = self::get_layout_pagination();
-
-			if ( $pagination && ! self::find_block( $loop['innerBlocks'], self::PAGINATION ) ) {
-				$loop = self::set_inner_blocks( $loop, array_merge( $loop['innerBlocks'], array( $pagination ) ) );
-			}
 		}
 
 		return self::set_click_action(
@@ -628,7 +630,15 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @return array|null
 	 */
 	private static function get_layout_pagination() {
-		foreach ( self::get_layouts() as $layout ) {
+		$layouts = self::get_layouts();
+
+		// The plugin's own paged grid first, so a theme's pattern registered
+		// earlier does not decide the pagination.
+		if ( isset( $layouts['visual-portfolio/gallery-posts-paged'] ) ) {
+			$layouts = array( $layouts['visual-portfolio/gallery-posts-paged'] ) + $layouts;
+		}
+
+		foreach ( $layouts as $layout ) {
 			foreach ( $layout['loop']['innerBlocks'] as $block ) {
 				if ( self::PAGINATION === $block['blockName'] ) {
 					return $block;

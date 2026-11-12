@@ -1055,7 +1055,10 @@ which the plugin merges into the loop's `sourceQuery`. `get-gallery` reports
 them the same way, so an agent can send a gallery back unchanged.
 
 `vpf_gallery_ability_apply` filters the parsed loop after the plugin applied
-what it knows, with the ability input and the action, `create` or `update`.
+what it knows, with the ability input, the action, `create` or `update`, and the
+loop before the change (on create, the layout's loop). A switch to another
+source keeps the keys `sourceQuery` held, as the editor's source picker does,
+so a source drops the keys of the source before it that it would misread.
 Fields declared at the top level of the source, and settings added above, are
 turned into attributes here.
 

@@ -25,7 +25,7 @@ WordPress plugin: portfolio / gallery layouts and Gutenberg integration. PHP bac
 - `build/` is generated — edit sources, never the bundles.
 - AI agents reach the Gallery Loop through the abilities in `classes/class-abilities.php`.
   A change to what a loop can be made of (a block attribute, a layout type, a content
-  source, a pattern, a default the editor applies) changes them in the same diff;
+  source, a default the editor applies) changes them in the same diff;
   `tests/phpunit/unit/test-class-abilities-coverage.php` fails until it does.
 - Do not run packaging/release commands (`build:prod`, `zip`, `bump:*`) unless the user asks.
 

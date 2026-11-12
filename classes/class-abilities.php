@@ -276,7 +276,8 @@ class Visual_Portfolio_Abilities {
 	}
 
 	/**
-	 * Permission: may edit the post the input names, or create a page.
+	 * Permission: may edit the post the input names, or create the draft a
+	 * gallery without a post goes into.
 	 *
 	 * @param array $input - ability input.
 	 *

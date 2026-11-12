@@ -158,15 +158,21 @@ class Test_Class_Abilities_Coverage extends WP_UnitTestCase {
 	public function test_every_editor_source_is_in_the_vocabulary() {
 		$names = array();
 
-		foreach ( array( 'images', 'posts', 'pro-sources' ) as $file ) {
-			preg_match_all( "/^\\s*name:\\s*'([a-z0-9\\/-]+)',\\s*$/m", $this->read( 'gutenberg/loop-sources/' . $file . '.js' ), $found );
+		foreach ( glob( visual_portfolio()->plugin_path . 'gutenberg/loop-sources/*.js' ) as $file ) {
+			$script = (string) file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+			// A source registered with its name written in the call.
+			preg_match_all( "/registerLoopSource\\(\\s*\\{\\s*name:\\s*'([^']+)'/", $script, $found );
 			$names = array_merge( $names, $found[1] );
+
+			// The Pro sources, registered from a list for the teasers.
+			if ( preg_match( '/const PRO_SOURCES = \\[(.*?)\\n\\];/s', $script, $list ) ) {
+				preg_match_all( "/^\\t\\tname: '([^']+)'/m", $list[1], $found );
+				$names = array_merge( $names, $found[1] );
+			}
 		}
 
-		// `posts.js` also names the filters Pro adds to a posts query.
-		$names = array_diff( $names, array( 'date', 'exclude-no-thumb' ) );
-
-		$this->assertNotEmpty( $names );
+		$this->assertEqualsCanonicalizing( array( 'images', 'posts', 'taxonomies', 'social-stream' ), array_intersect( $names, array( 'images', 'posts', 'taxonomies', 'social-stream' ) ), 'The source scan no longer finds the known sources: fix the patterns above.' );
 		$this->assertSame(
 			array(),
 			array_values( array_diff( $names, array_keys( Visual_Portfolio_Loop_Gallery::get_vocabulary()['sources'] ) ) ),
@@ -180,6 +186,12 @@ class Test_Class_Abilities_Coverage extends WP_UnitTestCase {
 	 */
 	public function test_layout_defaults_match_the_editor() {
 		$script = $this->read( 'gutenberg/blocks/loop/layout-defaults.js' );
+
+		$this->assertSame(
+			'f2740c09987dfc2070ec8fb65b10cd6e06196b0f',
+			sha1( $script ),
+			'gutenberg/blocks/loop/layout-defaults.js changed: make Visual_Portfolio_Loop_Gallery::apply_layout_defaults() do the same, then put the new sha1 of the file here.'
+		);
 
 		preg_match( "/PAGINATION_NAME = '([^']+)'/", $script, $pagination );
 		preg_match( '/CLICKABLE_NAMES = \\[([^\\]]+)\\]/', $script, $clickable );
