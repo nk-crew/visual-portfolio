@@ -365,7 +365,7 @@ class Visual_Portfolio_Custom_Post_Type {
 			return;
 		}
 
-		$check_string = self::get_updated_caps_check_string( true );
+		$check_string = self::get_updated_caps_check_string( true, visual_portfolio()->is_pro() );
 
 		if ( ! $force && get_option( 'visual_portfolio_updated_caps' ) === $check_string ) {
 			return;
@@ -424,17 +424,30 @@ class Visual_Portfolio_Custom_Post_Type {
 	/**
 	 * Sync roles when portfolio post type is disabled.
 	 *
-	 * Keeps Portfolio Manager for Saved Layouts, removes Portfolio Author.
-	 *
 	 * @param bool $force Force capabilities sync.
 	 * @return void
 	 */
 	public static function sync_roles_without_portfolio( $force = false ) {
+		self::sync_roles_without_portfolio_post_type( $force, visual_portfolio()->is_pro() );
+	}
+
+	/**
+	 * Sync roles when portfolio post type is disabled.
+	 *
+	 * Keeps Portfolio Manager for Saved Layouts. Pro's post types use the
+	 * portfolio capabilities, so while Pro is active the administrator and
+	 * editor keep them and Portfolio Author stays; without Pro they are removed.
+	 *
+	 * @param bool $force  Force capabilities sync.
+	 * @param bool $is_pro Is Visual Portfolio Pro active.
+	 * @return void
+	 */
+	private static function sync_roles_without_portfolio_post_type( $force, $is_pro ) {
 		if ( ! is_blog_installed() ) {
 			return;
 		}
 
-		$check_string = self::get_updated_caps_check_string( false );
+		$check_string = self::get_updated_caps_check_string( false, $is_pro );
 
 		if ( ! $force && get_option( 'visual_portfolio_updated_caps' ) === $check_string ) {
 			return;
@@ -452,19 +465,31 @@ class Visual_Portfolio_Custom_Post_Type {
 			return;
 		}
 
-		foreach ( self::get_portfolio_caps() as $cap ) {
-			self::remove_cap_from_roles(
-				array(
-					'portfolio_manager',
-					'portfolio_author',
-					'administrator',
-					'editor',
-				),
-				$cap
-			);
-		}
+		if ( $is_pro ) {
+			foreach ( self::get_portfolio_caps() as $cap ) {
+				self::add_cap_to_roles(
+					array(
+						'administrator',
+						'editor',
+					),
+					$cap
+				);
+			}
+		} else {
+			foreach ( self::get_portfolio_caps() as $cap ) {
+				self::remove_cap_from_roles(
+					array(
+						'portfolio_manager',
+						'portfolio_author',
+						'administrator',
+						'editor',
+					),
+					$cap
+				);
+			}
 
-		remove_role( 'portfolio_author' );
+			remove_role( 'portfolio_author' );
+		}
 
 		$wp_roles->add_role(
 			'portfolio_manager',
@@ -569,12 +594,13 @@ class Visual_Portfolio_Custom_Post_Type {
 	 * Get option value used to skip repeated capabilities sync.
 	 *
 	 * @param bool $portfolio_post_type_registered Is portfolio post type registered.
+	 * @param bool $is_pro                         Is Visual Portfolio Pro active.
 	 * @return string
 	 */
-	private static function get_updated_caps_check_string( $portfolio_post_type_registered ) {
+	private static function get_updated_caps_check_string( $portfolio_post_type_registered, $is_pro ) {
 		global $wp_version;
 
-		return 'Plugin: ' . VISUAL_PORTFOLIO_VERSION . ' WP: ' . $wp_version . ' Portfolio: ' . ( $portfolio_post_type_registered ? '1' : '0' );
+		return 'Plugin: ' . VISUAL_PORTFOLIO_VERSION . ' WP: ' . $wp_version . ' Portfolio: ' . ( $portfolio_post_type_registered ? '1' : '0' ) . ' Pro: ' . ( $is_pro ? '1' : '0' );
 	}
 
 	/**
