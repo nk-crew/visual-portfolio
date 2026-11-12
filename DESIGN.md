@@ -1,6 +1,6 @@
 # Settings screens
 
-General, Images and Popup & Lightbox use WordPress Gutenberg controls within the existing plugin navigation, white content area and sticky Save Changes footer. Other settings tabs retain their existing renderer and styling.
+Settings is a framed page (see Plugin admin pages). Its tabs are the header's sections, each group of settings is a card on the white page, and the tab on screen puts its own Save Changes button where the header's action goes; below 783px it stays at the bottom of the screen. General, Images and Popup & Lightbox use WordPress Gutenberg controls with one label style; the tabs the Settings API draws itself, Pro's among them, keep their renderer inside a card.
 
 Primary settings stay visible. Advanced or infrequently changed settings use collapsed groups. General groups custom taxonomies, performance and responsive breakpoints. Images groups independent layout and lightbox image sizes. Popup shows Behavior, Controls and Appearance before thumbnails, Albums, Quick View and Advanced.
 

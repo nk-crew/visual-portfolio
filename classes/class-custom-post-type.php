@@ -1118,27 +1118,26 @@ class Visual_Portfolio_Custom_Post_Type {
 					'utm_campaign' => 'proofing',
 				)
 			);
+			echo '<div class="vpf-admin-page">';
+			Visual_Portfolio_Admin::print_page_header(
+				array(
+					'title'       => esc_html__( 'Proofing', 'visual-portfolio' ),
+					'description' => esc_html__( 'Send a collection of photographs to your client for approval.', 'visual-portfolio' ),
+				)
+			);
 			?>
-			<table class="form-table" role="presentation">
-				<tbody>
-					<tr class="pro_info vpf-setting-type-html">
-						<td>
-							<div class="vpf-pro-note vpf-settings-info-pro">
-								<h3>
-									<?php echo esc_html__( 'Premium Only', 'visual-portfolio' ); ?>
-								</h3>
-								<div>
-									<p class="vpf-pro-note-description"><?php echo esc_html__( 'Send a collection of photographs to your client for approval.', 'visual-portfolio' ); ?></p>
-									<a class="vpf-pro-note-button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( $pro_url ); ?>">
-									<?php echo esc_html__( 'Go Pro', 'visual-portfolio' ); ?>
-									</a>
-								</div>
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+			<div class="vpf-admin-page__content">
+				<div class="vpf-admin-page__upsell">
+					<h2><?php echo esc_html__( 'Proofing comes with Visual Portfolio Pro', 'visual-portfolio' ); ?></h2>
+					<p><?php echo esc_html__( 'Collaborate with clients on image selections and benefit from self-healing proofing permalinks.', 'visual-portfolio' ); ?></p>
+					<a class="components-button is-primary is-next-40px-default-size" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( $pro_url ); ?>">
+						<?php echo esc_html__( 'Go Pro', 'visual-portfolio' ); ?>
+						<span class="screen-reader-text"><?php echo esc_html__( '(opens in a new tab)', 'visual-portfolio' ); ?></span>
+					</a>
+				</div>
+			</div>
 			<?php
+			echo '</div>';
 		}
 	}
 }

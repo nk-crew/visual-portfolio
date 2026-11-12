@@ -19,7 +19,7 @@ class Visual_Portfolio_Admin {
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'enqueue_block_assets', array( $this, 'saved_layouts_editor_enqueue_scripts' ) );
-		add_action( 'in_admin_header', array( $this, 'in_admin_header' ) );
+		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ) );
 
 		// Pro link.
@@ -71,6 +71,13 @@ class Visual_Portfolio_Admin {
 		Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-admin', 'build/assets/admin/css/style' );
 		wp_style_add_data( 'visual-portfolio-admin', 'rtl', 'replace' );
 		wp_style_add_data( 'visual-portfolio-admin', 'suffix', '.min' );
+
+		global $plugin_page;
+
+		if ( in_array( $plugin_page, self::FRAMED_PAGES, true ) ) {
+			Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-admin-page', 'build/assets/admin/css/admin-page', array( 'wp-components' ) );
+			wp_style_add_data( 'visual-portfolio-admin-page', 'rtl', 'replace' );
+		}
 	}
 
 	/**
@@ -138,97 +145,54 @@ class Visual_Portfolio_Admin {
 	}
 
 	/**
-	 * Admin navigation.
+	 * Pages the plugin draws in its own frame, by `page` slug.
 	 */
-	public function in_admin_header() {
-		if ( ! function_exists( 'get_current_screen' ) ) {
-			return;
-		}
+	const FRAMED_PAGES = array( 'visual-portfolio-settings', 'vpf_proofing_page', 'vpf-saved-layouts' );
 
-		$screen = get_current_screen();
+	/**
+	 * Mark the plugin's framed pages, so they share one look.
+	 *
+	 * @param string $classes - body classes.
+	 *
+	 * @return string
+	 */
+	public function admin_body_class( $classes ) {
+		global $plugin_page;
 
-		$is_settings = ( isset( $screen->post_type ) && isset( $screen->id ) && 'toplevel_page_visual-portfolio-settings' === $screen->id ) ? true : false;
+		return in_array( $plugin_page, self::FRAMED_PAGES, true ) ? $classes . ' vpf-admin-page-screen' : $classes;
+	}
 
-		// Determine if the current page being viewed is "Lazy Blocks" related.
-		if (
-			! isset( $screen->post_type ) ||
-			(
-				'portfolio' !== $screen->post_type &&
-				'vp_lists' !== $screen->post_type &&
-				'vp_proofing' !== $screen->post_type &&
-				! $is_settings
-			) ||
-			( isset( $screen->is_block_editor ) && $screen->is_block_editor() )
-		) {
-			return;
-		}
-
-		global $submenu, $submenu_file, $plugin_page;
-
-		$parent_slug = Visual_Portfolio_Custom_Post_Type::get_menu_slug();
-		$tabs        = array();
-
-		// Generate array of navigation items.
-		if ( isset( $submenu[ $parent_slug ] ) ) {
-			foreach ( $submenu[ $parent_slug ] as $sub_item ) {
-
-				// Check user can access page.
-				if ( ! current_user_can( $sub_item[1] ) ) {
-					continue;
-				}
-
-				// Ignore "Add New".
-				if ( 'post-new.php?post_type=portfolio' === $sub_item[2] ) {
-					continue;
-				}
-
-				// Define tab.
-				$tab = array(
-					'text' => $sub_item[0],
-					'url'  => $sub_item[2],
-				);
-
-				// Convert submenu slug "test" to "$parent_slug&page=test".
-				if ( ! strpos( $sub_item[2], '.php' ) && 0 !== strpos( $sub_item[2], 'https://' ) ) {
-					$tab['url'] = add_query_arg( array( 'page' => $sub_item[2] ), $parent_slug );
-				}
-
-				// Fixed Settings tab url if Portfolio Post Type disabled.
-				if ( 'visual-portfolio-settings' === $parent_slug && 'visual-portfolio-settings' === $sub_item[2] ) {
-					$tab['url'] = 'admin.php?page=' . $parent_slug;
-				}
-
-				// Detect active state.
-				if ( $submenu_file === $sub_item[2] || $plugin_page === $sub_item[2] ) {
-					$tab['is_active'] = true;
-				}
-
-				$tabs[] = $tab;
-			}
-		}
-
-		// Bail early if set to false.
-		if ( false === $tabs ) {
-			return;
-		}
-
+	/**
+	 * Print the header of a framed page: the title, what the page is for, its
+	 * actions and its sections. The markup is the one of the React frame,
+	 * `assets/admin/pages/components/page.js`.
+	 *
+	 * @param array $args - `title`, `description`, and the HTML of `actions` and `sections`, escaped by the caller.
+	 */
+	public static function print_page_header( $args ) {
 		?>
-		<div class="vpf-admin-toolbar">
-			<h2>
-				<i class="dashicons-visual-portfolio"></i>
-				<?php echo esc_html( visual_portfolio()->plugin_name ); ?>
-			</h2>
+		<header class="vpf-admin-page__header">
+			<div class="vpf-admin-page__heading">
+				<div class="vpf-admin-page__titles">
+					<h1><?php echo esc_html( $args['title'] ); ?></h1>
+					<?php if ( ! empty( $args['description'] ) ) : ?>
+						<p><?php echo esc_html( $args['description'] ); ?></p>
+					<?php endif; ?>
+				</div>
+				<?php if ( ! empty( $args['actions'] ) ) : ?>
+					<div class="vpf-admin-page__actions">
+						<?php
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by the caller.
+						echo $args['actions'];
+						?>
+					</div>
+				<?php endif; ?>
+			</div>
 			<?php
-			foreach ( $tabs as $tab ) {
-				printf(
-					'<a class="vpf-admin-toolbar-tab%s" href="%s">%s</a>',
-					! empty( $tab['is_active'] ) ? ' is-active' : '',
-					esc_url( $tab['url'] ),
-					wp_kses_post( $tab['text'] )
-				);
-			}
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by the caller.
+			echo $args['sections'] ?? '';
 			?>
-		</div>
+		</header>
 		<?php
 	}
 

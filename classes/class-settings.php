@@ -974,13 +974,31 @@ class Visual_Portfolio_Settings {
 	 * @return void
 	 */
 	public static function print_settings_page() {
-		echo '<div class="wrap">';
-		echo '<h2>' . esc_html__( 'Settings', 'visual-portfolio' ) . '</h2>';
+		$preview  = visual_portfolio()->is_pro() ? array() : self::get_pro_settings_preview();
+		$sections = '';
 
-		self::$settings_api->show_navigation();
+		foreach ( self::get_settings_sections() as $section ) {
+			$sections .= sprintf(
+				'<a href="#%1$s" class="nav-tab" id="%1$s-tab">%2$s%3$s</a>',
+				esc_attr( $section['id'] ),
+				esc_html( wp_strip_all_tags( $section['title'] ) ),
+				isset( $preview[ $section['id'] ] ) ? '<span class="vpf-admin-page__badge">' . esc_html__( 'Pro', 'visual-portfolio' ) . '</span>' : ''
+			);
+		}
+
+		echo '<div class="vpf-admin-page vpf-settings-page">';
+
+		Visual_Portfolio_Admin::print_page_header(
+			array(
+				'title'       => esc_html__( 'Settings', 'visual-portfolio' ),
+				'description' => esc_html__( 'Defaults for every gallery on this site.', 'visual-portfolio' ),
+				'sections'    => '<nav class="vpf-admin-page__sections nav-tab-wrapper" aria-label="' . esc_attr__( 'Settings sections', 'visual-portfolio' ) . '">' . $sections . '</nav>',
+			)
+		);
+
+		echo '<div class="vpf-admin-page__content">';
 		self::$settings_api->show_forms();
-
-		echo '</div>';
+		echo '</div></div>';
 
 		?>
 		<script>
