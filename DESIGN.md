@@ -16,6 +16,8 @@ Screens the plugin draws itself are React pages in one frame (`assets/admin/page
 
 Core list screens (Projects, Categories, Tags, and Pro's Proofing list) keep WordPress's rendering, since other plugins extend them. They get the frame's header above it, with Projects, Categories and Tags as its sections and the Add New link as its action, and WordPress's own title is hidden.
 
+A list screen gets this header by an entry in the `vpf_admin_list_screens` filter (`classes/class-admin.php`): its post type or taxonomy, a title (the name label by default), one line on what it is for, its sections, and its actions (Add New on a post type's list by default). Lists that belong together, such as a post type and its taxonomy, carry the same sections, so they read as one page with tabs. Pro registers its own screens there.
+
 # Saved Layouts library
 
 The Saved Layouts screen is a plugin admin page (see Plugin admin pages) with DataViews. It takes its type, spacing and colors from WordPress's components and adds no values of its own beyond the layout preview and the Legacy badge. Search, filters and, in the grid and list, Select all share one toolbar row; the grid has no select-all row of its own.
