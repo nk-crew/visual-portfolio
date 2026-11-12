@@ -167,11 +167,12 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 	/**
 	 * Labels of the filter items the editor endpoint answers with.
 	 *
-	 * @param array $posts_query - `postsQuery` of the loop.
+	 * @param array      $posts_query - `postsQuery` of the loop.
+	 * @param array|null $extensions  - `extensions` of the filter block.
 	 *
 	 * @return array
 	 */
-	private function request_labels( $posts_query ) {
+	private function request_labels( $posts_query, $extensions = null ) {
 		global $wp_rest_server;
 
 		$wp_rest_server = new WP_REST_Server();
@@ -182,9 +183,12 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 		$request->set_header( 'Content-Type', 'application/json' );
 		$request->set_body(
 			wp_json_encode(
-				array(
-					'queryType'  => 'posts',
-					'postsQuery' => $posts_query,
+				array_filter(
+					array(
+						'queryType'  => 'posts',
+						'postsQuery' => $posts_query,
+						'extensions' => $extensions,
+					)
 				)
 			)
 		);
@@ -809,5 +813,37 @@ class ClassLoopFilterTerms extends WP_UnitTestCase {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
 
 		$this->assertSame( array( 'All', 'Delta' ), $this->request_labels( $query ) );
+	}
+
+	/**
+	 * An extension decides the terms the editor lists, from the block's
+	 * extension settings.
+	 *
+	 * @return void
+	 */
+	public function test_an_extension_decides_the_terms_the_editor_lists() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+
+		$seen  = null;
+		$alone = function ( $terms, $extensions ) use ( &$seen ) {
+			$seen = $extensions;
+
+			return array_values( wp_list_filter( $terms, array( 'label' => 'Gamma' ) ) );
+		};
+
+		add_filter( 'vpf_rest_filter_terms', $alone, 10, 2 );
+
+		$labels = $this->request_labels(
+			array(
+				'source' => 'ids',
+				'ids'    => array( self::$posts[0], self::$posts[3] ),
+			),
+			array( 'facet' => array( 'by' => 'category' ) )
+		);
+
+		remove_filter( 'vpf_rest_filter_terms', $alone, 10 );
+
+		$this->assertSame( array( 'All', 'Gamma' ), $labels );
+		$this->assertSame( array( 'facet' => array( 'by' => 'category' ) ), $seen );
 	}
 }

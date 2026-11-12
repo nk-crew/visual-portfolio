@@ -64,6 +64,12 @@
 		"showCount": { "type": "boolean", "default": false },
 		"showAllItem": { "type": "boolean", "default": true },
 		"displayAsDropdown": { "type": "boolean", "default": false },
+		"label": { "type": "string", "default": "" },
+		"order": {
+			"type": "string",
+			"enum": ["manual", "name", "count"],
+			"default": "manual"
+		},
 		"extensions": { "type": "object", "default": {} }
 	},
 	"style": "visual-portfolio-block-loop-filter"
