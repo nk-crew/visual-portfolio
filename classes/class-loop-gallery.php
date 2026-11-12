@@ -41,6 +41,14 @@ class Visual_Portfolio_Loop_Gallery {
 	const POSTS_SELECTORS = array( 'ids', 'current_query', 'custom_query', 'post_types_set' );
 
 	/**
+	 * Attributes that describe a block rather than set it up, which a synced
+	 * loop never overrides, as in `gutenberg/extensions/saved-layout-sync/utils.js`.
+	 *
+	 * @var array
+	 */
+	const NOT_SETTINGS = array( 'lock', 'metadata' );
+
+	/**
 	 * Sources and settings the abilities accept.
 	 *
 	 * @return array
@@ -234,13 +242,17 @@ class Visual_Portfolio_Loop_Gallery {
 	}
 
 	/**
-	 * A loop in the words of the abilities.
+	 * A loop in the words of the abilities, as the page renders it.
 	 *
 	 * @param array $loop - loop block.
 	 *
 	 * @return array
 	 */
 	public static function describe( $loop ) {
+		if ( self::get_saved_layout_id( $loop ) ) {
+			$loop = Visual_Portfolio_Saved_Layouts::apply_layout( $loop );
+		}
+
 		$attrs      = $loop['attrs'];
 		$query_type = $attrs['queryType'] ?? 'posts';
 		$template   = self::find_block( $loop['innerBlocks'], self::TEMPLATE );
@@ -321,7 +333,7 @@ class Visual_Portfolio_Loop_Gallery {
 	 * A new loop: the loop of a layout, with a source and settings.
 	 *
 	 * @param string $layout - layout slug.
-	 * @param array  $input - `source` and `settings`.
+	 * @param array  $input - `source`, `settings` and `saved_layout`.
 	 * @param array  $blocks - parsed blocks of the post it goes into.
 	 *
 	 * @return array|WP_Error loop block.
@@ -338,14 +350,24 @@ class Visual_Portfolio_Loop_Gallery {
 		$loop['attrs']['block_id'] = self::get_free_block_id( $blocks );
 		$loop['attrs']['queryId']  = self::get_free_query_id( $blocks );
 
-		return self::apply( $loop, $input, 'create', null, $loop );
+		$before = $loop;
+
+		if ( ! empty( $input['saved_layout'] ) ) {
+			$loop = self::set_saved_layout( $loop, $input['saved_layout'] );
+
+			if ( is_wp_error( $loop ) ) {
+				return $loop;
+			}
+		}
+
+		return self::apply( $loop, $input, 'create', null, $before );
 	}
 
 	/**
 	 * A changed loop.
 	 *
 	 * @param array $loop - loop block.
-	 * @param array $input - `layout`, `source`, `settings` and the image operations.
+	 * @param array $input - `saved_layout`, `layout`, `source`, `settings` and the image operations.
 	 * @param array $blocks - parsed blocks of the post it is in.
 	 * @param int   $index - 0-based position of the loop among the loops of the post.
 	 *
@@ -369,9 +391,32 @@ class Visual_Portfolio_Loop_Gallery {
 			$loop['attrs']['queryId'] = self::get_free_query_id( $blocks );
 		}
 
+		// The rest of the call changes the loop as it is once synced or detached.
+		if ( array_key_exists( 'saved_layout', $input ) ) {
+			$loop = self::set_saved_layout( $loop, $input['saved_layout'] );
+
+			if ( is_wp_error( $loop ) ) {
+				return $loop;
+			}
+		}
+
 		$click_action = null;
 
 		if ( isset( $input['layout'] ) ) {
+			$saved_layout = self::get_saved_layout_id( $loop );
+
+			if ( $saved_layout ) {
+				return new WP_Error(
+					'vpf_synced_layout',
+					sprintf(
+						// translators: %1$s - Saved Layout title, %2$d - Saved Layout id.
+						__( 'This gallery is synced with the Saved Layout “%1$s” (%2$d), which provides its layout. To change the layout, pass `saved_layout: null` in the same call: the gallery then detaches, keeping its current look, and takes the new layout.', 'visual-portfolio' ),
+						self::get_saved_layout_title( $saved_layout ),
+						$saved_layout
+					)
+				);
+			}
+
 			$layouts = self::get_layouts();
 
 			if ( ! isset( $layouts[ $input['layout'] ] ) ) {
@@ -418,6 +463,63 @@ class Visual_Portfolio_Loop_Gallery {
 	 * @return array|WP_Error loop block.
 	 */
 	private static function apply( $loop, $input, $action, $click_action, $before ) {
+		$id = self::get_saved_layout_id( $loop );
+
+		if ( ! $id ) {
+			return self::apply_input( $loop, $input, $action, $click_action, $before );
+		}
+
+		// A synced loop changes the way the editor changes it: on what the
+		// page shows, each setting the layout provides that the call changed
+		// becoming an override.
+		$merged  = Visual_Portfolio_Saved_Layouts::apply_layout( $loop );
+		$changed = self::apply_input( $merged, $input, $action, $click_action, $before );
+
+		if ( is_wp_error( $changed ) ) {
+			return $changed;
+		}
+
+		$names = self::get_changed_synced_names( $merged, $changed );
+
+		if ( empty( $names ) ) {
+			return $changed;
+		}
+
+		if ( Visual_Portfolio_Saved_Layouts::is_locked( $id ) ) {
+			return new WP_Error(
+				'vpf_saved_layout_locked',
+				sprintf(
+					// translators: %s - Saved Layout title.
+					__( 'The Saved Layout “%s” is locked: a gallery synced with it cannot change the settings the layout provides, such as the columns, the lightbox and the item blocks. Edit the Saved Layout, or pass `saved_layout: null` in the same call to detach the gallery first.', 'visual-portfolio' ),
+					self::get_saved_layout_title( $id )
+				)
+			);
+		}
+
+		$overrides = Visual_Portfolio_Saved_Layouts::sanitize_overrides( $changed['attrs']['savedLayout']['overrides'] ?? array() );
+
+		foreach ( $names as $key => $list ) {
+			$overrides[ $key ] = array_values( array_unique( array_merge( $overrides[ $key ] ?? array(), $list ) ) );
+		}
+
+		$changed['attrs']['savedLayout']['overrides'] = $overrides;
+
+		return $changed;
+	}
+
+	/**
+	 * Apply a source, the layout defaults, settings and image operations to
+	 * the blocks of a loop as they are.
+	 *
+	 * @param array       $loop - loop block.
+	 * @param array       $input - ability input.
+	 * @param string      $action - `create` or `update`.
+	 * @param string|null $click_action - click action to keep over the layout's.
+	 * @param array       $before - the loop before the change; on create, the layout's loop.
+	 *
+	 * @return array|WP_Error loop block.
+	 */
+	private static function apply_input( $loop, $input, $action, $click_action, $before ) {
 		$source   = $input['source'] ?? null;
 		$previous = $loop['attrs']['queryType'] ?? 'posts';
 
@@ -607,11 +709,17 @@ class Visual_Portfolio_Loop_Gallery {
 	 * What a gallery starts with for its source, see
 	 * `gutenberg/blocks/loop/layout-defaults.js`.
 	 *
+	 * The item blocks of a synced loop come from its layout, so their click
+	 * action stays the layout's, as it does when the source changes in the
+	 * editor.
+	 *
 	 * @param array $loop - loop block.
 	 *
 	 * @return array
 	 */
 	private static function apply_layout_defaults( $loop ) {
+		$synced = (bool) self::get_saved_layout_id( $loop );
+
 		if ( 'images' === ( $loop['attrs']['queryType'] ?? 'posts' ) ) {
 			$inner = array_values(
 				array_filter(
@@ -626,16 +734,22 @@ class Visual_Portfolio_Loop_Gallery {
 				$loop = self::set_inner_blocks( $loop, $inner );
 			}
 
-			$loop = self::set_click_action(
-				$loop,
-				function () {
-					return 'popup';
-				}
-			);
+			if ( ! $synced ) {
+				$loop = self::set_click_action(
+					$loop,
+					function () {
+						return 'popup';
+					}
+				);
+			}
 
 			$loop['attrs']['baseQuery']            = $loop['attrs']['baseQuery'] ?? array();
 			$loop['attrs']['baseQuery']['perPage'] = -1;
 
+			return $loop;
+		}
+
+		if ( $synced ) {
 			return $loop;
 		}
 
@@ -932,6 +1046,138 @@ class Visual_Portfolio_Loop_Gallery {
 	}
 
 	/**
+	 * Id of the Saved Layout a loop is synced with.
+	 *
+	 * @param array $loop - loop block.
+	 *
+	 * @return int 0 when it is not synced.
+	 */
+	public static function get_saved_layout_id( $loop ) {
+		return (int) ( $loop['attrs']['savedLayout']['id'] ?? 0 );
+	}
+
+	/**
+	 * Title of a Saved Layout, as the editor shows it.
+	 *
+	 * @param int $id - layout id.
+	 *
+	 * @return string
+	 */
+	private static function get_saved_layout_title( $id ) {
+		return html_entity_decode( get_the_title( $id ), ENT_QUOTES, 'UTF-8' );
+	}
+
+	/**
+	 * A loop synced with a block-based Saved Layout, or detached from its own.
+	 *
+	 * Syncing takes the layout's item template and no overrides, as the
+	 * editor's Saved Layout panel links a gallery; the layout the loop already
+	 * follows keeps its overrides. Detaching keeps what the page shows.
+	 *
+	 * @param array    $loop - loop block.
+	 * @param int|null $id - layout id; null or 0 detaches.
+	 *
+	 * @return array|WP_Error
+	 */
+	private static function set_saved_layout( $loop, $id ) {
+		$id      = (int) $id;
+		$current = self::get_saved_layout_id( $loop );
+
+		if ( $id === $current ) {
+			return $loop;
+		}
+
+		if ( ! $id ) {
+			return Visual_Portfolio_Saved_Layout_Usage::detach_loop( $loop, Visual_Portfolio_Saved_Layouts::get_layout_loop( $current ), Visual_Portfolio_Saved_Layouts::is_locked( $current ) );
+		}
+
+		$layout = Visual_Portfolio_Saved_Layouts::get_layout_loop( $id );
+
+		if ( ! $layout || ! in_array( self::TEMPLATE, array_column( $layout['innerBlocks'], 'blockName' ), true ) ) {
+			return self::unknown_saved_layout( $id );
+		}
+
+		// A loop saved empty takes the layout's blocks, as a layout change does.
+		if ( ! in_array( self::TEMPLATE, array_column( $loop['innerBlocks'], 'blockName' ), true ) ) {
+			$loop = self::set_inner_blocks( $loop, $layout['innerBlocks'] );
+		}
+
+		$loop['attrs']['savedLayout'] = array(
+			'id'        => $id,
+			'overrides' => (object) array(),
+		);
+
+		return Visual_Portfolio_Saved_Layouts::apply_layout( $loop, $layout, false );
+	}
+
+	/**
+	 * Settings the layout provides that differ between two states of a synced
+	 * loop, by sync key: what the editor's `getPatch()` in
+	 * `gutenberg/extensions/saved-layout-sync/controller.js` compares.
+	 *
+	 * @param array $before - the loop before the change.
+	 * @param array $after - the loop after it.
+	 *
+	 * @return array attribute names, keyed by sync key.
+	 */
+	private static function get_changed_synced_names( $before, $after ) {
+		$names = array();
+
+		foreach ( Visual_Portfolio_Saved_Layouts::LOOP_SYNCED_ATTRIBUTES as $name ) {
+			if ( wp_json_encode( $before['attrs'][ $name ] ?? null ) !== wp_json_encode( $after['attrs'][ $name ] ?? null ) ) {
+				$names[ Visual_Portfolio_Saved_Layouts::LOOP_KEY ][] = $name;
+			}
+		}
+
+		$old = self::index_synced_blocks( $before );
+
+		foreach ( self::index_synced_blocks( $after ) as $key => $block ) {
+			if ( ! isset( $old[ $key ] ) ) {
+				continue;
+			}
+
+			foreach ( array_keys( $old[ $key ]['attrs'] + $block['attrs'] ) as $name ) {
+				if ( in_array( $name, self::NOT_SETTINGS, true ) ) {
+					continue;
+				}
+
+				if ( wp_json_encode( $old[ $key ]['attrs'][ $name ] ?? null ) !== wp_json_encode( $block['attrs'][ $name ] ?? null ) ) {
+					$names[ $key ][] = $name;
+				}
+			}
+		}
+
+		return $names;
+	}
+
+	/**
+	 * The item template of a loop and the blocks inside it, by sync key.
+	 *
+	 * @param array $loop - loop block.
+	 *
+	 * @return array
+	 */
+	private static function index_synced_blocks( $loop ) {
+		$index    = array();
+		$template = self::find_block( $loop['innerBlocks'], self::TEMPLATE );
+		$walk     = function ( $blocks ) use ( &$walk, &$index ) {
+			foreach ( $blocks as $block ) {
+				$key = $block['attrs']['metadata']['vpSyncKey'] ?? '';
+
+				if ( $key && ! isset( $index[ $key ] ) ) {
+					$index[ $key ] = $block;
+				}
+
+				$walk( $block['innerBlocks'] );
+			}
+		};
+
+		$walk( $template ? array( $template ) : array() );
+
+		return $index;
+	}
+
+	/**
 	 * Map every block of a tree, depth first.
 	 *
 	 * @param array    $blocks - blocks.
@@ -1185,6 +1431,24 @@ class Visual_Portfolio_Loop_Gallery {
 			array(
 				'utm_medium'   => 'abilities',
 				'utm_campaign' => 'loop_source',
+			)
+		);
+	}
+
+	/**
+	 * Error for a Saved Layout id a gallery cannot sync with.
+	 *
+	 * @param int $id - layout id.
+	 *
+	 * @return WP_Error
+	 */
+	public static function unknown_saved_layout( $id ) {
+		return new WP_Error(
+			'vpf_unknown_saved_layout',
+			sprintf(
+				// translators: %d - Saved Layout id.
+				__( 'Saved Layout %d cannot be synced with: it does not exist, is not built from blocks, or is not published. get-gallery-options lists the Saved Layouts a gallery can sync with.', 'visual-portfolio' ),
+				(int) $id
 			)
 		);
 	}

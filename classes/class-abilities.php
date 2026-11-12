@@ -53,7 +53,7 @@ class Visual_Portfolio_Abilities {
 			'get-gallery-options',
 			array(
 				'label'               => __( 'Get gallery options', 'visual-portfolio' ),
-				'description'         => __( 'Lists what a Visual Portfolio gallery can be made of: layouts (block patterns), content sources and settings. Call it before creating or changing a gallery.', 'visual-portfolio' ),
+				'description'         => __( 'Lists what a Visual Portfolio gallery can be made of: layouts (block patterns), content sources, settings, and the Saved Layouts a gallery can sync with. Call it before creating or changing a gallery.', 'visual-portfolio' ),
 				'output_schema'       => $this->get_options_schema(),
 				'execute_callback'    => array( $this, 'get_options' ),
 				'permission_callback' => array( $this, 'can_edit_posts' ),
@@ -258,7 +258,7 @@ class Visual_Portfolio_Abilities {
 			'get-gallery',
 			array(
 				'label'               => __( 'Get gallery', 'visual-portfolio' ),
-				'description'         => __( 'Returns one gallery: its layout type, its source with the images or the post query, and its settings.', 'visual-portfolio' ),
+				'description'         => __( 'Returns one gallery as the page shows it: its layout type, its source with the images or the post query, its settings, and the Saved Layout it is synced with.', 'visual-portfolio' ),
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
@@ -283,28 +283,33 @@ class Visual_Portfolio_Abilities {
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
-						'post_id'  => array(
+						'post_id'      => array(
 							'type'        => 'integer',
 							'description' => __( 'Post to add the gallery to. Leave out to create a draft.', 'visual-portfolio' ),
 							'minimum'     => 1,
 						),
-						'title'    => array(
+						'title'        => array(
 							'type'        => 'string',
 							'description' => __( 'Title of the draft created when `post_id` is left out.', 'visual-portfolio' ),
 						),
-						'position' => array(
+						'position'     => array(
 							'type'        => 'string',
 							'description' => __( 'Where in the post the gallery goes.', 'visual-portfolio' ),
 							'enum'        => array( 'end', 'start' ),
 							'default'     => 'end',
 						),
-						'layout'   => array(
+						'layout'       => array(
 							'type'        => 'string',
 							'description' => __( 'Layout slug from get-gallery-options.', 'visual-portfolio' ),
 							'enum'        => array_keys( Visual_Portfolio_Loop_Gallery::get_layouts() ),
 						),
-						'source'   => $this->get_source_schema(),
-						'settings' => $this->get_settings_schema(),
+						'source'       => $this->get_source_schema(),
+						'settings'     => $this->get_settings_schema(),
+						'saved_layout' => array(
+							'type'        => 'integer',
+							'description' => __( 'Id of a Saved Layout from get-gallery-options to sync the gallery with. The Saved Layout then provides the item blocks, the columns and the lightbox; `layout` still provides the blocks around them, and `settings` that differ from the Saved Layout\'s become changes of this gallery.', 'visual-portfolio' ),
+							'minimum'     => 1,
+						),
 					),
 					'required'             => array( 'layout', 'source' ),
 					'additionalProperties' => false,
@@ -326,15 +331,20 @@ class Visual_Portfolio_Abilities {
 			'update-gallery',
 			array(
 				'label'               => __( 'Update gallery', 'visual-portfolio' ),
-				'description'         => __( 'Changes a gallery: its layout, its source, its settings, and the images of an images gallery. Fields left out stay as they are. A published post is updated at once.', 'visual-portfolio' ),
+				'description'         => __( 'Changes a gallery: the Saved Layout it is synced with, its layout, its source, its settings, and the images of an images gallery. Fields left out stay as they are. On a gallery synced with a Saved Layout, a setting the Saved Layout provides becomes a change of this gallery, as in the editor. A published post is updated at once.', 'visual-portfolio' ),
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
 						'post_id'       => $this->get_post_id_schema(),
 						'gallery_id'    => $this->get_gallery_id_schema(),
+						'saved_layout'  => array(
+							'type'        => array( 'integer', 'null' ),
+							'description' => __( 'Id of a Saved Layout from get-gallery-options to sync the gallery with: the gallery takes its item blocks, columns and lightbox, and keeps its source. `null` (or 0) detaches the gallery, which keeps its current look. Applied before the other fields.', 'visual-portfolio' ),
+							'minimum'     => 0,
+						),
 						'layout'        => array(
 							'type'        => 'string',
-							'description' => __( 'New layout slug. The gallery keeps its source, columns, lightbox and items per page unless `settings` changes them; the blocks inside the gallery come from the new layout.', 'visual-portfolio' ),
+							'description' => __( 'New layout slug. The gallery keeps its source, columns, lightbox and items per page unless `settings` changes them; the blocks inside the gallery come from the new layout. Refused on a gallery synced with a Saved Layout unless the same call detaches it.', 'visual-portfolio' ),
 							'enum'        => array_keys( Visual_Portfolio_Loop_Gallery::get_layouts() ),
 						),
 						'source'        => $this->get_source_schema(),
@@ -499,10 +509,35 @@ class Visual_Portfolio_Abilities {
 		}
 
 		return array(
-			'layouts'  => $layouts,
-			'sources'  => $sources,
-			'settings' => $settings,
+			'layouts'       => $layouts,
+			'sources'       => $sources,
+			'settings'      => $settings,
+			'saved_layouts' => $this->get_saved_layout_choices(),
 		);
+	}
+
+	/**
+	 * Saved Layouts the current user can sync a gallery with, the ones the
+	 * editor's Saved Layout panel offers.
+	 *
+	 * @return array list of array( id, title ).
+	 */
+	private function get_saved_layout_choices() {
+		$response = rest_do_request( new WP_REST_Request( 'GET', '/visual-portfolio/v1/saved-layouts/choices' ) );
+		$choices  = array();
+
+		if ( $response->is_error() ) {
+			return $choices;
+		}
+
+		foreach ( (array) $response->get_data() as $choice ) {
+			$choices[] = array(
+				'id'    => (int) $choice['id'],
+				'title' => (string) $choice['title'],
+			);
+		}
+
+		return $choices;
 	}
 
 	/**
@@ -1100,6 +1135,10 @@ class Visual_Portfolio_Abilities {
 			);
 		}
 
+		if ( ! empty( $input['saved_layout'] ) && ! in_array( (int) $input['saved_layout'], array_column( $this->get_saved_layout_choices(), 'id' ), true ) ) {
+			return Visual_Portfolio_Loop_Gallery::unknown_saved_layout( $input['saved_layout'] );
+		}
+
 		if ( 'posts' === ( $input['source']['type'] ?? '' ) && isset( $input['source']['post_type'] ) ) {
 			$post_type = $input['source']['post_type'];
 
@@ -1186,7 +1225,31 @@ class Visual_Portfolio_Abilities {
 		return array_merge(
 			$this->get_post_fields( $post ),
 			array( 'gallery_id' => $gallery_id ),
-			Visual_Portfolio_Loop_Gallery::describe( $loop )
+			Visual_Portfolio_Loop_Gallery::describe( $loop ),
+			array( 'saved_layout' => $this->get_saved_layout( $loop ) )
+		);
+	}
+
+	/**
+	 * The Saved Layout a loop is synced with, titled when the current user
+	 * may read it to sync with, as the editor's Saved Layout panel shows it.
+	 *
+	 * @param array $loop - loop block.
+	 *
+	 * @return array|null array( id, title ), null when the loop is not synced.
+	 */
+	private function get_saved_layout( $loop ) {
+		$id = Visual_Portfolio_Loop_Gallery::get_saved_layout_id( $loop );
+
+		if ( ! $id ) {
+			return null;
+		}
+
+		$response = rest_do_request( new WP_REST_Request( 'GET', '/visual-portfolio/v1/saved-layouts/' . $id . '/sync-source' ) );
+
+		return array(
+			'id'    => $id,
+			'title' => $response->is_error() ? '' : (string) $response->get_data()['title'],
 		);
 	}
 
@@ -1474,10 +1537,17 @@ class Visual_Portfolio_Abilities {
 			'properties' => array_merge(
 				$this->get_post_fields_schema(),
 				array(
-					'layout_type' => array( 'type' => 'string' ),
-					'source'      => array( 'type' => 'object' ),
-					'settings'    => array( 'type' => 'object' ),
-					'warnings'    => array(
+					'layout_type'  => array( 'type' => 'string' ),
+					'source'       => array( 'type' => 'object' ),
+					'settings'     => array( 'type' => 'object' ),
+					'saved_layout' => array(
+						'type'       => array( 'object', 'null' ),
+						'properties' => array(
+							'id'    => array( 'type' => 'integer' ),
+							'title' => array( 'type' => 'string' ),
+						),
+					),
+					'warnings'     => array(
 						'type'  => 'array',
 						'items' => array( 'type' => 'string' ),
 					),
@@ -1495,7 +1565,7 @@ class Visual_Portfolio_Abilities {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
-				'layouts'  => array(
+				'layouts'       => array(
 					'type'  => 'array',
 					'items' => array(
 						'type'       => 'object',
@@ -1508,7 +1578,7 @@ class Visual_Portfolio_Abilities {
 						),
 					),
 				),
-				'sources'  => array(
+				'sources'       => array(
 					'type'  => 'array',
 					'items' => array(
 						'type'       => 'object',
@@ -1522,7 +1592,7 @@ class Visual_Portfolio_Abilities {
 						),
 					),
 				),
-				'settings' => array(
+				'settings'      => array(
 					'type'  => 'array',
 					'items' => array(
 						'type'       => 'object',
@@ -1530,6 +1600,16 @@ class Visual_Portfolio_Abilities {
 							'key'         => array( 'type' => 'string' ),
 							'description' => array( 'type' => 'string' ),
 							'schema'      => array( 'type' => 'object' ),
+						),
+					),
+				),
+				'saved_layouts' => array(
+					'type'  => 'array',
+					'items' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'id'    => array( 'type' => 'integer' ),
+							'title' => array( 'type' => 'string' ),
 						),
 					),
 				),
