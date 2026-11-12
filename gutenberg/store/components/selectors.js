@@ -27,6 +27,7 @@ import ToggleGroupCategoryControl, {
 	ToggleGroupButtonsControl,
 } from '../../components/toggle-group-control';
 import ToggleModal from '../../components/toggle-modal';
+import { ToolsPanel, ToolsPanelItem } from '../../components/tools-panel';
 
 export function get() {
 	return {
@@ -65,5 +66,11 @@ export function get() {
 		// effects and the ones an install added alike.
 		effectTakesColumns,
 		effectRepeats,
+
+		// Core's settings panels as a gallery synced with a Saved Layout
+		// needs them: a setting changed on the gallery is marked, and its
+		// reset returns it to the layout's value.
+		ToolsPanel,
+		ToolsPanelItem,
 	};
 }

@@ -1,17 +1,14 @@
 import {
 	SelectControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
+import { ToolsPanel, ToolsPanelItem } from '../components/tools-panel';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
 } from '../utils/tools-panel';
-
 import GalleryManager, { getUsedCategories } from './gallery-manager';
 import { ImagesIcon } from './icons';
 import { registerLoopSource } from './registry';

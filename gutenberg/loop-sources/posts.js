@@ -4,8 +4,6 @@ import {
 	SelectControl,
 	TextareaControl,
 	TextControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -14,6 +12,7 @@ import { useMemo } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { getMissingTeasers } from '../components/pro-teaser';
+import { ToolsPanel, ToolsPanelItem } from '../components/tools-panel';
 import {
 	getResetAllValues,
 	useToolsPanelDropdownMenuProps,
