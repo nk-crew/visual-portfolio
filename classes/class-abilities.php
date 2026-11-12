@@ -16,7 +16,7 @@ class Visual_Portfolio_Abilities {
 	const CATEGORY = 'visual-portfolio';
 
 	/**
-	 * Most galleries one `list-galleries` page returns.
+	 * Most items one page of a list or a search returns.
 	 *
 	 * @var int
 	 */
@@ -114,7 +114,7 @@ class Visual_Portfolio_Abilities {
 			'find-images',
 			array(
 				'label'               => __( 'Find images', 'visual-portfolio' ),
-				'description'         => __( 'Finds images in the Media Library, newest first, to use as the images of a gallery.', 'visual-portfolio' ),
+				'description'         => __( 'Finds images in the Media Library, newest first, to use as the images of a gallery. A page can hold fewer than `per_page` images the current user may see; ask for the next page while `has_more` is true.', 'visual-portfolio' ),
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
@@ -124,13 +124,17 @@ class Visual_Portfolio_Abilities {
 						),
 						'uploaded_after'  => array(
 							'type'        => 'string',
-							'description' => __( 'Only images uploaded on or after this date, YYYY-MM-DD.', 'visual-portfolio' ),
-							'format'      => 'date',
+							'description' => __( 'Only images uploaded on or after this date, YYYY-MM-DD, in the site\'s timezone.', 'visual-portfolio' ),
+							'pattern'     => '^\\d{4}-\\d{2}-\\d{2}$',
 						),
 						'uploaded_before' => array(
 							'type'        => 'string',
-							'description' => __( 'Only images uploaded on or before this date, YYYY-MM-DD.', 'visual-portfolio' ),
-							'format'      => 'date',
+							'description' => __( 'Only images uploaded on or before this date, YYYY-MM-DD, in the site\'s timezone.', 'visual-portfolio' ),
+							'pattern'     => '^\\d{4}-\\d{2}-\\d{2}$',
+						),
+						'mine'            => array(
+							'type'        => 'boolean',
+							'description' => __( 'Only images the current user uploaded.', 'visual-portfolio' ),
 						),
 						'order'           => array(
 							'type'    => 'string',
@@ -167,7 +171,7 @@ class Visual_Portfolio_Abilities {
 			'find-posts',
 			array(
 				'label'               => __( 'Find posts', 'visual-portfolio' ),
-				'description'         => __( 'Finds published posts, pages or projects, newest first, to show in a gallery by their ids.', 'visual-portfolio' ),
+				'description'         => __( 'Finds published posts, pages or projects, newest first, to show in a gallery by their ids. A page can hold fewer than `per_page` posts; ask for the next page while `has_more` is true.', 'visual-portfolio' ),
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
@@ -216,16 +220,20 @@ class Visual_Portfolio_Abilities {
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'properties'           => array(
-						'taxonomy' => array(
+						'taxonomy'  => array(
 							'type'        => 'string',
 							'description' => __( 'Only terms of this taxonomy, such as category, post_tag or portfolio_category.', 'visual-portfolio' ),
 						),
-						'search'   => array(
+						'post_type' => array(
+							'type'        => 'string',
+							'description' => __( 'Only terms of the taxonomies of this post type, the ones a posts gallery of that type can be limited to.', 'visual-portfolio' ),
+						),
+						'search'    => array(
 							'type'        => 'string',
 							'description' => __( 'Words in the term name.', 'visual-portfolio' ),
 						),
-						'page'     => $this->get_page_schema(),
-						'per_page' => $this->get_per_page_schema(),
+						'page'      => $this->get_page_schema(),
+						'per_page'  => $this->get_per_page_schema(),
 					),
 					'additionalProperties' => false,
 					'default'              => array(),
@@ -593,6 +601,12 @@ class Visual_Portfolio_Abilities {
 			$date['before'] = $input['uploaded_before'];
 		}
 
+		// The Media Library's search reaches file names the same way; core
+		// removes the filter once the query has run.
+		if ( ! empty( $input['search'] ) ) {
+			add_filter( 'wp_allow_query_attachment_by_filename', '__return_true' );
+		}
+
 		$query = $this->find(
 			$input,
 			array(
@@ -600,7 +614,7 @@ class Visual_Portfolio_Abilities {
 				'post_status'    => 'inherit',
 				'post_mime_type' => 'image',
 				's'              => $input['search'] ?? '',
-				'order'          => 'oldest' === ( $input['order'] ?? 'newest' ) ? 'ASC' : 'DESC',
+				'author'         => empty( $input['mine'] ) ? '' : get_current_user_id(),
 				'date_query'     => empty( $date ) ? array() : array( array_merge( $date, array( 'inclusive' => true ) ) ),
 			)
 		);
@@ -618,7 +632,7 @@ class Visual_Portfolio_Abilities {
 				'url'      => (string) wp_get_attachment_url( $image->ID ),
 				'width'    => (int) ( $meta['width'] ?? 0 ),
 				'height'   => (int) ( $meta['height'] ?? 0 ),
-				'uploaded' => get_post_time( 'Y-m-d', true, $image ),
+				'uploaded' => get_post_time( 'Y-m-d', false, $image ),
 			);
 		}
 
@@ -654,14 +668,31 @@ class Visual_Portfolio_Abilities {
 		);
 
 		if ( ! empty( $input['terms'] ) ) {
-			$terms     = array_map( 'intval', $input['terms'] );
+			$by_taxonomy = array();
+
+			foreach ( array_map( 'intval', $input['terms'] ) as $term_id ) {
+				$term = get_term( $term_id );
+
+				if ( $term instanceof WP_Term && is_object_in_taxonomy( $post_type, $term->taxonomy ) ) {
+					$by_taxonomy[ $term->taxonomy ][] = $term_id;
+				}
+			}
+
+			// No term the post type can carry matches no post, as the editor's preview shows.
+			if ( empty( $by_taxonomy ) ) {
+				return array(
+					'posts'    => array(),
+					'has_more' => false,
+				);
+			}
+
 			$tax_query = array( 'relation' => 'OR' );
 
-			foreach ( get_object_taxonomies( $post_type ) as $taxonomy ) {
+			foreach ( $by_taxonomy as $taxonomy => $term_ids ) {
 				$tax_query[] = array(
 					'taxonomy' => $taxonomy,
 					'field'    => 'term_id',
-					'terms'    => $terms,
+					'terms'    => $term_ids,
 				);
 			}
 
@@ -676,7 +707,7 @@ class Visual_Portfolio_Abilities {
 				'id'             => $post->ID,
 				'title'          => get_post_field( 'post_title', $post, 'raw' ),
 				'post_type'      => $post->post_type,
-				'date'           => get_post_time( 'Y-m-d', true, $post ),
+				'date'           => get_post_time( 'Y-m-d', false, $post ),
 				'url'            => (string) get_permalink( $post ),
 				'featured_image' => get_post_thumbnail_id( $post ) ? (int) get_post_thumbnail_id( $post ) : null,
 			);
@@ -698,6 +729,11 @@ class Visual_Portfolio_Abilities {
 	public function find_terms( $input ) {
 		$input      = (array) $input;
 		$taxonomies = get_taxonomies( array( 'public' => true ) );
+
+		// The editor offers every taxonomy of the post type a gallery shows.
+		if ( ! empty( $input['post_type'] ) ) {
+			$taxonomies = array_combine( get_object_taxonomies( $input['post_type'] ), get_object_taxonomies( $input['post_type'] ) );
+		}
 
 		if ( ! empty( $input['taxonomy'] ) ) {
 			if ( ! isset( $taxonomies[ $input['taxonomy'] ] ) ) {
@@ -762,8 +798,10 @@ class Visual_Portfolio_Abilities {
 				array(
 					'posts_per_page'      => $per_page,
 					'paged'               => $page,
-					'orderby'             => 'date',
-					'order'               => 'DESC',
+					'orderby'             => array(
+						'date' => 'oldest' === ( $input['order'] ?? 'newest' ) ? 'ASC' : 'DESC',
+						'ID'   => 'oldest' === ( $input['order'] ?? 'newest' ) ? 'ASC' : 'DESC',
+					),
 					'ignore_sticky_posts' => true,
 				),
 				array_filter(

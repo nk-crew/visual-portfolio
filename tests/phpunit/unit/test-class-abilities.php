@@ -506,6 +506,72 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 
 		$this->assertSame( array(), $this->run_ability( 'find-images', array( 'uploaded_after' => gmdate( 'Y-m-d', time() + DAY_IN_SECONDS * 2 ) ), 'author' )['images'] );
 		$this->assertWPError( $this->run_ability( 'find-images', array(), 'contributor' ) );
+		$this->assertWPError( $this->run_ability( 'find-images', array( 'uploaded_after' => 'last week' ), 'author' ) );
+
+		// The file name is searched too, as in the Media Library.
+		$file = wp_basename( get_attached_file( $named ) );
+		$this->assertSame( array( $named ), array_column( $this->run_ability( 'find-images', array( 'search' => pathinfo( $file, PATHINFO_FILENAME ) ), 'author' )['images'], 'id' ) );
+
+		// Only the user's own uploads.
+		$own = self::factory()->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png' );
+		wp_update_post(
+			array(
+				'ID'          => $own,
+				'post_author' => self::$users['author'],
+			)
+		);
+		$this->assertSame( array( $own ), array_column( $this->run_ability( 'find-images', array( 'mine' => true ), 'author' )['images'], 'id' ) );
+	}
+
+	/**
+	 * Pages of images neither repeat nor skip images uploaded in the same
+	 * second, and dates are the site's, in the filter and in the output.
+	 */
+	public function test_find_images_pages_and_dates() {
+		update_option( 'timezone_string', 'Pacific/Auckland' );
+
+		$same = gmdate( 'Y-m-d H:i:s' );
+		$ids  = array();
+
+		for ( $i = 0; $i < 5; $i++ ) {
+			$ids[] = self::factory()->attachment->create_object(
+				array(
+					'file'           => 'same-' . $i . '.jpg',
+					'post_mime_type' => 'image/jpeg',
+					'post_date'      => $same,
+				)
+			);
+		}
+
+		$seen = array();
+		$page = 1;
+
+		do {
+			$found = $this->run_ability(
+				'find-images',
+				array(
+					'search'   => 'same-',
+					'per_page' => 2,
+					'page'     => $page++,
+				)
+			);
+			$seen  = array_merge( $seen, array_column( $found['images'], 'id' ) );
+		} while ( $found['has_more'] );
+
+		$this->assertEqualsCanonicalizing( $ids, $seen );
+		$this->assertSame( 3, $page - 1 );
+
+		$day = substr( $same, 0, 10 );
+		$hit = $this->run_ability(
+			'find-images',
+			array(
+				'search'          => 'same-0',
+				'uploaded_after'  => $day,
+				'uploaded_before' => $day,
+			)
+		);
+		$this->assertSame( array( $ids[0] ), array_column( $hit['images'], 'id' ) );
+		$this->assertSame( $day, $hit['images'][0]['uploaded'] );
 	}
 
 	/**
@@ -545,6 +611,33 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 		$searched = $this->run_ability( 'find-posts', array( 'search' => 'Porto' ), 'author' );
 		$this->assertEqualsCanonicalizing( array( $in_term, $elsewhere ), array_column( $searched['posts'], 'id' ) );
 		$this->assertNotContains( $draft, array_column( $searched['posts'], 'id' ) );
+
+		// A term the post type cannot carry matches nothing, rather than everything.
+		$this->assertSame(
+			array(),
+			$this->run_ability(
+				'find-posts',
+				array(
+					'post_type' => 'page',
+					'terms'     => array( $term ),
+				),
+				'author'
+			)['posts']
+		);
+
+		// Terms page by name, and follow a post type's taxonomies.
+		self::factory()->category->create( array( 'name' => 'Portugal coast' ) );
+		$first = $this->run_ability(
+			'find-terms',
+			array(
+				'search'   => 'Portugal',
+				'per_page' => 1,
+			),
+			'author'
+		);
+		$this->assertTrue( $first['has_more'] );
+		$this->assertSame( array( 'Portugal coast' ), array_column( $first['terms'], 'name' ) );
+		$this->assertSame( 'category', $this->run_ability( 'find-terms', array( 'post_type' => 'post', 'search' => 'Portugal trips' ), 'author' )['terms'][0]['taxonomy'] );
 
 		$this->assertSame( 'vpf_invalid_post_type', $this->run_ability( 'find-posts', array( 'post_type' => 'nope' ), 'author' )->get_error_code() );
 		$this->assertSame( 'vpf_invalid_taxonomy', $this->run_ability( 'find-terms', array( 'taxonomy' => 'nope' ), 'author' )->get_error_code() );
