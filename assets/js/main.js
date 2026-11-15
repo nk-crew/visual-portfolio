@@ -676,7 +676,7 @@ class VP {
 		// width 0. On the next frame, since a layout that resizes the gallery
 		// inside the observer callback is a ResizeObserver loop error.
 		const relayout = rafSchd(() => {
-			self.initIsotope?.('layout');
+			self.resizeIsotope?.();
 			self.initFjGallery?.('resize');
 		});
 

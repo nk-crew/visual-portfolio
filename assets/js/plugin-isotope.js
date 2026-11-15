@@ -8,6 +8,15 @@ const $doc = $(document);
 
 const SUPPORTED_LAYOUTS = ['tiles', 'masonry', 'grid'];
 
+/**
+ * Width the page scrollbar takes from the viewport.
+ *
+ * @return {number} scrollbar width.
+ */
+function getPageScrollbar() {
+	return window.innerWidth - document.documentElement.clientWidth;
+}
+
 // Extend VP class.
 $doc.on('extendClass.vpf', (event, VP) => {
 	if (event.namespace !== 'vpf') {
@@ -59,9 +68,37 @@ $doc.on('extendClass.vpf', (event, VP) => {
 			this.emitEvent('beforeInitIsotope', [initOptions]);
 
 			this.$items_wrap.isotope(initOptions);
+			this.isotopeScrollbar = getPageScrollbar();
 
 			this.emitEvent('initIsotope', [initOptions]);
 		}
+	};
+
+	/**
+	 * Lay Isotope out again for a new width.
+	 */
+	VP.prototype.resizeIsotope = function () {
+		const isotope = this.$items_wrap.data('isotope');
+		const width = window.getSize(this.$items_wrap[0]).innerWidth;
+
+		// A hidden gallery reads 0 wide and keeps the layout it had.
+		if (!isotope || !width) {
+			return;
+		}
+
+		// Narrower only by the page scrollbar this layout brought: at the new
+		// width the page could lose it again, back and forth. The items only
+		// shrink a little.
+		const narrowed = isotope.size.innerWidth - width;
+
+		if (
+			narrowed > 0 &&
+			narrowed <= getPageScrollbar() - this.isotopeScrollbar
+		) {
+			return;
+		}
+
+		this.initIsotope('layout');
 	};
 
 	/**
@@ -173,10 +210,7 @@ $doc.on('initEvents.vpf', (event, self) => {
 			throttle(
 				100,
 				rafSchd(() => {
-					// A hidden gallery reads 0 wide and keeps the layout it had.
-					if (self.$items_wrap[0].clientWidth) {
-						self.initIsotope('layout');
-					}
+					self.resizeIsotope();
 				})
 			)
 		);
