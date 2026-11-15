@@ -2,20 +2,13 @@ import $ from 'jquery';
 import rafSchd from 'raf-schd';
 import { debounce, throttle } from 'throttle-debounce';
 
+import { createResizeLoopGuard } from './_resize-loop';
+
 const { getComputedStyle } = window;
 const $wnd = $(window);
 const $doc = $(document);
 
 const SUPPORTED_LAYOUTS = ['tiles', 'masonry', 'grid'];
-
-/**
- * Width the page scrollbar takes from the viewport.
- *
- * @return {number} scrollbar width.
- */
-function getPageScrollbar() {
-	return window.innerWidth - document.documentElement.clientWidth;
-}
 
 // Extend VP class.
 $doc.on('extendClass.vpf', (event, VP) => {
@@ -68,7 +61,6 @@ $doc.on('extendClass.vpf', (event, VP) => {
 			this.emitEvent('beforeInitIsotope', [initOptions]);
 
 			this.$items_wrap.isotope(initOptions);
-			this.isotopeScrollbar = getPageScrollbar();
 
 			this.emitEvent('initIsotope', [initOptions]);
 		}
@@ -78,23 +70,17 @@ $doc.on('extendClass.vpf', (event, VP) => {
 	 * Lay Isotope out again for a new width.
 	 */
 	VP.prototype.resizeIsotope = function () {
-		const isotope = this.$items_wrap.data('isotope');
-		const width = window.getSize(this.$items_wrap[0]).innerWidth;
-
-		// A hidden gallery reads 0 wide and keeps the layout it had.
-		if (!isotope || !width) {
+		if (!this.$items_wrap.data('isotope')) {
 			return;
 		}
 
-		// Narrower only by the page scrollbar this layout brought: at the new
-		// width the page could lose it again, back and forth. The items only
-		// shrink a little.
-		const narrowed = isotope.size.innerWidth - width;
+		const width = window.getSize(this.$items_wrap[0]).innerWidth;
 
-		if (
-			narrowed > 0 &&
-			narrowed <= getPageScrollbar() - this.isotopeScrollbar
-		) {
+		this.isIsotopeResizeLoop =
+			this.isIsotopeResizeLoop || createResizeLoopGuard();
+
+		// A hidden gallery reads 0 wide and keeps the layout it had.
+		if (!width || this.isIsotopeResizeLoop(width)) {
 			return;
 		}
 

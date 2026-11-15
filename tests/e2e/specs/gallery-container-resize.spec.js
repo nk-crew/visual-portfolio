@@ -554,5 +554,56 @@ test.describe('Gallery inside a container that changes width', () => {
 				expect(flips).toBe(0);
 			});
 		});
+
+		test('Visual Portfolio block lays out again when other content brings the scrollbar', async ({
+			page,
+			requestUtils,
+		}) => {
+			const box = 'e2e-fluid-box';
+			const link = await publish(
+				requestUtils,
+				'Container resize - scrollbar from content',
+				`<div id="${box}" style="position: absolute; top: 0; left: 0; right: 0; max-width: none">${getLegacyMarkup(
+					{
+						block_id: 'e2eResizeScrollbarContent',
+						content_source: 'images',
+						images,
+						items_count: -1,
+						items_gap: 20,
+						layout: 'masonry',
+						masonry_columns: 2,
+					}
+				)}</div>`
+			);
+
+			await page.setViewportSize({ width: 1280, height: 4000 });
+			await page.goto(link);
+			await page.waitForTimeout(1500);
+
+			// An accordion opening below the gallery.
+			await page.evaluate(() => {
+				const tall = document.createElement('div');
+
+				tall.style.height = '8000px';
+				document.body.append(tall);
+			});
+			await page.waitForTimeout(1500);
+
+			const gap = await page.evaluate((id) => {
+				const wrap = document.querySelector(
+					`#${id} .vp-portfolio__items`
+				);
+				const bottom = Math.max(
+					...[
+						...wrap.querySelectorAll('.vp-portfolio__item-wrap'),
+					].map((item) => item.getBoundingClientRect().bottom)
+				);
+
+				return wrap.getBoundingClientRect().bottom - bottom;
+			}, box);
+
+			// The layout of the narrower width ends where its last row does.
+			expect(Math.abs(gap)).toBeLessThan(1);
+		});
 	});
 });
