@@ -278,69 +278,75 @@ test.describe('Gallery inside a container that changes width', () => {
 		});
 	});
 
-	test('Visual Portfolio block keeps its layout while its container is hidden', async ({
-		page,
-		requestUtils,
-	}) => {
-		const hiddenBox = 'e2e-hidden-box';
-		const gallery = (blockId) =>
-			getLegacyMarkup({
-				block_id: blockId,
-				content_source: 'images',
-				images,
-				items_count: -1,
-				items_gap: 20,
-				layout: 'masonry',
-				masonry_columns: 2,
-			});
-		const link = await publish(
+	[
+		{ layout: 'masonry', masonry_columns: 2 },
+		{ layout: 'justified', justified_row_height: 150 },
+	].forEach((settings) => {
+		test(`Visual Portfolio block keeps its ${settings.layout} layout while its container is hidden`, async ({
+			page,
 			requestUtils,
-			'Container resize - legacy hidden',
-			inBox(gallery('e2eResizeWidened')) +
-				`<div id="${hiddenBox}" style="width: ${NARROW}px">${gallery('e2eResizeHidden')}</div>`
-		);
+		}) => {
+			const hiddenBox = 'e2e-hidden-box';
+			const gallery = (blockId) =>
+				getLegacyMarkup({
+					block_id: blockId,
+					content_source: 'images',
+					images,
+					items_count: -1,
+					items_gap: 20,
+					...settings,
+				});
+			const link = await publish(
+				requestUtils,
+				`Container resize - legacy hidden ${settings.layout}`,
+				inBox(gallery(`e2eResizeWidened${settings.layout}`)) +
+					`<div id="${hiddenBox}" style="width: ${NARROW}px">${gallery(
+						`e2eResizeHidden${settings.layout}`
+					)}</div>`
+			);
 
-		await openSettled(page, link, LEGACY_ITEM);
+			await openSettled(page, link, LEGACY_ITEM);
 
-		const getHeight = () =>
-			page.evaluate(
+			const getHeight = () =>
+				page.evaluate(
+					(box) =>
+						document.querySelector(`#${box} .vp-portfolio__items`)
+							.offsetHeight,
+					hiddenBox
+				);
+			const height = await getHeight();
+
+			// A closed tab or accordion reads 0 wide, and the gallery beside it
+			// changes width meanwhile.
+			await page.evaluate(
+				({ box, hidden, width }) => {
+					document.getElementById(hidden).style.display = 'none';
+					document.getElementById(box).style.width = `${width}px`;
+				},
+				{ box: BOX, hidden: hiddenBox, width: WIDE }
+			);
+			await page.waitForTimeout(1000);
+
+			// Read on the first frame after showing it, before any transition.
+			const shown = await page.evaluate(
 				(box) =>
-					document.querySelector(`#${box} .vp-portfolio__items`)
-						.offsetHeight,
+					new Promise((resolve) => {
+						document.getElementById(box).style.display = '';
+						window.requestAnimationFrame(() =>
+							resolve(
+								document.querySelector(
+									`#${box} .vp-portfolio__items`
+								).offsetHeight
+							)
+						);
+					}),
 				hiddenBox
 			);
-		const height = await getHeight();
 
-		// A closed tab or accordion reads 0 wide, and the gallery beside it
-		// changes width meanwhile.
-		await page.evaluate(
-			({ box, hidden, width }) => {
-				document.getElementById(hidden).style.display = 'none';
-				document.getElementById(box).style.width = `${width}px`;
-			},
-			{ box: BOX, hidden: hiddenBox, width: WIDE }
-		);
-		await page.waitForTimeout(1000);
-
-		// Read on the first frame after showing it, before any transition.
-		const shown = await page.evaluate(
-			(box) =>
-				new Promise((resolve) => {
-					document.getElementById(box).style.display = '';
-					window.requestAnimationFrame(() =>
-						resolve(
-							document.querySelector(
-								`#${box} .vp-portfolio__items`
-							).offsetHeight
-						)
-					);
-				}),
-			hiddenBox
-		);
-
-		expect(height).toBeGreaterThan(0);
-		expect(shown).toBe(height);
-		expect(await getHeight()).toBe(height);
+			expect(height).toBeGreaterThan(0);
+			expect(shown).toBe(height);
+			expect(await getHeight()).toBe(height);
+		});
 	});
 
 	test('a stretched Visual Portfolio block widens without a page error', async ({
@@ -420,6 +426,7 @@ test.describe('Gallery inside a container that changes width', () => {
 		[
 			{
 				name: 'Visual Portfolio block',
+				item: LEGACY_ITEM,
 				markup: () =>
 					getLegacyMarkup({
 						block_id: 'e2eResizeScrollbar',
@@ -432,7 +439,22 @@ test.describe('Gallery inside a container that changes width', () => {
 					}),
 			},
 			{
+				name: 'Visual Portfolio block justified',
+				item: LEGACY_ITEM,
+				markup: () =>
+					getLegacyMarkup({
+						block_id: 'e2eResizeScrollbarJustified',
+						content_source: 'images',
+						images,
+						items_count: -1,
+						items_gap: 20,
+						layout: 'justified',
+						justified_row_height: 300,
+					}),
+			},
+			{
 				name: 'Gallery Loop masonry',
+				item: LOOP_ITEM,
 				markup: () =>
 					getLoopMarkup(
 						{
@@ -452,6 +474,7 @@ test.describe('Gallery inside a container that changes width', () => {
 			},
 			{
 				name: 'Gallery Loop justified',
+				item: LOOP_ITEM,
 				markup: () =>
 					getLoopMarkup(
 						{
@@ -468,7 +491,7 @@ test.describe('Gallery inside a container that changes width', () => {
 						}
 					),
 			},
-		].forEach(({ name, markup }) => {
+		].forEach(({ name, item, markup }) => {
 			test(`${name} settles when its layout toggles the page scrollbar`, async ({
 				page,
 				requestUtils,
@@ -552,6 +575,25 @@ test.describe('Gallery inside a container that changes width', () => {
 				);
 
 				expect(flips).toBe(0);
+
+				const overflow = await page.evaluate(
+					({ id, selector }) => {
+						const container = document.getElementById(id);
+
+						return (
+							Math.max(
+								...[
+									...container.querySelectorAll(selector),
+								].map(
+									(node) => node.getBoundingClientRect().right
+								)
+							) - container.getBoundingClientRect().right
+						);
+					},
+					{ id: box, selector: item }
+				);
+
+				expect(overflow).toBeLessThan(1);
 			});
 		});
 
