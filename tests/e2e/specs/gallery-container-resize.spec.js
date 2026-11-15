@@ -417,16 +417,11 @@ test.describe('Gallery inside a container that changes width', () => {
 	});
 
 	test.describe('with a page scrollbar that takes space', () => {
-		test('Visual Portfolio block settles when its layout toggles the page scrollbar', async ({
-			page,
-			requestUtils,
-		}) => {
-			const box = 'e2e-fluid-box';
-			const link = await publish(
-				requestUtils,
-				'Container resize - legacy scrollbar',
-				`<div id="${box}" style="position: absolute; top: 0; left: 0; right: 0; max-width: none">${getLegacyMarkup(
-					{
+		[
+			{
+				name: 'Visual Portfolio block',
+				markup: () =>
+					getLegacyMarkup({
 						block_id: 'e2eResizeScrollbar',
 						content_source: 'images',
 						images,
@@ -434,80 +429,130 @@ test.describe('Gallery inside a container that changes width', () => {
 						items_gap: 20,
 						layout: 'masonry',
 						masonry_columns: 2,
-					}
-				)}</div>`
-			);
-
-			const getPageHeight = () =>
-				page.evaluate(
-					(id) =>
-						Math.ceil(
-							document.getElementById(id).getBoundingClientRect()
-								.bottom + window.scrollY
-						),
-					box
+					}),
+			},
+			{
+				name: 'Gallery Loop masonry',
+				markup: () =>
+					getLoopMarkup(
+						{
+							block_id: 'e2e-resize-scrollbar-masonry',
+							queryId: 1,
+							queryType: 'images',
+							baseQuery: { perPage: IMAGES_COUNT, maxPages: 0 },
+							imagesQuery: { images },
+						},
+						{
+							layoutType: 'masonry',
+							layoutColumnsMode: 'manual',
+							layoutColumnCount: 2,
+							style: { spacing: { blockGap: '20px' } },
+						}
+					),
+			},
+			{
+				name: 'Gallery Loop justified',
+				markup: () =>
+					getLoopMarkup(
+						{
+							block_id: 'e2e-resize-scrollbar-justified',
+							queryId: 1,
+							queryType: 'images',
+							baseQuery: { perPage: IMAGES_COUNT, maxPages: 0 },
+							imagesQuery: { images },
+						},
+						{
+							layoutType: 'justified',
+							justifiedRowHeight: 300,
+							style: { spacing: { blockGap: '20px' } },
+						}
+					),
+			},
+		].forEach(({ name, markup }) => {
+			test(`${name} settles when its layout toggles the page scrollbar`, async ({
+				page,
+				requestUtils,
+			}) => {
+				const box = 'e2e-fluid-box';
+				const link = await publish(
+					requestUtils,
+					`Container resize - scrollbar ${name}`,
+					`<div id="${box}" style="position: absolute; top: 0; left: 0; right: 0; max-width: none">${markup()}</div>`
 				);
 
-			// The page height with and without the scrollbar, on a viewport tall
-			// enough to need none.
-			await page.setViewportSize({ width: 1280, height: 4000 });
-			await page.goto(link);
-			await page.waitForTimeout(1500);
+				const getPageHeight = () =>
+					page.evaluate(
+						(id) =>
+							Math.ceil(
+								document
+									.getElementById(id)
+									.getBoundingClientRect().bottom +
+									window.scrollY
+							),
+						box
+					);
 
-			const tall = await getPageHeight();
-			const scrollbar = await page.evaluate(() => {
-				const root = document.documentElement;
+				// The page height with and without the scrollbar, on a viewport tall
+				// enough to need none.
+				await page.setViewportSize({ width: 1280, height: 4000 });
+				await page.goto(link);
+				await page.waitForTimeout(1500);
 
-				root.style.overflowY = 'scroll';
+				const tall = await getPageHeight();
+				const scrollbar = await page.evaluate(() => {
+					const root = document.documentElement;
 
-				const width = window.innerWidth - root.clientWidth;
+					root.style.overflowY = 'scroll';
 
-				root.style.overflowY = '';
+					const width = window.innerWidth - root.clientWidth;
 
-				return width;
+					root.style.overflowY = '';
+
+					return width;
+				});
+
+				await page.setViewportSize({
+					width: 1280 - scrollbar,
+					height: 4000,
+				});
+				await page.waitForTimeout(1500);
+
+				const short = await getPageHeight();
+
+				expect(tall).toBeGreaterThan(short + 4);
+
+				// Between the two, the layout that fits without a scrollbar needs one,
+				// and the one that fits with it does not.
+				await page.setViewportSize({
+					width: 1280,
+					height: Math.round((tall + short) / 2),
+				});
+				await page.goto(link);
+				await page.waitForTimeout(2000);
+
+				const flips = await page.evaluate(
+					() =>
+						new Promise((resolve) => {
+							const root = document.documentElement;
+							let width = root.clientWidth;
+							let count = 0;
+							const observer = new window.ResizeObserver(() => {
+								if (root.clientWidth !== width) {
+									width = root.clientWidth;
+									count += 1;
+								}
+							});
+
+							observer.observe(root);
+							setTimeout(() => {
+								observer.disconnect();
+								resolve(count);
+							}, 3000);
+						})
+				);
+
+				expect(flips).toBe(0);
 			});
-
-			await page.setViewportSize({
-				width: 1280 - scrollbar,
-				height: 4000,
-			});
-			await page.waitForTimeout(1500);
-
-			const short = await getPageHeight();
-
-			expect(tall).toBeGreaterThan(short + 4);
-
-			// Between the two, the layout that fits without a scrollbar needs one,
-			// and the one that fits with it does not.
-			await page.setViewportSize({
-				width: 1280,
-				height: Math.round((tall + short) / 2),
-			});
-			await page.goto(link);
-			await page.waitForTimeout(2000);
-
-			const flips = await page.evaluate(
-				() =>
-					new Promise((resolve) => {
-						const root = document.documentElement;
-						let width = root.clientWidth;
-						let count = 0;
-						const observer = new window.ResizeObserver(() => {
-							if (root.clientWidth !== width) {
-								width = root.clientWidth;
-								count += 1;
-							}
-						});
-
-						observer.observe(root);
-						setTimeout(() => {
-							observer.disconnect();
-							resolve(count);
-						}, 3000);
-					})
-			);
-
-			expect(flips).toBe(0);
 		});
 	});
 });
