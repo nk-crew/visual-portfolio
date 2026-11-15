@@ -667,6 +667,29 @@ class VP {
 			}
 		});
 
+		// A page builder can widen the gallery by script, with no window resize.
+		// Layouts write the height, so only a width change is a resize, and a
+		// hidden gallery reads 0 and keeps the layout it had.
+		let width = self.$item[0].clientWidth;
+
+		// Only this gallery: a window resize would lay out hidden galleries at
+		// width 0. On the next frame, since a layout that resizes the gallery
+		// inside the observer callback is a ResizeObserver loop error.
+		const relayout = rafSchd(() => {
+			self.initIsotope?.('layout');
+			self.initFjGallery?.('resize');
+		});
+
+		self.resizeObserver = new window.ResizeObserver(() => {
+			const newWidth = self.$item[0].clientWidth;
+
+			if (newWidth && newWidth !== width) {
+				width = newWidth;
+				relayout();
+			}
+		});
+		self.resizeObserver.observe(self.$item[0]);
+
 		self.emitEvent('initEvents');
 	}
 
@@ -683,6 +706,8 @@ class VP {
 
 		// destroy window events
 		$wnd.off(evp);
+
+		this.resizeObserver.disconnect();
 
 		this.emitEvent('destroyEvents');
 	}
