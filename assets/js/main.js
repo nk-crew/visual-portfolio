@@ -668,15 +668,20 @@ class VP {
 		});
 
 		// A page builder can widen the gallery by script, with no window resize.
-		// Layouts write the height, so only a width change is a resize.
-		let width = self.$item[0].getBoundingClientRect().width;
+		// Layouts write the height, so only a width change is a resize, and a
+		// hidden gallery reads 0 and keeps the layout it had.
+		let width = self.$item[0].clientWidth;
+
+		// The next frame: `stretch()` resizes the gallery inside a resize, which
+		// within the observer callback is a ResizeObserver loop error.
+		const resized = rafSchd(() => self.resized());
 
 		self.resizeObserver = new window.ResizeObserver(() => {
-			const newWidth = self.$item[0].getBoundingClientRect().width;
+			const newWidth = self.$item[0].clientWidth;
 
-			if (newWidth !== width) {
+			if (newWidth && newWidth !== width) {
 				width = newWidth;
-				self.resized();
+				resized();
 			}
 		});
 		self.resizeObserver.observe(self.$item[0]);

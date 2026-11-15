@@ -124,6 +124,39 @@ function getOverlaps(items) {
  * @return {Promise<Object>} `{ overlaps, right, width }` after the widening.
  */
 async function widenAfterLayout(page, link, selector) {
+	await openSettled(page, link, selector);
+
+	const before = await measure(page, selector);
+
+	expect(getOverlaps(before.items)).toEqual([]);
+
+	await page.evaluate(
+		({ box, width }) => {
+			document.getElementById(box).style.width = `${width}px`;
+		},
+		{ box: BOX, width: WIDE }
+	);
+
+	// Longer than any layout transition here.
+	await page.waitForTimeout(1500);
+
+	const after = await measure(page, selector);
+
+	return {
+		width: after.width,
+		overlaps: getOverlaps(after.items),
+		right: Math.round(Math.max(...after.items.map((item) => item.right))),
+	};
+}
+
+/**
+ * Open a page and wait until the gallery in the box has laid out its images.
+ *
+ * @param {import('@playwright/test').Page} page     - page under test.
+ * @param {string}                          link     - page URL.
+ * @param {string}                          selector - item selector.
+ */
+async function openSettled(page, link, selector) {
 	await page.goto(link);
 
 	// Settled at the narrow width: every image in, and the items placed.
@@ -147,28 +180,6 @@ async function widenAfterLayout(page, link, selector) {
 		)
 		.toBe(true);
 	await page.waitForTimeout(1000);
-
-	const before = await measure(page, selector);
-
-	expect(getOverlaps(before.items)).toEqual([]);
-
-	await page.evaluate(
-		({ box, width }) => {
-			document.getElementById(box).style.width = `${width}px`;
-		},
-		{ box: BOX, width: WIDE }
-	);
-
-	// Longer than any layout transition here.
-	await page.waitForTimeout(1500);
-
-	const after = await measure(page, selector);
-
-	return {
-		width: after.width,
-		overlaps: getOverlaps(after.items),
-		right: Math.round(Math.max(...after.items.map((item) => item.right))),
-	};
 }
 
 test.describe('Gallery inside a container that changes width', () => {
@@ -262,6 +273,98 @@ test.describe('Gallery inside a container that changes width', () => {
 			// The items reach across the new width, not the old one.
 			expect(result.right).toBeGreaterThan(WIDE - 30);
 		});
+	});
+
+	test('Visual Portfolio block keeps its layout while its container is hidden', async ({
+		page,
+		requestUtils,
+	}) => {
+		const link = await publish(
+			requestUtils,
+			'Container resize - legacy hidden',
+			inBox(
+				getLegacyMarkup({
+					block_id: 'e2eResizeHidden',
+					content_source: 'images',
+					images,
+					items_count: -1,
+					items_gap: 20,
+					layout: 'masonry',
+					masonry_columns: 2,
+				})
+			)
+		);
+
+		await openSettled(page, link, LEGACY_ITEM);
+
+		const getHeight = () =>
+			page.evaluate(
+				(box) =>
+					document.querySelector(`#${box} .vp-portfolio__items`)
+						.offsetHeight,
+				BOX
+			);
+		const height = await getHeight();
+
+		// A closed tab or accordion: the width reads 0 while it is hidden.
+		await page.evaluate((box) => {
+			document.getElementById(box).style.display = 'none';
+		}, BOX);
+		await page.waitForTimeout(1000);
+
+		// Read on the first frame after showing it, before any transition.
+		const shown = await page.evaluate(
+			(box) =>
+				new Promise((resolve) => {
+					document.getElementById(box).style.display = '';
+					window.requestAnimationFrame(() =>
+						resolve(
+							document.querySelector(
+								`#${box} .vp-portfolio__items`
+							).offsetHeight
+						)
+					);
+				}),
+			BOX
+		);
+
+		expect(height).toBeGreaterThan(0);
+		expect(shown).toBe(height);
+		expect(await getHeight()).toBe(height);
+	});
+
+	test('a stretched Visual Portfolio block widens without a page error', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.addInitScript(() => {
+			window.e2eErrors = [];
+			window.addEventListener('error', (event) =>
+				window.e2eErrors.push(String(event.message))
+			);
+		});
+
+		const link = await publish(
+			requestUtils,
+			'Container resize - legacy stretch',
+			inBox(
+				getLegacyMarkup({
+					block_id: 'e2eResizeStretch',
+					content_source: 'images',
+					images,
+					items_count: -1,
+					items_gap: 20,
+					layout: 'masonry',
+					masonry_columns: 2,
+					stretch: true,
+				})
+			)
+		);
+
+		const result = await widenAfterLayout(page, link, LEGACY_ITEM);
+
+		expect(result.overlaps).toEqual([]);
+		expect(await page.evaluate(() => window.e2eErrors)).toEqual([]);
 	});
 
 	[
