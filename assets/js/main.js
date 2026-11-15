@@ -677,7 +677,7 @@ class VP {
 		// inside the observer callback is a ResizeObserver loop error.
 		const relayout = rafSchd(() => {
 			self.resizeIsotope?.();
-			self.resizeFjGallery?.();
+			self.initFjGallery?.('resize');
 		});
 
 		self.resizeObserver = new window.ResizeObserver(() => {

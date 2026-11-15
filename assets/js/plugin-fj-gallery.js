@@ -1,7 +1,5 @@
 import $ from 'jquery';
 
-import { createResizeLoopGuard } from './_resize-loop';
-
 // Extend VP class.
 $(document).on('extendClass.vpf', (event, VP) => {
 	if (event.namespace !== 'vpf') {
@@ -60,27 +58,6 @@ $(document).on('extendClass.vpf', (event, VP) => {
 
 			this.emitEvent('initFjGallery', [initOptions, additional]);
 		}
-	};
-
-	/**
-	 * Lay fjGallery out again for a new width.
-	 */
-	VP.prototype.resizeFjGallery = function () {
-		if (!this.$items_wrap.data('fjGallery')) {
-			return;
-		}
-
-		const width = this.$items_wrap[0].clientWidth;
-
-		this.isFjGalleryResizeLoop =
-			this.isFjGalleryResizeLoop || createResizeLoopGuard();
-
-		// A hidden gallery reads 0 wide and keeps the layout it had.
-		if (!width || this.isFjGalleryResizeLoop(width)) {
-			return;
-		}
-
-		this.initFjGallery('resize');
 	};
 
 	/**
