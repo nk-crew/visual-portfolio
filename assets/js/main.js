@@ -667,6 +667,20 @@ class VP {
 			}
 		});
 
+		// A page builder can widen the gallery by script, with no window resize.
+		// Layouts write the height, so only a width change is a resize.
+		let width = self.$item[0].getBoundingClientRect().width;
+
+		self.resizeObserver = new window.ResizeObserver(() => {
+			const newWidth = self.$item[0].getBoundingClientRect().width;
+
+			if (newWidth !== width) {
+				width = newWidth;
+				self.resized();
+			}
+		});
+		self.resizeObserver.observe(self.$item[0]);
+
 		self.emitEvent('initEvents');
 	}
 
@@ -683,6 +697,8 @@ class VP {
 
 		// destroy window events
 		$wnd.off(evp);
+
+		this.resizeObserver.disconnect();
 
 		this.emitEvent('destroyEvents');
 	}
