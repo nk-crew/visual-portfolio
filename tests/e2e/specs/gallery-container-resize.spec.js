@@ -279,20 +279,22 @@ test.describe('Gallery inside a container that changes width', () => {
 		page,
 		requestUtils,
 	}) => {
+		const hiddenBox = 'e2e-hidden-box';
+		const gallery = (blockId) =>
+			getLegacyMarkup({
+				block_id: blockId,
+				content_source: 'images',
+				images,
+				items_count: -1,
+				items_gap: 20,
+				layout: 'masonry',
+				masonry_columns: 2,
+			});
 		const link = await publish(
 			requestUtils,
 			'Container resize - legacy hidden',
-			inBox(
-				getLegacyMarkup({
-					block_id: 'e2eResizeHidden',
-					content_source: 'images',
-					images,
-					items_count: -1,
-					items_gap: 20,
-					layout: 'masonry',
-					masonry_columns: 2,
-				})
-			)
+			inBox(gallery('e2eResizeWidened')) +
+				`<div id="${hiddenBox}" style="width: ${NARROW}px">${gallery('e2eResizeHidden')}</div>`
 		);
 
 		await openSettled(page, link, LEGACY_ITEM);
@@ -302,14 +304,19 @@ test.describe('Gallery inside a container that changes width', () => {
 				(box) =>
 					document.querySelector(`#${box} .vp-portfolio__items`)
 						.offsetHeight,
-				BOX
+				hiddenBox
 			);
 		const height = await getHeight();
 
-		// A closed tab or accordion: the width reads 0 while it is hidden.
-		await page.evaluate((box) => {
-			document.getElementById(box).style.display = 'none';
-		}, BOX);
+		// A closed tab or accordion reads 0 wide, and the gallery beside it
+		// changes width meanwhile.
+		await page.evaluate(
+			({ box, hidden, width }) => {
+				document.getElementById(hidden).style.display = 'none';
+				document.getElementById(box).style.width = `${width}px`;
+			},
+			{ box: BOX, hidden: hiddenBox, width: WIDE }
+		);
 		await page.waitForTimeout(1000);
 
 		// Read on the first frame after showing it, before any transition.
@@ -325,7 +332,7 @@ test.describe('Gallery inside a container that changes width', () => {
 						)
 					);
 				}),
-			BOX
+			hiddenBox
 		);
 
 		expect(height).toBeGreaterThan(0);

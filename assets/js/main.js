@@ -672,16 +672,20 @@ class VP {
 		// hidden gallery reads 0 and keeps the layout it had.
 		let width = self.$item[0].clientWidth;
 
-		// The next frame: `stretch()` resizes the gallery inside a resize, which
-		// within the observer callback is a ResizeObserver loop error.
-		const resized = rafSchd(() => self.resized());
+		// Only this gallery: a window resize would lay out hidden galleries at
+		// width 0. On the next frame, since a layout that resizes the gallery
+		// inside the observer callback is a ResizeObserver loop error.
+		const relayout = rafSchd(() => {
+			self.initIsotope?.('layout');
+			self.initFjGallery?.('resize');
+		});
 
 		self.resizeObserver = new window.ResizeObserver(() => {
 			const newWidth = self.$item[0].clientWidth;
 
 			if (newWidth && newWidth !== width) {
 				width = newWidth;
-				resized();
+				relayout();
 			}
 		});
 		self.resizeObserver.observe(self.$item[0]);

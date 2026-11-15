@@ -173,7 +173,10 @@ $doc.on('initEvents.vpf', (event, self) => {
 			throttle(
 				100,
 				rafSchd(() => {
-					self.initIsotope('layout');
+					// A hidden gallery reads 0 wide and keeps the layout it had.
+					if (self.$items_wrap[0].clientWidth) {
+						self.initIsotope('layout');
+					}
 				})
 			)
 		);
