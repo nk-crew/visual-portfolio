@@ -605,5 +605,39 @@ test.describe('Gallery inside a container that changes width', () => {
 			// The layout of the narrower width ends where its last row does.
 			expect(Math.abs(gap)).toBeLessThan(1);
 		});
+
+		test('Visual Portfolio block lays out a window that steps back across a breakpoint', async ({
+			page,
+			requestUtils,
+		}) => {
+			const link = await publish(
+				requestUtils,
+				'Container resize - breakpoint step back',
+				`<div id="${BOX}">${getLegacyMarkup({
+					block_id: 'e2eResizeStepBack',
+					content_source: 'images',
+					images,
+					items_count: -1,
+					items_gap: 20,
+					layout: 'masonry',
+					masonry_columns: 3,
+				})}</div><div style="height: 8000px"></div>`
+			);
+
+			// Three columns above 768px and two below it, with the scrollbar
+			// there the whole time: the window moves, not the page height.
+			await page.setViewportSize({ width: 766, height: 800 });
+			await openSettled(page, link, LEGACY_ITEM);
+
+			for (const width of [770, 766]) {
+				await page.setViewportSize({ width, height: 800 });
+				await page.waitForTimeout(300);
+			}
+			await page.waitForTimeout(1500);
+
+			const { items } = await measure(page, LEGACY_ITEM);
+
+			expect(getOverlaps(items)).toEqual([]);
+		});
 	});
 });
