@@ -182,6 +182,9 @@ async function openSettled(page, link, selector) {
 	await page.waitForTimeout(1000);
 }
 
+// A scrollbar that takes space, as on Windows, which headless Chromium hides.
+test.use({ launchOptions: { ignoreDefaultArgs: ['--hide-scrollbars'] } });
+
 test.describe('Gallery inside a container that changes width', () => {
 	let images = [];
 	const pageIds = [];
@@ -410,6 +413,101 @@ test.describe('Gallery inside a container that changes width', () => {
 			expect(result.width).toBe(WIDE);
 			expect(result.overlaps).toEqual([]);
 			expect(result.right).toBeGreaterThan(WIDE - 30);
+		});
+	});
+
+	test.describe('with a page scrollbar that takes space', () => {
+		test('Visual Portfolio block settles when its layout toggles the page scrollbar', async ({
+			page,
+			requestUtils,
+		}) => {
+			const box = 'e2e-fluid-box';
+			const link = await publish(
+				requestUtils,
+				'Container resize - legacy scrollbar',
+				`<div id="${box}" style="position: absolute; top: 0; left: 0; right: 0; max-width: none">${getLegacyMarkup(
+					{
+						block_id: 'e2eResizeScrollbar',
+						content_source: 'images',
+						images,
+						items_count: -1,
+						items_gap: 20,
+						layout: 'masonry',
+						masonry_columns: 2,
+					}
+				)}</div>`
+			);
+
+			const getPageHeight = () =>
+				page.evaluate(
+					(id) =>
+						Math.ceil(
+							document.getElementById(id).getBoundingClientRect()
+								.bottom + window.scrollY
+						),
+					box
+				);
+
+			// The page height with and without the scrollbar, on a viewport tall
+			// enough to need none.
+			await page.setViewportSize({ width: 1280, height: 4000 });
+			await page.goto(link);
+			await page.waitForTimeout(1500);
+
+			const tall = await getPageHeight();
+			const scrollbar = await page.evaluate(() => {
+				const root = document.documentElement;
+
+				root.style.overflowY = 'scroll';
+
+				const width = window.innerWidth - root.clientWidth;
+
+				root.style.overflowY = '';
+
+				return width;
+			});
+
+			await page.setViewportSize({
+				width: 1280 - scrollbar,
+				height: 4000,
+			});
+			await page.waitForTimeout(1500);
+
+			const short = await getPageHeight();
+
+			expect(tall).toBeGreaterThan(short + 4);
+
+			// Between the two, the layout that fits without a scrollbar needs one,
+			// and the one that fits with it does not.
+			await page.setViewportSize({
+				width: 1280,
+				height: Math.round((tall + short) / 2),
+			});
+			await page.goto(link);
+			await page.waitForTimeout(2000);
+
+			const flips = await page.evaluate(
+				() =>
+					new Promise((resolve) => {
+						const root = document.documentElement;
+						let width = root.clientWidth;
+						let count = 0;
+						const observer = new window.ResizeObserver(() => {
+							if (root.clientWidth !== width) {
+								width = root.clientWidth;
+								count += 1;
+							}
+						});
+
+						observer.observe(root);
+						setTimeout(() => {
+							observer.disconnect();
+							resolve(count);
+						}, 3000);
+					})
+			);
+
+			expect(flips).toBe(0);
 		});
 	});
 });
