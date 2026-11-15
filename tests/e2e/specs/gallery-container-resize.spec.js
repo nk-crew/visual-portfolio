@@ -182,6 +182,9 @@ async function openSettled(page, link, selector) {
 	await page.waitForTimeout(1000);
 }
 
+// A scrollbar that takes space, as on Windows, which headless Chromium hides.
+test.use({ launchOptions: { ignoreDefaultArgs: ['--hide-scrollbars'] } });
+
 test.describe('Gallery inside a container that changes width', () => {
 	let images = [];
 	const pageIds = [];
@@ -410,6 +413,231 @@ test.describe('Gallery inside a container that changes width', () => {
 			expect(result.width).toBe(WIDE);
 			expect(result.overlaps).toEqual([]);
 			expect(result.right).toBeGreaterThan(WIDE - 30);
+		});
+	});
+
+	test.describe('with a page scrollbar that takes space', () => {
+		[
+			{
+				name: 'Visual Portfolio block',
+				markup: () =>
+					getLegacyMarkup({
+						block_id: 'e2eResizeScrollbar',
+						content_source: 'images',
+						images,
+						items_count: -1,
+						items_gap: 20,
+						layout: 'masonry',
+						masonry_columns: 2,
+					}),
+			},
+			{
+				name: 'Gallery Loop masonry',
+				markup: () =>
+					getLoopMarkup(
+						{
+							block_id: 'e2e-resize-scrollbar-masonry',
+							queryId: 1,
+							queryType: 'images',
+							baseQuery: { perPage: IMAGES_COUNT, maxPages: 0 },
+							imagesQuery: { images },
+						},
+						{
+							layoutType: 'masonry',
+							layoutColumnsMode: 'manual',
+							layoutColumnCount: 2,
+							style: { spacing: { blockGap: '20px' } },
+						}
+					),
+			},
+			{
+				name: 'Gallery Loop justified',
+				markup: () =>
+					getLoopMarkup(
+						{
+							block_id: 'e2e-resize-scrollbar-justified',
+							queryId: 1,
+							queryType: 'images',
+							baseQuery: { perPage: IMAGES_COUNT, maxPages: 0 },
+							imagesQuery: { images },
+						},
+						{
+							layoutType: 'justified',
+							justifiedRowHeight: 300,
+							style: { spacing: { blockGap: '20px' } },
+						}
+					),
+			},
+		].forEach(({ name, markup }) => {
+			test(`${name} settles when its layout toggles the page scrollbar`, async ({
+				page,
+				requestUtils,
+			}) => {
+				const box = 'e2e-fluid-box';
+				const link = await publish(
+					requestUtils,
+					`Container resize - scrollbar ${name}`,
+					`<div id="${box}" style="position: absolute; top: 0; left: 0; right: 0; max-width: none">${markup()}</div>`
+				);
+
+				const getPageHeight = () =>
+					page.evaluate(
+						(id) =>
+							Math.ceil(
+								document
+									.getElementById(id)
+									.getBoundingClientRect().bottom +
+									window.scrollY
+							),
+						box
+					);
+
+				// The page height with and without the scrollbar, on a viewport tall
+				// enough to need none.
+				await page.setViewportSize({ width: 1280, height: 4000 });
+				await page.goto(link);
+				await page.waitForTimeout(1500);
+
+				const tall = await getPageHeight();
+				const scrollbar = await page.evaluate(() => {
+					const root = document.documentElement;
+
+					root.style.overflowY = 'scroll';
+
+					const width = window.innerWidth - root.clientWidth;
+
+					root.style.overflowY = '';
+
+					return width;
+				});
+
+				await page.setViewportSize({
+					width: 1280 - scrollbar,
+					height: 4000,
+				});
+				await page.waitForTimeout(1500);
+
+				const short = await getPageHeight();
+
+				expect(tall).toBeGreaterThan(short + 4);
+
+				// Between the two, the layout that fits without a scrollbar needs one,
+				// and the one that fits with it does not.
+				await page.setViewportSize({
+					width: 1280,
+					height: Math.round((tall + short) / 2),
+				});
+				await page.goto(link);
+				await page.waitForTimeout(2000);
+
+				const flips = await page.evaluate(
+					() =>
+						new Promise((resolve) => {
+							const root = document.documentElement;
+							let width = root.clientWidth;
+							let count = 0;
+							const observer = new window.ResizeObserver(() => {
+								if (root.clientWidth !== width) {
+									width = root.clientWidth;
+									count += 1;
+								}
+							});
+
+							observer.observe(root);
+							setTimeout(() => {
+								observer.disconnect();
+								resolve(count);
+							}, 3000);
+						})
+				);
+
+				expect(flips).toBe(0);
+			});
+		});
+
+		test('Visual Portfolio block lays out again when other content brings the scrollbar', async ({
+			page,
+			requestUtils,
+		}) => {
+			const box = 'e2e-fluid-box';
+			const link = await publish(
+				requestUtils,
+				'Container resize - scrollbar from content',
+				`<div id="${box}" style="position: absolute; top: 0; left: 0; right: 0; max-width: none">${getLegacyMarkup(
+					{
+						block_id: 'e2eResizeScrollbarContent',
+						content_source: 'images',
+						images,
+						items_count: -1,
+						items_gap: 20,
+						layout: 'masonry',
+						masonry_columns: 2,
+					}
+				)}</div>`
+			);
+
+			await page.setViewportSize({ width: 1280, height: 4000 });
+			await page.goto(link);
+			await page.waitForTimeout(1500);
+
+			// An accordion opening below the gallery.
+			await page.evaluate(() => {
+				const tall = document.createElement('div');
+
+				tall.style.height = '8000px';
+				document.body.append(tall);
+			});
+			await page.waitForTimeout(1500);
+
+			const gap = await page.evaluate((id) => {
+				const wrap = document.querySelector(
+					`#${id} .vp-portfolio__items`
+				);
+				const bottom = Math.max(
+					...[
+						...wrap.querySelectorAll('.vp-portfolio__item-wrap'),
+					].map((item) => item.getBoundingClientRect().bottom)
+				);
+
+				return wrap.getBoundingClientRect().bottom - bottom;
+			}, box);
+
+			// The layout of the narrower width ends where its last row does.
+			expect(Math.abs(gap)).toBeLessThan(1);
+		});
+
+		test('Visual Portfolio block lays out a window that steps back across a breakpoint', async ({
+			page,
+			requestUtils,
+		}) => {
+			const link = await publish(
+				requestUtils,
+				'Container resize - breakpoint step back',
+				`<div id="${BOX}">${getLegacyMarkup({
+					block_id: 'e2eResizeStepBack',
+					content_source: 'images',
+					images,
+					items_count: -1,
+					items_gap: 20,
+					layout: 'masonry',
+					masonry_columns: 3,
+				})}</div><div style="height: 8000px"></div>`
+			);
+
+			// Three columns above 768px and two below it, with the scrollbar
+			// there the whole time: the window moves, not the page height.
+			await page.setViewportSize({ width: 766, height: 800 });
+			await openSettled(page, link, LEGACY_ITEM);
+
+			for (const width of [770, 766]) {
+				await page.setViewportSize({ width, height: 800 });
+				await page.waitForTimeout(300);
+			}
+			await page.waitForTimeout(1500);
+
+			const { items } = await measure(page, LEGACY_ITEM);
+
+			expect(getOverlaps(items)).toEqual([]);
 		});
 	});
 });

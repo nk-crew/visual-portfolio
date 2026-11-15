@@ -8,6 +8,51 @@ const $doc = $(document);
 
 const SUPPORTED_LAYOUTS = ['tiles', 'masonry', 'grid'];
 
+// Longer than one turn of the loop below, the layout transition included.
+const SCROLLBAR_LOOP_TIME = 1000;
+
+/**
+ * Start a guard against a layout that toggles the page scrollbar.
+ *
+ * When the page height sits between its two scrollbar states, the layout at
+ * the wider width is tall enough to bring the scrollbar, and the one at the
+ * narrower width it leaves is short enough to lose it, back and forth, with
+ * the window untouched. No width settles, so the guard stops at the wider
+ * layout: the page keeps its scrollbar, and the items only shrink a little.
+ *
+ * @return {Function} takes the width a layout is about to run at, and returns
+ *                    whether that layout would only turn the loop again.
+ */
+function createScrollbarLoopGuard() {
+	let before = null;
+	let last = null;
+
+	return (width) => {
+		const time = window.performance.now();
+		const viewport = window.innerWidth;
+		const scrollbar = viewport - document.documentElement.clientWidth;
+
+		if (
+			before &&
+			width === before.width &&
+			width < last.width &&
+			viewport === before.viewport &&
+			viewport === last.viewport &&
+			scrollbar > last.scrollbar &&
+			time - last.time < SCROLLBAR_LOOP_TIME
+		) {
+			return true;
+		}
+
+		if (!last || last.width !== width) {
+			before = last;
+			last = { width, viewport, scrollbar, time };
+		}
+
+		return false;
+	};
+}
+
 // Extend VP class.
 $doc.on('extendClass.vpf', (event, VP) => {
 	if (event.namespace !== 'vpf') {
@@ -62,6 +107,27 @@ $doc.on('extendClass.vpf', (event, VP) => {
 
 			this.emitEvent('initIsotope', [initOptions]);
 		}
+	};
+
+	/**
+	 * Lay Isotope out again for a new width.
+	 */
+	VP.prototype.resizeIsotope = function () {
+		if (!this.$items_wrap.data('isotope')) {
+			return;
+		}
+
+		const width = window.getSize(this.$items_wrap[0]).innerWidth;
+
+		this.isScrollbarLoop =
+			this.isScrollbarLoop || createScrollbarLoopGuard();
+
+		// A hidden gallery reads 0 wide and keeps the layout it had.
+		if (!width || this.isScrollbarLoop(width)) {
+			return;
+		}
+
+		this.initIsotope('layout');
 	};
 
 	/**
@@ -173,10 +239,7 @@ $doc.on('initEvents.vpf', (event, self) => {
 			throttle(
 				100,
 				rafSchd(() => {
-					// A hidden gallery reads 0 wide and keeps the layout it had.
-					if (self.$items_wrap[0].clientWidth) {
-						self.initIsotope('layout');
-					}
+					self.resizeIsotope();
 				})
 			)
 		);
