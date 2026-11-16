@@ -151,19 +151,43 @@ function readBlocks(page) {
 	});
 }
 
+// The blocks this plugin ships, so blocks Pro adds to the family stay out.
+const OWN_BLOCKS = fs
+	.readdirSync(path.join(__dirname, '../../../gutenberg/blocks'))
+	.map(
+		(dir) =>
+			JSON.parse(
+				fs.readFileSync(
+					path.join(
+						__dirname,
+						'../../../gutenberg/blocks',
+						dir,
+						'block.json'
+					),
+					'utf8'
+				)
+			).name
+	);
+
 /**
- * Names of the registered blocks of the loop family.
+ * Names of the registered blocks of the loop family this plugin ships.
  *
  * @param {import('@playwright/test').Page} page - editor page.
  * @return {Promise<string[]>} block names.
  */
 function getFamilyNames(page) {
-	return page.evaluate(() =>
-		window.wp.blocks
-			.getBlockTypes()
-			.map(({ name }) => name)
-			.filter((name) => /^visual-portfolio\/(loop|item-)/.test(name))
-			.sort()
+	return page.evaluate(
+		(own) =>
+			window.wp.blocks
+				.getBlockTypes()
+				.map(({ name }) => name)
+				.filter(
+					(name) =>
+						own.includes(name) &&
+						/^visual-portfolio\/(loop|item-)/.test(name)
+				)
+				.sort(),
+		OWN_BLOCKS
 	);
 }
 
