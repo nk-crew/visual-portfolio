@@ -539,9 +539,13 @@ test.describe('Gallery Item Template', () => {
 		await expect(list).toHaveClass(/vp-layout-masonry/);
 		await expect(items).toHaveCount(PER_PAGE);
 
-		// The engine these tests run on has no Grid Lanes, so the layout
-		// library's script places the items, and marks the list it took.
-		await expect(list).toHaveAttribute('data-re-masonry', '');
+		// Where the engine has no Grid Lanes, the layout library's script places
+		// the items and marks the list it took; where it has them, nothing does.
+		if (await list.evaluate(() => CSS.supports('display', 'grid-lanes'))) {
+			await expect(list).not.toHaveAttribute('data-re-masonry');
+		} else {
+			await expect(list).toHaveAttribute('data-re-masonry', '');
+		}
 
 		// Packed into columns.
 		await expect
@@ -638,11 +642,18 @@ test.describe('Gallery Item Template', () => {
 
 		await expect(items).toHaveCount(IMAGES_COUNT);
 
-		// The engine these tests run on has no Grid Lanes, so the layout
-		// library's script lays the canvas out, and marks the list it took.
-		await expect(
-			getEditorCanvas(page, editor).locator(LIST).first()
-		).toHaveAttribute('data-re-masonry', '');
+		// Where the canvas has no Grid Lanes, the layout library's script lays
+		// it out and marks the list it took; where it has them, nothing does.
+		const canvasList = getEditorCanvas(page, editor).locator(LIST).first();
+		const native = await canvasList.evaluate((node) =>
+			node.ownerDocument.defaultView.CSS.supports('display', 'grid-lanes')
+		);
+
+		if (native) {
+			await expect(canvasList).not.toHaveAttribute('data-re-masonry');
+		} else {
+			await expect(canvasList).toHaveAttribute('data-re-masonry', '');
+		}
 
 		lateUrl = await items
 			.first()

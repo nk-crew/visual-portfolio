@@ -273,28 +273,6 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 		--re-justified-row-height: var(--vp-layout-row-height, 320px);
 		--re-justified-gap: var(--vp-layout-gap, 1.5rem);
 		--re-justified-row-gap: #{$row-gap};
-
-		// The whole picture box takes the proportion, border included, so a
-		// border on the image keeps a row's pictures one height. Only the
-		// item's own picture: a gallery inside an item keeps its shapes.
-		#{$item} .wp-block-visual-portfolio-item-image:not(.wp-block-visual-portfolio-item-template .wp-block-visual-portfolio-item-template *) {
-			box-sizing: border-box;
-			width: 100% !important;
-			height: auto !important;
-			aspect-ratio: var(--re-ratio) !important;
-
-			> a {
-				display: block;
-				height: 100%;
-			}
-
-			img {
-				width: 100%;
-				height: 100% !important;
-				aspect-ratio: auto !important;
-				object-fit: cover;
-			}
-		}
 	}
 
 	// A scroll container, nothing more: the swipe, the scroll and the keyboard
@@ -745,5 +723,38 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 		padding-inline-start: calc(50cqw + var(--vp-carousel-seam-shift, 0px)) !important;
 		padding-inline-end: calc(50cqw - var(--vp-carousel-seam-shift, 0px)) !important;
 		scroll-padding-inline: var(--vp-carousel-inset, 0) !important;
+	}
+}
+
+// The picture of a justified item is as tall as the row: its box takes the
+// item's width over its proportion, border and padding included, and what is
+// inside fills it. A height rather than `aspect-ratio`, so the percentage
+// heights inside resolve against the content box in every engine. Scoped to
+// the item's own picture: a gallery inside an item keeps its own shapes.
+@scope (.wp-block-visual-portfolio-item-template.vp-layout-justified > #{$item}) to (.wp-block-visual-portfolio-item-template) {
+	:scope {
+		container-type: inline-size;
+	}
+
+	.wp-block-visual-portfolio-item-image,
+	.wp-block-visual-portfolio-item-cover {
+		box-sizing: border-box;
+		width: auto !important;
+		height: calc(100cqw / var(--re-ratio)) !important;
+		aspect-ratio: auto !important;
+	}
+
+	.wp-block-visual-portfolio-item-image {
+		> a {
+			display: block;
+			height: 100%;
+		}
+
+		img {
+			width: 100%;
+			height: 100% !important;
+			aspect-ratio: auto !important;
+			object-fit: cover;
+		}
 	}
 }

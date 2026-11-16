@@ -621,7 +621,12 @@ test.describe('Gallery Item Template layouts', () => {
 
 		const list = page.locator(LIST);
 
-		await expect(list).toHaveAttribute('data-re-masonry', '');
+		// Where the engine has no Grid Lanes, the library's script packs them.
+		if (
+			!(await list.evaluate(() => CSS.supports('display', 'grid-lanes')))
+		) {
+			await expect(list).toHaveAttribute('data-re-masonry', '');
+		}
 
 		// Each item sits a row gap under the one above it in its column. An
 		// item measured across the whole width before it was placed would sit
@@ -664,6 +669,226 @@ test.describe('Gallery Item Template layouts', () => {
 						);
 					}),
 				{ timeout: 20000 }
+			)
+			.toBe(true);
+	});
+
+	// Pictures of four shapes: rows of one shape would hide a picture box that
+	// ignores the proportion it was laid out with.
+	const shapedImages = [];
+
+	async function getShapedImages(requestUtils) {
+		if (!shapedImages.length) {
+			for (const name of [
+				'image-800x600.png',
+				'image-600x900.png',
+				'image-1200x600.png',
+				'image-600x600.png',
+				'image-600x900.png',
+				'image-1200x600.png',
+			]) {
+				const uploaded = await requestUtils.uploadMedia(
+					getFixturePath(name)
+				);
+
+				shapedImages.push({ id: uploaded.id });
+			}
+		}
+
+		return shapedImages;
+	}
+
+	/**
+	 * Heights of the pictures of each full row of a justified list - every row
+	 * but the last, which may not be full.
+	 *
+	 * @param {import('@playwright/test').Locator} list    - justified list.
+	 * @param {string}                             picture - selector of the picture box.
+	 * @return {Promise<number[][]>} picture heights per row.
+	 */
+	function getRowPictureHeights(list, picture) {
+		return list.evaluate((node, selector) => {
+			const rows = new Map();
+
+			Array.from(node.children).forEach((item) => {
+				const box = item.querySelector(selector);
+
+				if (!box) {
+					return;
+				}
+
+				const top = Math.round(item.getBoundingClientRect().top);
+
+				rows.set(top, [
+					...(rows.get(top) || []),
+					box.getBoundingClientRect().height,
+				]);
+			});
+
+			return [...rows.values()].slice(0, -1);
+		}, picture);
+	}
+
+	const sameHeights = (rows) =>
+		rows.length > 0 &&
+		rows.every(
+			(heights) =>
+				heights.length > 1 &&
+				Math.max(...heights) - Math.min(...heights) < 1
+		);
+
+	test('justified keeps one picture height per row with a border and margin on the image', async ({
+		page,
+		requestUtils,
+	}) => {
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Layouts - justified border',
+				status: 'publish',
+				content: getLoopMarkup({
+					blockId: 'e2e-justified-border',
+					images: await getShapedImages(requestUtils),
+					layout: {
+						layoutType: 'justified',
+						justifiedRowHeight: 200,
+						style: { spacing: { blockGap: '10px' } },
+					},
+				}).replace(
+					'<!-- wp:visual-portfolio/item-image {"clickAction":"url"} /-->',
+					'<!-- wp:visual-portfolio/item-image {"clickAction":"url","style":{"border":{"width":"12px","color":"#000000","style":"solid"},"spacing":{"padding":{"top":"6px","right":"6px","bottom":"6px","left":"6px"},"margin":{"left":"16px","right":"16px"}}}} /-->'
+				),
+			},
+		});
+
+		pageIds.push(created.id);
+		await page.goto(created.link);
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveAttribute('data-re-justified', /.+/);
+		await expect
+			.poll(async () =>
+				sameHeights(
+					await getRowPictureHeights(
+						list,
+						'.wp-block-visual-portfolio-item-image'
+					)
+				)
+			)
+			.toBe(true);
+
+		// A margin narrows the picture inside its item, never past the list.
+		expect(
+			await list.evaluate((node) => {
+				const right = node.getBoundingClientRect().right;
+
+				return Math.max(
+					...Array.from(
+						node.querySelectorAll(
+							'.wp-block-visual-portfolio-item-image'
+						)
+					).map((box) => box.getBoundingClientRect().right - right)
+				);
+			})
+		).toBeLessThan(0.5);
+	});
+
+	test('justified sizes an item cover to the row like an image', async ({
+		page,
+		requestUtils,
+	}) => {
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Layouts - justified cover',
+				status: 'publish',
+				content: getLoopMarkup({
+					blockId: 'e2e-justified-cover',
+					images: await getShapedImages(requestUtils),
+					layout: {
+						layoutType: 'justified',
+						justifiedRowHeight: 200,
+						style: { spacing: { blockGap: '10px' } },
+					},
+				}).replace(
+					'<!-- wp:visual-portfolio/item-image {"clickAction":"url"} /-->',
+					'<!-- wp:visual-portfolio/item-cover /-->'
+				),
+			},
+		});
+
+		pageIds.push(created.id);
+		await page.goto(created.link);
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveAttribute('data-re-justified', /.+/);
+		await expect
+			.poll(async () =>
+				sameHeights(
+					await getRowPictureHeights(
+						list,
+						'.wp-block-visual-portfolio-item-cover'
+					)
+				)
+			)
+			.toBe(true);
+	});
+
+	test('a justified gallery inside a grid item keeps its rows', async ({
+		page,
+		requestUtils,
+	}) => {
+		const inner = getLoopMarkup({
+			blockId: 'e2e-justified-nested',
+			queryId: 2,
+			images: await getShapedImages(requestUtils),
+			layout: {
+				layoutType: 'justified',
+				justifiedRowHeight: 150,
+				style: { spacing: { blockGap: '10px' } },
+			},
+		}).replace(
+			'<!-- wp:visual-portfolio/item-image {"clickAction":"url"} /-->',
+			'<!-- wp:visual-portfolio/item-image {"clickAction":"url","aspectRatio":"1"} /-->'
+		);
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Layouts - justified nested',
+				status: 'publish',
+				content: getLoopMarkup({
+					blockId: 'e2e-grid-outer',
+					images: images.slice(0, 1),
+					perPage: 1,
+					layout: {
+						layoutType: 'grid',
+						layoutColumnsMode: 'manual',
+						layoutColumnCount: 1,
+					},
+					itemBlocks: inner,
+				}),
+			},
+		});
+
+		pageIds.push(created.id);
+		await page.goto(created.link);
+
+		const nested = page.locator(`${LIST}.vp-layout-justified`);
+
+		await expect(nested).toHaveAttribute('data-re-justified', /.+/);
+		await expect
+			.poll(async () =>
+				sameHeights(
+					await getRowPictureHeights(
+						nested,
+						'.wp-block-visual-portfolio-item-image'
+					)
+				)
 			)
 			.toBe(true);
 	});
