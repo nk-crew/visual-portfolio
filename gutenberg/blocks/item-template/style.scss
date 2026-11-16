@@ -174,8 +174,8 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 	}
 
 	// A grid in auto mode needs no script: the browser fits as many tracks as
-	// the container holds. Masonry and the carousel cannot say it in CSS, and
-	// have their count written onto the list by the layout module instead.
+	// the container holds. The carousel cannot say it in CSS, and has its count
+	// written onto the list by the layout module instead.
 	&.vp-layout-grid.vp-layout-auto-columns {
 		container-type: inline-size;
 		grid-template-columns: repeat(var(--vp-layout-auto-placement), minmax(var(--vp-layout-track, min(16rem, 100%)), 1fr));
@@ -274,11 +274,26 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 		--re-justified-gap: var(--vp-layout-gap, 1.5rem);
 		--re-justified-row-gap: #{$row-gap};
 
-		#{$item} .wp-block-visual-portfolio-item-image img {
-			aspect-ratio: var(--re-ratio) !important;
-			width: 100%;
+		// The whole picture box takes the proportion, border included, so a
+		// border on the image keeps a row's pictures one height. Only the
+		// item's own picture: a gallery inside an item keeps its shapes.
+		#{$item} .wp-block-visual-portfolio-item-image:not(.wp-block-visual-portfolio-item-template .wp-block-visual-portfolio-item-template *) {
+			box-sizing: border-box;
+			width: 100% !important;
 			height: auto !important;
-			object-fit: cover;
+			aspect-ratio: var(--re-ratio) !important;
+
+			> a {
+				display: block;
+				height: 100%;
+			}
+
+			img {
+				width: 100%;
+				height: 100% !important;
+				aspect-ratio: auto !important;
+				object-fit: cover;
+			}
 		}
 	}
 

@@ -1011,7 +1011,6 @@ export default function BlockEdit({
 	const listRef = useEditorLayout({
 		layoutType,
 		justified: {
-			rowHeight: justifiedRowHeight,
 			rowHeightTolerance: justifiedRowHeightTolerance,
 			maxRowsCount: justifiedMaxRowsCount,
 			lastRow: justifiedLastRow,
@@ -1931,8 +1930,8 @@ export default function BlockEdit({
 					{/* Out of the flow, so a settings change never moves the
 				    gallery under the pointer that is still changing it. A
 				    list item rather than a sibling: the list is the block
-				    element, and neither layout library looks at a node
-				    without the item class. */}
+				    element, and the layout library leaves a child out of
+				    the flow out of its rows and lanes. */}
 					{isWaiting ? (
 						<li
 							className="wp-block-visual-portfolio-item-template__editor-spinner"

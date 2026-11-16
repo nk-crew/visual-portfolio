@@ -638,6 +638,12 @@ test.describe('Gallery Item Template', () => {
 
 		await expect(items).toHaveCount(IMAGES_COUNT);
 
+		// The engine these tests run on has no Grid Lanes, so the layout
+		// library's script lays the canvas out, and marks the list it took.
+		await expect(
+			getEditorCanvas(page, editor).locator(LIST).first()
+		).toHaveAttribute('data-re-masonry', '');
+
 		lateUrl = await items
 			.first()
 			.locator('img')

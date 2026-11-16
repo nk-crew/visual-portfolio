@@ -1258,10 +1258,9 @@ class Visual_Portfolio_Block_Item_Template {
 
 				$last_row = isset( $attributes['justifiedLastRow'] ) ? (string) $attributes['justifiedLastRow'] : 'left';
 
-				$extra['data-vp-justified-row-height'] = max( 40, (int) ( $attributes['justifiedRowHeight'] ?? 320 ) );
-				$extra['data-vp-justified-tolerance']  = max( 0, min( 1, (float) ( $attributes['justifiedRowHeightTolerance'] ?? 0.25 ) ) );
-				$extra['data-vp-justified-max-rows']   = max( 0, (int) ( $attributes['justifiedMaxRowsCount'] ?? 0 ) );
-				$extra['data-vp-justified-last-row']   = in_array( $last_row, array( 'left', 'center', 'right', 'hide' ), true ) ? $last_row : 'left';
+				$extra['data-vp-justified-tolerance'] = max( 0, min( 1, (float) ( $attributes['justifiedRowHeightTolerance'] ?? 0.25 ) ) );
+				$extra['data-vp-justified-max-rows']  = max( 0, (int) ( $attributes['justifiedMaxRowsCount'] ?? 0 ) );
+				$extra['data-vp-justified-last-row']  = in_array( $last_row, array( 'left', 'center', 'right', 'hide' ), true ) ? $last_row : 'left';
 				break;
 
 			case 'carousel':

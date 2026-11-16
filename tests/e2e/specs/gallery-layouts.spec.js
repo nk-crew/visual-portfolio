@@ -601,6 +601,73 @@ test.describe('Gallery Item Template layouts', () => {
 		});
 	});
 
+	test('masonry that fills the available space packs its columns', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - masonry auto fit',
+			blockId: 'e2e-masonry-auto-fit',
+			images,
+			layout: {
+				layoutType: 'masonry',
+				layoutColumnsMode: 'auto',
+				layoutMinimumColumnWidth: '12rem',
+				layoutColumnCount: 3,
+				layoutAutoFit: true,
+				style: { spacing: { blockGap: '20px' } },
+			},
+		});
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveAttribute('data-re-masonry', '');
+
+		// Each item sits a row gap under the one above it in its column. An
+		// item measured across the whole width before it was placed would sit
+		// hundreds of pixels lower.
+		await expect
+			.poll(
+				() =>
+					list.evaluate((node) => {
+						const box = node.getBoundingClientRect();
+						const gap = parseFloat(getComputedStyle(node).rowGap);
+						const columns = new Map();
+
+						Array.from(node.children).forEach((item) => {
+							const rect = item.getBoundingClientRect();
+							const x = Math.round(rect.x - box.x);
+
+							columns.set(x, [
+								...(columns.get(x) || []),
+								{ y: rect.y - box.y, height: rect.height },
+							]);
+						});
+
+						return (
+							columns.size > 1 &&
+							[...columns.values()].every((column) =>
+								column
+									.sort((a, b) => a.y - b.y)
+									.every((item, index) =>
+										0 === index
+											? Math.abs(item.y) < 2
+											: Math.abs(
+													item.y -
+														(column[index - 1].y +
+															column[index - 1]
+																.height +
+															gap)
+												) < 2
+									)
+							)
+						);
+					}),
+				{ timeout: 20000 }
+			)
+			.toBe(true);
+	});
+
 	test('carousel scrolls, snaps, takes the keyboard and moves with its controls', async ({
 		page,
 		requestUtils,
