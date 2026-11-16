@@ -178,6 +178,7 @@ export default function ItemCoverEdit({
 		'vp/itemFocalPoint': itemFocalPoint,
 		'vp/itemFormat': itemFormat,
 		'vp/layoutColumns': layoutColumns,
+		'vp/layoutType': layoutType,
 	} = context;
 
 	const blockEditingMode = useBlockEditingMode();
@@ -353,50 +354,57 @@ export default function ItemCoverEdit({
 							panelId={clientId}
 						/>
 					</InspectorControls>
-					<InspectorControls group="dimensions">
-						{/* "Original" here is the proportions of each item's own
-						    image, which is what a masonry layout is made of. */}
-						<AspectRatioTool
-							panelId={clientId}
-							value={aspectRatio}
-							defaultValue="1"
-							onChange={(value) =>
-								setAttributes({ aspectRatio: value })
-							}
-							resetAllFilter={() => ({ aspectRatio: '1' })}
-						/>
-						<ToolsPanelItem
-							label={__('Minimum height', 'visual-portfolio')}
-							hasValue={() => !!minHeight}
-							onDeselect={() =>
-								setAttributes({ minHeight: undefined })
-							}
-							resetAllFilter={() => ({ minHeight: undefined })}
-							panelId={clientId}
-						>
-							<UnitControl
-								label={__('Minimum height', 'visual-portfolio')}
-								value={minHeight}
-								onChange={(value) =>
-									setAttributes({ minHeight: value })
-								}
-							/>
-						</ToolsPanelItem>
-						{/* A cover with neither is exactly its own image, so
-						    there is nothing for the scale to do. */}
-						{!!(aspectRatio || minHeight) && (
-							<ScaleTool
+					{'justified' !== layoutType && (
+						<InspectorControls group="dimensions">
+							{/* "Original" here is the proportions of each item's own
+							    image, which is what a masonry layout is made of. */}
+							<AspectRatioTool
 								panelId={clientId}
-								value={backgroundSize}
+								value={aspectRatio}
+								defaultValue="1"
 								onChange={(value) =>
-									setAttributes({ backgroundSize: value })
+									setAttributes({ aspectRatio: value })
+								}
+								resetAllFilter={() => ({ aspectRatio: '1' })}
+							/>
+							<ToolsPanelItem
+								label={__('Minimum height', 'visual-portfolio')}
+								hasValue={() => !!minHeight}
+								onDeselect={() =>
+									setAttributes({ minHeight: undefined })
 								}
 								resetAllFilter={() => ({
-									backgroundSize: 'cover',
+									minHeight: undefined,
 								})}
-							/>
-						)}
-					</InspectorControls>
+								panelId={clientId}
+							>
+								<UnitControl
+									label={__(
+										'Minimum height',
+										'visual-portfolio'
+									)}
+									value={minHeight}
+									onChange={(value) =>
+										setAttributes({ minHeight: value })
+									}
+								/>
+							</ToolsPanelItem>
+							{/* A cover with neither is exactly its own image, so
+							    there is nothing for the scale to do. */}
+							{!!(aspectRatio || minHeight) && (
+								<ScaleTool
+									panelId={clientId}
+									value={backgroundSize}
+									onChange={(value) =>
+										setAttributes({ backgroundSize: value })
+									}
+									resetAllFilter={() => ({
+										backgroundSize: 'cover',
+									})}
+								/>
+							)}
+						</InspectorControls>
+					)}
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}

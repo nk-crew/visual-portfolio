@@ -1073,4 +1073,54 @@ test.describe('Gallery Item Image toolbar', () => {
 			page.getByRole('menuitem', { name: 'Remove from gallery' })
 		).toHaveCount(0);
 	});
+
+	test('offers no picture size in a justified layout', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await admin.createNewPost({
+			title: 'Gallery Item Image toolbar - justified size',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+
+		const loop = getLoopBlock({
+			queryType: 'images',
+			imagesQuery: { images: [{ id: image.id }] },
+		});
+
+		loop.innerBlocks[0].attributes.layoutType = 'justified';
+		await editor.insertBlock(loop);
+
+		const canvas = getEditorCanvas(page, editor);
+
+		await expect(canvas.locator(`${ITEM}:visible`)).toHaveCount(1);
+		await editor.selectBlocks(canvas.locator(ITEM_IMAGE).first());
+		await editor.openDocumentSettingsSidebar();
+
+		const settings = page.getByRole('region', { name: 'Editor settings' });
+		const aspectRatio = settings.getByRole('combobox', {
+			name: 'Aspect ratio',
+		});
+
+		await settings.getByRole('tab', { name: 'Styles' }).click();
+		await expect(
+			settings.getByRole('heading', { name: 'Dimensions' })
+		).toBeVisible();
+		await expect(aspectRatio).toHaveCount(0);
+
+		await page.evaluate(() => {
+			const { select, dispatch } = window.wp.data;
+			const [block] = select('core/block-editor').getBlocks();
+
+			dispatch('core/block-editor').updateBlockAttributes(
+				block.innerBlocks[0].clientId,
+				{ layoutType: 'grid' }
+			);
+		});
+
+		await expect(aspectRatio).toBeVisible();
+	});
 });
