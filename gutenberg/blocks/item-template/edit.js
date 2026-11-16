@@ -338,10 +338,6 @@ function getAutoplayModeHelp(repeatable) {
 	);
 }
 
-// The same question the view module asks: where the browser packs masonry
-// itself, the stylesheet does the layout and no script should run over it.
-const HAS_NATIVE_MASONRY = !!window.CSS?.supports?.('display', 'grid-lanes');
-
 // The units a column width is typed in, the same set the core grid offers.
 const CSS_UNITS = [
 	{ value: 'px', label: 'px', default: 320 },
@@ -953,11 +949,14 @@ export default function BlockEdit({
 			return '';
 		}
 
-		const classes = [
-			'masonry' === layoutType && HAS_NATIVE_MASONRY
-				? 'vp-layout-masonry-native'
-				: `vp-layout-${layoutType}`,
-		];
+		const classes = [`vp-layout-${layoutType}`];
+
+		// The classes the layout library styles, as the page prints them.
+		if ('justified' === layoutType) {
+			classes.push('re-justified');
+		} else if ('masonry' === layoutType) {
+			classes.push('re-masonry');
+		}
 
 		if ('grid' === layoutType && verticalAlignment) {
 			classes.push(`are-vertically-aligned-${verticalAlignment}`);

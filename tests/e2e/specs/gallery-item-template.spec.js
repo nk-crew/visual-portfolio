@@ -177,13 +177,51 @@ async function getGalleryImages(requestUtils, count) {
  * @param {import('@playwright/test').Locator} items - item locator.
  * @return {Promise<Array>} `{ position, top }` of every item.
  */
-function getItemPositions(items) {
-	return items.evaluateAll((nodes) =>
-		nodes.map((node) => ({
-			position: window.getComputedStyle(node).position,
-			top: Number.parseFloat(node.style.top) || 0,
-		}))
-	);
+/**
+ * Whether a masonry list has packed its items: more than one column, and each
+ * item right under the one above it in its column - a row gap away, where a
+ * plain grid would leave the gap of a taller neighbour - with none overlapping.
+ *
+ * @param {import('@playwright/test').Locator} list - item template list.
+ * @return {Promise<{packed: boolean, rows: number, height: number}>} layout.
+ */
+function getMasonryLayout(list) {
+	return list.evaluate((node) => {
+		const box = node.getBoundingClientRect();
+		const rowGap = parseFloat(window.getComputedStyle(node).rowGap) || 0;
+		const columns = new Map();
+
+		Array.from(node.children).forEach((item) => {
+			const rect = item.getBoundingClientRect();
+			const x = Math.round(rect.x - box.x);
+
+			columns.set(x, [
+				...(columns.get(x) || []),
+				{ y: rect.y - box.y, height: rect.height },
+			]);
+		});
+
+		const packed = [...columns.values()].every((column) =>
+			column
+				.sort((a, b) => a.y - b.y)
+				.every((item, index) =>
+					0 === index
+						? Math.abs(item.y) < 2
+						: Math.abs(
+								item.y -
+									(column[index - 1].y +
+										column[index - 1].height +
+										rowGap)
+							) < 2
+				)
+		);
+
+		return {
+			packed: columns.size > 1 && packed,
+			rows: Math.max(...[...columns.values()].map((c) => c.length)),
+			height: box.height,
+		};
+	});
 }
 
 test.describe('Gallery Item Template', () => {
@@ -501,48 +539,36 @@ test.describe('Gallery Item Template', () => {
 		await expect(list).toHaveClass(/vp-layout-masonry/);
 		await expect(items).toHaveCount(PER_PAGE);
 
-		// CSS alone leaves the items in the flow; only the layout callback takes
-		// them out of it. Images are measured first, so this settles late.
+		// The engine these tests run on has no Grid Lanes, so the layout
+		// library's script places the items, and marks the list it took.
+		await expect(list).toHaveAttribute('data-re-masonry', '');
+
+		// Packed into columns.
 		await expect
-			.poll(
-				async () =>
-					(await getItemPositions(items)).every(
-						(item) => 'absolute' === item.position
-					),
-				{ timeout: 20000 }
-			)
+			.poll(async () => (await getMasonryLayout(list)).packed, {
+				timeout: 20000,
+			})
 			.toBe(true);
 
 		// Two columns and three items: one of them had to go into a second row.
-		const positioned = await getItemPositions(items);
+		const before = await getMasonryLayout(list);
 
-		expect(positioned.some((item) => item.top > 0)).toBe(true);
-
-		const heightBefore = await list.evaluate((node) => node.style.height);
+		expect(before.rows).toBeGreaterThan(1);
 
 		await frontend.locator(LOAD_MORE).click();
 
 		await expect(items).toHaveCount(POSTS_COUNT);
 
-		// The appended items are laid out too, and the container grew to hold
-		// them - Masonry writes both, so neither survives a missed relayout.
+		// The appended items are packed too, and the list grew to hold them.
 		await expect
-			.poll(
-				async () =>
-					(await getItemPositions(items)).every(
-						(item) => 'absolute' === item.position
-					),
-				{ timeout: 20000 }
-			)
+			.poll(async () => (await getMasonryLayout(list)).packed, {
+				timeout: 20000,
+			})
 			.toBe(true);
 
 		await expect
-			.poll(async () =>
-				Number.parseFloat(
-					await list.evaluate((node) => node.style.height)
-				)
-			)
-			.toBeGreaterThan(Number.parseFloat(heightBefore));
+			.poll(async () => (await getMasonryLayout(list)).height)
+			.toBeGreaterThan(before.height);
 	});
 
 	test('masonry in the editor places an item again once its picture arrives', async ({

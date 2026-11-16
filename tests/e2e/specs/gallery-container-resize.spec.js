@@ -486,7 +486,9 @@ test.describe('Gallery inside a container that changes width', () => {
 						},
 						{
 							layoutType: 'justified',
-							justifiedRowHeight: 300,
+							// Two full rows: their scaling is what moves the
+							// page height when the scrollbar comes.
+							justifiedRowHeight: 400,
 							style: { spacing: { blockGap: '20px' } },
 						}
 					),

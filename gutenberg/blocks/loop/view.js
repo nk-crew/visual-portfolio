@@ -5,8 +5,6 @@ import {
 	withSyncEvent,
 } from '@wordpress/interactivity';
 
-import { syncColumns } from '../item-template/auto-columns';
-
 /**
  * The front end of the whole Gallery Loop family - the loop wrapper, its filter,
  * sort and pagination controls and the item template all run on this one store.
@@ -22,20 +20,12 @@ import { syncColumns } from '../item-template/auto-columns';
 
 const LOOP_SELECTOR = '.vp-block-loop';
 const LIST_SELECTOR = '.wp-block-visual-portfolio-item-template';
-const ITEM_SELECTOR = '.wp-block-visual-portfolio-item-template__item';
 const PAGINATION_SELECTOR = '.vp-block-loop-pagination';
 const TRIGGER_SELECTOR = '.vp-block-loop-pagination-trigger';
 const END_SELECTOR = '.vp-block-loop-pagination-end';
-const MASONRY_CLASS = 'vp-layout-masonry';
 const RANGE_SELECTOR = '.vp-block-loop-query-total[data-vp-range-text]';
 const THUMBS_SELECTOR = '.vp-block-loop-carousel-thumbnails';
 const THUMB_SELECTOR = '.vp-block-loop-carousel-thumb';
-
-// Written on the list once Masonry is positioning the items, and read by the
-// stylesheet: until then the browser packs them into columns on its own. Not
-// the hydration-time `vp-has-script` class - `masonry` is a classic script and a
-// plugin is free to defer it, so the module can be running long before it.
-const MASONRY_READY_CLASS = 'vp-has-masonry';
 
 // What a fetch of the next page came to. Only the infinite observer reads them:
 // it has to know whether asking again could ever answer differently.
@@ -49,7 +39,8 @@ const STOP = 'stop';
 // with a page - past that, nothing this loop could say about itself is true.
 const NAVIGATION_TIMEOUT = 10000;
 
-// Listened for by the item template module, which owns justified and carousel.
+// Listened for by the item template module, which owns justified, masonry and
+// carousel.
 const RELAYOUT_EVENT = 'vp-relayout';
 
 // Sent by an infinite trigger before a load it starts by itself; an extension
@@ -63,10 +54,6 @@ const REQUEST_EVENT = 'vp-loop-request';
 // Sent on a loop once it shows what it loaded.
 const LOADED_EVENT = 'vp-loop-loaded';
 
-const masonryLayouts = new WeakMap();
-const autoColumns = new WeakMap();
-const resizeObservers = new WeakMap();
-const observedWidths = new WeakMap();
 const pendingRequests = new WeakMap();
 const loopUndos = new WeakMap();
 const loopUndoAddresses = new WeakMap();
@@ -96,213 +83,15 @@ function getLoopContext() {
 }
 
 /**
- * Masonry gutter, as CSS resolved it.
- *
- * Item widths are a `calc()` over the layout variables and Masonry measures
- * them off the first item. The gap is declared next to them as `column-gap`, so
- * reading it back keeps CSS the only place either number is written down - and
- * a theme that overrides the variables per breakpoint keeps working.
- *
- * @param {HTMLElement} list Item template list.
- *
- * @return {number} Gutter in pixels.
- */
-function getGutter(list) {
-	const gap = window.getComputedStyle(list).columnGap;
-
-	// A percentage gap is not resolved at computed-value time, and it resolves
-	// against the same width the item `calc()` uses.
-	if (gap.endsWith('%')) {
-		return (parseFloat(gap) / 100) * list.clientWidth || 0;
-	}
-
-	return parseFloat(gap) || 0;
-}
-
-/**
- * Run a callback once the images inside the target have been measured.
- *
- * @param {HTMLElement|HTMLElement[]} target   Element or elements to watch.
- * @param {Function}                  callback Callback.
- */
-function whenImagesLoaded(target, callback) {
-	const { imagesLoaded } = window;
-
-	if (!imagesLoaded) {
-		return;
-	}
-
-	imagesLoaded(target, callback);
-}
-
-/**
- * Keep the layout correct while the container is resized.
- *
- * Masonry writes the container height, so a plain size observer would schedule
- * itself forever - only a width change can alter the layout.
- *
- * @param {HTMLElement} list Item template list.
- */
-function observeWidth(list) {
-	if (!window.ResizeObserver || resizeObservers.has(list)) {
-		return;
-	}
-
-	const observer = new window.ResizeObserver((entries) => {
-		entries.forEach((entry) => {
-			const width = entry.contentRect.width;
-
-			if (observedWidths.get(list) === width) {
-				return;
-			}
-
-			observedWidths.set(list, width);
-
-			const layout = masonryLayouts.get(list);
-
-			if (layout) {
-				layout.options.gutter = getGutter(list);
-				layout.layout();
-			}
-		});
-	});
-
-	observer.observe(list);
-	resizeObservers.set(list, observer);
-}
-
-/**
- * Start Masonry on a list.
- *
- * @param {HTMLElement} list Item template list.
- */
-function initMasonry(list) {
-	const { Masonry } = window;
-
-	// Masonry measures the column off the first item, so an empty list would
-	// leave it with the selector instead of a width.
-	if (masonryLayouts.has(list) || !list.querySelector(ITEM_SELECTOR)) {
-		return;
-	}
-
-	// WordPress prints its own scripts so that they run before a module, but a
-	// plugin that defers them turns that around. By `load` they have all run.
-	if (!Masonry) {
-		window.addEventListener(
-			'load',
-			() => {
-				if (list.isConnected) {
-					initMasonry(list);
-				}
-			},
-			{ once: true }
-		);
-
-		return;
-	}
-
-	// Masonry reads the column off the first item, and the item width is a
-	// `calc()` over the column count. The count has to be settled before the
-	// first placement, and the items placed again whenever it moves - which a
-	// container of a fixed width does not report as a resize.
-	autoColumns.set(
-		list,
-		syncColumns(list, () => {
-			const current = masonryLayouts.get(list);
-
-			if (current) {
-				current.layout();
-			}
-		})
-	);
-
-	// Before the widths are read: Masonry measures the column off the first
-	// item, and the column fallback gives every item the width of its column.
-	list.classList.add(MASONRY_READY_CLASS);
-
-	const layout = new Masonry(list, {
-		itemSelector: ITEM_SELECTOR,
-		columnWidth: ITEM_SELECTOR,
-		gutter: getGutter(list),
-		percentPosition: true,
-		horizontalOrder: true,
-		transitionDuration: 0,
-	});
-
-	masonryLayouts.set(list, layout);
-	observedWidths.set(list, list.getBoundingClientRect().width);
-	observeWidth(list);
-
-	whenImagesLoaded(list, () => layout.layout());
-}
-
-/**
- * Drop the Masonry instance of a list.
- *
- * @param {HTMLElement} list Item template list.
- */
-function destroyMasonry(list) {
-	list.classList.remove(MASONRY_READY_CLASS);
-
-	const stopColumns = autoColumns.get(list);
-
-	if (stopColumns) {
-		autoColumns.delete(list);
-		stopColumns();
-	}
-
-	const layout = masonryLayouts.get(list);
-
-	if (layout) {
-		layout.destroy();
-		masonryLayouts.delete(list);
-	}
-
-	const observer = resizeObservers.get(list);
-
-	if (observer) {
-		observer.disconnect();
-		resizeObservers.delete(list);
-	}
-}
-
-/**
  * Lay the list out again after its items changed.
  *
- * @param {HTMLElement}   list  Item template list.
- * @param {HTMLElement[]} added Items appended since the last layout, if any.
+ * The layouts are the item template module's, and its own init callback does
+ * not run again on a list the router kept.
+ *
+ * @param {HTMLElement} list Item template list.
  */
-function refreshLayout(list, added) {
-	const layout = masonryLayouts.get(list);
-
-	if (!layout) {
-		// The same class `initLayout` starts from, asked again rather than
-		// assumed: `window.Masonry` is on the page as soon as one loop on it is
-		// a masonry, and starting Masonry on the list of a carousel or a
-		// justified loop next to it would take that layout apart.
-		if (list.classList.contains(MASONRY_CLASS)) {
-			initMasonry(list);
-
-			return;
-		}
-
-		// Justified and carousel are the item template module's, and its own
-		// init callback does not run again on a list the router kept.
-		list.dispatchEvent(new window.CustomEvent(RELAYOUT_EVENT));
-
-		return;
-	}
-
-	if (added && added.length) {
-		layout.appended(added);
-	} else {
-		layout.reloadItems();
-	}
-
-	layout.layout();
-	whenImagesLoaded(added && added.length ? added : list, () =>
-		layout.layout()
-	);
+function refreshLayout(list) {
+	list.dispatchEvent(new window.CustomEvent(RELAYOUT_EVENT));
 }
 
 /**
@@ -829,7 +618,7 @@ async function loadNextPage(trigger, context, byClick) {
 		});
 		advanceRanges(loop, nextLoop);
 		advanceThumbnails(loop, nextLoop);
-		refreshLayout(list, added);
+		refreshLayout(list);
 		announceUpdate(context);
 
 		// The last page took the trigger away. The first of the items that
@@ -1113,26 +902,6 @@ store('visual-portfolio/loop', {
 		}),
 	},
 	callbacks: {
-		/**
-		 * Lay the items out.
-		 *
-		 * Grid is CSS alone; masonry is positioned here, from the widths CSS
-		 * resolved.
-		 *
-		 * @return {Function|undefined} Teardown, when there is one.
-		 */
-		initLayout() {
-			const { ref } = getElement();
-
-			if (!ref.classList.contains(MASONRY_CLASS)) {
-				return undefined;
-			}
-
-			initMasonry(ref);
-
-			return () => destroyMasonry(ref);
-		},
-
 		/**
 		 * Load the next page as the trigger comes into view.
 		 *

@@ -848,10 +848,10 @@ class Visual_Portfolio_Block_Item_Template {
 	 * Directives are evaluated on the server as well as in the browser, so a
 	 * class bound to state nobody seeded would be stripped from the markup
 	 * before it ever reached a browser. What is seeded here is the answer that
-	 * is right with no JavaScript running: masonry is the script's, and the
-	 * controls that need the script stay hidden. The module overwrites all three
-	 * as it loads - client state wins over server state - so the browser sees
-	 * its own answer before the first directive runs.
+	 * is right with no JavaScript running: the controls that need the script
+	 * stay hidden. The module overwrites it as it loads - client state wins over
+	 * server state - so the browser sees its own answer before the first
+	 * directive runs.
 	 *
 	 * @return void
 	 */
@@ -869,11 +869,36 @@ class Visual_Portfolio_Block_Item_Template {
 		wp_interactivity_state(
 			self::VIEW_MODULE_STORE,
 			array(
-				'hasScript'        => false,
-				'useJsMasonry'     => true,
-				'useNativeMasonry' => false,
+				'hasScript' => false,
 			)
 		);
+	}
+
+	/**
+	 * The proportion of an item's first picture, as the style of a justified item.
+	 *
+	 * The layout library reads it, and so does its stylesheet before any script
+	 * runs, which is what lays the rows out on the first paint.
+	 *
+	 * @param string $item_content rendered item.
+	 *
+	 * @return string style attribute with a leading space, or an empty string.
+	 */
+	private function get_item_ratio_style( $item_content ) {
+		$tags = new WP_HTML_Tag_Processor( $item_content );
+
+		if ( ! $tags->next_tag( 'img' ) ) {
+			return '';
+		}
+
+		$width  = (int) $tags->get_attribute( 'width' );
+		$height = (int) $tags->get_attribute( 'height' );
+
+		if ( $width <= 0 || $height <= 0 ) {
+			return '';
+		}
+
+		return sprintf( ' style="--re-ratio:%s"', esc_attr( round( $width / $height, 4 ) ) );
 	}
 
 	/**
@@ -1175,7 +1200,8 @@ class Visual_Portfolio_Block_Item_Template {
 					$popup_markup
 				)
 				: sprintf(
-					'<li class="wp-block-visual-portfolio-item-template__item">%1$s%2$s</li>',
+					'<li class="wp-block-visual-portfolio-item-template__item"%1$s>%2$s%3$s</li>',
+					'justified' === $layout_type ? $this->get_item_ratio_style( $item_content ) : '',
 					$item_content,
 					$popup_markup
 				);
@@ -1184,8 +1210,16 @@ class Visual_Portfolio_Block_Item_Template {
 		list( $layout_classes, $layout_styles ) = $this->get_layout_props( $attributes, $layout_type );
 
 		$classes = array_merge( array( 'vp-layout-' . $layout_type ), $layout_classes );
-		$extra   = array();
-		$before  = '';
+
+		// The classes the layout library styles. Printed rather than added by
+		// its script, so the rows and lanes hold before the script runs.
+		if ( 'justified' === $layout_type ) {
+			$classes[] = 're-justified';
+		} elseif ( 'masonry' === $layout_type ) {
+			$classes[] = 're-masonry';
+		}
+		$extra  = array();
+		$before = '';
 
 		// A grid row is as tall as its tallest item. Left unset, the others
 		// stretch to fill it; aligned, they keep their height and sit where asked.
@@ -1198,28 +1232,17 @@ class Visual_Portfolio_Block_Item_Template {
 		// the same, and comes back when the layout does.
 		$after = $controls_content;
 
-		// Masonry is the family store's: it is the one layout the store also
-		// has to lay out again after a Load More, and splitting init from
-		// relayout would leave two engines on one list. Every other layout the
-		// module owns end to end, so the list carries one init directive and it
-		// points at whichever of the two stores is in charge.
-		$init = 'callbacks.initLayout';
+		// Grid and tiles are stylesheet alone. The layouts that need a browser
+		// are the module's end to end, and point the list's init directive at it.
+		$init = '';
 
 		switch ( $layout_type ) {
 			case 'masonry':
-				// WordPress ships both handles, and `masonry` pulls
-				// `imagesloaded` in itself.
-				wp_enqueue_script( 'masonry' );
+				// Grid Lanes lays masonry out in the stylesheet; elsewhere the
+				// module places the items the same way.
 				$this->enqueue_view_module();
 
-				// Grid Lanes lays masonry out in the stylesheet, and where it
-				// works the script has nothing left to do. The class the family
-				// store starts Masonry from is therefore not the class the
-				// stylesheet needs: this one is dropped and the native one is
-				// added the moment the module finds `display: grid-lanes`, and
-				// with no module at all the `@supports` rule still applies.
-				$extra['data-wp-class--vp-layout-masonry']        = self::VIEW_MODULE_STORE . '::state.useJsMasonry';
-				$extra['data-wp-class--vp-layout-masonry-native'] = self::VIEW_MODULE_STORE . '::state.useNativeMasonry';
+				$init = self::VIEW_MODULE_STORE . '::callbacks.initLayout';
 				break;
 
 			case 'tiles':
@@ -1239,7 +1262,6 @@ class Visual_Portfolio_Block_Item_Template {
 				$extra['data-vp-justified-tolerance']  = max( 0, min( 1, (float) ( $attributes['justifiedRowHeightTolerance'] ?? 0.25 ) ) );
 				$extra['data-vp-justified-max-rows']   = max( 0, (int) ( $attributes['justifiedMaxRowsCount'] ?? 0 ) );
 				$extra['data-vp-justified-last-row']   = in_array( $last_row, array( 'left', 'center', 'right', 'hide' ), true ) ? $last_row : 'left';
-				$extra['data-wp-class--vp-has-script'] = self::VIEW_MODULE_STORE . '::state.hasScript';
 				break;
 
 			case 'carousel':
@@ -1363,14 +1385,14 @@ class Visual_Portfolio_Block_Item_Template {
 					'data-vp-layout' => $layout_type,
 				),
 				// Before the init directive on purpose: both are applied by an
-				// effect, the effects run in the order the attributes are read,
-				// and the masonry class has to be gone before the family store
-				// looks for it.
+				// effect, and the effects run in the order the attributes are read.
 				$extra,
-				array(
-					'data-wp-interactive'     => Visual_Portfolio_Block_Loop::STORE,
-					'data-wp-init'            => $init,
-					'data-wp-bind--aria-busy' => 'state.isLoading',
+				array_filter(
+					array(
+						'data-wp-interactive'     => Visual_Portfolio_Block_Loop::STORE,
+						'data-wp-init'            => $init,
+						'data-wp-bind--aria-busy' => 'state.isLoading',
+					)
 				)
 			)
 		);

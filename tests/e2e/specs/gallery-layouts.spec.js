@@ -456,21 +456,47 @@ test.describe('Gallery Item Template layouts', () => {
 		const list = page.locator(LIST);
 
 		await expect(list).toHaveClass(/vp-layout-justified/);
-		// Added by the module, and what tells the stylesheet to stop growing the
-		// items itself - the library sizes them from here on.
-		await expect(list).toHaveClass(/vp-has-script/);
+		// Written by the layout library once its script chose the breaks; the
+		// stylesheet alone already draws rows before that.
+		await expect(list).toHaveAttribute('data-re-justified', 'start');
 
-		// The library takes the items out of the flow to place them, which is
-		// the only thing that says it ran rather than that CSS wrapped them.
-		await expect
-			.poll(
-				async () =>
-					(await getItemBoxes(page)).every(
-						(item) => 'absolute' === item.position
-					),
-				{ timeout: 20000 }
-			)
-			.toBe(true);
+		// Every full row ends at the right edge of the list, and its pictures
+		// share one height - before and after the script picked the breaks.
+		const isFilled = async () => {
+			const boxes = await getItemBoxes(page);
+			const width = await list.evaluate((node) => node.clientWidth);
+			const rows = [];
+
+			boxes.forEach((item) => {
+				const row = rows.find((current) => current.y === item.y);
+
+				if (row) {
+					row.items.push(item);
+				} else {
+					rows.push({ y: item.y, items: [item] });
+				}
+			});
+
+			return (
+				rows.length > 0 &&
+				rows.slice(0, -1).every(({ items: rowItems }) => {
+					const right = Math.max(
+						...rowItems.map((item) => item.x + item.width)
+					);
+
+					return (
+						rowItems.length > 1 &&
+						Math.abs(right - width) < 2 &&
+						rowItems.every(
+							(item) =>
+								Math.abs(item.height - rowItems[0].height) < 2
+						)
+					);
+				})
+			);
+		};
+
+		await expect.poll(isFilled, { timeout: 20000 }).toBe(true);
 
 		const rows = await getItemBoxes(page);
 
@@ -494,15 +520,85 @@ test.describe('Gallery Item Template layouts', () => {
 
 		// The appended items are laid out too: the list watches itself, because
 		// the append is made by the loop store, which knows nothing about it.
-		await expect
-			.poll(
-				async () =>
-					(await getItemBoxes(page)).every(
-						(item) => 'absolute' === item.position
-					),
-				{ timeout: 20000 }
-			)
-			.toBe(true);
+		await expect.poll(isFilled, { timeout: 20000 }).toBe(true);
+	});
+
+	// 800px wide, a 10px gap and a 200px row: the first three pictures make a
+	// full row, and the two left over fit the target height, so they are the
+	// last row, which is not full.
+	[
+		{ lastRow: 'left', edge: 'left' },
+		{ lastRow: 'right', edge: 'right' },
+		{ lastRow: 'center', edge: 'center' },
+		{ lastRow: 'left', edge: 'left', dir: 'rtl' },
+		{ lastRow: 'hide', visible: 3 },
+		{ lastRow: 'left', maxRows: 1, count: 6, visible: 3 },
+	].forEach(({ lastRow, edge, dir, visible, maxRows = 0, count = 5 }) => {
+		test(`justified lays the last row out as ${lastRow}${dir ? ` in ${dir}` : ''}${maxRows ? ` with ${maxRows} row` : ''}`, async ({
+			page,
+			requestUtils,
+		}) => {
+			const created = await requestUtils.rest({
+				path: '/wp/v2/pages',
+				method: 'POST',
+				data: {
+					title: `Layouts - justified last row ${lastRow}`,
+					status: 'publish',
+					content: `<div dir="${dir || 'ltr'}" style="width:800px;max-width:none">${getLoopMarkup(
+						{
+							blockId: `e2e-justified-${lastRow}-${dir || 'ltr'}-${maxRows}`,
+							images: images.slice(0, count),
+							perPage: count,
+							layout: {
+								layoutType: 'justified',
+								justifiedRowHeight: 200,
+								justifiedLastRow: lastRow,
+								justifiedMaxRowsCount: maxRows,
+								style: { spacing: { blockGap: '10px' } },
+							},
+						}
+					)}</div>`,
+				},
+			});
+
+			pageIds.push(created.id);
+			await page.goto(created.link);
+
+			const list = page.locator(LIST);
+
+			await expect(list).toHaveAttribute('data-re-justified', /.+/);
+
+			const shown = (await getItemBoxes(page)).filter(
+				(item) => item.width > 0
+			);
+			const rows = [...new Set(shown.map((item) => item.y))];
+
+			if (visible) {
+				expect(shown).toHaveLength(visible);
+				expect(rows).toHaveLength(1);
+
+				return;
+			}
+
+			expect(rows).toHaveLength(2);
+
+			const last = shown.filter((item) => item.y === rows[1]);
+			const left = Math.min(...last.map((item) => item.x));
+			const right =
+				800 - Math.max(...last.map((item) => item.x + item.width));
+
+			expect(last).toHaveLength(2);
+			// Room enough to tell the edges apart.
+			expect(left + right).toBeGreaterThan(20);
+
+			if ('left' === edge) {
+				expect(left).toBeLessThan(2);
+			} else if ('right' === edge) {
+				expect(right).toBeLessThan(2);
+			} else {
+				expect(Math.abs(left - right)).toBeLessThan(2);
+			}
+		});
 	});
 
 	test('carousel scrolls, snaps, takes the keyboard and moves with its controls', async ({
@@ -3608,20 +3704,17 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(masonry).toHaveClass(/vp-layout-masonry/);
 		await expect(carousel).toHaveClass(/vp-layout-carousel/);
 
-		// Masonry positions what it lays out, which is also what puts the
-		// library on the page - the reason the carousel below is in danger at
-		// all.
+		// Masonry places what it lays out, by the lane and the offset it writes
+		// on each item - the reason the carousel below is in danger at all.
 		await expect
 			.poll(
 				async () =>
 					masonry
 						.locator(ITEM)
-						.evaluateAll((nodes) =>
-							nodes.every(
-								(node) =>
-									'absolute' ===
-									window.getComputedStyle(node).position
-							)
+						.evaluateAll(
+							(nodes) =>
+								nodes.length > 1 &&
+								nodes.every((node) => node.style.gridColumn)
 						),
 				{ timeout: 20000 }
 			)
@@ -3632,18 +3725,16 @@ test.describe('Gallery Item Template layouts', () => {
 
 		// The loop that loaded is a carousel, and a carousel is a row of items
 		// in the flow. Laying it out again means laying out a carousel, not
-		// reaching for the engine the loop above it happens to have loaded.
-		const positioned = await carousel
+		// reaching for the engine the loop above it runs.
+		const placed = await carousel
 			.locator(ITEM)
 			.evaluateAll((nodes) =>
 				nodes.some(
-					(node) =>
-						'absolute' === window.getComputedStyle(node).position
+					(node) => node.style.gridColumn || node.style.marginTop
 				)
 			);
 
-		expect(positioned).toBe(false);
-		// Masonry writes the height of the container it took over.
+		expect(placed).toBe(false);
 		expect(await carousel.evaluate((node) => node.style.height)).toBe('');
 	});
 
@@ -3716,16 +3807,20 @@ test.describe('Gallery Item Template layouts', () => {
 
 		const list = page.locator(LIST);
 
-		await expect(list).toHaveClass(/vp-layout-masonry-native/);
-		// The class the family store starts Masonry from is gone, so it never
-		// does - and the items stay in the flow the stylesheet put them in.
-		await expect(list).not.toHaveClass(/vp-layout-masonry(\s|$)/);
+		await expect(list).toHaveClass(/vp-layout-masonry/);
 
 		await page.waitForTimeout(2000);
 
-		const boxes = await getItemBoxes(page);
-
-		expect(boxes.every((item) => 'absolute' !== item.position)).toBe(true);
+		// The script finds Grid Lanes and writes nothing: no lane, no offset,
+		// no marker of its fallback on the list.
+		expect(
+			await list.evaluate((node) => ({
+				fallback: node.hasAttribute('data-re-masonry'),
+				placed: Array.from(node.children).some(
+					(item) => item.style.gridColumn || item.style.marginTop
+				),
+			}))
+		).toEqual({ fallback: false, placed: false });
 	});
 
 	test('a region swap keeps the layout it navigated with', async ({
