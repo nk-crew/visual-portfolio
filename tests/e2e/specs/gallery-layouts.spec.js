@@ -456,21 +456,47 @@ test.describe('Gallery Item Template layouts', () => {
 		const list = page.locator(LIST);
 
 		await expect(list).toHaveClass(/vp-layout-justified/);
-		// Added by the module, and what tells the stylesheet to stop growing the
-		// items itself - the library sizes them from here on.
-		await expect(list).toHaveClass(/vp-has-script/);
+		// Written by the layout library once its script chose the breaks; the
+		// stylesheet alone already draws rows before that.
+		await expect(list).toHaveAttribute('data-re-justified', 'start');
 
-		// The library takes the items out of the flow to place them, which is
-		// the only thing that says it ran rather than that CSS wrapped them.
-		await expect
-			.poll(
-				async () =>
-					(await getItemBoxes(page)).every(
-						(item) => 'absolute' === item.position
-					),
-				{ timeout: 20000 }
-			)
-			.toBe(true);
+		// Every full row ends at the right edge of the list, and its pictures
+		// share one height - before and after the script picked the breaks.
+		const isFilled = async () => {
+			const boxes = await getItemBoxes(page);
+			const width = await list.evaluate((node) => node.clientWidth);
+			const rows = [];
+
+			boxes.forEach((item) => {
+				const row = rows.find((current) => current.y === item.y);
+
+				if (row) {
+					row.items.push(item);
+				} else {
+					rows.push({ y: item.y, items: [item] });
+				}
+			});
+
+			return (
+				rows.length > 0 &&
+				rows.slice(0, -1).every(({ items: rowItems }) => {
+					const right = Math.max(
+						...rowItems.map((item) => item.x + item.width)
+					);
+
+					return (
+						rowItems.length > 1 &&
+						Math.abs(right - width) < 2 &&
+						rowItems.every(
+							(item) =>
+								Math.abs(item.height - rowItems[0].height) < 2
+						)
+					);
+				})
+			);
+		};
+
+		await expect.poll(isFilled, { timeout: 20000 }).toBe(true);
 
 		const rows = await getItemBoxes(page);
 
@@ -494,13 +520,375 @@ test.describe('Gallery Item Template layouts', () => {
 
 		// The appended items are laid out too: the list watches itself, because
 		// the append is made by the loop store, which knows nothing about it.
+		await expect.poll(isFilled, { timeout: 20000 }).toBe(true);
+	});
+
+	// 800px wide, a 10px gap and a 200px row: the first three pictures make a
+	// full row, and the two left over fit the target height, so they are the
+	// last row, which is not full.
+	[
+		{ lastRow: 'left', edge: 'left' },
+		{ lastRow: 'right', edge: 'right' },
+		{ lastRow: 'center', edge: 'center' },
+		{ lastRow: 'left', edge: 'left', dir: 'rtl' },
+		{ lastRow: 'hide', visible: 3 },
+		{ lastRow: 'left', maxRows: 1, count: 6, visible: 3 },
+	].forEach(({ lastRow, edge, dir, visible, maxRows = 0, count = 5 }) => {
+		test(`justified lays the last row out as ${lastRow}${dir ? ` in ${dir}` : ''}${maxRows ? ` with ${maxRows} row` : ''}`, async ({
+			page,
+			requestUtils,
+		}) => {
+			const created = await requestUtils.rest({
+				path: '/wp/v2/pages',
+				method: 'POST',
+				data: {
+					title: `Layouts - justified last row ${lastRow}`,
+					status: 'publish',
+					content: `<div dir="${dir || 'ltr'}" style="width:800px;max-width:none">${getLoopMarkup(
+						{
+							blockId: `e2e-justified-${lastRow}-${dir || 'ltr'}-${maxRows}`,
+							images: images.slice(0, count),
+							perPage: count,
+							layout: {
+								layoutType: 'justified',
+								justifiedRowHeight: 200,
+								justifiedLastRow: lastRow,
+								justifiedMaxRowsCount: maxRows,
+								style: { spacing: { blockGap: '10px' } },
+							},
+						}
+					)}</div>`,
+				},
+			});
+
+			pageIds.push(created.id);
+			await page.goto(created.link);
+
+			const list = page.locator(LIST);
+
+			await expect(list).toHaveAttribute('data-re-justified', /.+/);
+
+			const shown = (await getItemBoxes(page)).filter(
+				(item) => item.width > 0
+			);
+			const rows = [...new Set(shown.map((item) => item.y))];
+
+			if (visible) {
+				expect(shown).toHaveLength(visible);
+				expect(rows).toHaveLength(1);
+
+				return;
+			}
+
+			expect(rows).toHaveLength(2);
+
+			const last = shown.filter((item) => item.y === rows[1]);
+			const left = Math.min(...last.map((item) => item.x));
+			const right =
+				800 - Math.max(...last.map((item) => item.x + item.width));
+
+			expect(last).toHaveLength(2);
+			// Room enough to tell the edges apart.
+			expect(left + right).toBeGreaterThan(20);
+
+			if ('left' === edge) {
+				expect(left).toBeLessThan(2);
+			} else if ('right' === edge) {
+				expect(right).toBeLessThan(2);
+			} else {
+				expect(Math.abs(left - right)).toBeLessThan(2);
+			}
+		});
+	});
+
+	test('masonry that fills the available space packs its columns', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - masonry auto fit',
+			blockId: 'e2e-masonry-auto-fit',
+			images,
+			layout: {
+				layoutType: 'masonry',
+				layoutColumnsMode: 'auto',
+				layoutMinimumColumnWidth: '12rem',
+				layoutColumnCount: 3,
+				layoutAutoFit: true,
+				style: { spacing: { blockGap: '20px' } },
+			},
+		});
+
+		const list = page.locator(LIST);
+
+		// Where the engine has no Grid Lanes, the library's script packs them.
+		if (
+			!(await list.evaluate(() => CSS.supports('display', 'grid-lanes')))
+		) {
+			await expect(list).toHaveAttribute('data-re-masonry', '');
+		}
+
+		// Each item sits a row gap under the one above it in its column. An
+		// item measured across the whole width before it was placed would sit
+		// hundreds of pixels lower.
 		await expect
 			.poll(
-				async () =>
-					(await getItemBoxes(page)).every(
-						(item) => 'absolute' === item.position
-					),
+				() =>
+					list.evaluate((node) => {
+						const box = node.getBoundingClientRect();
+						const gap = parseFloat(getComputedStyle(node).rowGap);
+						const columns = new Map();
+
+						Array.from(node.children).forEach((item) => {
+							const rect = item.getBoundingClientRect();
+							const x = Math.round(rect.x - box.x);
+
+							columns.set(x, [
+								...(columns.get(x) || []),
+								{ y: rect.y - box.y, height: rect.height },
+							]);
+						});
+
+						return (
+							columns.size > 1 &&
+							[...columns.values()].every((column) =>
+								column
+									.sort((a, b) => a.y - b.y)
+									.every((item, index) =>
+										0 === index
+											? Math.abs(item.y) < 2
+											: Math.abs(
+													item.y -
+														(column[index - 1].y +
+															column[index - 1]
+																.height +
+															gap)
+												) < 2
+									)
+							)
+						);
+					}),
 				{ timeout: 20000 }
+			)
+			.toBe(true);
+	});
+
+	// Pictures of four shapes: rows of one shape would hide a picture box that
+	// ignores the proportion it was laid out with.
+	const shapedImages = [];
+
+	async function getShapedImages(requestUtils) {
+		if (!shapedImages.length) {
+			for (const name of [
+				'image-800x600.png',
+				'image-600x900.png',
+				'image-1200x600.png',
+				'image-600x600.png',
+				'image-600x900.png',
+				'image-1200x600.png',
+			]) {
+				const uploaded = await requestUtils.uploadMedia(
+					getFixturePath(name)
+				);
+
+				shapedImages.push({ id: uploaded.id });
+			}
+		}
+
+		return shapedImages;
+	}
+
+	/**
+	 * Heights of the pictures of each full row of a justified list - every row
+	 * but the last, which may not be full.
+	 *
+	 * @param {import('@playwright/test').Locator} list    - justified list.
+	 * @param {string}                             picture - selector of the picture box.
+	 * @return {Promise<number[][]>} picture heights per row.
+	 */
+	function getRowPictureHeights(list, picture) {
+		return list.evaluate((node, selector) => {
+			const rows = new Map();
+
+			Array.from(node.children).forEach((item) => {
+				const box = item.querySelector(selector);
+
+				if (!box) {
+					return;
+				}
+
+				const top = Math.round(item.getBoundingClientRect().top);
+
+				rows.set(top, [
+					...(rows.get(top) || []),
+					box.getBoundingClientRect().height,
+				]);
+			});
+
+			return [...rows.values()].slice(0, -1);
+		}, picture);
+	}
+
+	const sameHeights = (rows) =>
+		rows.length > 0 &&
+		rows.every(
+			(heights) =>
+				heights.length > 1 &&
+				Math.max(...heights) - Math.min(...heights) < 1
+		);
+
+	test('justified keeps one picture height per row with a border and margin on the image', async ({
+		page,
+		requestUtils,
+	}) => {
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Layouts - justified border',
+				status: 'publish',
+				content: getLoopMarkup({
+					blockId: 'e2e-justified-border',
+					images: await getShapedImages(requestUtils),
+					layout: {
+						layoutType: 'justified',
+						justifiedRowHeight: 200,
+						style: { spacing: { blockGap: '10px' } },
+					},
+				}).replace(
+					'<!-- wp:visual-portfolio/item-image {"clickAction":"url"} /-->',
+					'<!-- wp:visual-portfolio/item-image {"clickAction":"url","style":{"border":{"width":"12px","color":"#000000","style":"solid"},"spacing":{"padding":{"top":"6px","right":"6px","bottom":"6px","left":"6px"},"margin":{"left":"16px","right":"16px"}}}} /-->'
+				),
+			},
+		});
+
+		pageIds.push(created.id);
+		await page.goto(created.link);
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveAttribute('data-re-justified', /.+/);
+		await expect
+			.poll(async () =>
+				sameHeights(
+					await getRowPictureHeights(
+						list,
+						'.wp-block-visual-portfolio-item-image'
+					)
+				)
+			)
+			.toBe(true);
+
+		// A margin narrows the picture inside its item, never past the list.
+		expect(
+			await list.evaluate((node) => {
+				const right = node.getBoundingClientRect().right;
+
+				return Math.max(
+					...Array.from(
+						node.querySelectorAll(
+							'.wp-block-visual-portfolio-item-image'
+						)
+					).map((box) => box.getBoundingClientRect().right - right)
+				);
+			})
+		).toBeLessThan(0.5);
+	});
+
+	test('justified sizes an item cover to the row like an image', async ({
+		page,
+		requestUtils,
+	}) => {
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Layouts - justified cover',
+				status: 'publish',
+				content: getLoopMarkup({
+					blockId: 'e2e-justified-cover',
+					images: await getShapedImages(requestUtils),
+					layout: {
+						layoutType: 'justified',
+						justifiedRowHeight: 200,
+						style: { spacing: { blockGap: '10px' } },
+					},
+				}).replace(
+					'<!-- wp:visual-portfolio/item-image {"clickAction":"url"} /-->',
+					'<!-- wp:visual-portfolio/item-cover /-->'
+				),
+			},
+		});
+
+		pageIds.push(created.id);
+		await page.goto(created.link);
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveAttribute('data-re-justified', /.+/);
+		await expect
+			.poll(async () =>
+				sameHeights(
+					await getRowPictureHeights(
+						list,
+						'.wp-block-visual-portfolio-item-cover'
+					)
+				)
+			)
+			.toBe(true);
+	});
+
+	test('a justified gallery inside a grid item keeps its rows', async ({
+		page,
+		requestUtils,
+	}) => {
+		const inner = getLoopMarkup({
+			blockId: 'e2e-justified-nested',
+			queryId: 2,
+			images: await getShapedImages(requestUtils),
+			layout: {
+				layoutType: 'justified',
+				justifiedRowHeight: 150,
+				style: { spacing: { blockGap: '10px' } },
+			},
+		}).replace(
+			'<!-- wp:visual-portfolio/item-image {"clickAction":"url"} /-->',
+			'<!-- wp:visual-portfolio/item-image {"clickAction":"url","aspectRatio":"1"} /-->'
+		);
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Layouts - justified nested',
+				status: 'publish',
+				content: getLoopMarkup({
+					blockId: 'e2e-grid-outer',
+					images: images.slice(0, 1),
+					perPage: 1,
+					layout: {
+						layoutType: 'grid',
+						layoutColumnsMode: 'manual',
+						layoutColumnCount: 1,
+					},
+					itemBlocks: inner,
+				}),
+			},
+		});
+
+		pageIds.push(created.id);
+		await page.goto(created.link);
+
+		const nested = page.locator(`${LIST}.vp-layout-justified`);
+
+		await expect(nested).toHaveAttribute('data-re-justified', /.+/);
+		await expect
+			.poll(async () =>
+				sameHeights(
+					await getRowPictureHeights(
+						nested,
+						'.wp-block-visual-portfolio-item-image'
+					)
+				)
 			)
 			.toBe(true);
 	});
@@ -3608,20 +3996,17 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(masonry).toHaveClass(/vp-layout-masonry/);
 		await expect(carousel).toHaveClass(/vp-layout-carousel/);
 
-		// Masonry positions what it lays out, which is also what puts the
-		// library on the page - the reason the carousel below is in danger at
-		// all.
+		// Masonry places what it lays out, by the lane and the offset it writes
+		// on each item - the reason the carousel below is in danger at all.
 		await expect
 			.poll(
 				async () =>
 					masonry
 						.locator(ITEM)
-						.evaluateAll((nodes) =>
-							nodes.every(
-								(node) =>
-									'absolute' ===
-									window.getComputedStyle(node).position
-							)
+						.evaluateAll(
+							(nodes) =>
+								nodes.length > 1 &&
+								nodes.every((node) => node.style.gridColumn)
 						),
 				{ timeout: 20000 }
 			)
@@ -3632,18 +4017,16 @@ test.describe('Gallery Item Template layouts', () => {
 
 		// The loop that loaded is a carousel, and a carousel is a row of items
 		// in the flow. Laying it out again means laying out a carousel, not
-		// reaching for the engine the loop above it happens to have loaded.
-		const positioned = await carousel
+		// reaching for the engine the loop above it runs.
+		const placed = await carousel
 			.locator(ITEM)
 			.evaluateAll((nodes) =>
 				nodes.some(
-					(node) =>
-						'absolute' === window.getComputedStyle(node).position
+					(node) => node.style.gridColumn || node.style.marginTop
 				)
 			);
 
-		expect(positioned).toBe(false);
-		// Masonry writes the height of the container it took over.
+		expect(placed).toBe(false);
 		expect(await carousel.evaluate((node) => node.style.height)).toBe('');
 	});
 
@@ -3716,16 +4099,20 @@ test.describe('Gallery Item Template layouts', () => {
 
 		const list = page.locator(LIST);
 
-		await expect(list).toHaveClass(/vp-layout-masonry-native/);
-		// The class the family store starts Masonry from is gone, so it never
-		// does - and the items stay in the flow the stylesheet put them in.
-		await expect(list).not.toHaveClass(/vp-layout-masonry(\s|$)/);
+		await expect(list).toHaveClass(/vp-layout-masonry/);
 
 		await page.waitForTimeout(2000);
 
-		const boxes = await getItemBoxes(page);
-
-		expect(boxes.every((item) => 'absolute' !== item.position)).toBe(true);
+		// The script finds Grid Lanes and writes nothing: no lane, no offset,
+		// no marker of its fallback on the list.
+		expect(
+			await list.evaluate((node) => ({
+				fallback: node.hasAttribute('data-re-masonry'),
+				placed: Array.from(node.children).some(
+					(item) => item.style.gridColumn || item.style.marginTop
+				),
+			}))
+		).toEqual({ fallback: false, placed: false });
 	});
 
 	test('a region swap keeps the layout it navigated with', async ({

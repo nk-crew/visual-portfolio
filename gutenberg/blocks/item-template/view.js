@@ -142,20 +142,18 @@ function answerForScrollWidth(list) {
 import { getElement, store } from '@wordpress/interactivity';
 
 import { syncColumns } from './auto-columns';
-import { getJustifiedOptions, layoutJustified, startLayout } from './layouts';
+import { getJustifiedOptions, startJustified, startMasonry } from './layouts';
 
 /**
  * The layouts of the Gallery Item Template that need a browser.
  *
- * Grid and tiles are stylesheet alone and never load this module. Masonry loads
- * it only to answer one question - whether the browser lays masonry out itself -
- * and is otherwise the family store's, which is also what puts the appended
- * items of a Load More back in place. Justified and carousel are owned here end
- * to end.
+ * Grid and tiles are stylesheet alone and never load this module. Justified,
+ * masonry and carousel are owned here end to end.
  *
- * Nothing here is required for a gallery to be readable: justified falls back to
- * rows that grow on their own, and a carousel is a scroll container, which
- * swipes, scrolls and takes the keyboard with no script at all.
+ * Nothing here is required for a gallery to be readable: justified rows and
+ * masonry lanes are laid out by their stylesheet before the script runs, and a
+ * carousel is a scroll container, which swipes, scrolls and takes the keyboard
+ * with no script at all.
  */
 
 const LIST_SELECTOR = '.wp-block-visual-portfolio-item-template';
@@ -220,8 +218,6 @@ const MOVED_ROUND_CLASS = 'vp-carousel-moved-round';
 const COPY_COVER_PROPERTY = '--vp-carousel-copy-cover';
 const COPY_CONTAIN_PROPERTY = '--vp-carousel-copy-contain';
 const EDGE_FADE_CLASS = 'vp-carousel-edge-fade';
-const MASONRY_CLASS = 'vp-layout-masonry';
-const MASONRY_NATIVE_CLASS = 'vp-layout-masonry-native';
 
 // Dispatched on the list by the family store once the router has swapped the
 // region in. An event rather than a cross-store call: the two modules load
@@ -989,34 +985,6 @@ function scrollListTo(list, position, behavior = getScrollBehavior()) {
 }
 
 /**
- * Whether the browser packs a masonry layout without being asked twice.
- *
- * Grid Lanes shipped in Safari 26.4 and is behind a flag elsewhere, so this is a
- * browser question and stays one - the WordPress version the family requires
- * says nothing about it.
- *
- * @return {boolean} True when `display: grid-lanes` is understood.
- */
-function hasNativeMasonry() {
-	return !!window.CSS?.supports?.('display', 'grid-lanes');
-}
-
-const nativeMasonry = hasNativeMasonry();
-
-// The family store starts Masonry from the `vp-layout-masonry` class, and it
-// does so in an effect of the same hydration pass that applies the class
-// directives on this list. Taking the class off here, while the document is
-// still only parsed, settles the question before either effect runs.
-if (nativeMasonry && typeof document !== 'undefined') {
-	document
-		.querySelectorAll(`${LIST_SELECTOR}.${MASONRY_CLASS}`)
-		.forEach((list) => {
-			list.classList.remove(MASONRY_CLASS);
-			list.classList.add(MASONRY_NATIVE_CLASS);
-		});
-}
-
-/**
  * Watch a list for the items a Load More appends.
  *
  * The append is made by the family store, which knows nothing about the layouts
@@ -1053,9 +1021,7 @@ function observeItems(list, onAppend) {
  * @return {Function} Teardown.
  */
 function initJustified(list) {
-	return startLayout(list, (element) =>
-		layoutJustified(element, getJustifiedOptions(element))
-	);
+	return startJustified(list, getJustifiedOptions(list));
 }
 
 /**
@@ -3135,6 +3101,10 @@ function startListLayout(list, restore) {
 		return initJustified(list);
 	}
 
+	if ('masonry' === list.dataset.vpLayout) {
+		return startMasonry(list);
+	}
+
 	if ('carousel' === list.dataset.vpLayout) {
 		return initCarousel(list, restore);
 	}
@@ -3147,8 +3117,6 @@ store('visual-portfolio/item-template', {
 		// Read by the markup rather than by this module: a control that only
 		// works with a script is hidden until there is one.
 		hasScript: true,
-		useJsMasonry: !nativeMasonry,
-		useNativeMasonry: nativeMasonry,
 	},
 	actions: {
 		/**

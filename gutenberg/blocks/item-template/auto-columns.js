@@ -1,11 +1,11 @@
 /**
  * The column count a layout is drawn with, kept in step with the screen.
  *
- * A grid says "as many as fit, each at least this wide" in one line of CSS and
- * needs nothing from here. Masonry and the carousel cannot: their items are
- * placed by a script, or sized by a `calc()` that has to name a number. So the
- * number is settled here and published as `--vp-layout-current-columns`, which
- * is the property both of those layouts already read.
+ * A grid or masonry says "as many as fit, each at least this wide" in one line
+ * of CSS and needs nothing from here. The carousel cannot: its slides are sized
+ * by a `calc()` that has to name a number. So the number is settled here and
+ * published as `--vp-layout-current-columns`, which is the property the
+ * carousel already reads.
  *
  * Where it comes from depends on the mode. Auto mode measures the container.
  * A named count is narrowed by the stylesheet instead, and is only read back.

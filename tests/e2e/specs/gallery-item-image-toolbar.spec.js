@@ -576,6 +576,11 @@ test.describe('Gallery Item Image toolbar', () => {
 				.poll(() => getShownOrder(canvas, attachments))
 				.toEqual(attachments.map(({ id }) => id));
 
+			// The layout library chose the rows, not only the stylesheet.
+			await expect(
+				canvas.locator(ITEM).first().locator('xpath=..')
+			).toHaveAttribute('data-re-justified', /.+/);
+
 			await selectItemImage(editor, canvas, 0);
 
 			const getBox = () =>

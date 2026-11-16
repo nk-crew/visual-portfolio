@@ -1,4 +1,5 @@
 @use "carousel-effects" as effects;
+@import "@reuse-sh/gallery/dist/styles.css";
 
 // Columns and gap are a public contract: the server prints the variables on the
 // list and a theme overrides a gallery by redeclaring them, without touching
@@ -75,7 +76,7 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 // Registered so that the count stays a number. The steps cap it with `min()`,
 // and an unregistered custom property hands that straight back to
 // `getComputedStyle()` as the text it was written as - which is where the
-// editor's masonry reads its column count from.
+// carousel reads its column count from.
 @property --vp-layout-current-columns {
 	syntax: "<integer>";
 	inherits: true;
@@ -118,64 +119,6 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 	syntax: "<integer>";
 	inherits: true;
 	initial-value: 0;
-}
-
-// The layout Masonry positions by hand. Item widths come from here - Masonry
-// reads them, it does not calculate them. The gaps are declared as `column-gap`
-// and `row-gap` for the same reason: they do nothing to a block container, they
-// are where the scripts read the gutters from.
-@mixin masonry-script {
-	position: relative;
-	column-gap: var(--vp-layout-gap, 1.5rem);
-	row-gap: $row-gap;
-
-	> #{$item} {
-		width: calc((100% - (var(--vp-layout-current-columns) - 1) * var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns));
-		margin-bottom: $row-gap;
-	}
-}
-
-// The same layout as far as a browser with no Grid Lanes can pack it on its
-// own. Multi-column measures nothing and needs nobody: an item is as tall as it
-// is, and the browser fills each column before starting the next.
-//
-// What it costs is the reading order. A column is read top to bottom, so the
-// items run down the first one and continue at the top of the second, where the
-// script keeps them in source order across each row. That is the trade for a
-// gallery that is a gallery before - and without - the script.
-@mixin masonry-columns {
-	column-count: var(--vp-layout-current-columns);
-	column-gap: var(--vp-layout-gap, 1.5rem);
-
-	// A count and a width together are the cap and the minimum of the same
-	// question: as many columns as fit, and never more than the count.
-	&.vp-layout-auto-columns {
-		column-width: var(--vp-layout-min-column-width, 16rem);
-	}
-
-	> #{$item} {
-		width: auto;
-		margin-bottom: $row-gap;
-		break-inside: avoid;
-	}
-}
-
-// The same layout, with the browser doing the packing. Applied wherever Grid
-// Lanes exists - to a page whose script never arrived through `@supports`, and
-// by class the moment the module confirms the support itself.
-@mixin masonry-lanes {
-	display: grid-lanes;
-	grid-template-columns: repeat(var(--vp-layout-current-columns), minmax(0, 1fr));
-	gap: $row-gap var(--vp-layout-gap, 1.5rem);
-
-	&.vp-layout-auto-columns {
-		grid-template-columns: repeat(var(--vp-layout-auto-placement), minmax(var(--vp-layout-track, min(16rem, 100%)), 1fr));
-	}
-
-	> #{$item} {
-		width: auto;
-		margin-bottom: 0;
-	}
 }
 
 .wp-block-visual-portfolio-item-template {
@@ -231,40 +174,25 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 	}
 
 	// A grid in auto mode needs no script: the browser fits as many tracks as
-	// the container holds. Masonry and the carousel cannot say it in CSS, and
-	// have their count written onto the list by the layout module instead.
+	// the container holds. The carousel cannot say it in CSS, and has its count
+	// written onto the list by the layout module instead.
 	&.vp-layout-grid.vp-layout-auto-columns {
 		container-type: inline-size;
 		grid-template-columns: repeat(var(--vp-layout-auto-placement), minmax(var(--vp-layout-track, min(16rem, 100%)), 1fr));
 	}
 
+	// Lanes are laid out by `@reuse-sh/gallery`: natively where the browser
+	// has Grid Lanes, by its script elsewhere, from the same columns and gaps.
+	// A named count is the column count; in auto mode the tracks are the same
+	// as a grid's, capped by `--vp-layout-track`, and the script reads them.
 	&.vp-layout-masonry {
-		@include masonry-script;
+		--re-masonry-columns: var(--vp-layout-current-columns);
+		--re-masonry-gap: var(--vp-layout-gap, 1.5rem);
+		--re-masonry-row-gap: #{$row-gap};
 
-		// Until Masonry has placed the items there is nothing placing them:
-		// with JavaScript off, and on a page whose `masonry` handle was
-		// deferred, for as long as that takes. The class is written by the loop
-		// module when it starts Masonry, not by hydration, so the columns hold
-		// until the script really has the list.
-		//
-		// Only where the browser cannot pack the items itself - where it can,
-		// the rule below is already the whole layout, script or no script.
-		@supports not (display: grid-lanes) {
-			&:not(.vp-has-masonry) {
-				@include masonry-columns;
-			}
+		&.vp-layout-auto-columns {
+			grid-template-columns: repeat(var(--vp-layout-auto-placement), minmax(var(--vp-layout-track, min(16rem, 100%)), 1fr));
 		}
-
-		@supports (display: grid-lanes) {
-			@include masonry-lanes;
-		}
-	}
-
-	// Set by the module, and only where it found `display: grid-lanes`. It also
-	// takes `vp-layout-masonry` off the list, which is what stops the family
-	// store from starting the script the browser has made unnecessary.
-	&.vp-layout-masonry-native {
-		@include masonry-lanes;
 	}
 
 	// The width and the height of every tile come from the pattern rules the
@@ -336,36 +264,15 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 		}
 	}
 
-	// Rows are measured and placed by fjGallery, which takes the items out of
-	// the flow entirely. What is declared here is the layout of a page whose
-	// script never arrived: items that grow into rows of their own accord.
+	// Rows are laid out by `@reuse-sh/gallery`: its stylesheet draws rows
+	// from the proportion each item carries before any script runs, and its
+	// script picks where the rows break. The row height belongs to the
+	// picture, so the picture takes the item's proportion and the blocks under
+	// it add to the item, not to the row.
 	&.vp-layout-justified {
-		position: relative;
-		display: flex;
-		flex-wrap: wrap;
-		gap: $row-gap var(--vp-layout-gap, 1.5rem);
-
-		> #{$item} {
-			flex: 1 1 auto;
-			max-width: 100%;
-		}
-
-		&.vp-has-script > #{$item} {
-			flex-grow: 0;
-		}
-
-		// A measured row gives the picture its height, and the picture fills
-		// it - the same chain a tile needs, for the same reason.
-		&.vp-has-script #{$item} .wp-block-visual-portfolio-item-image {
-			> a {
-				height: 100%;
-			}
-
-			img {
-				height: 100%;
-				object-fit: cover;
-			}
-		}
+		--re-justified-row-height: var(--vp-layout-row-height, 320px);
+		--re-justified-gap: var(--vp-layout-gap, 1.5rem);
+		--re-justified-row-gap: #{$row-gap};
 	}
 
 	// A scroll container, nothing more: the swipe, the scroll and the keyboard
@@ -439,8 +346,7 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 
 		// The blocks of a slide fill the height the slide was given rather
 		// than sitting at the top of it: the item becomes a column, and the
-		// picture takes what the rest of the blocks leave - the same chain a
-		// justified row needs, for the same reason.
+		// picture takes what the rest of the blocks leave.
 		&.vp-carousel-stretch-slides {
 			> #{$item} {
 				display: flex;
@@ -817,5 +723,38 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 		padding-inline-start: calc(50cqw + var(--vp-carousel-seam-shift, 0px)) !important;
 		padding-inline-end: calc(50cqw - var(--vp-carousel-seam-shift, 0px)) !important;
 		scroll-padding-inline: var(--vp-carousel-inset, 0) !important;
+	}
+}
+
+// The picture of a justified item is as tall as the row: its box takes the
+// item's width over its proportion, border and padding included, and what is
+// inside fills it. A height rather than `aspect-ratio`, so the percentage
+// heights inside resolve against the content box in every engine. Scoped to
+// the item's own picture: a gallery inside an item keeps its own shapes.
+@scope (.wp-block-visual-portfolio-item-template.vp-layout-justified > #{$item}) to (.wp-block-visual-portfolio-item-template) {
+	:scope {
+		container-type: inline-size;
+	}
+
+	.wp-block-visual-portfolio-item-image,
+	.wp-block-visual-portfolio-item-cover {
+		box-sizing: border-box;
+		width: auto !important;
+		height: calc(100cqw / var(--re-ratio)) !important;
+		aspect-ratio: auto !important;
+	}
+
+	.wp-block-visual-portfolio-item-image {
+		> a {
+			display: block;
+			height: 100%;
+		}
+
+		img {
+			width: 100%;
+			height: 100% !important;
+			aspect-ratio: auto !important;
+			object-fit: cover;
+		}
 	}
 }

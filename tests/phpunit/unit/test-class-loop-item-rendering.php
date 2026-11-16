@@ -1293,4 +1293,67 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'vp-block-loop-carousel-nav', $with_control );
 	}
+
+	/**
+	 * A justified item carries the proportion of its picture, so the rows of
+	 * the stylesheet are right before the layout script runs.
+	 *
+	 * @return void
+	 */
+	public function test_justified_items_carry_the_ratio_of_their_picture() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'justified' )
+		);
+		$this->assertStringContainsString( 're-justified', $output );
+
+		// Each item's proportion is that of the picture it holds, as printed.
+		preg_match_all( '/<li class="wp-block-visual-portfolio-item-template__item" style="--re-ratio:([0-9.]+)">.*?<img[^>]* width="(\d+)" height="(\d+)"/s', $output, $matches, PREG_SET_ORDER );
+
+		$this->assertCount( count( self::$images ), $matches );
+
+		foreach ( $matches as $match ) {
+			$this->assertSame( (string) round( $match[2] / $match[3], 4 ), $match[1] );
+		}
+	}
+
+	/**
+	 * An item without a picture, or with a picture of no size, carries no
+	 * proportion, and the library falls back to its own.
+	 *
+	 * @return void
+	 */
+	public function test_justified_items_without_a_sized_picture_carry_no_ratio() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-title /-->',
+			array( 'layoutType' => 'justified' )
+		);
+
+		$this->assertStringNotContainsString( '--re-ratio', $output );
+
+		$method = new ReflectionMethod( Visual_Portfolio_Block_Item_Template::class, 'get_item_ratio_style' );
+		$method->setAccessible( true );
+		$template = new ReflectionClass( Visual_Portfolio_Block_Item_Template::class );
+		$instance = $template->newInstanceWithoutConstructor();
+
+		$this->assertSame( '', $method->invoke( $instance, '<img width="0" height="10" src="a.png">' ) );
+		$this->assertSame( '', $method->invoke( $instance, '<p>No picture</p>' ) );
+		$this->assertSame( ' style="--re-ratio:1.5"', $method->invoke( $instance, '<a><img src="a.png" width="300" height="200"></a>' ) );
+	}
+
+	/**
+	 * Masonry is the layout library's on both paths, and the masonry-layout
+	 * script of WordPress stays off the page.
+	 *
+	 * @return void
+	 */
+	public function test_masonry_prints_the_library_class_without_the_masonry_script() {
+		$output = $this->render_loop(
+			'<!-- wp:visual-portfolio/item-image /-->',
+			array( 'layoutType' => 'masonry' )
+		);
+
+		$this->assertMatchesRegularExpression( '/<ul [^>]*class="[^"]*\bre-masonry\b/', $output );
+		$this->assertFalse( wp_script_is( 'masonry', 'enqueued' ) );
+	}
 }

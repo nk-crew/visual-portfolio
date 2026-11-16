@@ -9,7 +9,7 @@ import { applyFilters } from '@wordpress/hooks';
  */
 import { driveTimelines } from './_timelines';
 import { syncColumns } from './auto-columns';
-import { layoutJustified, layoutMasonry, startLayout } from './layouts';
+import { startJustified, startMasonry } from './layouts';
 
 const noop = () => {};
 
@@ -49,13 +49,11 @@ export default function useEditorLayout({
 		}
 
 		if ('masonry' === layoutType) {
-			return startLayout(list, layoutMasonry);
+			return startMasonry(list);
 		}
 
 		if ('justified' === layoutType) {
-			return startLayout(list, (element) =>
-				layoutJustified(element, justifiedRef.current)
-			);
+			return startJustified(list, justifiedRef.current);
 		}
 
 		// The carousel is drawn by the stylesheet, but its slide width is a

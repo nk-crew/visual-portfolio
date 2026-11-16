@@ -1181,8 +1181,8 @@ without any change here.
 
 | Store | Module | What it does |
 |---|---|---|
-| `visual-portfolio/loop` | `build/gutenberg/blocks/loop/view.js` | Navigation of the whole family: `actions.navigate`, `actions.navigateTo`, `actions.loadMore`, `callbacks.initLayout` (masonry), `callbacks.observeInfinite`, `state.isLoading`, `state.ariaLiveMessage`, `state.isEnhanced` |
-| `visual-portfolio/item-template` | `build/gutenberg/blocks/item-template/view.js` | Justified and carousel layouts, the carousel controls (`actions.carouselPrev`, `actions.carouselNext`, `actions.carouselGoTo`, `actions.carouselAutoplayToggle`), native masonry detection |
+| `visual-portfolio/loop` | `build/gutenberg/blocks/loop/view.js` | Navigation of the whole family: `actions.navigate`, `actions.navigateTo`, `actions.loadMore`, `callbacks.observeInfinite`, `state.isLoading`, `state.ariaLiveMessage`, `state.isEnhanced` |
+| `visual-portfolio/item-template` | `build/gutenberg/blocks/item-template/view.js` | Justified, masonry and carousel layouts, the carousel controls (`actions.carouselPrev`, `actions.carouselNext`, `actions.carouselGoTo`, `actions.carouselAutoplayToggle`) |
 | `visual-portfolio/item-cover` | `build/gutenberg/blocks/item-cover/view.js` | The `fly` effect only |
 
 Compose onto a namespace with another `store()` call, and **add** actions rather
@@ -1195,16 +1195,18 @@ load with a region swap, and hand the navigation back to the browser whenever
 they cannot. `state.isEnhanced` is how a server-rendered fallback control — the
 submit button of a filter or sort form — knows to take itself away.
 
-They are directives and actions and nothing else. Each is between 0.7 and 8.4 KB
-after gzip, and `@wordpress/interactivity` from the WordPress bundle is the only
-static dependency. Everything larger is fetched at the moment it is used and never
+They are directives and actions and nothing else. Each is between 0.7 and 12.2 KB
+after gzip. `@wordpress/interactivity` from the WordPress bundle is the only
+static dependency loaded apart from them; the item template module bundles
+`@reuse-sh/gallery`, which lays out justified rows and masonry lanes. Everything larger is fetched at the moment it is used and never
 bundled: `@wordpress/interactivity-router` on the first region swap, the Blossom
 carousel from the address on the markup. A gallery that is a plain grid
 downloads neither.
 
-The layouts that need a library use `masonry` and `imagesloaded` from WordPress
-and a jQuery-free build of fjGallery registered under a handle of the family's
-own. jQuery comes in with the lightbox only.
+Justified rows and masonry lanes come from `@reuse-sh/gallery`: native Grid
+Lanes where the browser has them, its script elsewhere, and its stylesheet, part
+of the item template's, before any script runs. jQuery comes in with the
+lightbox only.
 
 ### Lightbox
 

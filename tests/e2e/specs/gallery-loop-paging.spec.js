@@ -131,6 +131,7 @@ function getLayout(page) {
 				parseFloat(style.paddingLeft) -
 				parseFloat(style.paddingRight),
 			height: box.height,
+			rowGap: parseFloat(style.rowGap) || 0,
 			items: Array.from(list.querySelectorAll(itemSelector)).map(
 				(item) => {
 					const rect = item.getBoundingClientRect();
@@ -141,7 +142,6 @@ function getLayout(page) {
 						y: rect.y - box.y,
 						width: rect.width,
 						height: rect.height,
-						position: window.getComputedStyle(item).position,
 						ratio: image
 							? image.getAttribute('width') /
 								image.getAttribute('height')
@@ -168,18 +168,42 @@ function overlaps(a, b) {
 }
 
 /**
- * Whether Masonry has placed every item: taken out of the flow, apart from
- * each other and inside the height it gave the list.
+ * Whether masonry has packed every item: apart from each other, inside the
+ * list, and each one right under the one above it in its column - a row gap
+ * away, where a plain grid would leave the gap of a taller neighbour.
  *
  * @param {Object} layout - see `getLayout()`.
  * @return {boolean} placed.
  */
 function isMasonryPlaced(layout) {
-	const { items, height } = layout;
+	const { items, height, rowGap } = layout;
+	const columns = new Map();
+
+	items.forEach((item) => {
+		const x = Math.round(item.x);
+		columns.set(x, [...(columns.get(x) || []), item]);
+	});
+
+	const packed = [...columns.values()].every((column) =>
+		column
+			.sort((a, b) => a.y - b.y)
+			.every(
+				(item, index) =>
+					(0 === index && Math.abs(item.y) < 2) ||
+					(index > 0 &&
+						Math.abs(
+							item.y -
+								(column[index - 1].y +
+									column[index - 1].height +
+									rowGap)
+						) < 2)
+			)
+	);
 
 	return (
 		items.length > 1 &&
-		items.every((item) => 'absolute' === item.position) &&
+		columns.size > 1 &&
+		packed &&
 		items.every((item, index) =>
 			items.slice(index + 1).every((other) => !overlaps(item, other))
 		) &&
@@ -197,11 +221,6 @@ function isMasonryPlaced(layout) {
  */
 function isJustifiedPlaced(layout) {
 	const { items, width } = layout;
-
-	if (!items.every((item) => 'absolute' === item.position)) {
-		return false;
-	}
-
 	const rows = [];
 
 	items.forEach((item) => {
