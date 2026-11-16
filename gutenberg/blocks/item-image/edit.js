@@ -125,6 +125,7 @@ export default function ItemImageEdit({
 		'vp/itemUrl': itemUrl,
 		'vp/itemFormat': itemFormat,
 		'vp/layoutColumns': layoutColumns,
+		'vp/layoutType': layoutType,
 	} = context;
 
 	// The width is the figure's, as on the page: see `index.php`.
@@ -380,13 +381,15 @@ export default function ItemImageEdit({
 							panelId={clientId}
 						/>
 					</InspectorControls>
-					<InspectorControls group="dimensions">
-						<DimensionsTool
-							panelId={clientId}
-							value={{ aspectRatio, width, height, scale }}
-							onChange={setAttributes}
-						/>
-					</InspectorControls>
+					{'justified' !== layoutType && (
+						<InspectorControls group="dimensions">
+							<DimensionsTool
+								panelId={clientId}
+								value={{ aspectRatio, width, height, scale }}
+								onChange={setAttributes}
+							/>
+						</InspectorControls>
+					)}
 					<InspectorControls>
 						<ToolsPanel
 							label={__('Settings', 'visual-portfolio')}

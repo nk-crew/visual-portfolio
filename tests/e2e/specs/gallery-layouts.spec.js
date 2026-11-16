@@ -838,6 +838,49 @@ test.describe('Gallery Item Template layouts', () => {
 			.toBe(true);
 	});
 
+	test('justified keeps a cover with a minimum height to its row', async ({
+		page,
+		requestUtils,
+	}) => {
+		const created = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: {
+				title: 'Layouts - justified cover min height',
+				status: 'publish',
+				content: getLoopMarkup({
+					blockId: 'e2e-justified-cover-min-height',
+					images: await getShapedImages(requestUtils),
+					layout: {
+						layoutType: 'justified',
+						justifiedRowHeight: 200,
+						style: { spacing: { blockGap: '10px' } },
+					},
+				}).replace(
+					'<!-- wp:visual-portfolio/item-image {"clickAction":"url"} /-->',
+					'<!-- wp:visual-portfolio/item-cover {"minHeight":"600px"} /-->'
+				),
+			},
+		});
+
+		pageIds.push(created.id);
+		await page.goto(created.link);
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveAttribute('data-re-justified', /.+/);
+		await expect
+			.poll(async () => {
+				const rows = await getRowPictureHeights(
+					list,
+					'.wp-block-visual-portfolio-item-cover'
+				);
+
+				return sameHeights(rows) && Math.max(...rows.flat()) < 400;
+			})
+			.toBe(true);
+	});
+
 	test('a justified gallery inside a grid item keeps its rows', async ({
 		page,
 		requestUtils,

@@ -22,7 +22,8 @@
 		"vp/itemFormat",
 		"vp/itemPopupData",
 		"vp/itemImageLoading",
-		"vp/layoutColumns"
+		"vp/layoutColumns",
+		"vp/layoutType"
 	],
 	"attributes": {
 		"clickAction": {

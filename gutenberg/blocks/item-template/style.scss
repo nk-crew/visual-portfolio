@@ -741,6 +741,7 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 		box-sizing: border-box;
 		width: auto !important;
 		height: calc(100cqw / var(--re-ratio)) !important;
+		min-height: 0 !important;
 		aspect-ratio: auto !important;
 	}
 
