@@ -511,10 +511,16 @@ class Test_Class_Loop_Gallery extends WP_UnitTestCase {
 
 		// Where the delimiter scanner and the parser disagree, nothing is written.
 		$odd     = '<!-- wp:visual-portfolio/loop {"block_id":"odd","note":"a --> b"} --><div class="vp-block-loop"></div><!-- /wp:visual-portfolio/loop -->' . $third;
-		$blocks  = parse_blocks( $odd );
-		$found   = Visual_Portfolio_Loop_Gallery::find_loop( $blocks, 'third' );
-		$updated = Visual_Portfolio_Loop_Gallery::update( $found['block'], array( 'settings' => array( 'per_page' => 2 ) ), $blocks, $found['index'] );
-		$this->assertNull( Visual_Portfolio_Loop_Gallery::replace_in_content( $odd, $found['index'], $found['block'], $updated ) );
+		$odd_blocks = parse_blocks( $odd );
+		$found      = Visual_Portfolio_Loop_Gallery::find_loop( $odd_blocks, 'third' );
+
+		if ( version_compare( get_bloginfo( 'version' ), '7.2-alpha', '>=' ) ) {
+			// WordPress 7.2 parses with the delimiter scanner, which reads this markup as one freeform block.
+			$this->assertSame( array(), Visual_Portfolio_Loop_Gallery::find_loops( $odd_blocks ) );
+		} else {
+			$updated = Visual_Portfolio_Loop_Gallery::update( $found['block'], array( 'settings' => array( 'per_page' => 2 ) ), $odd_blocks, $found['index'] );
+			$this->assertNull( Visual_Portfolio_Loop_Gallery::replace_in_content( $odd, $found['index'], $found['block'], $updated ) );
+		}
 
 		// A partial posts update keeps the block's default post type.
 		$updated = Visual_Portfolio_Loop_Gallery::update(
