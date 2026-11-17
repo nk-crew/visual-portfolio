@@ -2,6 +2,51 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.11.0 - Nov 17, 2026 =
+
+* improved the experimental Gallery Loop blocks:
+  * added Saved Layouts built from Gallery Loop blocks. A gallery syncs with one from its block menu, takes the layout's item design and lightbox, and keeps its own images or posts. A setting changed on the page is marked and can be reset to the layout, and a locked layout allows no changes
+  * added the Saved Layouts library, with live previews, the pages each layout is used on, filters, duplicate, copy shortcode, export and import. A layout deleted for good leaves the galleries synced with it looking as they did
+  * added Gallery Loop to the block switcher of the Visual Portfolio and Saved Layout blocks, which converts a legacy gallery with its source, layout, skin, filter, sort, search and pagination
+  * added folder and ZIP import to image galleries. Files upload three at a time in the order of their names, and files the gallery already holds are skipped
+  * added Move left, Move right and Remove from gallery to the toolbar of an image in the preview
+  * added Label and Order settings to the Gallery Filter, and the List tab in the sidebar for the items of a filter shown as a dropdown
+  * added a choice of formats to the format badge of Item Image
+  * added Sticky posts to a post types set that includes posts
+  * added a tablet and phone block gap, and cover padding, set with the editor's responsive styles
+  * changed the tablet and phone columns to switch at the theme's breakpoints, the ones the editor previews, instead of 768px and 576px
+  * changed the blocks inside an item to be spaced by the theme's block gap, so a caption no longer sits flush against the picture
+  * changed the selects, text and date fields of the filter, sort and search blocks to one look in the theme's type and colors
+  * changed Justified and Masonry layouts to hold their rows and columns before the page scripts run
+  * removed the size settings of Item Image and Item Cover from the Justified layout, where they did not change the picture. They come back with their values when the layout changes
+  * fixed an Item Cover minimum height making a picture taller than its row in the Justified layout
+  * fixed masonry items overlapping in the editor until the window was resized
+* added abilities that let AI agents list, create and change Gallery Loop galleries through the WordPress Abilities API and the MCP Adapter, on WordPress 7.1 and newer
+* added a Live Preview to the plugin page on WordPress.org
+* changed the Settings, Saved Layouts and Proofing pages, and the Projects, Categories and Tags lists, to one page header with sections as tabs, on a white background
+* changed the Settings to show each setting on its own row, with its name and description beside the control
+* fixed galleries not laying out again when their container width changed without a window resize
+* fixed galleries laying out again and again when they made the page scrollbar appear and disappear
+* fixed the lightbox opening a scaled-down copy of a tall image that fits its largest size, such as a long screenshot
+* fixed the plugin name missing from the Lazy Loading setting
+* **Pro:**
+* added advanced filters to the Gallery Loop:
+  * the Gallery Filter lists any taxonomy or chosen image categories, takes several terms at once and shows child terms
+  * added the Gallery Author Filter, Gallery Date Filter and Gallery Field Filter blocks
+  * added the Gallery Active Filters block, which shows each choice with a way to remove it and clears them all
+  * added the Gallery Filters Panel block, which puts the filters behind a button that opens a drawer, on phones or always
+  * every filter works as links or a form, without JavaScript too
+* added Import from server, which adds the files uploaded over FTP to the `vp-import` folder in uploads to a gallery, with the same order, duplicate skips and progress as a folder import
+* added watermarks to Item Cover pictures, so galleries converted from the Fade, Fly, Emerge and Caption Move skins are watermarked too
+* added the posts count of a term to Item Meta in a Taxonomies gallery
+* added the editor's Tablet and Mobile screens to Move under image on Item Cover
+* added the Taxonomies and Social sources and Photo Proofing selections to the abilities for AI agents
+* added Pro settings to the conversion of a legacy gallery: sources, post filters, protection, image effects, Caption Move, typography, infinite scroll, search, quick view, album counts and proofing
+* added Changed markers, and reset to the layout, to Pro settings on galleries synced with a Saved Layout
+* changed the Social Feeds and Proofing lists to the plugin's page header
+* fixed the Social Feeds and Proofing screens disappearing for administrators and editors when the Portfolio post type was turned off
+* removed unused libraries that some hosting scanners flagged as malicious, which makes the plugin 12 MB smaller
+
 = 3.10.1 - Nov 10, 2026 =
 
 * changed the WordPress.org changelog to show recent releases with a link to the full history
