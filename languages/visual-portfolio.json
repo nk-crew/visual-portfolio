@@ -38,7 +38,214 @@
          "Design Options": [
             ""
          ],
+         "Create, read and change Visual Portfolio galleries built with the Gallery Loop block.": [
+            ""
+         ],
+         "Get gallery options": [
+            ""
+         ],
+         "Lists what a Visual Portfolio gallery can be made of: layouts (block patterns), content sources, settings, and the Saved Layouts a gallery can sync with. Call it before creating or changing a gallery.": [
+            ""
+         ],
+         "List galleries": [
+            ""
+         ],
+         "Lists the Visual Portfolio galleries (Gallery Loop blocks) in posts, pages and templates the current user can edit.": [
+            ""
+         ],
+         "Only the galleries of this post.": [
+            ""
+         ],
+         "Only posts whose title contains this text.": [
+            ""
+         ],
+         "Find images": [
+            ""
+         ],
+         "Finds images in the Media Library, newest first, to use as the images of a gallery. A page can hold fewer than `per_page` images the current user may see; ask for the next page while `has_more` is true.": [
+            ""
+         ],
+         "Words in the title, caption, description or file name.": [
+            ""
+         ],
+         "Only images uploaded on or after this date, YYYY-MM-DD, in the site's timezone.": [
+            ""
+         ],
+         "Only images uploaded on or before this date, YYYY-MM-DD, in the site's timezone.": [
+            ""
+         ],
+         "Only images the current user uploaded.": [
+            ""
+         ],
+         "Find posts": [
+            ""
+         ],
+         "Finds published posts, pages or projects, newest first, to show in a gallery by their ids. A page can hold fewer than `per_page` posts; ask for the next page while `has_more` is true.": [
+            ""
+         ],
+         "Post type, such as post, page or portfolio.": [
+            ""
+         ],
+         "Words in the title or content.": [
+            ""
+         ],
+         "Only posts in any of these term ids, from find-terms.": [
+            ""
+         ],
+         "Find terms": [
+            ""
+         ],
+         "Finds categories, tags and other public terms, to limit a posts gallery to them.": [
+            ""
+         ],
+         "Only terms of this taxonomy, such as category, post_tag or portfolio_category.": [
+            ""
+         ],
+         "Only terms of the taxonomies of this post type, the ones a posts gallery of that type can be limited to.": [
+            ""
+         ],
+         "Words in the term name.": [
+            ""
+         ],
+         "Get gallery": [
+            ""
+         ],
+         "Returns one gallery as the page shows it: its layout type, its source with the images or the post query, its settings, and the Saved Layout it is synced with.": [
+            ""
+         ],
+         "Create gallery": [
+            ""
+         ],
+         "Adds a gallery to a post, or creates a draft holding it: a page, or a post for a user who cannot create pages. The gallery starts from a layout (see get-gallery-options), takes a source and optional settings. A published post is updated at once.": [
+            ""
+         ],
+         "Post to add the gallery to. Leave out to create a draft.": [
+            ""
+         ],
+         "Title of the draft created when `post_id` is left out.": [
+            ""
+         ],
+         "Where in the post the gallery goes.": [
+            ""
+         ],
+         "Layout slug from get-gallery-options.": [
+            ""
+         ],
+         "Id of a Saved Layout from get-gallery-options to sync the gallery with. The Saved Layout then provides the item blocks, the columns and the lightbox; `layout` still provides the blocks around them, and `settings` that differ from the Saved Layout's become changes of this gallery.": [
+            ""
+         ],
+         "Update gallery": [
+            ""
+         ],
+         "Changes a gallery: the Saved Layout it is synced with, its layout, its source, its settings, and the images of an images gallery. Fields left out stay as they are. On a gallery synced with a Saved Layout, a setting the Saved Layout provides becomes a change of this gallery, as in the editor. A published post is updated at once.": [
+            ""
+         ],
+         "Id of a Saved Layout from get-gallery-options to sync the gallery with: the gallery takes its item blocks, columns and lightbox, and keeps its source. `null` (or 0) detaches the gallery, which keeps its current look. Applied before the other fields.": [
+            ""
+         ],
+         "New layout slug. The gallery keeps its source, columns, lightbox and items per page unless `settings` changes them; the blocks inside the gallery come from the new layout. Refused on a gallery synced with a Saved Layout unless the same call detaches it.": [
+            ""
+         ],
+         "Images to add at the end. An image the gallery already has is skipped.": [
+            ""
+         ],
+         "Attachment ids of the images to remove.": [
+            ""
+         ],
+         "Attachment ids in the new order. Images left out follow, in their current order.": [
+            ""
+         ],
+         "Post type `%s` does not exist or has no public pages.": [
+            ""
+         ],
+         "Unknown taxonomy `%1$s`. Taxonomies of this site: %2$s.": [
+            ""
+         ],
+         "Gallery": [
+            ""
+         ],
+         "Post %1$d is open in the editor of %2$s. Try again once they close it.": [
+            ""
+         ],
+         "The post is open in your editor. Reload it there before saving, or the editor will save its own copy over this change.": [
+            ""
+         ],
+         "Image %d is not an image attachment the current user can read.": [
+            ""
+         ],
+         "`per_page` must be -1 for all items, or 1 to 100.": [
+            ""
+         ],
+         "Post %d does not exist, is in the trash, or cannot hold blocks.": [
+            ""
+         ],
+         "A gallery inside a Saved Layout cannot sync with a Saved Layout.": [
+            ""
+         ],
+         "No gallery `%1$s` in post %2$d. Its galleries: %3$s.": [
+            ""
+         ],
+         "none": [
+            ""
+         ],
+         "Id of the post, page or template the gallery is in.": [
+            ""
+         ],
+         "Gallery id from list-galleries. An id of the form `loop-<n>` is a position in the post, and a gallery created at its start moves it.": [
+            ""
+         ],
+         "Image attachment id.": [
+            ""
+         ],
+         "URL the item links to.": [
+            ""
+         ],
+         "Source type from get-gallery-options.": [
+            ""
+         ],
+         "Images of an `images` source.": [
+            ""
+         ],
+         "Post type of a `posts` source.": [
+            ""
+         ],
+         "Post ids of a `posts` source, shown in this order instead of a query.": [
+            ""
+         ],
+         "Term ids a `posts` source is limited to.": [
+            ""
+         ],
+         "Read only: how get-gallery reports a `posts` source that is not one post type (`ids`, `current_query`, `custom_query`, `post_types_set`). Sent back, it changes nothing.": [
+            ""
+         ],
+         "Fields of a source that is neither `images` nor `posts`, as get-gallery reports them.": [
+            ""
+         ],
+         "What the gallery shows. See the sources of get-gallery-options for what each type takes. On update, fields left out keep their value.": [
+            ""
+         ],
          "and": [
+            ""
+         ],
+         "All projects": [
+            ""
+         ],
+         "Categories": [
+            ""
+         ],
+         "Tags": [
+            ""
+         ],
+         "Projects": [
+            ""
+         ],
+         "The works your galleries show.": [
+            ""
+         ],
+         "Group projects, so a gallery can show or filter by them.": [
+            ""
+         ],
+         "Label projects, so a gallery can show or filter by them.": [
             ""
          ],
          "Go Pro": [
@@ -333,9 +540,6 @@
             ""
          ],
          "Description": [
-            ""
-         ],
-         "Categories": [
             ""
          ],
          "Format": [
@@ -917,9 +1121,6 @@
          "Parent Project": [
             ""
          ],
-         "Projects": [
-            ""
-         ],
          "View Project": [
             ""
          ],
@@ -954,9 +1155,6 @@
             ""
          ],
          "Portfolio Tag": [
-            ""
-         ],
-         "Tags": [
             ""
          ],
          "Saved Layouts": [
@@ -1022,10 +1220,16 @@
          "Proofing": [
             ""
          ],
-         "Premium Only": [
+         "Send a collection of photographs to your client for approval.": [
             ""
          ],
-         "Send a collection of photographs to your client for approval.": [
+         "Proofing comes with Visual Portfolio Pro": [
+            ""
+         ],
+         "Collaborate with clients on image selections and benefit from self-healing proofing permalinks.": [
+            ""
+         ],
+         "(opens in a new tab)": [
             ""
          ],
          "Portfolio Activity": [
@@ -1136,6 +1340,63 @@
          "Extra Large (VP)": [
             ""
          ],
+         "Images": [
+            ""
+         ],
+         "Images from the Media Library, in the order given. Each item takes `id` (an image attachment id) and optional `title`, `description`, `alt` and `link`.": [
+            ""
+         ],
+         "Posts of one post type, shown by their featured image. Takes `post_type`, `ids` for a manual selection, `terms` (term ids), `order_by` and `order`.": [
+            ""
+         ],
+         "Display social feeds such as Instagram, YouTube, Flickr, X, etc…": [
+            ""
+         ],
+         "Number of columns on grid, masonry and carousel layouts. Tiles and justified layouts ignore it.": [
+            ""
+         ],
+         "Items per page, or -1 for all of them on one page. An images gallery made by these abilities has no pagination, so there it is how many images show.": [
+            ""
+         ],
+         "Whether a click on a picture opens it in the lightbox. Off, a picture of an images gallery opens nothing and a post opens its page.": [
+            ""
+         ],
+         "This gallery is synced with the Saved Layout %s, which provides its layout. To change the layout, pass `saved_layout: null` in the same call: the gallery then detaches, keeping its current look, and takes the new layout.": [
+            ""
+         ],
+         "Images can be added, removed or reordered only in a gallery whose source is `images`.": [
+            ""
+         ],
+         "The Saved Layout %s is locked: a gallery synced with it cannot change the settings the layout provides, such as the columns, the lightbox and the item blocks. Edit the Saved Layout, or pass `saved_layout: null` in the same call to detach the gallery first.": [
+            ""
+         ],
+         "Unknown source `%1$s`. Use one of: %2$s.": [
+            ""
+         ],
+         "The %1$s source requires Visual Portfolio Pro: %2$s": [
+            ""
+         ],
+         "The `%s` source is not available on this site.": [
+            ""
+         ],
+         "#%d": [
+            ""
+         ],
+         "“%1$s” (%2$d)": [
+            ""
+         ],
+         "This gallery keeps its item template inside another block, where a Saved Layout cannot provide it. Move the item template out of that block in the editor, then sync the gallery.": [
+            ""
+         ],
+         "The Saved Layout %s keeps its item template inside another block, so it cannot fill this empty gallery. Give the gallery a layout first, then sync it.": [
+            ""
+         ],
+         "Saved Layout %d cannot be synced with: it does not exist, is not built from blocks, or is not published. get-gallery-options lists the Saved Layouts a gallery can sync with.": [
+            ""
+         ],
+         "Unknown layout `%1$s`. Use one of: %2$s.": [
+            ""
+         ],
          "Required parameters are missing.": [
             ""
          ],
@@ -1148,6 +1409,12 @@
          "Sorry, you are not allowed to get list of saved layouts.": [
             ""
          ],
+         "Sorry, you are not allowed to get saved layouts data.": [
+            ""
+         ],
+         "Saved layout not found.": [
+            ""
+         ],
          "Post ID is required for this request.": [
             ""
          ],
@@ -1157,10 +1424,25 @@
          "User don't have permissions to change options.": [
             ""
          ],
-         "Settings": [
+         "This preview is not available.": [
             ""
          ],
-         "Images": [
+         "This Saved Layout no longer exists.": [
+            ""
+         ],
+         "This Saved Layout is not published.": [
+            ""
+         ],
+         "The Saved Layout could not be restored.": [
+            ""
+         ],
+         "%s (copy)": [
+            ""
+         ],
+         "This file is not a Visual Portfolio Saved Layouts export.": [
+            ""
+         ],
+         "Settings": [
             ""
          ],
          "Popup & Lightbox": [
@@ -1224,9 +1506,6 @@
             ""
          ],
          "%s comes with Visual Portfolio Pro.": [
-            ""
-         ],
-         "(opens in a new tab)": [
             ""
          ],
          "Register Portfolio Post Type": [
@@ -1469,6 +1748,15 @@
          "Background Color": [
             ""
          ],
+         "Pro": [
+            ""
+         ],
+         "Defaults for every gallery on this site.": [
+            ""
+         ],
+         "Settings sections": [
+            ""
+         ],
          "-- Select Page --": [
             ""
          ],
@@ -1569,9 +1857,6 @@
             ""
          ],
          "Proofing workflows": [
-            ""
-         ],
-         "Collaborate with clients on image selections and benefit from self-healing proofing permalinks.": [
             ""
          ],
          "Content protection": [
@@ -1704,9 +1989,6 @@
          "Audio": [
             ""
          ],
-         "Gallery": [
-            ""
-         ],
          "By %s": [
             ""
          ],
@@ -1750,6 +2032,210 @@
             ""
          ],
          "Thumbnails and slideshow": [
+            ""
+         ],
+         "It is not used on any page. Shortcodes inside page builders are not counted, and they will show nothing.": [
+            ""
+         ],
+         "It is not used on any page.": [
+            ""
+         ],
+         "It is used on %d page:": [
+            "",
+            ""
+         ],
+         "Synced": [
+            ""
+         ],
+         "Inserted": [
+            ""
+         ],
+         "And %d more.": [
+            "",
+            ""
+         ],
+         "Inserted copies stop showing on these pages.": [
+            ""
+         ],
+         "Synced galleries keep their current look and stop syncing.": [
+            ""
+         ],
+         "Synced galleries keep following it until it is deleted for good.": [
+            ""
+         ],
+         "Some layouts could not be deleted.": [
+            ""
+         ],
+         "“%s” deleted.": [
+            ""
+         ],
+         "“%s” moved to the trash.": [
+            ""
+         ],
+         "%d layout deleted.": [
+            "",
+            ""
+         ],
+         "%d layout moved to the trash.": [
+            "",
+            ""
+         ],
+         "%d layout is selected. Galleries synced with them keep their look.": [
+            "",
+            ""
+         ],
+         "Cancel": [
+            ""
+         ],
+         "Delete": [
+            ""
+         ],
+         "Move to trash": [
+            ""
+         ],
+         "Restore": [
+            ""
+         ],
+         "%d layout restored.": [
+            "",
+            ""
+         ],
+         "Delete permanently": [
+            ""
+         ],
+         "Delete “%s” permanently?": [
+            ""
+         ],
+         "Delete layouts permanently?": [
+            ""
+         ],
+         "Edit": [
+            ""
+         ],
+         "Duplicate": [
+            ""
+         ],
+         "“%s” duplicated.": [
+            ""
+         ],
+         "Copy shortcode": [
+            ""
+         ],
+         "Shortcode copied.": [
+            ""
+         ],
+         "Export as JSON": [
+            ""
+         ],
+         "Move “%s” to the trash?": [
+            ""
+         ],
+         "Move layouts to the trash?": [
+            ""
+         ],
+         "Carousel": [
+            ""
+         ],
+         "Blocks": [
+            ""
+         ],
+         "Legacy": [
+            ""
+         ],
+         "Used": [
+            ""
+         ],
+         "Not used": [
+            ""
+         ],
+         "Draft": [
+            ""
+         ],
+         "Private": [
+            ""
+         ],
+         "Scheduled": [
+            ""
+         ],
+         "Trash": [
+            ""
+         ],
+         "Counting…": [
+            ""
+         ],
+         "Not used yet": [
+            ""
+         ],
+         "%d page": [
+            "",
+            ""
+         ],
+         "%1$s · %2$d synced": [
+            ""
+         ],
+         "Preview": [
+            ""
+         ],
+         "Editor": [
+            ""
+         ],
+         "Summary": [
+            ""
+         ],
+         "Source": [
+            ""
+         ],
+         "Used on": [
+            ""
+         ],
+         "More ways to add": [
+            ""
+         ],
+         "Gallery Loop blocks. Insert it on pages or sync galleries with it.": [
+            ""
+         ],
+         "Classic settings editor, for page builders and shortcodes.": [
+            ""
+         ],
+         "Legacy Saved Layout": [
+            ""
+         ],
+         "%1$s was not imported: %2$s": [
+            ""
+         ],
+         "the file cannot be read.": [
+            ""
+         ],
+         "%d layout imported.": [
+            "",
+            ""
+         ],
+         "%d image is not on this site and was left out.": [
+            "",
+            ""
+         ],
+         "Import": [
+            ""
+         ],
+         "No Saved Layouts yet": [
+            ""
+         ],
+         "A Saved Layout is a gallery you build once. Insert it on any page, or sync the settings of Gallery Loop blocks with it, so changing it here changes them all.": [
+            ""
+         ],
+         "Galleries you build once. Insert one on a page, or sync a Gallery Loop with it.": [
+            ""
+         ],
+         "The trash is empty.": [
+            ""
+         ],
+         "No layouts match.": [
+            ""
+         ],
+         "Search layouts": [
+            ""
+         ],
+         "Preview of %s": [
             ""
          ],
          "--- Select Layout ---": [
@@ -1911,9 +2397,6 @@
          "Gallery item description": [
             ""
          ],
-         "Source": [
-            ""
-         ],
          "Excerpt": [
             ""
          ],
@@ -1933,6 +2416,15 @@
             ""
          ],
          "Replace": [
+            ""
+         ],
+         "Move right": [
+            ""
+         ],
+         "Move left": [
+            ""
+         ],
+         "Remove from gallery": [
             ""
          ],
          "Unavailable meta: %s": [
@@ -2076,9 +2568,6 @@
          "What happens to a row that has too few items to fill it.": [
             ""
          ],
-         "Carousel": [
-            ""
-         ],
          "How one slide gives way to the next. %d more effect comes with Pro.": [
             "",
             ""
@@ -2116,7 +2605,7 @@
          "Peek": [
             ""
          ],
-         "How much of the next slide shows at the edge, as an invitation to scroll.": [
+         "How much of the next slide shows at the edge, as an invitation to scroll. Never more than a quarter of the carousel, so a phone keeps most of the slide.": [
             ""
          ],
          "This effect lays the slides out itself, so no part of the next one shows at the edge.": [
@@ -2125,7 +2614,7 @@
          "Slides per step": [
             ""
          ],
-         "How many slides an arrow moves at a press. Zero moves a whole screen at a time, however many slides that is.": [
+         "How many slides an arrow moves at a press, never more than the screen shows. Zero moves a whole screen at a time, however many slides that is.": [
             ""
          ],
          "Slide height": [
@@ -2301,13 +2790,58 @@
          "The shape of one thumbnail, written the way CSS writes it: 1, 4/3, 16/9.": [
             ""
          ],
+         "Label": [
+            ""
+         ],
          "Add category text…": [
+            ""
+         ],
+         "Buttons": [
+            ""
+         ],
+         "Filter by": [
+            ""
+         ],
+         "Pick the taxonomy, or the image categories, this filter lists, and put several filters in one gallery.": [
+            ""
+         ],
+         "Several terms": [
+            ""
+         ],
+         "Let visitors choose more than one term at a time.": [
+            ""
+         ],
+         "Child terms": [
+            ""
+         ],
+         "Show child terms under their parent, or once a parent is chosen.": [
+            ""
+         ],
+         "Hide empty terms": [
+            ""
+         ],
+         "Leave out the terms the other filters leave without items.": [
             ""
          ],
          "Filtering is not available for this source, so the page shows no filter.": [
             ""
          ],
-         "Display as dropdown": [
+         "Display as": [
+            ""
+         ],
+         "The name screen readers give the filter, and the prompt of its dropdown.": [
+            ""
+         ],
+         "Order": [
+            ""
+         ],
+         "As arranged in the editor": [
+            ""
+         ],
+         "Name": [
+            ""
+         ],
+         "Number of items": [
             ""
          ],
          "Show how many items each category holds.": [
@@ -2403,13 +2937,13 @@
          "Search…": [
             ""
          ],
-         "Label": [
-            ""
-         ],
          "Read by screen readers, not shown.": [
             ""
          ],
          "Sorting is not available for this source, so the page shows no sort control.": [
+            ""
+         ],
+         "Display as dropdown": [
             ""
          ],
          "Sort Options": [
@@ -2505,7 +3039,7 @@
          "Add images": [
             ""
          ],
-         "Upload images, choose them from the Media Library, or drop them here.": [
+         "Upload images, a folder or a ZIP archive, choose them from the Media Library, or drop them here.": [
             ""
          ],
          "Upload": [
@@ -2518,9 +3052,6 @@
             ""
          ],
          "Show instead": [
-            ""
-         ],
-         "Pro": [
             ""
          ],
          "Drop images to add them": [
@@ -2619,12 +3150,6 @@
          "Bulk actions": [
             ""
          ],
-         "Edit": [
-            ""
-         ],
-         "Delete": [
-            ""
-         ],
          "Are you sure you want to remove selected items?": [
             ""
          ],
@@ -2695,6 +3220,12 @@
          "Edit Tiles": [
             ""
          ],
+         "Changed on this gallery": [
+            ""
+         ],
+         "Reset to Saved Layout": [
+            ""
+         ],
          "Focal point will be used in Visual Portfolio layouts only:": [
             ""
          ],
@@ -2725,6 +3256,125 @@
          "Be careful, the output of all your items can adversely affect the performance of your site, this option may be helpful for image galleries.": [
             ""
          ],
+         "Synced · %d change": [
+            "",
+            ""
+         ],
+         "Saved. The synced gallery on %d page uses the new settings.": [
+            "",
+            ""
+         ],
+         "Insert": [
+            ""
+         ],
+         "Copy": [
+            ""
+         ],
+         "Or add the Saved Layout block to a page, or sync a Gallery Loop with it from the block’s menu.": [
+            ""
+         ],
+         "Not used on any page yet.": [
+            ""
+         ],
+         "Saving updates the synced gallery on %d page.": [
+            "",
+            ""
+         ],
+         "Shortcodes inside page builders are not counted.": [
+            ""
+         ],
+         "Syncing": [
+            ""
+         ],
+         "Galleries can change settings": [
+            ""
+         ],
+         "Synced galleries always match this layout. Their settings are locked.": [
+            ""
+         ],
+         "A synced gallery can change any setting. Settings it did not change follow this layout.": [
+            ""
+         ],
+         "The Saved Layout locks this setting. Edit the Saved Layout to change it.": [
+            ""
+         ],
+         "Save as Saved Layout": [
+            ""
+         ],
+         "This gallery keeps its images and starts syncing its settings with the new layout.": [
+            ""
+         ],
+         "Save": [
+            ""
+         ],
+         "Untitled (#%d)": [
+            ""
+         ],
+         "Sync with Saved Layout": [
+            ""
+         ],
+         "There is no other Saved Layout to sync with yet.": [
+            ""
+         ],
+         "The gallery takes its layout, item blocks and lightbox from the Saved Layout. Its images, and settings changed here, stay its own.": [
+            ""
+         ],
+         "Sync": [
+            ""
+         ],
+         "Locked by the layout": [
+            ""
+         ],
+         "%d setting changed here": [
+            "",
+            ""
+         ],
+         "Follows the layout": [
+            ""
+         ],
+         "Detached. The gallery keeps its current settings.": [
+            ""
+         ],
+         "This Saved Layout cannot be synced.": [
+            ""
+         ],
+         "Synced with “%1$s”. %2$d setting changed on this gallery stays.": [
+            "",
+            ""
+         ],
+         "Synced with “%s”.": [
+            ""
+         ],
+         "The Saved Layout could not be created.": [
+            ""
+         ],
+         "This Saved Layout is not published, so its settings cannot be shown here. The page still follows it.": [
+            ""
+         ],
+         "This Saved Layout is in the trash. The gallery still follows it until it is deleted for good.": [
+            ""
+         ],
+         "Sync with Saved Layout…": [
+            ""
+         ],
+         "Save as Saved Layout…": [
+            ""
+         ],
+         "Saved Layout #%d": [
+            ""
+         ],
+         "Reset": [
+            ""
+         ],
+         "Saved Layout options": [
+            ""
+         ],
+         "Sync with another…": [
+            ""
+         ],
+         "Detach from Saved Layout": [
+            ""
+         ],
          "Copied!": [
             ""
          ],
@@ -2735,6 +3385,56 @@
             ""
          ],
          "Show Additional Shortcodes": [
+            ""
+         ],
+         "This is not a ZIP archive, or it is damaged.": [
+            ""
+         ],
+         "Encrypted files are not supported.": [
+            ""
+         ],
+         "This file is compressed in a way the browser cannot unpack.": [
+            ""
+         ],
+         "Upload files or ZIP": [
+            ""
+         ],
+         "Upload folder": [
+            ""
+         ],
+         "Uploaded %1$d of %2$d": [
+            ""
+         ],
+         "Reading files…": [
+            ""
+         ],
+         "%d duplicate skipped.": [
+            "",
+            ""
+         ],
+         "%d unsupported file skipped.": [
+            "",
+            ""
+         ],
+         "%d file canceled.": [
+            "",
+            ""
+         ],
+         "No images or videos found.": [
+            ""
+         ],
+         "Dismiss": [
+            ""
+         ],
+         "%d file added.": [
+            "",
+            ""
+         ],
+         "%d file failed:": [
+            "",
+            ""
+         ],
+         "Retry failed": [
             ""
          ],
          "Image %d": [
@@ -2800,7 +3500,7 @@
          "Reordering cancelled.": [
             ""
          ],
-         "Drag images, upload new ones or pick from your media library.": [
+         "Drag images, a folder or a ZIP archive, upload new ones or pick from your media library.": [
             ""
          ],
          "Add media": [
@@ -2832,9 +3532,6 @@
             ""
          ],
          "Which field of the image the description is read from.": [
-            ""
-         ],
-         "Order": [
             ""
          ],
          "Order By": [
@@ -2928,9 +3625,6 @@
             ""
          ],
          "Keep the post being viewed out of a gallery placed on its own page.": [
-            ""
-         ],
-         "Display social feeds such as Instagram, YouTube, Flickr, X, etc…": [
             ""
          ],
          "Pause": [
