@@ -233,37 +233,11 @@ $escaped-svg-characters: (
  * Admin Toolbar.
  */
 /**
- * The plugin's WordPress list screens, refreshed: white, like its own pages,
- * with WordPress's markup and behavior left as they are.
+ * A term's edit screen, outside the frame, titled like the framed pages.
  */
-.post-type-portfolio.edit-php,
-.post-type-portfolio.edit-tags-php,
-.post-type-portfolio.term-php,
-.post-type-vp_proofing.edit-php {
-	background: #fff;
-
-	.wrap h1.wp-heading-inline,
-	.wrap > h1 {
-		font-size: 23px;
-		font-weight: 600;
-	}
-
-	.wp-list-table {
-		border-color: #e0e0e0;
-		border-radius: 8px;
-		box-shadow: none;
-
-		thead th,
-		thead td,
-		tfoot th,
-		tfoot td {
-			border-color: #e0e0e0;
-		}
-	}
-
-	.striped > tbody > :nth-child(odd) {
-		background-color: #fafafa;
-	}
+.post-type-portfolio.term-php .wrap > h1 {
+	font-size: 23px;
+	font-weight: 600;
 }
 
 /**
@@ -529,7 +503,7 @@ $escaped-svg-characters: (
 			z-index: 1;
 			padding: 16px 0;
 			margin-top: 8px;
-			background: #fff;
+			background: #f0f0f1;
 
 			> p {
 				padding: 0;
@@ -540,6 +514,7 @@ $escaped-svg-characters: (
 				position: absolute;
 				top: 32px;
 				right: 32px;
+				bottom: auto;
 				padding: 0;
 				margin: 0;
 				background: none;
@@ -554,7 +529,8 @@ $escaped-svg-characters: (
 		}
 
 		// Tabs whose fields the Settings API draws itself, Pro's among them.
-		.form-table {
+		// A field may hold a table of its own, which stays unframed.
+		form > .form-table {
 			display: block;
 			max-width: 800px;
 			padding: 24px;
@@ -565,6 +541,10 @@ $escaped-svg-characters: (
 
 			tbody {
 				display: block;
+			}
+
+			> tbody > tr:last-child > td {
+				margin-bottom: 0;
 			}
 		}
 	}
@@ -708,7 +688,8 @@ $escaped-svg-characters: (
 		align-items: center;
 		padding: 16px 20px;
 		margin: 0 0 16px;
-		background: #f6f7f7;
+		background: #fff;
+		border: 1px solid #e0e0e0;
 		border-radius: 8px;
 
 		p {
@@ -1003,16 +984,13 @@ $escaped-svg-characters: (
 /**
  * Welcome Screen.
  */
-.portfolio_page_visual-portfolio-welcome,
-.toplevel_page_visual-portfolio-welcome {
-	background-color: #fff;
+// A page to read rather than to work in, so it stays white on the canvas.
+.vpf-welcome-page {
+	background: #fff;
 }
 
 .vpf-welcome-screen {
 	box-sizing: border-box;
-	padding-right: 20px;
-	padding-left: 20px;
-	margin-left: -20px;
 	font-size: 16px;
 	line-height: 1.6;
 	color: #1d2327;
@@ -1022,10 +1000,6 @@ $escaped-svg-characters: (
 	*::before,
 	*::after {
 		box-sizing: inherit;
-	}
-
-	@media screen and (max-width: 782px) {
-		margin-left: -10px;
 	}
 
 	p {
@@ -1047,7 +1021,6 @@ $escaped-svg-characters: (
 		margin-bottom: 60px;
 		background: #f6f7f7;
 		border-radius: 28px;
-		margin-top: 20px;
 
 		.vpf-welcome-head-inner {
 			position: relative;

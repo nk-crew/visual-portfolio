@@ -492,6 +492,18 @@ test.describe('Contextual settings controls', () => {
 		expect(Math.abs(control.x - name.x)).toBeLessThan(2);
 	});
 
+	test('the Save Changes button in the header leaves the cards under it clickable', async ({
+		admin,
+		page,
+	}) => {
+		await page.setViewportSize({ width: 1024, height: 768 });
+		const form = await openTab(admin, page, 'vp_popup_gallery');
+		const toggle = form.getByRole('checkbox', { name: 'Display Arrows' });
+		const checked = await toggle.isChecked();
+		await toggle.click({ timeout: 5000 });
+		await expect(toggle).toBeChecked({ checked: !checked });
+	});
+
 	test('incoming target hashes activate their tab without enhancing legacy tabs', async ({
 		admin,
 		page,

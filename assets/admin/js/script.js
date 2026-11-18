@@ -56,6 +56,17 @@ window.VPAdminSettingsForms = {
 	},
 };
 
+// WordPress prints Screen Options after the header of a framed list screen;
+// it belongs in the header, before the actions when there are some.
+const $screenOptions = $('body.vpf-admin-list-screen #screen-meta-links');
+const $headerActions = $('.vpf-admin-page__header .vpf-admin-page__actions');
+
+if ($headerActions.length) {
+	$screenOptions.prependTo($headerActions);
+} else {
+	$screenOptions.appendTo('.vpf-admin-page__header');
+}
+
 $('.vpf-settings-form').each(function () {
 	const $form = $(this);
 

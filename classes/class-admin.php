@@ -71,7 +71,6 @@ class Visual_Portfolio_Admin {
 		wp_localize_script( 'visual-portfolio-admin', 'VPAdminVariables', $data_init );
 		Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-admin', 'build/assets/admin/css/style' );
 		wp_style_add_data( 'visual-portfolio-admin', 'rtl', 'replace' );
-		wp_style_add_data( 'visual-portfolio-admin', 'suffix', '.min' );
 
 		global $plugin_page;
 
@@ -96,7 +95,6 @@ class Visual_Portfolio_Admin {
 			// chrome, and core marks that pass by turning this flag off.
 			Visual_Portfolio_Assets::enqueue_style( 'visual-portfolio-saved-layouts', 'build/gutenberg/style-layouts-editor' );
 			wp_style_add_data( 'visual-portfolio-saved-layouts', 'rtl', 'replace' );
-			wp_style_add_data( 'visual-portfolio-saved-layouts', 'suffix', '.min' );
 
 			if ( ! wp_should_load_block_editor_scripts_and_styles() ) {
 				return;
@@ -148,7 +146,7 @@ class Visual_Portfolio_Admin {
 	/**
 	 * Pages the plugin draws in its own frame, by `page` slug.
 	 */
-	const FRAMED_PAGES = array( 'visual-portfolio-settings', 'vpf_proofing_page', 'vpf-saved-layouts' );
+	const FRAMED_PAGES = array( 'visual-portfolio-settings', 'vpf_proofing_page', 'vpf-saved-layouts', 'visual-portfolio-welcome' );
 
 	/**
 	 * Mark the plugin's framed pages, so they share one look.

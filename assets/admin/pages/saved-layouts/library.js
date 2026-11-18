@@ -136,7 +136,7 @@ function AddNewButton() {
 	const isSmall = useViewportMatch('medium', '<');
 
 	return (
-		<HStack spacing={0} className="vpf-library-add">
+		<HStack spacing={0} expanded={false} className="vpf-library-add">
 			<Button __next40pxDefaultSize variant="primary" href={NEW_URL}>
 				{isSmall
 					? __('Add New', 'visual-portfolio')
@@ -374,11 +374,11 @@ function useBulkSlot() {
 
 			wrapper.style.setProperty(
 				'--vpf-bulk-top',
-				`${box.top - frame.top}px`
+				`${box.top - frame.top - wrapper.clientTop}px`
 			);
 			wrapper.style.setProperty(
 				'--vpf-bulk-left',
-				`${box.left - frame.left}px`
+				`${box.left - frame.left - wrapper.clientLeft}px`
 			);
 			wrapper.style.setProperty('--vpf-bulk-width', `${box.width}px`);
 		};

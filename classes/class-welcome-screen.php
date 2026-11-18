@@ -272,6 +272,8 @@ class Visual_Portfolio_Welcome_Screen {
 			),
 		);
 		?>
+		<div class="vpf-admin-page vpf-welcome-page">
+		<div class="vpf-admin-page__content">
 		<div class="vpf-welcome-screen <?php echo $is_pro_context ? 'is-pro-context' : 'is-free-context'; ?>">
 			<div class="vpf-welcome-head">
 				<div class="vpf-welcome-head-inner">
@@ -318,6 +320,8 @@ class Visual_Portfolio_Welcome_Screen {
 				$this->render_pro_highlights_section( $context_copy, $pro_highlights );
 			}
 			?>
+		</div>
+		</div>
 		</div>
 		<?php
 	}
