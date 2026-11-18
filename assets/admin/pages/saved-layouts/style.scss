@@ -168,8 +168,6 @@
 }
 
 .vpf-library-add {
-	width: auto;
-
 	> .components-button:first-child {
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
@@ -226,7 +224,20 @@
 	transform: translateX(-50%);
 }
 
-// The page header and content set the gutters, so DataViews adds none.
+// The library is a white card on the page's gray canvas; the card sets the
+// gutters, so DataViews adds none.
+.vpf-library .dataviews-wrapper {
+	position: relative;
+	padding: 20px 24px 0;
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+}
+
+.vpf-library .dataviews-footer {
+	border-radius: 0 0 8px 8px;
+}
+
 .vpf-library .dataviews-view-grid,
 .vpf-library .dataviews-view-list,
 .vpf-library .dataviews-footer,
@@ -272,11 +283,8 @@
 }
 
 // The grid's select-all bar, with the selection's bulk actions, sits over the
-// toolbar's slot (see `useBulkSlot()`) instead of on a row of its own.
-.vpf-library .dataviews-wrapper {
-	position: relative;
-}
-
+// toolbar's slot (see `useBulkSlot()`) instead of on a row of its own; the
+// card above is its positioned parent.
 .vpf-library .dataviews-view-grid__bulk-actions-header {
 	position: absolute;
 	top: var(--vpf-bulk-top, 0);

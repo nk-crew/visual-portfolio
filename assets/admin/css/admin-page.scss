@@ -1,11 +1,14 @@
-// Plugin pages sit on white, edge to edge, the way the Site Editor's screens
-// do. Values are the gray scale and theme color of @wordpress/components.
+// Plugin pages put a white header on WordPress's gray canvas and their content
+// in white cards on it. Values are the gray scale and theme color of
+// @wordpress/components, and the canvas color of the WordPress admin.
 $gray-900: #1e1e1e;
 $gray-700: #757575;
+$gray-300: #e0e0e0;
 $gray-100: #f0f0f0;
+$canvas: #f0f0f1;
 
 body.vpf-admin-page-screen {
-	background: #fff;
+	background: $canvas;
 
 	#wpcontent {
 		padding-left: 0;
@@ -29,20 +32,285 @@ body.vpf-admin-page-screen {
 // WordPress's list screens of the plugin's content: the frame's header above
 // WordPress's own markup, at the same gutter.
 body.vpf-admin-list-screen {
-	background: #fff;
+	background: $canvas;
 
 	#wpcontent {
 		padding-left: 0;
 	}
 
 	#wpbody-content > .wrap {
-		margin: 24px 32px 0;
+		margin: 24px 32px 32px;
 	}
 
 	#screen-meta,
 	#screen-meta-links {
 		margin-right: 32px;
 		margin-left: 32px;
+	}
+
+	#wpfooter {
+		padding-right: 32px;
+		padding-left: 32px;
+	}
+
+	#screen-meta-links .show-settings {
+		background: none;
+
+		&:not(:focus) {
+			border-color: transparent;
+		}
+	}
+
+	// The admin script moves Screen Options into the header, before the
+	// actions, or after the tabs on a screen with no actions. From 783px it
+	// sits at the right end of the tabs.
+	.vpf-admin-page__header #screen-meta-links {
+		display: flow-root;
+		float: none;
+		margin: 0 8px 0 0;
+	}
+
+	.vpf-admin-page__header > #screen-meta-links {
+		margin: 0 0 8px;
+
+		.show-settings {
+			padding-left: 0;
+		}
+	}
+
+	@media (min-width: 783px) {
+		.vpf-admin-page__header:has(> .vpf-admin-page__sections) #screen-meta-links {
+			position: absolute;
+			right: 32px;
+			bottom: 6px;
+			margin: 0;
+		}
+	}
+
+	// A post list and its controls share one white card, in two rows: the
+	// status links and search, then bulk actions, filters and pages. Only the
+	// layout changes, so whatever other plugins print in these places stays.
+	&.edit-php #wpbody-content > .wrap {
+		display: flex;
+		flex-wrap: wrap;
+		row-gap: 16px;
+		align-items: center;
+		padding: 20px 24px 24px;
+		background: #fff;
+		border: 1px solid $gray-300;
+		border-radius: 8px;
+
+		> * {
+			flex: 1 0 100%;
+			order: 0;
+			margin: 0;
+		}
+
+		> .subsubsub {
+			flex: 0 1 auto;
+			order: 1;
+			float: none;
+			font-size: 13px;
+		}
+
+		> .wp-header-end {
+			order: 3;
+			height: 0;
+			visibility: hidden;
+			border: 0;
+		}
+
+		// Quick Edit's template form, the response slot and the clearfix hold no
+		// visible row, so they take no place and no gap in the card.
+		> form:not(#posts-filter) {
+			display: contents;
+		}
+
+		> :is(#ajax-response:empty, .clear) {
+			display: none;
+		}
+	}
+
+	&.edit-php #posts-filter,
+	&.edit-php #posts-filter > .tablenav.top {
+		display: contents;
+	}
+
+	&.edit-php #posts-filter {
+		> .search-box {
+			display: flex;
+			flex: 0 1 auto;
+			gap: 8px;
+			order: 2;
+			float: none;
+			height: auto;
+			margin: 0 0 0 auto;
+		}
+
+		> .tablenav.top {
+			> .bulkactions {
+				order: 4;
+				float: none;
+				padding: 0 16px 0 0;
+				margin: 0 8px 0 0;
+				border-right: 1px solid $gray-300;
+			}
+
+			> .actions:not(.bulkactions) {
+				order: 5;
+				float: none;
+				padding: 0 0 0 8px;
+				overflow: visible;
+			}
+
+			> .tablenav-pages {
+				order: 6;
+				float: none;
+				height: auto;
+				margin: 0 0 0 auto;
+			}
+
+			> .tablenav-pages.one-page,
+			> br.clear {
+				display: none;
+			}
+		}
+
+		> .wp-list-table {
+			flex: 1 0 100%;
+			order: 7;
+			margin: 8px 0 0;
+		}
+
+		> .tablenav.bottom {
+			display: flex;
+			flex: 1 0 100%;
+			flex-wrap: wrap;
+			gap: 8px;
+			align-items: center;
+			order: 8;
+			height: auto;
+			padding: 0;
+			margin: 0;
+
+			> .actions {
+				float: none;
+				padding: 0;
+			}
+
+			> .tablenav-pages {
+				float: none;
+				height: auto;
+				margin: 0 0 0 auto;
+			}
+
+			> br.clear {
+				display: none;
+			}
+		}
+	}
+
+	// A taxonomy's add form and its list, each in a card.
+	&.edit-tags-php {
+		.wrap > .search-form {
+			display: flex;
+			justify-content: flex-end;
+			margin: 0 0 16px;
+
+			.search-box {
+				float: none;
+				margin: 0;
+			}
+		}
+
+		#col-container {
+			display: flex;
+			gap: 24px;
+			align-items: flex-start;
+
+			// WordPress's clearfix would take a place, and a gap, in the row.
+			&::after {
+				display: none;
+			}
+		}
+
+		#col-left,
+		#col-right {
+			float: none;
+			width: auto;
+			min-width: 0;
+		}
+
+		#col-left {
+			flex: 0 0 340px;
+
+			:is(input[type="text"], textarea, select) {
+				width: 100%;
+				max-width: 100%;
+			}
+
+			h2 {
+				margin-top: 0;
+				font-size: 15px;
+			}
+		}
+
+		#col-right {
+			flex: 1 1 auto;
+		}
+
+		#col-left p.submit {
+			padding-bottom: 0;
+			margin-bottom: 0;
+		}
+
+		#col-left .col-wrap,
+		#col-right .col-wrap {
+			padding: 20px 24px;
+			background: #fff;
+			border: 1px solid $gray-300;
+			border-radius: 8px;
+		}
+
+		@media (max-width: 782px) {
+			#col-container {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			#col-left {
+				flex-basis: auto;
+			}
+		}
+	}
+
+	// WordPress's table drawn for white, as DataViews draws its own: no frame
+	// or stripes, a line between rows. The markup stays WordPress's.
+	.wp-list-table {
+		border: 0;
+		box-shadow: none;
+
+		> thead > tr > *,
+		> tfoot > tr > * {
+			border-color: $gray-300;
+		}
+	}
+
+	.striped > tbody > :nth-child(odd) {
+		background-color: transparent;
+	}
+
+	// Below 783px WordPress turns each row into a flex box.
+	@media (min-width: 783px) {
+		.wp-list-table > tbody > tr + tr > * {
+			border-top: 1px solid $gray-100;
+		}
+	}
+
+	@media (max-width: 782px) {
+		.wp-list-table > tbody > tr + tr {
+			border-top: 1px solid $gray-100;
+		}
 	}
 
 	.wrap > .wp-heading-inline,
@@ -74,7 +342,9 @@ body.vpf-admin-list-screen {
 }
 
 .vpf-admin-page__header {
+	position: relative;
 	padding: 32px 32px 0;
+	background: #fff;
 	border-bottom: 1px solid $gray-100;
 }
 
@@ -196,7 +466,7 @@ body.vpf-admin-list-screen {
 	padding: 0 6px;
 	font-size: 11px;
 	line-height: 18px;
-	color: $gray-700;
+	color: $gray-900;
 	text-align: center;
 	background: $gray-100;
 	border-radius: 9px;
@@ -210,7 +480,8 @@ body.vpf-admin-list-screen {
 .vpf-admin-page__upsell {
 	max-width: 640px;
 	padding: 32px;
-	background: #f6f7f7;
+	background: #fff;
+	border: 1px solid $gray-300;
 	border-radius: 8px;
 
 	h2 {
@@ -228,7 +499,9 @@ body.vpf-admin-list-screen {
 }
 
 @media (max-width: 782px) {
-	body.vpf-admin-list-screen #wpbody-content > .wrap {
+	body.vpf-admin-list-screen #wpbody-content > .wrap,
+	body.vpf-admin-list-screen #screen-meta,
+	body.vpf-admin-list-screen #screen-meta-links {
 		margin-right: 16px;
 		margin-left: 16px;
 	}
@@ -238,6 +511,20 @@ body.vpf-admin-list-screen {
 	body.vpf-admin-page-screen #wpbody-content > .updated {
 		margin-right: 16px;
 		margin-left: 16px;
+	}
+
+	body.vpf-admin-list-screen.edit-php #wpbody-content > .wrap {
+		padding: 16px;
+	}
+
+	body.vpf-admin-list-screen.edit-php #posts-filter > .search-box {
+		flex-basis: 100%;
+		margin-left: 0;
+	}
+
+	body.vpf-admin-list-screen #col-left .col-wrap,
+	body.vpf-admin-list-screen #col-right .col-wrap {
+		padding: 16px;
 	}
 
 	.vpf-admin-page__header {
