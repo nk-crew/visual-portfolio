@@ -5,24 +5,11 @@ const $doc = $(document);
 const { screenSizes } = window.VPData;
 
 function getSwiperVersion(Swiper) {
-	let ver = 8;
-
-	// in version 8 added new parameter `maxBackfaceHiddenSlides`.
-	if (typeof Swiper.defaults.maxBackfaceHiddenSlides === 'undefined') {
-		ver = 7;
-	}
-
-	// in version 7 added new parameter `rewind`.
-	if (typeof Swiper.defaults.rewind === 'undefined') {
-		ver = 6;
-	}
-
-	// in version 6 added new parameter `loopPreventsSlide`.
-	if (typeof Swiper.defaults.loopPreventsSlide === 'undefined') {
-		ver = 5;
-	}
-
-	return ver;
+	if (typeof Swiper.defaults.maxBackfaceHiddenSlides !== 'undefined')
+		return 8;
+	if (typeof Swiper.defaults.rewind !== 'undefined') return 7;
+	if (typeof Swiper.defaults.loopPreventsSlide !== 'undefined') return 6;
+	return 5;
 }
 
 // Extend VP class.
@@ -38,11 +25,9 @@ $doc.on('extendClass.vpf', (event, VP) => {
 	 */
 	VP.prototype.initSwiper = function (options = false) {
 		const self = this;
+		const Swiper = window.VisualPortfolioSwiper || window.Swiper;
 
-		if (
-			self.options.layout === 'slider' &&
-			typeof window.Swiper !== 'undefined'
-		) {
+		if (self.options.layout === 'slider' && typeof Swiper !== 'undefined') {
 			const $parent = self.$items_wrap.parent();
 
 			$parent.addClass('swiper');
@@ -242,7 +227,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
 
 			// Fallbacks for old Swiper versions.
 			(() => {
-				const swiperVersion = getSwiperVersion(window.Swiper);
+				const swiperVersion = getSwiperVersion(Swiper);
 				const isThumbsEnabled =
 					optionsThumbs && $thumbsParent && $thumbsParent[0];
 
@@ -279,7 +264,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
 
 			// Init Swiper.
 			if (optionsThumbs && $thumbsParent && $thumbsParent[0]) {
-				const swiperThumbs = new window.Swiper(
+				const swiperThumbs = new Swiper(
 					$thumbsParent[0],
 					optionsThumbs
 				);
@@ -288,7 +273,7 @@ $doc.on('extendClass.vpf', (event, VP) => {
 					swiper: swiperThumbs,
 				};
 			}
-			const instance = new window.Swiper($parent[0], options);
+			const instance = new Swiper($parent[0], options);
 
 			// Autoplay Hover Pause.
 			if (
