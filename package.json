@@ -41,9 +41,6 @@
 		"postinstall": "composer install",
 		"lint:ci": "biome ci"
 	},
-	"overrides": {
-		"webpack-dev-server": "5.2.2"
-	},
 	"devDependencies": {
 		"@babel/node": "^7.23.9",
 		"@babel/plugin-proposal-object-rest-spread": "^7.20.7",
@@ -59,14 +56,14 @@
 		"@wordpress/data": "11.1.0",
 		"@wordpress/dataviews": "22.0.0",
 		"@wordpress/date": "6.1.0",
-		"@wordpress/e2e-test-utils-playwright": "^1.37.0",
-		"@wordpress/env": "^11.13.0",
+		"@wordpress/e2e-test-utils-playwright": "^3.3.0",
+		"@wordpress/env": "^12.0.0",
 		"@wordpress/notices": "6.1.0",
-		"@wordpress/scripts": "^34.1.0",
+		"@wordpress/scripts": "^37.2.0",
 		"@wordpress/stylelint-config": "^23.29.0",
 		"@wordpress/url": "5.1.0",
 		"@wp-playground/cli": "^3.1.48",
-		"ajv": "8.17.1",
+		"ajv": "8.18.0",
 		"concurrently": "^8.2.0",
 		"cross-env": "^7.0.3",
 		"del": "^6.1.1",
@@ -121,5 +118,10 @@
 			"gutenberg-test-plugin-disables-the-css-animations",
 			"vpf-test-carousel-effect"
 		]
+	},
+	"overrides": {
+		"copy-webpack-plugin": {
+			"serialize-javascript": "^7.1.4"
+		}
 	}
 }

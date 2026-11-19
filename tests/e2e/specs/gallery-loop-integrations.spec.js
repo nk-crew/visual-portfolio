@@ -458,6 +458,10 @@ test.describe('Gallery Loop integrations', () => {
 			legacyCanvas: true,
 		});
 
+		await page.evaluate(() =>
+			window.wp.data.resolveSelect('core').getPostTypes({ per_page: -1 })
+		);
+
 		await editor.insertBlock({
 			name: 'core/query',
 			attributes: {
