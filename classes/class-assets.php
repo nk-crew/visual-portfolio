@@ -551,9 +551,20 @@ class Visual_Portfolio_Assets {
 		}
 
 		// Swiper.
+		$swiper_handle = 'swiper';
 		if ( apply_filters( 'vpf_enqueue_plugin_swiper', true ) ) {
-			self::register_style( 'swiper', 'assets/vendor/swiper/swiper-bundle.min', array(), '8.4.7' );
-			self::register_script( 'swiper', 'assets/vendor/swiper/swiper-bundle.min', array(), '8.4.7' );
+			$swiper_handle = 'visual-portfolio-swiper';
+			self::register_style( $swiper_handle, 'build/assets/js/swiper' );
+			self::register_script( $swiper_handle, 'build/assets/js/swiper' );
+			if ( ! class_exists( '\\Elementor\\Plugin' ) ) {
+				if ( ! wp_script_is( 'swiper', 'registered' ) ) {
+					wp_register_script( 'swiper', false, array( $swiper_handle ), null, true );
+					wp_add_inline_script( $swiper_handle, 'if (typeof window.Swiper === "undefined") { window.Swiper = window.VisualPortfolioSwiper; }' );
+				}
+				if ( ! wp_style_is( 'swiper', 'registered' ) ) {
+					wp_register_style( 'swiper', false, array( $swiper_handle ), null );
+				}
+			}
 		}
 
 		// Simplebar.
@@ -568,7 +579,7 @@ class Visual_Portfolio_Assets {
 			'visual-portfolio-elementor'        => array( 'build/assets/css/elementor', array( 'visual-portfolio' ) ),
 			'visual-portfolio-custom-scrollbar' => array( 'build/assets/css/custom-scrollbar', array( 'simplebar' ) ),
 			'visual-portfolio-layout-justified' => array( 'build/assets/css/layout-justified', array( 'visual-portfolio' ) ),
-			'visual-portfolio-layout-slider'    => array( 'build/assets/css/layout-slider', array( 'visual-portfolio', 'swiper' ) ),
+			'visual-portfolio-layout-slider'    => array( 'build/assets/css/layout-slider', array( 'visual-portfolio', $swiper_handle ) ),
 			'visual-portfolio-layout-masonry'   => array( 'build/assets/css/layout-masonry', array( 'visual-portfolio' ) ),
 			'visual-portfolio-layout-grid'      => array( 'build/assets/css/layout-grid', array( 'visual-portfolio' ) ),
 			'visual-portfolio-layout-tiles'     => array( 'build/assets/css/layout-tiles', array( 'visual-portfolio' ) ),
@@ -597,7 +608,7 @@ class Visual_Portfolio_Assets {
 			'visual-portfolio-plugin-swiper' => array(
 				'build/assets/js/plugin-swiper',
 				array(
-					'swiper',
+					$swiper_handle,
 				),
 			),
 			'visual-portfolio-custom-scrollbar' => array(

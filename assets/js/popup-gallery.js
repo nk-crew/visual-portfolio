@@ -303,13 +303,33 @@ const VPPopupAPI = {
 		// Previously we also used the `:not(.swiper-slide-duplicate-active)`, but it contains a valid first slide.
 		// A Gallery Loop list holds its items as children, and a gallery inside
 		// the content of one of them is not its.
-		const $items = $gallery.is('.wp-block-visual-portfolio-item-template')
+		let $items = $gallery.is('.wp-block-visual-portfolio-item-template')
 			? $gallery.children(
 					'.wp-block-visual-portfolio-item-template__item'
 				)
 			: $gallery.find(
 					'.vp-portfolio__item-wrap:not(.swiper-slide-duplicate)'
 				);
+
+		const $slider = $gallery
+			.children('.vp-portfolio__items-wrap.swiper')
+			.first();
+		if ($slider[0]?.swiper) {
+			$items = $slider
+				.children('.vp-portfolio__items')
+				.children(
+					'.vp-portfolio__item-wrap:not(.swiper-slide-duplicate)'
+				);
+			$items = $(
+				$items
+					.get()
+					.sort(
+						(a, b) =>
+							Number(a.getAttribute('data-swiper-slide-index')) -
+							Number(b.getAttribute('data-swiper-slide-index'))
+					)
+			);
+		}
 
 		$items.each(function () {
 			const itemData = VPPopupAPI.parseItem(this);

@@ -1,3 +1,4 @@
+const scopeSwiperCss = require('./build-tools/scope-swiper-css');
 /**
  * External Dependencies
  */
@@ -64,7 +65,42 @@ const QUIET_BUILD_WARNING_PATTERNS = [
 	/Sass @import rules are deprecated/i,
 ];
 
+const swiperCssPattern = /[\\/]node_modules[\\/]swiper[\\/].*\.css$/;
+const cssRule = defaultConfig.module.rules.find((rule) =>
+	rule.test?.test('style.css')
+);
+const scopedSwiperCssRule = {
+	...cssRule,
+	test: swiperCssPattern,
+	use: [
+		...cssRule.use,
+		{
+			loader: require.resolve('postcss-loader'),
+			options: {
+				postcssOptions: {
+					config: false,
+					plugins: [scopeSwiperCss('vp-swiper')],
+				},
+			},
+		},
+	],
+};
+cssRule.exclude = swiperCssPattern;
+defaultConfig.module.rules.push(scopedSwiperCssRule);
+
 const vendorFiles = [
+	{
+		source: 'node_modules/swiper/swiper-bundle.min.js',
+		destination: 'assets/vendor/swiper/swiper-bundle.min.js',
+	},
+	{
+		source: 'node_modules/swiper/swiper-bundle.min.js.map',
+		destination: 'assets/vendor/swiper/swiper-bundle.min.js.map',
+	},
+	{
+		source: 'node_modules/swiper/swiper-bundle.min.css',
+		destination: 'assets/vendor/swiper/swiper-bundle.min.css',
+	},
 	{
 		source: 'node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js',
 		destination: 'assets/vendor/fancybox/dist/jquery.fancybox.min.js',
@@ -148,18 +184,6 @@ const vendorFiles = [
 	{
 		source: 'node_modules/simplebar/dist/simplebar.min.css',
 		destination: 'assets/vendor/simplebar/dist/simplebar.min.css',
-	},
-	{
-		source: 'node_modules/swiper/swiper-bundle.min.js',
-		destination: 'assets/vendor/swiper/swiper-bundle.min.js',
-	},
-	{
-		source: 'node_modules/swiper/swiper-bundle.min.js.map',
-		destination: 'assets/vendor/swiper/swiper-bundle.min.js.map',
-	},
-	{
-		source: 'node_modules/swiper/swiper-bundle.min.css',
-		destination: 'assets/vendor/swiper/swiper-bundle.min.css',
 	},
 	{
 		source: 'assets/admin/images',
