@@ -1,7 +1,7 @@
 import { LOOP_POPUP_OPEN } from './open';
 import { openReuse } from './reuse';
 
-const { jQuery: $, VPData } = window;
+const { VPData } = window;
 const useReuse = !VPData.pro || VPData.loopLightbox === 'reuse';
 
 const TRIGGER_SELECTOR = '[data-vp-popup]';
@@ -30,15 +30,16 @@ function getGallery(loop) {
 		const region = loop.getAttribute('data-wp-router-region') || '';
 
 		gallery = {
-			$item: $(loop),
+			$item: window.jQuery?.(loop) || [loop],
 			uid: region.replace(/^vp-loop-/, '') || `loop-${lastUid}`,
 			options: { itemsClickAction: 'popup_gallery' },
 			isPreview: () => false,
 			emitEvent(event, data) {
 				const args = data ? [gallery].concat(data) : [gallery];
 
-				gallery.$item.trigger(`${event}.vpf`, args);
-				gallery.$item.trigger(`${event}.vpf-uid-${gallery.uid}`, args);
+				const $item = window.jQuery?.(loop);
+				$item?.trigger(`${event}.vpf`, args);
+				$item?.trigger(`${event}.vpf-uid-${gallery.uid}`, args);
 			},
 		};
 
@@ -81,7 +82,7 @@ document.addEventListener('click', (event) => {
 	}
 
 	// One entry per item, however many of its blocks open it.
-	const items = VPPopupAPI.parseGallery($(list));
+	const items = VPPopupAPI.parseGallery(window.jQuery?.(list) || list);
 	const index = items.findIndex((data) => data.el === item);
 
 	if (index < 0) {

@@ -617,8 +617,12 @@ class Visual_Portfolio_Assets {
 					'simplebar',
 				),
 			),
+			'visual-portfolio-popup-gallery-data' => array(
+				'build/assets/js/popup-gallery-data',
+			),
 			'visual-portfolio-popup-gallery' => array(
 				'build/assets/js/popup-gallery',
+				array( 'visual-portfolio-popup-gallery-data' ),
 			),
 			'visual-portfolio-plugin-photoswipe' => array(
 				'build/assets/js/plugin-photoswipe',

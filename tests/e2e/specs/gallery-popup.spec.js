@@ -30,6 +30,14 @@ async function isPro(page) {
 	return page.evaluate(() => !!window.VPData?.pro);
 }
 
+async function loadJQuery(page) {
+	if (!(await page.evaluate(() => !!window.jQuery))) {
+		await page.addScriptTag({
+			url: '/wp-includes/js/jquery/jquery.min.js',
+		});
+	}
+}
+
 async function expectPosition(page, index, count) {
 	if (await isPro(page)) {
 		if (index) {
@@ -432,6 +440,9 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		// The picture and the title of every item open it, and it holds each
 		// item once.
 		await expect(page.locator(TRIGGER)).toHaveCount(IMAGES_COUNT * 2);
+		if (!(await isPro(page))) {
+			expect(await page.evaluate(() => window.jQuery)).toBeUndefined();
+		}
 
 		await page.locator(TRIGGER).nth(1).click();
 
@@ -520,6 +531,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 
 		// The gallery the lightbox names in its events is the loop, by the id
 		// an address can name it by again.
+		await loadJQuery(page);
 		await page.evaluate(() => {
 			window
 				.jQuery(document)
@@ -557,6 +569,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		});
 		test.skip(await isPro(page), 'Free uses the Reuse viewer.');
 
+		await loadJQuery(page);
 		await page.evaluate(() => {
 			window.VPData.settingsPopupGallery.background_color = '#345678';
 			window.VPData.settingsPopupGallery.show_thumbs = true;
