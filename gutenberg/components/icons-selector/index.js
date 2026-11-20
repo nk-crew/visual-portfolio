@@ -3,10 +3,8 @@ import './style.scss';
 import { Button, Spinner } from '@wordpress/components';
 import { Component, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { buildQueryString } from '@wordpress/url';
 import classnames from 'classnames/dedupe';
-
-const { ajaxurl, VPGutenbergVariables } = window;
+import requestDynamicControl from '../../utils/request-dynamic-control';
 
 const cachedOptions = {};
 
@@ -76,36 +74,27 @@ export default class IconsSelector extends Component {
 			});
 		}
 
-		const ajaxData = {
-			action: 'vp_dynamic_control_callback',
-			nonce: VPGutenbergVariables.nonce,
-			vp_control_name: controlName,
-			vp_attributes: attributes,
-			...additionalData,
-		};
-
-		const data = await fetch(ajaxurl, {
-			method: 'POST',
-			body: new URLSearchParams(buildQueryString(ajaxData)),
-			signal: request.signal,
-		})
-			.then((response) => response.json())
-			.catch(() => null);
+		const response = await requestDynamicControl(
+			controlName,
+			attributes,
+			additionalData,
+			request.signal
+		);
 
 		if (this.ajaxRequest !== request) {
 			return;
 		}
 
 		try {
-			if (data?.response) {
-				if (data.response.options) {
+			if (response) {
+				if (response.options) {
 					cachedOptions[controlName] = {
 						...cachedOptions[controlName],
-						...data.response.options,
+						...response.options,
 					};
 				}
 
-				callback(data.response);
+				callback(response);
 			}
 		} finally {
 			if (this.ajaxRequest === request) {

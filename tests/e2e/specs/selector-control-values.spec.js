@@ -310,6 +310,56 @@ test.describe('selector control attribute values validation', () => {
 		await assertNoError(response);
 	});
 
+	test('Specific Posts search replaces a pending request with the latest match', async ({
+		admin,
+		editor,
+		page,
+	}) => {
+		await admin.createNewPost({
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+		await editor.insertBlock({
+			name: 'visual-portfolio/block',
+			attributes: {
+				setup_wizard: 'false',
+				content_source: 'post-based',
+				posts_source: 'ids',
+			},
+		});
+
+		const previousQuery = 'Pending search';
+		const isPreviousRequest = (request) => {
+			const fields = new URLSearchParams(request.postData() || '');
+			return (
+				fields.get('vp_control_name') === 'posts_ids' &&
+				fields.get('q') === previousQuery
+			);
+		};
+		await page.route('**/wp-admin/admin-ajax.php', async (route) => {
+			if (!isPreviousRequest(route.request())) {
+				await route.fallback();
+			}
+		});
+
+		const selector = page.locator('.vpf-control-wrap-name-posts_ids');
+		const field = selector.getByRole('combobox');
+		const started = page.waitForRequest(isPreviousRequest);
+		await field.fill(previousQuery);
+		const previous = await started;
+
+		await field.fill('Test Blog Post 2');
+		await page.getByRole('option', { name: 'Test Blog Post 2' }).click();
+		await expect(
+			selector.getByRole('button', {
+				name: 'Test Blog Post 2',
+				exact: true,
+			})
+		).toBeVisible();
+		await expect.poll(() => previous.failure()?.errorText).toBeTruthy();
+	});
+
 	// =========================================================================
 	// Test Case 4: Block rendering with invalid and valid values.
 	// =========================================================================

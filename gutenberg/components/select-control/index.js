@@ -21,17 +21,15 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import selectStyles from 'gutenberg-react-select-styles';
-import $ from 'jquery';
 import rafSchd from 'raf-schd';
 import { createPortal } from 'react-dom';
 import Select, { components } from 'react-select';
 import AsyncSelect from 'react-select/async';
 import CreatableSelect from 'react-select/creatable';
 import { debounce } from 'throttle-debounce';
+import requestDynamicControl from '../../utils/request-dynamic-control';
 
 const { Option } = components;
-
-const { ajaxurl, VPGutenbergVariables } = window;
 
 const cachedOptions = {};
 const SortableMultiValueContext = createContext({});
@@ -312,7 +310,8 @@ export default class SelectControl extends Component {
 		this.getDefaultValue = this.getDefaultValue.bind(this);
 		this.findValueData = this.findValueData.bind(this);
 		this.requestAjax = this.requestAjax.bind(this);
-		this.requestAjaxDebounce = debounce(300, rafSchd(this.requestAjax));
+		this.scheduleRequest = rafSchd(this.requestAjax);
+		this.requestAjaxDebounce = debounce(300, this.scheduleRequest);
 	}
 
 	componentDidMount() {
@@ -349,6 +348,13 @@ export default class SelectControl extends Component {
 				}
 			});
 		}
+	}
+
+	componentWillUnmount() {
+		this.requestAjaxDebounce.cancel();
+		this.scheduleRequest.cancel();
+		this.ajaxRequest?.abort();
+		this.ajaxRequest = null;
 	}
 
 	/**
@@ -443,18 +449,16 @@ export default class SelectControl extends Component {
 	 * @param {Function} callback        - callback.
 	 * @param {boolean}  useStateLoading - use state change when loading.
 	 */
-	requestAjax(
+	async requestAjax(
 		additionalData = {},
 		callback = () => {},
 		useStateLoading = true
 	) {
 		const { controlName, attributes } = this.props;
 
-		if (this.isAJAXinProgress) {
-			return;
-		}
-
-		this.isAJAXinProgress = true;
+		this.ajaxRequest?.abort();
+		const request = new AbortController();
+		this.ajaxRequest = request;
 
 		if (useStateLoading) {
 			this.setState({
@@ -462,42 +466,33 @@ export default class SelectControl extends Component {
 			});
 		}
 
-		const ajaxData = {
-			action: 'vp_dynamic_control_callback',
-			nonce: VPGutenbergVariables.nonce,
-			vp_control_name: controlName,
-			vp_attributes: attributes,
-			...additionalData,
-		};
+		const response = await requestDynamicControl(
+			controlName,
+			attributes,
+			additionalData,
+			request.signal
+		);
 
-		$.ajax({
-			url: ajaxurl,
-			method: 'POST',
-			dataType: 'json',
-			data: ajaxData,
-			complete: (data) => {
-				const json = data.responseJSON;
+		if (this.ajaxRequest !== request) {
+			return;
+		}
 
-				if (callback && json.response) {
-					if (json.response.options) {
-						cachedOptions[controlName] = {
-							...cachedOptions[controlName],
-							...json.response.options,
-						};
-					}
-
-					callback(json.response);
-				}
-
+		try {
+			if (response?.options) {
+				cachedOptions[controlName] = {
+					...cachedOptions[controlName],
+					...response.options,
+				};
+			}
+			callback(response || {});
+		} finally {
+			if (this.ajaxRequest === request) {
+				this.ajaxRequest = null;
 				if (useStateLoading) {
-					this.setState({
-						ajaxStatus: true,
-					});
+					this.setState({ ajaxStatus: true });
 				}
-
-				this.isAJAXinProgress = false;
-			},
-		});
+			}
+		}
 	}
 
 	/**

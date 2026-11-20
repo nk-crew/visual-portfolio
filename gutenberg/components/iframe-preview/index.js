@@ -257,11 +257,8 @@ class IframePreview extends Component {
 			return;
 		}
 
-		if (this.frameJQuery) {
-			this.$framePortfolio = this.frameJQuery('.vp-portfolio');
-
-			this.maybeResizePreviews();
-		}
+		this.$framePortfolio = this.frameJQuery?.('.vp-portfolio');
+		this.maybeResizePreviews();
 
 		if (this.frameTimeout) {
 			clearTimeout(this.frameTimeout);
