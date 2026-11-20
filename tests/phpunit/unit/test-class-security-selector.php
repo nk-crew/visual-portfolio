@@ -184,6 +184,18 @@ class Test_Class_Security_Selector extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A saved empty array falls back to the current single select default.
+	 */
+	public function test_legacy_saved_layout_array_uses_single_select_default() {
+		$layout_id = self::factory()->post->create( array( 'post_type' => 'vp_lists' ) );
+		update_post_meta( $layout_id, 'vp_posts_order_by', array() );
+
+		$options = Visual_Portfolio_Get::get_options( array( 'id' => $layout_id ) );
+
+		$this->assertSame( 'post_date', $options['posts_order_by'] );
+	}
+
+	/**
 	 * Mock dynamic callback for testing.
 	 *
 	 * @return array
