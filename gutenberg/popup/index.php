@@ -11,13 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Visual Portfolio Loop popup.
- *
- * The lightbox the `popup` click action opens is the one the classic gallery
- * opens: the vendor chosen in Settings, Fancybox or PhotoSwipe, driven by
- * `VPPopupAPI`. A loop item carries the same `<template>` a classic item does,
- * built by the same code and filtered by the same `vpf_popup_output`, and a
- * small script opens the vendor for a loop the way the classic gallery does
- * for itself - see `gutenberg/popup/view.js`.
  */
 class Visual_Portfolio_Popup {
 	/**
@@ -58,9 +51,6 @@ class Visual_Portfolio_Popup {
 	/**
 	 * Register the script of the lightbox.
 	 *
-	 * The vendor scripts it opens are the classic gallery's, registered on
-	 * `template_redirect`; a dependency is resolved when the page prints it.
-	 *
 	 * @return void
 	 */
 	public function register_assets() {
@@ -69,6 +59,7 @@ class Visual_Portfolio_Popup {
 			'build/gutenberg/popup/view',
 			array( 'jquery', 'visual-portfolio-popup-gallery' )
 		);
+		Visual_Portfolio_Assets::register_style( self::SCRIPT, 'build/gutenberg/popup/view' );
 	}
 
 	/**
@@ -77,12 +68,13 @@ class Visual_Portfolio_Popup {
 	 * @param array $item    - item data, see `Visual_Portfolio_Get::default_item_args()`.
 	 * @param array $options - portfolio options the item was resolved with.
 	 * @param array $sources - `title` and `description` caption sources of the loop.
+	 * @param array $lightbox - lightbox settings provided by the loop.
 	 *
 	 * @return array `src`, the address a click opens without the lightbox, and
 	 *               `markup`, the `<template>` of the item. Empty for an item the
 	 *               lightbox has nothing to show.
 	 */
-	public static function get_item_popup( $item, $options, $sources = array() ) {
+	public static function get_item_popup( $item, $options, $sources = array(), $lightbox = array() ) {
 		// An item the pipeline allows no popup still goes through the filter:
 		// Pro opens its media from there, as it does for the classic gallery.
 		// The filter callbacks read the options of a gallery that opens a popup.
@@ -96,6 +88,7 @@ class Visual_Portfolio_Popup {
 				$item,
 				array(
 					'format_video_url' => $item['video'] ?? '',
+					'loop_lightbox'    => $lightbox,
 					'vp_opts'          => $options,
 				)
 			)
@@ -253,12 +246,17 @@ class Visual_Portfolio_Popup {
 	}
 
 	/**
-	 * Load the lightbox: the vendor chosen in Settings and the loop script.
+	 * Load the lightbox used by the Gallery Loop.
 	 *
 	 * @return void
 	 */
 	public static function enqueue() {
-		Visual_Portfolio_Assets::enqueue_popup_assets();
+		if ( visual_portfolio()->is_pro() ) {
+			// Pro extensions still consume the legacy vendor events and instance.
+			Visual_Portfolio_Assets::enqueue_popup_assets();
+		} else {
+			wp_enqueue_style( self::SCRIPT );
+		}
 
 		wp_enqueue_script( self::SCRIPT );
 

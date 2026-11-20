@@ -1206,22 +1206,26 @@ lightbox only.
 
 ### Lightbox
 
-The lightbox is the classic gallery's: `VPPopupAPI` with the vendor chosen in
-Settings, Fancybox or PhotoSwipe, and every Popup Gallery setting. An item
-carries the same `<template class="vp-portfolio__item-popup">` a classic item
-does, built by `Visual_Portfolio_Get::get_item_popup_output()` and filtered by
-`vpf_popup_output`; its triggers are anchors with `data-vp-popup` and the full
-size image as `href`. `build/gutenberg/popup/view.js` opens the vendor with the
-items of the list, one slide per item, and a stand-in for the classic gallery
-instance per loop (`$item`, `uid`, `options`, `isPreview()`, `emitEvent()`), so
-the vendor events (`initFancybox.vpf`, `beforeInitPhotoSwipe.vpf` and the rest)
-fire on the loop element with the stand-in first, as they do for a classic
-gallery. The `uid` of the stand-in is the block id of the loop, so an address
-that names a gallery finds the same loop on the next visit. The caption sources
-are the loop's `lightbox` attribute,
-`titleSource` and `descriptionSource`, with the values of the classic Title and
-Description Source; defaults `item_title` and `item_excerpt`. An item the
-lightbox has nothing to show and that has an address of its own links to it.
+Gallery Loop uses Reuse Lightbox in Free. The classic gallery, WordPress image
+integration and Gallery Loop with Pro use the Fancybox or PhotoSwipe vendor
+chosen in Settings during the transition.
+
+An item carries the same `<template class="vp-portfolio__item-popup">` a classic
+item does, built by `Visual_Portfolio_Get::get_item_popup_output()` and filtered
+by `vpf_popup_output`. The filter receives the loop lightbox settings in
+`loop_lightbox`. Triggers are anchors with `data-vp-popup` and the full size
+image as `href`. The saved caption sources are `titleSource` and
+`descriptionSource` in the `lightbox` attribute. They default to `item_title`
+and `item_excerpt`. An item with no popup uses its own address.
+
+A loop has a gallery instance with `$item`, `uid`, `options`, `isPreview()` and
+`emitEvent()`. Its UID comes from the loop block ID. Events fire on the loop
+with the gallery instance first, plus the usual `.vpf` namespace. Reuse emits
+`beforeInitPopup`, `initPopup`, `beforeChangePopup`, `afterChangePopup`,
+`beforeClosePopup` and `destroyPopup`. Before initialization, a listener may
+change the viewer options. Before a slide change, the event identifies the
+upcoming index while the current slide is still active. Settings control
+whether users may open the thumbnail strip. Its button starts closed.
 
 The click actions of the item blocks are None, Open the item, Open in lightbox
 and Open its link, else in lightbox (`url-or-popup`): a post opens itself, an

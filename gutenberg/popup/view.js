@@ -1,19 +1,7 @@
-/**
- * The lightbox of the Gallery Loop family.
- *
- * It is the classic gallery's lightbox: `VPPopupAPI` with the vendor chosen in
- * Settings, reading the `<template>` every item carries. What a loop lacks is
- * the gallery instance the classic gallery opens it with, so each loop gets a
- * stand-in that answers what the vendors and Pro ask of one: `$item`, `uid`,
- * `options`, `isPreview()` and `emitEvent()`. Events go out the way the classic
- * gallery sends them, as `<event>.vpf` on the loop with the stand-in first.
- *
- * Nothing here is required for a gallery to work: a trigger is an anchor to
- * the full size image. The gallery is read off the DOM at the moment of the
- * click, so it survives a region swap and a Load More without being told.
- */
+import { LOOP_POPUP_OPEN } from './open';
+import { openReuse } from './reuse';
 
-const $ = window.jQuery;
+const { jQuery: $, VPData } = window;
 
 const TRIGGER_SELECTOR = '[data-vp-popup]';
 const ITEM_SELECTOR = '.wp-block-visual-portfolio-item-template__item';
@@ -53,6 +41,10 @@ function getGallery(loop) {
 			},
 		};
 
+		if (!VPData.pro) {
+			gallery[LOOP_POPUP_OPEN] = openReuse;
+		}
+
 		galleries.set(loop, gallery);
 	}
 
@@ -73,7 +65,7 @@ document.addEventListener('click', (event) => {
 		event.ctrlKey ||
 		event.shiftKey ||
 		event.altKey ||
-		!VPPopupAPI?.vendor
+		(VPData.pro && !VPPopupAPI.vendor)
 	) {
 		return;
 	}
@@ -83,7 +75,7 @@ document.addEventListener('click', (event) => {
 	const list = item?.closest(LIST_SELECTOR);
 	const loop = list?.closest(LOOP_SELECTOR);
 
-	if (!loop) {
+	if (!loop || trigger.closest(LOOP_SELECTOR) !== loop) {
 		return;
 	}
 
@@ -95,13 +87,19 @@ document.addEventListener('click', (event) => {
 		return;
 	}
 
-	event.preventDefault();
-
 	// Where the focus goes back to when the lightbox closes on a slide.
 	items.forEach((data) => {
-		data.linkEl = data.el.querySelector(TRIGGER_SELECTOR);
+		data.linkEl = Array.from(
+			data.el.querySelectorAll(TRIGGER_SELECTOR)
+		).find((link) => link.closest(ITEM_SELECTOR) === data.el);
 	});
 	items[index].linkEl = trigger;
 
-	VPPopupAPI.open(items, index, getGallery(loop));
+	const gallery = getGallery(loop);
+	if (VPData.pro) {
+		event.preventDefault();
+		VPPopupAPI.open(items, index, gallery);
+	} else if (VPPopupAPI.open(items, index, gallery) !== false) {
+		event.preventDefault();
+	}
 });

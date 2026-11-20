@@ -1157,7 +1157,7 @@ class Visual_Portfolio_Block_Item_Template {
 		}
 
 		foreach ( $items as $item ) {
-			$popup        = $with_popup ? Visual_Portfolio_Popup::get_item_popup( $item, $result['options'], $sources ) : array();
+			$popup        = $with_popup ? Visual_Portfolio_Popup::get_item_popup( $item, $result['options'], $sources, $lightbox ) : array();
 			$item_context = array_merge(
 				self::map_item_to_context( $item, $result['options'], 'vp/', $popup ),
 				array( 'vp/itemImageLoading' => $this->get_image_loading_attributes( $index, $first_row, $warm && $index > $last - $warm ) )

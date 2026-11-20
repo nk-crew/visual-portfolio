@@ -1,0 +1,60 @@
+.vp-loop-lightbox {
+	z-index: var(--vp-popup__z-index, 1500);
+
+	.re-lightbox-stage {
+		top: var(--wp-admin--admin-bar--height, 0);
+	}
+
+	p.re-lightbox-caption {
+		display: none;
+	}
+
+	.re-lightbox-caption {
+		a,
+		h3 {
+			color: inherit;
+		}
+	}
+
+	.vp-loop-lightbox-thumbnails::before {
+		display: block;
+		width: 16px;
+		height: 12px;
+		border: 1px solid currentColor;
+		border-radius: 2px;
+		background: linear-gradient(
+			to right,
+			transparent 30%,
+			currentColor 30% 36%,
+			transparent 36% 64%,
+			currentColor 64% 70%,
+			transparent 70%
+		);
+		content: "";
+	}
+
+	.vp-loop-lightbox-share {
+		position: relative;
+
+		summary {
+			width: auto;
+			padding-inline: 0.75em;
+			cursor: pointer;
+			list-style: none;
+		}
+
+		div {
+			position: absolute;
+			inset-inline-end: 0;
+			padding: 0.5em 0.75em;
+			background: var(--re-lightbox-background);
+		}
+
+		a {
+			display: block;
+			padding: 0.25em 0;
+			color: inherit;
+			white-space: nowrap;
+		}
+	}
+}

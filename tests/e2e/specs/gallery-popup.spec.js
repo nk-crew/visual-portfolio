@@ -3,9 +3,8 @@
  *
  * `clickAction` is the whole of the model - a link, a lightbox, or nothing -
  * and only the rendered page can say which of the three an item ended up being.
- * The lightbox is the classic gallery's, the vendor chosen in Settings, and it
- * is asserted the way a visitor meets it: opened from a click, walked with the
- * keyboard, closed with Escape, and asked to give the focus back afterwards.
+ * Open the lightbox from a click, walk it with the keyboard, and verify
+ * where the focus goes after Escape.
  *
  * Pages are published straight through REST: every test here is about the front
  * end, and one of them runs with JavaScript switched off.
@@ -22,10 +21,40 @@ const TEMPLATE = 'template.vp-portfolio__item-popup';
 const LOAD_MORE = '.vp-block-loop-pagination-trigger';
 const PAGE_NUMBER = '.vp-block-loop-pagination-numbers a';
 
-const FANCYBOX = '.fancybox-container';
-const FANCYBOX_INDEX = `${FANCYBOX} [data-fancybox-index]`;
-const FANCYBOX_COUNT = `${FANCYBOX} [data-fancybox-count]`;
-const FANCYBOX_CAPTION = `${FANCYBOX} .fancybox-caption__body`;
+const REUSE = '.vp-loop-lightbox';
+const POPUP = `${REUSE}, .fancybox-container`;
+const POPUP_CAPTION = `${REUSE} div.re-lightbox-caption, .fancybox-caption__body`;
+const POPUP_IMAGE = `${REUSE} .re-lightbox-slide[aria-hidden="false"] img.re-lightbox-image, .fancybox-slide--current img.fancybox-image`;
+
+async function isPro(page) {
+	return page.evaluate(() => !!window.VPData?.pro);
+}
+
+async function expectPosition(page, index, count) {
+	if (await isPro(page)) {
+		if (index) {
+			await expect(page.locator('[data-fancybox-index]')).toHaveText(
+				String(index)
+			);
+		}
+		if (count) {
+			await expect(page.locator('[data-fancybox-count]')).toHaveText(
+				String(count)
+			);
+		}
+	} else {
+		if (index && count > 1) {
+			await expect(
+				page.locator(`${REUSE} .re-lightbox-counter`)
+			).toHaveText(`${index} / ${count}`);
+		}
+		if (count) {
+			await expect(
+				page.locator(`${REUSE} .re-lightbox-slide`)
+			).toHaveCount(count);
+		}
+	}
+}
 // Open and done animating in: the library ignores the keyboard until then.
 const PHOTOSWIPE = '.pswp.pswp--open.pswp--animated-in';
 const PHOTOSWIPE_COUNTER = '.pswp__counter';
@@ -383,8 +412,8 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			});
 
 		await links.nth(1).click();
-		await expect(page.locator(FANCYBOX)).toBeVisible();
-		await expect(page.locator(FANCYBOX_COUNT)).toHaveText('1');
+		await expect(page.locator(POPUP)).toBeVisible();
+		await expectPosition(page, 1, 1);
 	});
 
 	test('the lightbox opens one slide per item, walks with the keyboard and hands the focus back', async ({
@@ -406,18 +435,15 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 
 		await page.locator(TRIGGER).nth(1).click();
 
-		await expect(page.locator(FANCYBOX)).toBeVisible();
-		await expect(page.locator(FANCYBOX_COUNT)).toHaveText(
-			`${IMAGES_COUNT}`
-		);
-		await expect(page.locator(FANCYBOX_INDEX)).toHaveText('1');
-		await expect(page.locator(FANCYBOX_CAPTION)).toContainText(TITLE_TEXT);
+		await expect(page.locator(POPUP)).toBeVisible();
+		await expectPosition(page, 1, IMAGES_COUNT);
+		await expect(page.locator(POPUP_CAPTION)).toContainText(TITLE_TEXT);
 
 		await page.keyboard.press('ArrowRight');
-		await expect(page.locator(FANCYBOX_INDEX)).toHaveText('2');
+		await expectPosition(page, 2, IMAGES_COUNT);
 
 		await page.keyboard.press('Escape');
-		await expect(page.locator(FANCYBOX)).toBeHidden();
+		await expect(page.locator(POPUP)).toBeHidden();
 
 		// Back on the item of the slide the visitor left, not on the top of
 		// the document.
@@ -477,13 +503,8 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 				.first()
 				.dispatchEvent('click');
 
-			await expect(page.locator(FANCYBOX_COUNT)).toHaveText(
-				`${IMAGES_COUNT}`
-			);
-			await expect(page.locator(FANCYBOX_INDEX)).toHaveText('2');
-			await expect(page.locator(FANCYBOX_CAPTION)).toContainText(
-				'Image 2'
-			);
+			await expectPosition(page, 2, IMAGES_COUNT);
+			await expect(page.locator(POPUP_CAPTION)).toContainText('Image 2');
 		});
 	});
 
@@ -500,20 +521,221 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		// The gallery the lightbox names in its events is the loop, by the id
 		// an address can name it by again.
 		await page.evaluate(() => {
-			window.jQuery(document).on('initFancybox.vpf', (event, self) => {
-				window.vpOpenedFor = self.uid;
-			});
+			window
+				.jQuery(document)
+				.on('initFancybox.vpf initPopup.vpf', (event, self) => {
+					window.vpOpenedFor = self.uid;
+				});
 		});
 
 		// The cover renders its trigger as the anchor that covers the whole
 		// item, which is the other of the two blocks that can open a popup.
 		await page.locator(TRIGGER).first().click();
-		await expect(page.locator(FANCYBOX)).toBeVisible();
-		await expect(page.locator(FANCYBOX_INDEX)).toHaveText('1');
+		await expect(page.locator(POPUP)).toBeVisible();
+		await expectPosition(page, 1, IMAGES_COUNT);
 
 		expect(await page.evaluate(() => window.vpOpenedFor)).toBe(
 			'e2e-popup-cover'
 		);
+	});
+
+	test('Free extensions can wrap open and change viewer options', async ({
+		page,
+		requestUtils,
+	}) => {
+		test.skip(!!process.env.CORE, 'Free uses the Reuse viewer.');
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - Reuse extension',
+			blockId: 'e2e-popup-reuse-extension',
+			queryId: 1,
+			images,
+			clickAction: 'popup',
+			lightbox: {
+				titleSource: 'item_title',
+				descriptionSource: 'item_author',
+			},
+		});
+		test.skip(await isPro(page), 'Free uses the Reuse viewer.');
+
+		await page.evaluate(() => {
+			window.VPData.settingsPopupGallery.background_color = '#345678';
+			window.VPData.settingsPopupGallery.show_thumbs = true;
+			window.vpfChangeEvents = [];
+			const api = window.VPPopupAPI;
+			const open = api.open;
+			api.open = (items, index, gallery) =>
+				open(items, index + 1, gallery);
+			window
+				.jQuery(document)
+				.on('beforeInitPopup.vpf', (event, gallery, options) => {
+					options.controls.close = false;
+				})
+				.on(
+					'beforeChangePopup.vpf',
+					(event, gallery, lightbox, change) => {
+						window.vpfChangeEvents.push([
+							event.type,
+							lightbox.getState().index,
+							change.nextIndex,
+						]);
+					}
+				)
+				.on('afterChangePopup.vpf', (event, gallery, lightbox) => {
+					window.vpfChangeEvents.push([
+						event.type,
+						lightbox.getState().index,
+					]);
+				});
+		});
+
+		await page.locator(TRIGGER).first().click();
+		await expectPosition(page, 2, IMAGES_COUNT);
+		await expect(page.locator(`${REUSE} .re-lightbox-close`)).toHaveCount(
+			0
+		);
+		await expect(
+			page.locator(`${REUSE} div.re-lightbox-caption h3`)
+		).toHaveText('Image 2');
+
+		const thumbnails = page.getByRole('button', { name: 'Thumbnails' });
+		const strip = page.locator(REUSE).locator('.re-lightbox-thumbnails');
+		await expect(thumbnails).toHaveAttribute('aria-expanded', 'false');
+		await expect(strip).toHaveCount(0);
+		await thumbnails.click();
+		await expect(strip).toBeVisible();
+		await expect(thumbnails).toHaveAttribute('aria-expanded', 'true');
+		await thumbnails.click();
+		await expect(strip).toHaveCount(0);
+		await expectPosition(page, 2, IMAGES_COUNT);
+
+		await page.getByText('Share', { exact: true }).click();
+		const facebook = page.getByRole('link', { name: 'Share on Facebook' });
+		await expect(facebook).toBeVisible();
+		expect(
+			new URL(await facebook.getAttribute('href')).searchParams.get('u')
+		).toBe(page.url());
+
+		await page.evaluate(
+			(count) => window.VPPopupAPI.instance.goTo(count - 1),
+			IMAGES_COUNT
+		);
+		await expectPosition(page, IMAGES_COUNT, IMAGES_COUNT);
+		expect(await page.evaluate(() => window.vpfChangeEvents)).toEqual([
+			['beforeChangePopup', 1, IMAGES_COUNT - 1],
+			['afterChangePopup', IMAGES_COUNT - 1],
+		]);
+		await page.keyboard.press('ArrowRight');
+		await expectPosition(page, 1, IMAGES_COUNT);
+
+		await page.evaluate(() => window.VPPopupAPI.close());
+		await expect(page.locator(REUSE)).toHaveCount(0);
+		await expect
+			.poll(() => page.evaluate(() => window.VPPopupAPI.instance))
+			.toBe(false);
+	});
+
+	test('Free opens a WordPress image with the configured vendor on the same page as Reuse', async ({
+		admin,
+		page,
+		requestUtils,
+	}) => {
+		test.skip(!!process.env.CORE, 'Free uses the Reuse viewer.');
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - mixed galleries',
+			blockId: 'e2e-popup-mixed',
+			queryId: 1,
+			images,
+			clickAction: 'popup',
+		});
+		test.skip(await isPro(page), 'Free uses the Reuse viewer.');
+		const loopUrl = page.url();
+
+		const setWordPressImages = async (enabled) => {
+			await admin.visitAdminPage(
+				'edit.php',
+				'post_type=portfolio&page=visual-portfolio-settings'
+			);
+			await page.locator('#vp_popup_gallery-tab').click();
+			const form = page.locator('#vp_popup_gallery form');
+			await form
+				.locator('summary')
+				.filter({ hasText: 'Advanced' })
+				.click();
+			const control = form.getByLabel('Lightbox for WordPress Images');
+			if ((await control.isChecked()) !== enabled) {
+				await control.click();
+				await form
+					.getByRole('button', { name: 'Save Changes' })
+					.click();
+				await page.waitForURL(/settings-updated=true/);
+			}
+		};
+
+		try {
+			await setWordPressImages(true);
+			await page.goto(loopUrl);
+			await page.evaluate((url) => {
+				const figure = document.createElement('figure');
+				figure.className = 'wp-block-image';
+				const link = document.createElement('a');
+				link.href = url;
+				const image = document.createElement('img');
+				image.src = url;
+				link.append(image);
+				figure.append(link);
+				document.querySelector('.vp-block-loop').after(figure);
+			}, images[0].url);
+
+			await page.locator(TRIGGER).first().click();
+			await expect(page.locator(REUSE)).toBeVisible();
+			await page.keyboard.press('Escape');
+			await expect(page.locator(REUSE)).toHaveCount(0);
+
+			await page.locator('.wp-block-image > a').click();
+			await expect(page.locator('.fancybox-container')).toBeVisible();
+			await page.keyboard.press('Escape');
+			await expect(page.locator('.fancybox-container')).toBeHidden();
+
+			await page.locator(TRIGGER).first().click();
+			await expect(page.locator(REUSE)).toBeVisible();
+		} finally {
+			await setWordPressImages(false);
+		}
+	});
+
+	test('dragging a carousel slide leaves the lightbox closed', async ({
+		page,
+		requestUtils,
+	}) => {
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - carousel drag',
+			blockId: 'e2e-popup-carousel-drag',
+			queryId: 1,
+			images,
+			clickAction: 'popup',
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 2,
+			},
+		});
+
+		await expect(page.locator(LIST)).toHaveAttribute(
+			'blossom-carousel',
+			'true'
+		);
+		const trigger = page.locator(TRIGGER).first();
+		await trigger.scrollIntoViewIfNeeded();
+		const { x, y, width, height } = await trigger.boundingBox();
+
+		await page.mouse.move(x + width * 0.75, y + height / 2);
+		await page.mouse.down();
+		await page.mouse.move(x + width * 0.25, y + height / 2, { steps: 12 });
+		await page.mouse.up();
+
+		await expect(page.locator(POPUP)).toHaveCount(0);
+		await page.locator(TRIGGER).nth(1).click();
+		await expect(page.locator(POPUP)).toBeVisible();
 	});
 
 	test('a video item is played in a frame', async ({
@@ -546,8 +768,11 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await page.locator(TRIGGER).nth(1).click();
 
 		await expect(
-			page.locator(`${FANCYBOX} .fancybox-slide--current iframe`)
-		).toHaveAttribute('src', /youtube\.com\/embed\/aBcDeFgHiJk/);
+			page.locator(`${REUSE} iframe, .fancybox-slide--current iframe`)
+		).toHaveAttribute(
+			'src',
+			/youtube(?:-nocookie)?\.com\/embed\/aBcDeFgHiJk/
+		);
 	});
 
 	test('the lightbox holds the items a load more appended', async ({
@@ -573,10 +798,8 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		// off the page at the click.
 		await page.locator(TRIGGER).last().click();
 
-		await expect(page.locator(FANCYBOX)).toBeVisible();
-		await expect(page.locator(FANCYBOX_INDEX)).toHaveText(
-			`${IMAGES_COUNT}`
-		);
+		await expect(page.locator(POPUP)).toBeVisible();
+		await expectPosition(page, IMAGES_COUNT, IMAGES_COUNT);
 
 		// A step back through a history of the hash alone - what a deep link
 		// to each slide writes - leaves the page, appended items and all.
@@ -618,8 +841,8 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 
 		await page.locator(TRIGGER).first().click();
 
-		await expect(page.locator(FANCYBOX)).toBeVisible();
-		await expect(page.locator(FANCYBOX_COUNT)).toHaveText('2');
+		await expect(page.locator(POPUP)).toBeVisible();
+		await expectPosition(page, 1, 2);
 		// The picture on screen is the one of the page that was swapped in, in
 		// whichever of its sizes the vendor picked.
 		const file = swapped[0].img
@@ -627,13 +850,10 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			.pop()
 			.replace(/\.\w+$/, '');
 
-		await expect(
-			page
-				.locator(
-					`${FANCYBOX} .fancybox-slide--current img.fancybox-image`
-				)
-				.last()
-		).toHaveAttribute('src', new RegExp(file));
+		await expect(page.locator(POPUP_IMAGE).last()).toHaveAttribute(
+			'src',
+			new RegExp(file)
+		);
 	});
 
 	test.describe('with PhotoSwipe chosen in Settings', () => {
@@ -645,7 +865,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			await setVendor(admin, page, 'fancybox');
 		});
 
-		test('the lightbox is PhotoSwipe, one slide per item', async ({
+		test('one slide per item with PhotoSwipe chosen for legacy galleries', async ({
 			page,
 			requestUtils,
 		}) => {
@@ -659,6 +879,16 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			});
 
 			await page.locator(TRIGGER).first().click();
+
+			if (!(await isPro(page))) {
+				await expect(page.locator(REUSE)).toBeVisible();
+				await expectPosition(page, 1, IMAGES_COUNT);
+				await page.keyboard.press('ArrowRight');
+				await expectPosition(page, 2, IMAGES_COUNT);
+				await page.keyboard.press('Escape');
+				await expect(page.locator(REUSE)).toBeHidden();
+				return;
+			}
 
 			await expect(page.locator(PHOTOSWIPE)).toBeVisible();
 			await expect(page.locator(PHOTOSWIPE_COUNTER)).toHaveText(
