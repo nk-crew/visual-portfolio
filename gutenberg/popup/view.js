@@ -2,6 +2,7 @@ import { LOOP_POPUP_OPEN } from './open';
 import { openReuse } from './reuse';
 
 const { jQuery: $, VPData } = window;
+const useReuse = !VPData.pro || VPData.loopLightbox === 'reuse';
 
 const TRIGGER_SELECTOR = '[data-vp-popup]';
 const ITEM_SELECTOR = '.wp-block-visual-portfolio-item-template__item';
@@ -41,7 +42,7 @@ function getGallery(loop) {
 			},
 		};
 
-		if (!VPData.pro) {
+		if (useReuse) {
 			gallery[LOOP_POPUP_OPEN] = openReuse;
 		}
 
@@ -65,7 +66,7 @@ document.addEventListener('click', (event) => {
 		event.ctrlKey ||
 		event.shiftKey ||
 		event.altKey ||
-		(VPData.pro && !VPPopupAPI.vendor)
+		(!useReuse && !VPPopupAPI.vendor)
 	) {
 		return;
 	}
@@ -96,7 +97,7 @@ document.addEventListener('click', (event) => {
 	items[index].linkEl = trigger;
 
 	const gallery = getGallery(loop);
-	if (VPData.pro) {
+	if (!useReuse) {
 		event.preventDefault();
 		VPPopupAPI.open(items, index, gallery);
 	} else if (VPPopupAPI.open(items, index, gallery) !== false) {
