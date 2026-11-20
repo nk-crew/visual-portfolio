@@ -80,9 +80,13 @@ document.body.addEventListener('vpf_settings_form_persisted', ({ target }) => {
 	window.VPAdminSettingsForms.persist(target.closest?.(settingsForm));
 });
 
-// Older Pro releases emit these custom events through jQuery.
+// Older Pro releases emit synthetic form events through jQuery.
 window
 	.jQuery?.(document.body)
+	.on('input change', `${settingsForm} :input`, function (event) {
+		if (!event.originalEvent)
+			updateSettingsSubmitState(this.closest(settingsForm));
+	})
 	.on('vpf_settings_form_updated', settingsForm, function (event) {
 		if (!event.originalEvent) updateSettingsSubmitState(this);
 	})
