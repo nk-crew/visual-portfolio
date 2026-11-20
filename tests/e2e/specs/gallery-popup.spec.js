@@ -38,8 +38,14 @@ async function loadJQuery(page) {
 	}
 }
 
+async function usesReuse(page) {
+	return page.evaluate(
+		() => !window.VPData.pro || window.VPData.loopLightbox === 'reuse'
+	);
+}
+
 async function expectPosition(page, index, count) {
-	if (await isPro(page)) {
+	if (!(await usesReuse(page))) {
 		if (index) {
 			await expect(page.locator('[data-fancybox-index]')).toHaveText(
 				String(index)
@@ -899,7 +905,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 
 			await page.locator(TRIGGER).first().click();
 
-			if (!(await isPro(page))) {
+			if (await usesReuse(page)) {
 				await expect(page.locator(REUSE)).toBeVisible();
 				await expectPosition(page, 1, IMAGES_COUNT);
 				await page.keyboard.press('ArrowRight');
