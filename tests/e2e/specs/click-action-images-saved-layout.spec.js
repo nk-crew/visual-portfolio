@@ -228,13 +228,27 @@ test.describe('click action gallery images (saved layout)', () => {
 			)
 			.click();
 
-		// Save Layout.
-		await page
-			.locator('button.components-button.editor-post-publish-button', {
-				hasText: 'Save',
-			})
-			.first()
-			.click();
+		const [saved] = await Promise.all([
+			page.waitForResponse((response) => {
+				const url = new URL(response.url());
+				const route =
+					url.searchParams.get('rest_route') || url.pathname;
+				return (
+					response.request().method() === 'POST' &&
+					route.endsWith(`/wp/v2/vp_lists/${postID}`)
+				);
+			}),
+			page
+				.locator(
+					'button.components-button.editor-post-publish-button',
+					{
+						hasText: 'Save',
+					}
+				)
+				.first()
+				.click(),
+		]);
+		expect(saved.ok()).toBe(true);
 
 		await admin.createNewPost({
 			title: 'Click Action (with saved layout)',

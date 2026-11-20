@@ -415,6 +415,21 @@ test.describe('archive pages', () => {
 			typePagination === 'paged'
 				? '.vp-pagination__item.vp-pagination__item-next > a'
 				: 'a.vp-pagination__load-more';
+		if (typePagination === 'paged') {
+			const items = page.locator(
+				'.vp-portfolio__ready .vp-portfolio__items article.vp-portfolio__item-wrap'
+			);
+			await items.evaluateAll((nodes) => {
+				for (const node of nodes) {
+					node.setAttribute('data-vpf-archive-previous-page', '');
+				}
+			});
+			await pagination.locator(button).click();
+			await expect(
+				page.locator('[data-vpf-archive-previous-page]')
+			).toHaveCount(0);
+			return;
+		}
 		await Promise.all([
 			page
 				.waitForSelector('.vp-portfolio__ready', {
