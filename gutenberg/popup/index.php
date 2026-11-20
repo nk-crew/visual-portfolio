@@ -57,7 +57,7 @@ class Visual_Portfolio_Popup {
 		Visual_Portfolio_Assets::register_script(
 			self::SCRIPT,
 			'build/gutenberg/popup/view',
-			array( 'jquery', 'visual-portfolio-popup-gallery' )
+			array( 'visual-portfolio-popup-gallery-data' )
 		);
 		Visual_Portfolio_Assets::register_style( self::SCRIPT, 'build/gutenberg/popup/view' );
 	}
