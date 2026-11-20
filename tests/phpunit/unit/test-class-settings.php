@@ -73,4 +73,29 @@ class ClassSettings extends WP_UnitTestCase {
 
 		$this->assertSame( 'Acme Gallery Only', $this->get_lazy_loading_field()['options']['vp'] );
 	}
+
+	public function test_settings_section_renders_its_html_description() {
+		global $wp_settings_sections;
+
+		$section_id = 'vpf_test_section_description';
+		$settings   = new Visual_Portfolio_Settings_API();
+		$settings->set_sections(
+			array(
+				array(
+					'id'    => $section_id,
+					'title' => 'Example section',
+					'desc'  => '<strong title="Example">Section description</strong>',
+				),
+			)
+		);
+		$settings->admin_init();
+
+		try {
+			$this->expectOutputString( '<div class="inside"><strong title="Example">Section description</strong></div>' );
+			$settings->do_settings_sections( $section_id );
+		} finally {
+			unregister_setting( $section_id, $section_id );
+			unset( $wp_settings_sections[ $section_id ] );
+		}
+	}
 }
