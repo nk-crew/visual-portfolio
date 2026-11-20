@@ -411,7 +411,7 @@ $(() => {
 			});
 			const metabox = $(form).closest('.metabox-holder');
 			metabox.conditionize('runCheck', metabox.find('[data-cond]'));
-			window.VPAdminSettingsForms?.refresh($(form));
+			window.VPAdminSettingsForms?.refresh(form);
 		};
 		const add = (parent, field) => {
 			const row = table.querySelector(`tr.${CSS.escape(field.name)}`);
@@ -616,7 +616,7 @@ $(() => {
 		});
 		requestAnimationFrame(() => {
 			refresh();
-			window.VPAdminSettingsForms?.persist($(form));
+			window.VPAdminSettingsForms?.persist(form);
 		});
 	});
 	window.addEventListener('hashchange', () => {
