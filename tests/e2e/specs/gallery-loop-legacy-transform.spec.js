@@ -452,6 +452,162 @@ test.describe('Gallery Loop from the legacy block', () => {
 		expect(find(loop, 'loop-carousel-indicator')).toBeTruthy();
 	});
 
+	test('converted hover covers reveal on keyboard focus without swallowing a tap', async ({
+		page,
+		browser,
+		requestUtils,
+	}) => {
+		const content = await page.evaluate((image) => {
+			const { cloneBlock, createBlock, serialize, switchToBlockType } =
+				window.wp.blocks;
+			const covers = [
+				['fly', 'hover', '#000000'],
+				['fade', 'hover', 'linear-gradient(#0099ff, #003399)'],
+				['fade', 'always', '#0099ff'],
+			];
+			return serialize(
+				covers.map(([skin, reveal, color], index) =>
+					cloneBlock(
+						switchToBlockType(
+							createBlock('visual-portfolio/block', {
+								block_id: `touchcover${index}`,
+								content_source: 'images',
+								images: [image],
+								items_count: -1,
+								layout: 'tiles',
+								items_style: skin,
+								items_click_action: 'popup_gallery',
+								[`items_style_${skin}__show_overlay`]: reveal,
+								[`items_style_${skin}__overlay_bg_color`]:
+									color,
+							}),
+							'visual-portfolio/loop'
+						)[0],
+						{ block_id: `touchloop${index}` }
+					)
+				)
+			);
+		}, images[0]);
+		expect(content).toContain('wp:visual-portfolio/item-cover');
+		const published = await requestUtils.createPage({
+			title: 'Converted touch covers',
+			status: 'publish',
+			content,
+		});
+		pageIds.push(published.id);
+
+		const touch = await browser.newPage({
+			hasTouch: true,
+			isMobile: true,
+			viewport: { width: 390, height: 844 },
+			reducedMotion: 'reduce',
+		});
+		try {
+			await touch.goto(published.link);
+			const cover = touch.locator(
+				'.wp-block-visual-portfolio-item-cover'
+			);
+			const overlay = cover.locator(
+				'.wp-block-visual-portfolio-item-cover__overlay--hover'
+			);
+			const link = cover.locator(
+				'.wp-block-visual-portfolio-item-cover__link'
+			);
+			await expect(cover).toHaveCount(3);
+			await expect(
+				cover
+					.nth(0)
+					.locator('.wp-block-visual-portfolio-item-cover__inner')
+			).not.toHaveCSS('transform', 'none');
+			await expect(overlay.nth(1)).toHaveCSS('opacity', '0');
+			await expect(overlay.nth(2)).toHaveCSS('opacity', '1');
+
+			await link.nth(1).tap();
+			const lightbox = touch.locator('.fancybox-is-open, .pswp--open');
+			await expect(lightbox).toBeVisible();
+			await touch.keyboard.press('Escape');
+			await expect(lightbox).toHaveCount(0);
+			await link.nth(0).focus();
+			await touch.keyboard.press('Tab');
+			await expect(link.nth(1)).toBeFocused();
+			await expect(overlay.nth(1)).toHaveCSS('opacity', '1');
+		} finally {
+			await touch.close();
+		}
+	});
+
+	test('converted auto-width slider keeps proportional slide dimensions with thumbnails', async ({
+		page,
+		requestUtils,
+	}) => {
+		const content = await page.evaluate((galleryImages) => {
+			const { cloneBlock, createBlock, serialize, switchToBlockType } =
+				window.wp.blocks;
+			const legacy = createBlock('visual-portfolio/block', {
+				block_id: 'legacyautowidth',
+				content_source: 'images',
+				images: galleryImages,
+				layout: 'slider',
+				items_style: 'default',
+				slider_thumbnails: true,
+				slider_thumbnails_height_type: 'static',
+				slider_thumbnails_height_static: 100,
+				slider_slides_per_view_type: 'auto',
+				slider_items_height_type: 'dynamic',
+				slider_items_height_dynamic: 50,
+			});
+			return serialize([
+				legacy,
+				cloneBlock(
+					switchToBlockType(legacy, 'visual-portfolio/loop')[0],
+					{ block_id: 'autowidthloop' }
+				),
+			]);
+		}, images);
+		expect(content).toContain('wp:visual-portfolio/item-template');
+		const published = await requestUtils.createPage({
+			title: 'Converted auto-width slider',
+			status: 'publish',
+			content,
+		});
+		pageIds.push(published.id);
+		await page.goto(published.link);
+
+		const frame = page.locator(
+			'.wp-block-visual-portfolio-item-template__carousel-frame'
+		);
+		const image = frame
+			.locator('.wp-block-visual-portfolio-item-image img')
+			.first();
+		const legacyImage = page.locator('.vp-portfolio__item-img img').first();
+		await expect(frame).toHaveCount(1);
+		await expect(image).toBeVisible();
+		await expect(legacyImage).toBeVisible();
+
+		for (const width of [1280, 390]) {
+			await page.setViewportSize({ width, height: 900 });
+			await expect
+				.poll(async () => {
+					const { width: frameWidth } = await frame.boundingBox();
+					const { width: imageWidth, height } =
+						await image.boundingBox();
+					return [
+						Math.round((height / frameWidth) * 100),
+						Math.round((imageWidth / height) * 100),
+						Math.round(
+							((await legacyImage.boundingBox()).height /
+								height) *
+								100
+						),
+					];
+				})
+				.toEqual([50, 133, 100]);
+		}
+		await expect(
+			page.locator('.vp-block-loop-carousel-thumb').first()
+		).toHaveCSS('height', '100px');
+	});
+
 	test('custom CSS becomes the custom CSS of the loop', async ({ page }) => {
 		const loop = await switchLegacy(page, {
 			block_id: 'legacycss',
