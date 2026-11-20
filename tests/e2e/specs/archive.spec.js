@@ -385,7 +385,13 @@ test.describe('archive pages', () => {
 		});
 
 		await expect(saveChangesButton).toBeEnabled();
-		await saveChangesButton.click();
+		await Promise.all([
+			page.waitForURL(/settings-updated=true/),
+			saveChangesButton.click(),
+		]);
+		await expect(
+			page.getByLabel('Archive Page Items Per Page')
+		).toHaveValue('2');
 	}
 
 	// This function ensures that the page is fully loaded before any data collection begins.
