@@ -869,16 +869,11 @@ end has run out of to the other, so an effect that pins its slides in place —
 a deck — has nothing to move: with `repeat: false` on both sides the *Repeat*
 setting is left out of the page and the control is greyed with the reason. Two
 carousels are left out of the loop whatever the effect: one whose slides are
-their own width, since the loop is counted a step per slide, and one whose
-slides all fit the frame, which has nothing to run round. The first is settled
-on the server. The second is the frame's to say. Three slides fit three columns
-on a desktop and overflow the one column of a phone, so the module counts the
-slides against the columns, and counts again whenever the columns change,
-starting the carousel over as a loop or as a plain one. An RTL carousel runs as
-a plain one as well: the carousel library carries its loop in the scroll
-positions of LTR only. On an RTL site the server leaves the loop out and the
-control is greyed with the reason; a block made RTL on an LTR page is left out
-by the module.
+their own width, and one whose slides all fit the frame. The server excludes
+the first. Reuse Carousel measures the second again when the viewport or slide
+dimensions change. RTL galleries keep bounded navigation. On an RTL site the
+server leaves Repeat out and greys out the control. The view module also
+leaves Repeat out when the block itself is RTL on an LTR page.
 
 `peek` says whether the effect leaves an edge for a slide of the next one to
 show at, and is `true` unless the effect says otherwise. An effect that lays
@@ -1199,9 +1194,10 @@ They are directives and actions and nothing else. Each is between 0.7 and 12.2 K
 after gzip. `@wordpress/interactivity` from the WordPress bundle is the only
 static dependency loaded apart from them; the item template module bundles
 `@reuse-sh/gallery`, which lays out justified rows and masonry lanes. Everything larger is fetched at the moment it is used and never
-bundled: `@wordpress/interactivity-router` on the first region swap, the Blossom
-carousel from the address on the markup. A gallery that is a plain grid
-downloads neither.
+bundled: `@wordpress/interactivity-router` on the first region swap and Reuse
+Carousel from the address on the carousel markup. A plain grid downloads
+neither. If the carousel module fails to load, the list remains a native
+scroll container and its controls continue to work.
 
 Justified rows and masonry lanes come from `@reuse-sh/gallery`: native Grid
 Lanes where the browser has them, its script elsewhere, and its stylesheet, part
@@ -1300,8 +1296,9 @@ template:
 | Event | Payload |
 |---|---|
 | `vp-carousel-go-to` | `detail.index` — scroll to that slide |
+| `vp-carousel-step` | a control requested a move; restart the autoplay countdown |
 | `vp-carousel-autoplay` | `detail.playing` — `false` holds autoplay, `true` releases it |
-| `vp-carousel-place` | `detail.position` — a place on the loop of a repeating carousel, scrolled to at once and kept off the seam the way a step is; written back as the scroll it came to rest at |
+| `vp-carousel-place` | `detail.position` — a scroll position on a repeating carousel, applied at once; written back as the resulting scroll position |
 | `vp-carousel-autoplay-take` | the autoplay stops moving the carousel and hands each frame to the script that took it |
 
 And announces itself on the same element, bubbling, so that a script outside
@@ -1311,16 +1308,16 @@ the module can run beside a carousel for as long as it runs:
 |---|---|
 | `vp-carousel-start` | the module has started the carousel, once per start — a Load More starts it again |
 | `vp-carousel-stop` | the module is about to let go of it |
-| `vp-carousel-travel-start` | the module has started drawing a step of a repeating carousel, snapping held off (not bubbling) |
-| `vp-carousel-travel-end` | the step has arrived or was stopped, and the snap is back (not bubbling) |
+| `vp-carousel-travel-start` | a command is about to move a repeating carousel; the marquee yields control (not bubbling) |
+| `vp-carousel-travel-end` | the move has settled and the marquee can resume (not bubbling) |
 | `vp-carousel-autoplay-frame` | a frame of a taken autoplay: `detail.elapsed` in milliseconds, `detail.held` (the visitor's stop, a script's hold, off the screen, the keyboard), `detail.pointer` and `detail.keyboard` (not bubbling) |
 
 A script that takes the autoplay moves the carousel itself and keeps the rest:
 the pauses, the play and pause button, and a visitor who asked for less
 motion, for whom no frame ever comes. It takes it again on every
-`vp-carousel-start`, since a Load More starts a new autoplay. Snapping is
-switched by the list's `--snap-type` custom property, which the carousel
-library reads; a step saves it and puts it back when it arrives.
+`vp-carousel-start`, since a Load More starts a new autoplay. The carousel
+controller suspends snapping while the marquee places the track. User input
+and control commands can take the track back.
 
 Holding autoplay is not the same as stopping it: the pause a pointer or a focus
 already applies keeps working underneath, and releasing the hold does not
