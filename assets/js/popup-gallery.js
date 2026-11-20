@@ -1,5 +1,7 @@
 import $ from 'jquery';
 
+import { LOOP_POPUP_OPEN } from '../../gutenberg/popup/open';
+
 const { VPData } = window;
 const { settingsPopupGallery } = VPData;
 const templatesSupport = 'content' in document.createElement('template');
@@ -75,7 +77,9 @@ const VPPopupAPI = {
 	],
 
 	init() {},
-	open() {},
+	open(items, index, self) {
+		return self?.[LOOP_POPUP_OPEN]?.(items, index, self);
+	},
 	close() {},
 	append() {},
 
