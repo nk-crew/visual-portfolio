@@ -307,9 +307,7 @@
 	}
 }
 
-// Hiding the panel behind a pointer only makes sense where there is one. On a
-// touch screen it is always there and a single tap follows the link, the way a
-// tap on anything else does.
+// Covers show the panel by default on touch. A single tap follows the link.
 //
 // Each pair below is written hidden state first, and the two weigh the same:
 // with the hovered states inside `:where()` it is the order that decides, not a
@@ -357,7 +355,7 @@
 }
 
 @media (hover: none) {
-	.wp-block-visual-portfolio-item-cover.vp-show-content-hover:where(.vp-legacy-hover-cover):not(:where(:has(:focus-visible), .is-selected, .has-child-selected)) {
+	.wp-block-visual-portfolio-item-cover.vp-show-content-hover:where(.vp-legacy-hover-cover:is(.vp-effect-fade, .vp-effect-fly)):not(:where(:has(:focus-visible), .is-selected, .has-child-selected)) {
 		--vp-panel-hidden-clip: inset(100%);
 
 		@include panel-hidden;

@@ -513,12 +513,11 @@ test.describe('Gallery Loop from the legacy block', () => {
 			const link = cover.locator(
 				'.wp-block-visual-portfolio-item-cover__link'
 			);
+			const flyPanel = cover
+				.nth(0)
+				.locator('.wp-block-visual-portfolio-item-cover__inner');
 			await expect(cover).toHaveCount(3);
-			await expect(
-				cover
-					.nth(0)
-					.locator('.wp-block-visual-portfolio-item-cover__inner')
-			).not.toHaveCSS('transform', 'none');
+			await expect(flyPanel).not.toHaveCSS('transform', 'none');
 			await expect(overlay.nth(1)).toHaveCSS('opacity', '0');
 			await expect(overlay.nth(2)).toHaveCSS('opacity', '1');
 
@@ -531,6 +530,11 @@ test.describe('Gallery Loop from the legacy block', () => {
 			await touch.keyboard.press('Tab');
 			await expect(link.nth(1)).toBeFocused();
 			await expect(overlay.nth(1)).toHaveCSS('opacity', '1');
+
+			await cover.nth(0).evaluate((node) => {
+				node.classList.replace('vp-effect-fly', 'vp-effect-emerge');
+			});
+			await expect(flyPanel).toHaveCSS('clip-path', /^polygon\(/);
 		} finally {
 			await touch.close();
 		}
