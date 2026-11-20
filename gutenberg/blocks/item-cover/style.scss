@@ -355,10 +355,16 @@
 }
 
 @media (hover: none) {
-	.wp-block-visual-portfolio-item-cover.vp-show-content-hover:where(.vp-legacy-hover-cover:is(.vp-effect-fade, .vp-effect-fly)):not(:where(:has(:focus-visible), .is-selected, .has-child-selected)) {
-		--vp-panel-hidden-clip: inset(100%);
+	.wp-block-visual-portfolio-item-cover.vp-show-content-hover:where(.vp-legacy-hover-cover:is(.vp-effect-fade, .vp-effect-fly)) {
+		&:not(:where(:has(:focus-visible), .is-selected, .has-child-selected)) {
+			--vp-panel-hidden-clip: inset(100%);
 
-		@include panel-hidden;
+			@include panel-hidden;
+		}
+
+		&:where(:has(:focus-visible)) > .wp-block-visual-portfolio-item-cover__media > .wp-block-visual-portfolio-item-cover__image-background {
+			transform: var(--vp-image-hover-transform, none);
+		}
 	}
 }
 

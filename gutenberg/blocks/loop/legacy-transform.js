@@ -591,6 +591,7 @@ function getTemplateAttributes(legacy) {
 		case 'slider': {
 			const autoplay = parseFloat(legacy.slider_autoplay) || 0;
 			const autoWidth = 'auto' === legacy.slider_slides_per_view_type;
+			const sizeAutoWidth = autoWidth && 'fade' !== legacy.slider_effect;
 			const heightType = legacy.slider_items_height_type;
 
 			Object.assign(attributes, {
@@ -624,13 +625,13 @@ function getTemplateAttributes(legacy) {
 							}px`,
 						}
 					: {}),
-				...(autoWidth && 'dynamic' === heightType
+				...(sizeAutoWidth && 'dynamic' === heightType
 					? {
 							carouselSlideHeight: `${parseFloat(legacy.slider_items_height_dynamic) || 80}cqw`,
 						}
 					: {}),
 			});
-			if (autoWidth && attributes.carouselSlideHeight) {
+			if (sizeAutoWidth && attributes.carouselSlideHeight) {
 				attributes.className = 'vp-legacy-sized-auto-width';
 			}
 			break;

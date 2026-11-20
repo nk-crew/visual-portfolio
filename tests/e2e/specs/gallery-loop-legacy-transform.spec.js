@@ -530,6 +530,13 @@ test.describe('Gallery Loop from the legacy block', () => {
 			await touch.keyboard.press('Tab');
 			await expect(link.nth(1)).toBeFocused();
 			await expect(overlay.nth(1)).toHaveCSS('opacity', '1');
+			await expect(
+				cover
+					.nth(1)
+					.locator(
+						'.wp-block-visual-portfolio-item-cover__image-background'
+					)
+			).toHaveCSS('transform', 'matrix(1.05, 0, 0, 1.05, 0, 0)');
 
 			await cover.nth(0).evaluate((node) => {
 				node.classList.replace('vp-effect-fly', 'vp-effect-emerge');
@@ -610,6 +617,24 @@ test.describe('Gallery Loop from the legacy block', () => {
 		await expect(
 			page.locator('.vp-block-loop-carousel-thumb').first()
 		).toHaveCSS('height', '100px');
+	});
+
+	test('a Fade slider ignores the legacy automatic slide width setting for image sizing', async ({
+		page,
+	}) => {
+		const loop = await switchLegacy(page, {
+			content_source: 'post-based',
+			layout: 'slider',
+			slider_effect: 'fade',
+			slider_items_height_type: 'dynamic',
+			slider_items_height_dynamic: 50,
+			slider_slides_per_view_type: 'auto',
+		});
+
+		expect(find(loop, 'item-template').attributes).toMatchObject({
+			carouselEffect: 'fade',
+			carouselSlideHeight: '',
+		});
 	});
 
 	test('custom CSS becomes the custom CSS of the loop', async ({ page }) => {
