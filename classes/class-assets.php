@@ -796,6 +796,7 @@ class Visual_Portfolio_Assets {
 				'show_download_button'             => Visual_Portfolio_Settings::get_option( 'show_download_button', 'vp_popup_gallery' ),
 				'show_slideshow'                   => Visual_Portfolio_Settings::get_option( 'show_slideshow', 'vp_popup_gallery' ),
 
+				'background_color'                 => Visual_Portfolio_Settings::get_option( 'background_color', 'vp_popup_gallery' ),
 				'click_to_zoom'                    => Visual_Portfolio_Settings::get_option( 'click_to_zoom', 'vp_popup_gallery' ),
 				'restore_focus'                    => Visual_Portfolio_Settings::get_option( 'restore_focus', 'vp_popup_gallery' ),
 				'loop'                             => Visual_Portfolio_Settings::get_option( 'loop', 'vp_popup_gallery' ),

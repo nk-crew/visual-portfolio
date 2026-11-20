@@ -1,6 +1,8 @@
 import isNumber from 'is-number';
 import $ from 'jquery';
 
+import { LOOP_POPUP_OPEN } from '../../gutenberg/popup/open';
+
 const {
 	Image,
 	VPData,
@@ -180,6 +182,10 @@ if (PhotoSwipe && VPPopupAPI) {
 	// Extend Popup API.
 	VPPopupAPI.vendor = 'photoswipe';
 	VPPopupAPI.open = (items, index, self) => {
+		if (self?.[LOOP_POPUP_OPEN]) {
+			return self[LOOP_POPUP_OPEN](items, index, self);
+		}
+
 		const finalItems = mapItemsToPhotoSwipe(items);
 
 		const $pswpElement = $('.vp-pswp');
