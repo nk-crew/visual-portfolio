@@ -3,8 +3,8 @@ import './style.scss';
 import { Button, Spinner } from '@wordpress/components';
 import { Component, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { buildQueryString } from '@wordpress/url';
 import classnames from 'classnames/dedupe';
-import $ from 'jquery';
 
 const { ajaxurl, VPGutenbergVariables } = window;
 
@@ -44,6 +44,11 @@ export default class IconsSelector extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		this.ajaxRequest?.abort();
+		this.ajaxRequest = null;
+	}
+
 	/**
 	 * Request AJAX dynamic data.
 	 *
@@ -51,18 +56,19 @@ export default class IconsSelector extends Component {
 	 * @param {Function} callback        - callback.
 	 * @param {boolean}  useStateLoading - use state change when loading.
 	 */
-	requestAjax(
+	async requestAjax(
 		additionalData = {},
 		callback = () => {},
 		useStateLoading = true
 	) {
 		const { controlName, attributes } = this.props;
 
-		if (this.isAJAXinProgress) {
+		if (this.ajaxRequest) {
 			return;
 		}
 
-		this.isAJAXinProgress = true;
+		const request = new AbortController();
+		this.ajaxRequest = request;
 
 		if (useStateLoading) {
 			this.setState({
@@ -78,34 +84,37 @@ export default class IconsSelector extends Component {
 			...additionalData,
 		};
 
-		$.ajax({
-			url: ajaxurl,
+		const data = await fetch(ajaxurl, {
 			method: 'POST',
-			dataType: 'json',
-			data: ajaxData,
-			complete: (data) => {
-				const json = data.responseJSON;
+			body: new URLSearchParams(buildQueryString(ajaxData)),
+			signal: request.signal,
+		})
+			.then((response) => response.json())
+			.catch(() => null);
 
-				if (callback && json.response) {
-					if (json.response.options) {
-						cachedOptions[controlName] = {
-							...cachedOptions[controlName],
-							...json.response.options,
-						};
-					}
+		if (this.ajaxRequest !== request) {
+			return;
+		}
 
-					callback(json.response);
+		try {
+			if (data?.response) {
+				if (data.response.options) {
+					cachedOptions[controlName] = {
+						...cachedOptions[controlName],
+						...data.response.options,
+					};
 				}
 
+				callback(data.response);
+			}
+		} finally {
+			if (this.ajaxRequest === request) {
+				this.ajaxRequest = null;
 				if (useStateLoading) {
-					this.setState({
-						ajaxStatus: true,
-					});
+					this.setState({ ajaxStatus: true });
 				}
-
-				this.isAJAXinProgress = false;
-			},
-		});
+			}
+		}
 	}
 
 	render() {
