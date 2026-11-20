@@ -94,7 +94,11 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		// middle like any other. Stated against the block rather than
 		// against the narrowed list, which is the one way of writing it
 		// that does not depend on its own outcome.
-		gap: 0;
+		--vp-coverflow-box-width: calc(50cqw / max(var(--vp-layout-current-columns), 2));
+
+		--vp-coverflow-loop-gap: 0;
+
+		gap: var(--vp-coverflow-loop-gap);
 
 		// Over the padding a centred carousel is given too, which weighs one
 		// class more than the list and comes earlier.
@@ -105,12 +109,9 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		}
 
 		> #{$item} {
-			// The one snapping box the padding narrows the list to, stated
-			// against the frame for the same reason a plain slide is: a
-			// repeating carousel is padded by half its width at each end
-			// instead, and a box sized against what that padding leaves
-			// came out at nothing at all.
-			width: calc(50cqw / max(var(--vp-layout-current-columns), 2));
+			// Size the snapping box against the frame so repeat spacers do
+			// not change the width of the card.
+			width: var(--vp-coverflow-box-width);
 			scroll-snap-align: center;
 
 			// The window the turn is played over: a little under three
@@ -126,7 +127,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 
 			// The raised stacking that keeps the card in the middle in front
 			// of the ones it overhangs, on the item rather than on the card:
-			// Blossom translates every item of a repeating carousel, which
+			// The loop translates every item of a repeating carousel, which
 			// makes each one a stacking context of its own, and a z-index on
 			// the card inside one ranks nothing outside it.
 			animation-name: vp-carousel-coverflow-item;
