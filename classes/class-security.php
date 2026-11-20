@@ -285,16 +285,14 @@ class Visual_Portfolio_Security {
 	/**
 	 * Sanitize selector attribute.
 	 *
-	 * @param int|float|string $attribute - Unclear Selector Attribute.
-	 * @param array            $control - Array of control parameters.
+	 * @param mixed $attribute - Unclear Selector Attribute.
+	 * @param array $control - Array of control parameters.
 	 * @return int|float|string
 	 */
 	public static function sanitize_selector( $attribute, $control ) {
-		/**
-		 * Checking a selector for invalid options.
-		 * Exclude multiple and dynamically callback selectors.
-		 */
-		if (
+		if ( ! is_scalar( $attribute ) ) {
+			$attribute = self::reset_control_attribute_to_default( $attribute, $control );
+		} elseif (
 			empty( $control['value_callback'] ) &&
 			! isset( $control['options'][ $attribute ] ) &&
 			(
