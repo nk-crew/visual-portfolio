@@ -107,7 +107,7 @@ function captionSlot({ document: doc }) {
 	};
 }
 
-function shareSlot({ document: doc }) {
+function shareSlot({ document: doc }, shareUrl) {
 	const node = doc.createElement('details');
 	node.className = 'vp-loop-lightbox-share';
 	const button = doc.createElement('summary');
@@ -139,10 +139,15 @@ function shareSlot({ document: doc }) {
 
 	return {
 		node,
-		update({ item }) {
+		update(state) {
+			const { item } = state;
+			const destination =
+				(typeof shareUrl === 'function' && shareUrl(state)) ||
+				doc.location.href;
+
 			for (const { link, href, key } of services) {
 				const url = new URL(href);
-				url.searchParams.set(key, doc.location.href);
+				url.searchParams.set(key, destination);
 				if (url.hostname === 'www.pinterest.com' && item?.src) {
 					url.searchParams.set(
 						'media',
@@ -155,10 +160,12 @@ function shareSlot({ document: doc }) {
 	};
 }
 
-function toolbarSlot(context) {
+function toolbarSlot(context, shareUrl) {
 	const { document: doc, lightbox } = context;
 	const node = doc.createDocumentFragment();
-	const share = settings.show_share_button ? shareSlot(context) : null;
+	const share = settings.show_share_button
+		? shareSlot(context, shareUrl)
+		: null;
 	let button;
 
 	if (settings.show_thumbs) {
@@ -227,7 +234,10 @@ export function openReuse(items, index, gallery) {
 		slots: {
 			footer: captionSlot,
 			...(settings.show_share_button || settings.show_thumbs
-				? { toolbarEnd: toolbarSlot }
+				? {
+						toolbarEnd: (context) =>
+							toolbarSlot(context, options.shareUrl),
+					}
 				: {}),
 		},
 		strings: {
@@ -251,7 +261,9 @@ export function openReuse(items, index, gallery) {
 		api.close();
 	}
 
-	const lightbox = createLightbox(options);
+	const viewerOptions = { ...options };
+	delete viewerOptions.shareUrl;
+	const lightbox = createLightbox(viewerOptions);
 	const rawItems = slides.map(({ raw }) => raw);
 	const { close, append } = api;
 	const closeReuse = () => lightbox.close();

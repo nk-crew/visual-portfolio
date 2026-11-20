@@ -1206,9 +1206,9 @@ lightbox only.
 
 ### Lightbox
 
-Gallery Loop uses Reuse Lightbox in Free. The classic gallery, WordPress image
-integration and Gallery Loop with Pro use the Fancybox or PhotoSwipe vendor
-chosen in Settings during the transition.
+Gallery Loop uses Reuse Lightbox in Free and with a Pro version that declares
+viewer support. The classic gallery, WordPress image integration and Gallery
+Loop with an older Pro version use the vendor chosen in Settings.
 
 An item carries the same `<template class="vp-portfolio__item-popup">` a classic
 item does, built by `Visual_Portfolio_Get::get_item_popup_output()` and filtered
@@ -1223,7 +1223,8 @@ A loop has a gallery instance with `$item`, `uid`, `options`, `isPreview()` and
 with the gallery instance first, plus the usual `.vpf` namespace. Reuse emits
 `beforeInitPopup`, `initPopup`, `beforeChangePopup`, `afterChangePopup`,
 `beforeClosePopup` and `destroyPopup`. Before initialization, a listener may
-change the viewer options. Before a slide change, the event identifies the
+change the viewer options or set `shareUrl(state)` to provide the active slide's
+sharing address. Before a slide change, the event identifies the
 upcoming index while the current slide is still active. Settings control
 whether users may open the thumbnail strip. Its button starts closed.
 

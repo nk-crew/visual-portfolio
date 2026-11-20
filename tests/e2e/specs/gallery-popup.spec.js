@@ -30,8 +30,14 @@ async function isPro(page) {
 	return page.evaluate(() => !!window.VPData?.pro);
 }
 
+async function usesReuse(page) {
+	return page.evaluate(
+		() => !window.VPData.pro || window.VPData.loopLightbox === 'reuse'
+	);
+}
+
 async function expectPosition(page, index, count) {
-	if (await isPro(page)) {
+	if (!(await usesReuse(page))) {
 		if (index) {
 			await expect(page.locator('[data-fancybox-index]')).toHaveText(
 				String(index)
@@ -569,6 +575,8 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 				.jQuery(document)
 				.on('beforeInitPopup.vpf', (event, gallery, options) => {
 					options.controls.close = false;
+					options.shareUrl = ({ index }) =>
+						`https://example.org/gallery/${index + 1}`;
 				})
 				.on(
 					'beforeChangePopup.vpf',
@@ -613,13 +621,20 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await expect(facebook).toBeVisible();
 		expect(
 			new URL(await facebook.getAttribute('href')).searchParams.get('u')
-		).toBe(page.url());
+		).toBe('https://example.org/gallery/2');
 
 		await page.evaluate(
 			(count) => window.VPPopupAPI.instance.goTo(count - 1),
 			IMAGES_COUNT
 		);
 		await expectPosition(page, IMAGES_COUNT, IMAGES_COUNT);
+		await expect
+			.poll(async () =>
+				new URL(await facebook.getAttribute('href')).searchParams.get(
+					'u'
+				)
+			)
+			.toBe(`https://example.org/gallery/${IMAGES_COUNT}`);
 		expect(await page.evaluate(() => window.vpfChangeEvents)).toEqual([
 			['beforeChangePopup', 1, IMAGES_COUNT - 1],
 			['afterChangePopup', IMAGES_COUNT - 1],
@@ -877,7 +892,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 
 			await page.locator(TRIGGER).first().click();
 
-			if (!(await isPro(page))) {
+			if (await usesReuse(page)) {
 				await expect(page.locator(REUSE)).toBeVisible();
 				await expectPosition(page, 1, IMAGES_COUNT);
 				await page.keyboard.press('ArrowRight');
