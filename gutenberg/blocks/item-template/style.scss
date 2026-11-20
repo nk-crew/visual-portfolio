@@ -400,27 +400,17 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 			scroll-snap-type: none;
 		}
 
-		// Held off while the progress bar is being dragged, so the carousel
-		// follows the finger instead of being pulled back to the nearest slide
-		// on every move. Blossom writes the snap type into a custom property
-		// and reads it back with `!important`, so the module sets that too -
-		// this is the switch for a carousel that never loaded it.
 		&.vp-carousel-is-scrubbing {
 			scroll-snap-type: none;
 			scroll-behavior: auto;
 		}
 
-		// A carousel that repeats is padded by half its width at each end to
-		// carry the loop, so it is laid out off its snap positions: the first
-		// slide rests half a frame in, and the list starts at nothing. Firefox
-		// snaps to the slide at load, and with a smooth scroll it does not
-		// give up when the module opens the carousel there outright - the
-		// animation went on from where the module had put the list, and
-		// carried it half a frame past the slide. Every move of a repeating
-		// carousel is drawn by the module frame by frame anyway, so the
-		// browser is left nothing to smooth.
-		&[data-vp-carousel-repeat="true"] {
+		&[data-vp-carousel-repeat="true"].re-carousel {
 			scroll-behavior: auto;
+
+			> #{$item} {
+				translate: var(--re-carousel-shift, 0);
+			}
 		}
 
 		// The edges dissolve rather than cut, so a half slide reads as more
@@ -691,53 +681,9 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 	clip-path: inset(50%);
 }
 
-// A carousel that repeats is padded by half its width at each end - that is
-// how the library carries the loop - and the slides it moves round to the far
-// end are moved by the scrollable width, which is the slides and the gaps
-// between them and not a gap after the last one: the first slide landed flush
-// against the last. One more gap at the end of the list gives the seam its
-// gap. It is a box rather than padding or a margin: the padding is a share of
-// the frame, and a list padded by more than the frame grows by the excess,
-// which leaves the scrollable width where it was - and the browser does not
-// scroll as far as the end margin of the last slide, which left the seam
-// out of reach. A box the width of the gap, pulled back over the gap the
-// list draws before it, is scrolled to and counted.
-.wp-block-visual-portfolio-item-template.vp-layout-carousel[data-vp-carousel-repeat="true"]::after {
-	flex: 0 0 var(--vp-layout-gap, 1.5rem);
-	margin-inline-start: calc(-1 * var(--vp-layout-gap, 1.5rem));
-	content: "";
-
-	// Not a place to rest: the loop wraps at the far end of the range, and a
-	// carousel that snapped to the box just short of it never got there.
-	scroll-snap-align: none;
-}
-
-// The padding Blossom carries the loop with, restated in the length of the
-// frame rather than as a share of it: the library reads `scroll-padding`
-// back to place its snaps, and a percentage it reads as that many pixels, so
-// its snaps sat 370px off the browser's and a drag settled twice.
-//
-// The scroll padding itself is down to the room a container keeps, and to
-// nothing at all without one. Half the frame of it lines a slide up with the
-// middle of the frame, which is where a centred slide belongs and where a
-// slide aligned to the start does not: a carousel of whole-width slides
-// opened on the second half of one. This way a slide rests where its
-// alignment says, and the padding is only the room the copies moved round
-// from the far end are drawn in. The view module reads the padding back to
-// place the slides on the loop.
-//
-// In the library's own layer, since that is where both are written with
-// `!important`, and a rule outside it would lose.
-@layer blossom-carousel {
-	.wp-block-visual-portfolio-item-template.vp-layout-carousel[data-vp-carousel-repeat="true"] {
-		// Half the frame at each end, less a shift the module moves from one
-		// end to the other when a slide would come to rest on the seam of the
-		// loop - see `keepSeamOffTheGrid` in the view module. The two still
-		// add up to the frame, so the loop is as long as it was.
-		padding-inline-start: calc(50cqw + var(--vp-carousel-seam-shift, 0px)) !important;
-		padding-inline-end: calc(50cqw - var(--vp-carousel-seam-shift, 0px)) !important;
-		scroll-padding-inline: var(--vp-carousel-inset, 0) !important;
-	}
+// These buttons keep the dimensions set by the thumbnail block.
+.vp-block-loop-carousel-thumbnails.re-carousel > .vp-block-loop-carousel-thumb {
+	flex: none;
 }
 
 // The picture of a justified item is as tall as the row: its box takes the

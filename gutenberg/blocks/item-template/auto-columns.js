@@ -48,7 +48,9 @@ export function getAutoColumns(list) {
 	const view = list.ownerDocument.defaultView || window;
 	const styles = view.getComputedStyle(list);
 	const width = list.clientWidth;
-	const gap = parseFloat(styles.columnGap) || 0;
+	const gap = list.style.getPropertyValue('--vp-coverflow-loop-gap')
+		? 0
+		: parseFloat(styles.columnGap) || 0;
 	const minimum = getMinColumnWidth(list);
 
 	if (!width || !minimum) {

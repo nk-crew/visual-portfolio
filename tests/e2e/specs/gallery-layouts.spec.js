@@ -136,26 +136,22 @@ function getItemBoxes(page) {
 }
 
 /**
- * The slide a repeating carousel is resting on, read the way the module reads
- * it: the position on a clock one period long, one step per slide, counted
- * from where the padding puts the first.
+ * Read the slide drawn nearest the leading edge, including across the seam.
  *
- * @param {import('@playwright/test').Locator} list - the carousel.
- * @return {Promise<number>} index of the slide.
+ * @param {import('@playwright/test').Locator} list The carousel.
+ * @return {Promise<number>} Index of the slide.
  */
 function getRestingSlide(list) {
-	return list.evaluate((node) => {
-		const items = node.children;
-		const step = items[1].offsetLeft - items[0].offsetLeft;
-		const period = items.length * step;
-		const origin = parseFloat(
-			window.getComputedStyle(node).paddingInlineStart
-		);
-		const position =
-			(((node.scrollLeft - origin) % period) + period) % period;
+	return list
+		.locator(':scope > .wp-block-visual-portfolio-item-template__item')
+		.evaluateAll((items) => {
+			const start = items[0].parentElement.getBoundingClientRect().left;
+			const distances = items.map((item) =>
+				Math.abs(item.getBoundingClientRect().left - start)
+			);
 
-		return Math.round(position / step) % items.length;
-	});
+			return distances.indexOf(Math.min(...distances));
+		});
 }
 
 /**
@@ -337,7 +333,7 @@ test.describe('Gallery Item Template layouts', () => {
 		const strip = page.locator('.vp-block-loop-carousel-thumbnails');
 
 		// The library the strip is handed to is what stretched it to the row.
-		await expect(strip).toHaveAttribute('blossom-carousel', 'true');
+		await expect(strip).toHaveClass(/\bre-carousel\b/);
 
 		const [rowBox, stripBox] = await Promise.all([
 			row.boundingBox(),
@@ -1056,7 +1052,7 @@ test.describe('Gallery Item Template layouts', () => {
 		const list = page.locator(LIST);
 
 		// The drag is the library's, and a cold cache takes its time.
-		await expect(list).toHaveAttribute('blossom-carousel', 'true', {
+		await expect(list).toHaveClass(/\bre-carousel\b/, {
 			timeout: 15000,
 		});
 
@@ -1201,50 +1197,32 @@ test.describe('Gallery Item Template layouts', () => {
 		// rests.
 		// The library that carries the loop is fetched by the module, and a
 		// cold cache takes its time.
-		await expect(list).toHaveAttribute('has-repeat', 'true', {
+		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true', {
 			timeout: 15000,
 		});
 
-		const seam = () =>
-			list.evaluate(async (node) => {
-				node.scrollLeft = node.scrollWidth - node.clientWidth - 100;
+		for (let index = 1; index < IMAGES_COUNT; index += 1) {
+			await page.locator(NEXT_ARROW).click();
+		}
+		await expect.poll(() => getRestingSlide(list)).toBe(IMAGES_COUNT - 1);
+		await settle(list);
 
-				await new Promise((resolve) =>
-					window.requestAnimationFrame(() =>
-						window.requestAnimationFrame(resolve)
-					)
-				);
-
-				const items = Array.from(node.children);
+		const measured = await list
+			.locator(`:scope > ${ITEM}`)
+			.evaluateAll((items) => {
 				const first = items[0];
-				const last = items[items.length - 1];
-
-				if (!(parseFloat(first.style.translate) > 0)) {
-					return null;
-				}
+				const last = items.at(-1);
 
 				return {
-					gap: parseFloat(window.getComputedStyle(node).gap),
+					gap: parseFloat(
+						window.getComputedStyle(first.parentElement).gap
+					),
 					seam:
 						first.getBoundingClientRect().left -
 						last.getBoundingClientRect().right,
 				};
 			});
 
-		let measured = null;
-
-		await expect
-			.poll(
-				async () => {
-					measured = await seam();
-
-					return measured;
-				},
-				{ timeout: 10000 }
-			)
-			.not.toBeNull();
-
-		// One gap, the same one the slides keep between themselves.
 		expect(measured.seam).toBeCloseTo(measured.gap, 0);
 	});
 
@@ -1274,27 +1252,12 @@ test.describe('Gallery Item Template layouts', () => {
 
 		// The library that carries the loop is fetched by the module, and a
 		// cold cache takes its time.
-		await expect(list).toHaveAttribute('has-repeat', 'true', {
+		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true', {
 			timeout: 15000,
 		});
 		await expect(dots).toHaveCount(IMAGES_COUNT);
 
-		// The slide the carousel rests on, read the way the module reads it:
-		// the position on a clock one period long, one step per slide.
-		const resting = () =>
-			list.evaluate((node) => {
-				const items = node.children;
-				const step = items[1].offsetLeft - items[0].offsetLeft;
-				const period = items.length * step;
-				// The first slide rests where the padding puts it.
-				const origin = parseFloat(
-					window.getComputedStyle(node).paddingInlineStart
-				);
-				const position =
-					(((node.scrollLeft - origin) % period) + period) % period;
-
-				return Math.round(position / step) % items.length;
-			});
+		const resting = () => getRestingSlide(list);
 
 		// Opened on the first slide, drawn flush with the frame.
 		await expect.poll(resting, { timeout: 10000 }).toBe(0);
@@ -1303,7 +1266,11 @@ test.describe('Gallery Item Template layouts', () => {
 				() =>
 					list.evaluate((node) =>
 						Math.round(
-							node.children[0].getBoundingClientRect().left -
+							node
+								.querySelector(
+									'.wp-block-visual-portfolio-item-template__item'
+								)
+								.getBoundingClientRect().left -
 								node.parentElement.getBoundingClientRect().left
 						)
 					),
@@ -1350,13 +1317,7 @@ test.describe('Gallery Item Template layouts', () => {
 		// asked for less motion never runs on its own.
 		await page.emulateMedia({ reducedMotion: 'no-preference' });
 
-		// Four across with no gap: the loop is padded by half the frame, which
-		// is two slides, so the third slide from the end comes to rest exactly
-		// where the loop is joined - and the library lets nothing rest within
-		// a few pixels of the join. The carousel snapped into that margin,
-		// the library threw it to the other end, and the two handed it back
-		// and forth until it fell back to the slide before: an arrow, a dot
-		// and autoplay all died there.
+		// Four across with no gap exercised the snap at the loop seam.
 		await publishLoop(requestUtils, page, {
 			title: 'Layouts - carousel repeat seam slide',
 			blockId: 'e2e-carousel-repeat-seam-slide',
@@ -1381,7 +1342,7 @@ test.describe('Gallery Item Template layouts', () => {
 		const dots = page.locator(`${NAV} ${DOT}`);
 		const seamSlide = IMAGES_COUNT - 2;
 
-		await expect(list).toHaveAttribute('has-repeat', 'true', {
+		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true', {
 			timeout: 15000,
 		});
 		await expect(dots).toHaveCount(IMAGES_COUNT);
@@ -1393,7 +1354,11 @@ test.describe('Gallery Item Template layouts', () => {
 				() =>
 					list.evaluate((node) =>
 						Math.round(
-							node.children[0].getBoundingClientRect().left -
+							node
+								.querySelector(
+									'.wp-block-visual-portfolio-item-template__item'
+								)
+								.getBoundingClientRect().left -
 								node.parentElement.getBoundingClientRect().left
 						)
 					),
@@ -1429,7 +1394,13 @@ test.describe('Gallery Item Template layouts', () => {
 
 		const { farthest, step } = await list.evaluate((node) => ({
 			farthest: parseFloat(node.dataset.farthest),
-			step: node.children[1].offsetLeft - node.children[0].offsetLeft,
+			step:
+				node.querySelectorAll(
+					'.wp-block-visual-portfolio-item-template__item'
+				)[1].offsetLeft -
+				node.querySelector(
+					'.wp-block-visual-portfolio-item-template__item'
+				).offsetLeft,
 		}));
 
 		expect(farthest - before).toBeLessThan(2 * step);
@@ -1469,7 +1440,7 @@ test.describe('Gallery Item Template layouts', () => {
 
 		const list = page.locator(LIST);
 
-		await expect(list).toHaveAttribute('has-repeat', 'true', {
+		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true', {
 			timeout: 15000,
 		});
 		await expect
@@ -1598,6 +1569,35 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(page.locator(NEXT_ARROW)).toBeDisabled();
 	});
 
+	test('carousel controls work when its enhancement cannot load', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.route('**/reuse-carousel/carousel.js?*', (route) =>
+			route.abort()
+		);
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - native carousel fallback',
+			blockId: 'e2e-carousel-native-fallback',
+			images,
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 1,
+				carouselRepeat: true,
+			},
+			carousel: ['loop-carousel-next', 'loop-carousel-indicator'],
+		});
+
+		const list = page.locator(LIST);
+		const dots = page.locator(`${NAV} ${DOT}`);
+		await expect(dots).toHaveCount(IMAGES_COUNT);
+		await page.locator(NEXT_ARROW).click();
+		await expect(dots.nth(1)).toHaveAttribute('aria-current', 'true');
+		await expect.poll(() => getRestingSlide(list)).toBe(1);
+		await expect(list).not.toHaveAttribute('data-vp-carousel-repeat');
+	});
+
 	test('an RTL carousel asked to repeat runs as a plain one', async ({
 		page,
 		requestUtils,
@@ -1623,9 +1623,7 @@ test.describe('Gallery Item Template layouts', () => {
 
 		const list = page.locator(LIST);
 
-		// The library carries its loop in LTR scroll positions only, so the
-		// module leaves it out: the carousel rests on its first slide, and
-		// the arrow steps to the next.
+		// RTL galleries keep the same bounded navigation as before.
 		await expect(list).toHaveClass(/vp-has-script/);
 		await expect(list).not.toHaveAttribute('data-vp-carousel-repeat');
 
@@ -2183,8 +2181,8 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(current, { timeout: 10000 }).toBe(0);
 
 		// A swipe comes to rest where an arrow leaves the carousel: only the
-		// slides that begin a frame are places it may stop at, and the last
-		// slide, which is the end of the carousel whatever the step is.
+		// slides that begin a frame are snap targets. The last two slides
+		// share the same stop at the end of the carousel.
 		await expect
 			.poll(
 				() =>
@@ -2192,14 +2190,15 @@ test.describe('Gallery Item Template layouts', () => {
 						.locator(`${LIST} > ${ITEM}`)
 						.evaluateAll((nodes) =>
 							nodes.map((node) =>
-								node.classList.contains('vp-carousel-no-snap')
+								window.getComputedStyle(node)
+									.scrollSnapAlign === 'none'
 									? '-'
 									: 'S'
 							)
 						),
 				{ timeout: 10000 }
 			)
-			.toEqual(['S', '-', 'S', '-', 'S', 'S']);
+			.toEqual(['S', '-', 'S', '-', 'S', '-']);
 
 		// Two slides a press rather than one, which is one frame along.
 		await next.click();
@@ -2696,9 +2695,6 @@ test.describe('Gallery Item Template layouts', () => {
 		await dots.last().click();
 		await page.locator(LIST).evaluate((list) => {
 			list.dispatchEvent(
-				new WheelEvent('wheel', { deltaX: 1, deltaY: 30 })
-			);
-			list.dispatchEvent(
 				new CustomEvent('scrollsnapchanging', {
 					detail: { snapTargetInline: list.children[1] },
 				})
@@ -2791,44 +2787,34 @@ test.describe('Gallery Item Template layouts', () => {
 		});
 		const list = page.locator(LIST);
 		const dots = page.locator(`${NAV} ${DOT}`);
-		await expect(list).toHaveAttribute('blossom-carousel', 'true');
+		await expect(list).toHaveClass(/\bre-carousel\b/);
 		await expect(dots).toHaveCount(IMAGES_COUNT);
-		await page.evaluate(() => {
-			window.swipeTargets = [];
-		});
-		await list.evaluate((node) => {
-			node.addEventListener('scrollsnapchanging', (event) => {
-				const target =
-					event.snapTargetInline || event.detail?.snapTargetInline;
-				const items = Array.from(node.children);
-				window.swipeTargets.push({
-					index: items.indexOf(target),
-					scroll: node.scrollLeft,
-					target: Math.min(
-						target?.offsetLeft,
-						node.scrollWidth - node.clientWidth
-					),
-				});
-			});
-		});
 		const box = await list.boundingBox();
 		await page.mouse.move(box.x + box.width - 40, box.y + 80);
 		await page.mouse.down();
 		await page.mouse.move(box.x + 40, box.y + 80, { steps: 20 });
 		await page.mouse.up();
-		const released = await list.evaluate((node) => ({
-			active: Array.from(
+		const released = await list.evaluate((node) => {
+			const dots = Array.from(
 				node
 					.closest('.vp-block-loop')
 					.querySelectorAll('.vp-block-loop-carousel-dot')
-			).findIndex((dot) => dot.getAttribute('aria-current') === 'true'),
-			target: window.swipeTargets.at(-1),
-		}));
-		expect(released.target.index).toBeGreaterThanOrEqual(3);
+			);
+			return {
+				active: dots.findIndex(
+					(dot) => dot.getAttribute('aria-current') === 'true'
+				),
+				remaining:
+					node.scrollWidth - node.clientWidth - node.scrollLeft,
+			};
+		});
 		expect(released.active).toBe(3);
-		expect(
-			Math.abs(released.target.scroll - released.target.target)
-		).toBeGreaterThan(20);
+		expect(released.remaining).toBeGreaterThan(20);
+		await settle(list);
+		await expect(dots.nth(released.active)).toHaveAttribute(
+			'aria-current',
+			'true'
+		);
 	});
 
 	test('a touch swipe skips intermediate dots', async ({
@@ -2924,7 +2910,7 @@ test.describe('Gallery Item Template layouts', () => {
 		});
 		const list = page.locator(LIST);
 		const dots = page.locator(`${NAV} ${DOT}`);
-		await expect(list).toHaveAttribute('blossom-carousel', 'true');
+		await expect(list).toHaveClass(/\bre-carousel\b/);
 		await expect(dots).toHaveCount(IMAGES_COUNT);
 		const box = await list.boundingBox();
 		await page.mouse.move(box.x + 100, box.y + 80);
@@ -2947,12 +2933,24 @@ test.describe('Gallery Item Template layouts', () => {
 			resetBox.x + 100,
 			(visibleTop + visibleBottom) / 2
 		);
+		await list.evaluate((node) => {
+			node.addEventListener(
+				'pointerdown',
+				({ pointerId, pointerType }) => {
+					window.cancelCarouselPointer = () => {
+						window.dispatchEvent(
+							new PointerEvent('pointercancel', {
+								pointerId,
+								pointerType,
+							})
+						);
+					};
+				},
+				{ once: true }
+			);
+		});
 		await page.mouse.down();
-		await page.evaluate(() =>
-			window.dispatchEvent(
-				new PointerEvent('pointercancel', { pointerType: 'pen' })
-			)
-		);
+		await page.evaluate(() => window.cancelCarouselPointer());
 		await list.evaluate((node) =>
 			node.scrollTo({ left: node.scrollWidth, behavior: 'instant' })
 		);
@@ -3633,7 +3631,7 @@ test.describe('Gallery Item Template layouts', () => {
 		const list = page.locator(LIST);
 		const root = page.locator(CAROUSEL);
 		const dots = root.locator(DOT);
-		await expect(list).toHaveAttribute('blossom-carousel', 'true');
+		await expect(list).toHaveClass(/\bre-carousel\b/);
 		await expect(dots).toHaveCount(IMAGES_COUNT);
 		await list.scrollIntoViewIfNeeded();
 		await page.mouse.move(0, 0);
@@ -3653,6 +3651,9 @@ test.describe('Gallery Item Template layouts', () => {
 		await page.mouse.move(box.x + box.width * 0.2, box.y + box.height / 2, {
 			steps: 20,
 		});
+		// Hold at the destination before lifting so the test measures the
+		// countdown independently of the release velocity.
+		await page.waitForTimeout(100);
 		await page.mouse.up();
 		await expect(dots.nth(1)).toHaveAttribute('aria-current', 'true');
 		await expect.poll(progress).toBe(0);
@@ -3836,10 +3837,7 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(list).toHaveClass(/vp-carousel-coverflow/);
 		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true');
 
-		// A repeating carousel is padded by half its width at each end to
-		// carry the loop, which leaves the list no width of its own - and a
-		// box sized against the list rather than against the frame came out
-		// at nothing at all, so the cards were not drawn.
+		// The loop's wider scroll range leaves each card sized to the frame.
 		const geometry = await list.evaluate((node) => {
 			const item = node.querySelector(
 				'.wp-block-visual-portfolio-item-template__item'
@@ -3867,9 +3865,14 @@ test.describe('Gallery Item Template layouts', () => {
 			.poll(
 				() =>
 					list.evaluate((node) => {
-						const items = Array.from(node.children);
-						const copy = items.find((item) =>
-							item.classList.contains('vp-carousel-moved-round')
+						const items = Array.from(
+							node.querySelectorAll(
+								':scope > .wp-block-visual-portfolio-item-template__item'
+							)
+						);
+						const copy = items.find(
+							(item) =>
+								item.getAttribute('data-re-cycle') === '-1'
 						);
 
 						if (!copy) {
@@ -3882,7 +3885,9 @@ test.describe('Gallery Item Template layouts', () => {
 						const [start] = copy.style
 							.getPropertyValue('--vp-carousel-copy-contain')
 							.split(' ');
-						const moved = parseFloat(copy.style.translate);
+						const moved = parseFloat(
+							copy.style.getPropertyValue('--re-carousel-shift')
+						);
 						// `end - box + inset`, the way the module writes it.
 						const expected =
 							copy.offsetLeft +
@@ -3902,13 +3907,33 @@ test.describe('Gallery Item Template layouts', () => {
 		// context of its own, so the raised stacking is the item's - where a
 		// z-index on the card inside one ranked nothing outside it.
 		const stacking = await list.evaluate((node) =>
-			Array.from(node.children).map((item) =>
-				parseInt(window.getComputedStyle(item).zIndex, 10)
-			)
+			Array.from(
+				node.querySelectorAll(
+					':scope > .wp-block-visual-portfolio-item-template__item'
+				)
+			).map((item) => parseInt(window.getComputedStyle(item).zIndex, 10))
 		);
 
 		expect(stacking[0]).toBe(100);
 		expect(Math.max(...stacking.slice(1))).toBeLessThan(100);
+
+		const offset = (index) =>
+			list.evaluate((node, active) => {
+				const item = node.querySelectorAll(
+					':scope > .wp-block-visual-portfolio-item-template__item'
+				)[active];
+
+				return Math.abs(
+					parseFloat(
+						item.style.getPropertyValue('--re-carousel-offset')
+					)
+				);
+			}, index);
+
+		await page.locator(PREV_ARROW).click();
+		await expect.poll(() => offset(images.length - 1)).toBeLessThan(0.02);
+		await page.locator(NEXT_ARROW).click();
+		await expect.poll(() => offset(0)).toBeLessThan(0.02);
 	});
 
 	test('the arrows step one slide a press, however fast they are pressed', async ({

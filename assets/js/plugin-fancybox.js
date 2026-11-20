@@ -1,5 +1,7 @@
 import $ from 'jquery';
 
+import { LOOP_POPUP_OPEN } from '../../gutenberg/popup/open';
+
 const { VPData, VPPopupAPI } = window;
 const { __, settingsPopupGallery } = VPData;
 const $doc = $(document);
@@ -69,6 +71,10 @@ if (typeof $.fancybox !== 'undefined' && VPPopupAPI) {
 	// Extend Popup API.
 	VPPopupAPI.vendor = 'fancybox';
 	VPPopupAPI.open = (items, index, self) => {
+		if (self?.[LOOP_POPUP_OPEN]) {
+			return self[LOOP_POPUP_OPEN](items, index, self);
+		}
+
 		const finalItems = mapItemsToFancybox(items);
 
 		const buttons = [];

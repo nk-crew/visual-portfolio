@@ -522,7 +522,9 @@ test.describe('Gallery Loop from the legacy block', () => {
 			await expect(overlay.nth(2)).toHaveCSS('opacity', '1');
 
 			await link.nth(1).tap();
-			const lightbox = touch.locator('.fancybox-is-open, .pswp--open');
+			const lightbox = touch.locator(
+				'.vp-loop-lightbox, .fancybox-is-open, .pswp--open'
+			);
 			await expect(lightbox).toBeVisible();
 			await touch.keyboard.press('Escape');
 			await expect(lightbox).toHaveCount(0);

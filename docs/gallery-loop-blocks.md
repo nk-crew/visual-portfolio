@@ -869,16 +869,11 @@ end has run out of to the other, so an effect that pins its slides in place —
 a deck — has nothing to move: with `repeat: false` on both sides the *Repeat*
 setting is left out of the page and the control is greyed with the reason. Two
 carousels are left out of the loop whatever the effect: one whose slides are
-their own width, since the loop is counted a step per slide, and one whose
-slides all fit the frame, which has nothing to run round. The first is settled
-on the server. The second is the frame's to say. Three slides fit three columns
-on a desktop and overflow the one column of a phone, so the module counts the
-slides against the columns, and counts again whenever the columns change,
-starting the carousel over as a loop or as a plain one. An RTL carousel runs as
-a plain one as well: the carousel library carries its loop in the scroll
-positions of LTR only. On an RTL site the server leaves the loop out and the
-control is greyed with the reason; a block made RTL on an LTR page is left out
-by the module.
+their own width, and one whose slides all fit the frame. The server excludes
+the first. Reuse Carousel measures the second again when the viewport or slide
+dimensions change. RTL galleries keep bounded navigation. On an RTL site the
+server leaves Repeat out and greys out the control. The view module also
+leaves Repeat out when the block itself is RTL on an LTR page.
 
 `peek` says whether the effect leaves an edge for a slide of the next one to
 show at, and is `true` unless the effect says otherwise. An effect that lays
@@ -1199,9 +1194,10 @@ They are directives and actions and nothing else. Each is between 0.7 and 12.2 K
 after gzip. `@wordpress/interactivity` from the WordPress bundle is the only
 static dependency loaded apart from them; the item template module bundles
 `@reuse-sh/gallery`, which lays out justified rows and masonry lanes. Everything larger is fetched at the moment it is used and never
-bundled: `@wordpress/interactivity-router` on the first region swap, the Blossom
-carousel from the address on the markup. A gallery that is a plain grid
-downloads neither.
+bundled: `@wordpress/interactivity-router` on the first region swap and Reuse
+Carousel from the address on the carousel markup. A plain grid downloads
+neither. If the carousel module fails to load, the list remains a native
+scroll container and its controls continue to work.
 
 Justified rows and masonry lanes come from `@reuse-sh/gallery`: native Grid
 Lanes where the browser has them, its script elsewhere, and its stylesheet, part
@@ -1210,22 +1206,27 @@ lightbox only.
 
 ### Lightbox
 
-The lightbox is the classic gallery's: `VPPopupAPI` with the vendor chosen in
-Settings, Fancybox or PhotoSwipe, and every Popup Gallery setting. An item
-carries the same `<template class="vp-portfolio__item-popup">` a classic item
-does, built by `Visual_Portfolio_Get::get_item_popup_output()` and filtered by
-`vpf_popup_output`; its triggers are anchors with `data-vp-popup` and the full
-size image as `href`. `build/gutenberg/popup/view.js` opens the vendor with the
-items of the list, one slide per item, and a stand-in for the classic gallery
-instance per loop (`$item`, `uid`, `options`, `isPreview()`, `emitEvent()`), so
-the vendor events (`initFancybox.vpf`, `beforeInitPhotoSwipe.vpf` and the rest)
-fire on the loop element with the stand-in first, as they do for a classic
-gallery. The `uid` of the stand-in is the block id of the loop, so an address
-that names a gallery finds the same loop on the next visit. The caption sources
-are the loop's `lightbox` attribute,
-`titleSource` and `descriptionSource`, with the values of the classic Title and
-Description Source; defaults `item_title` and `item_excerpt`. An item the
-lightbox has nothing to show and that has an address of its own links to it.
+Gallery Loop uses Reuse Lightbox in Free and with a Pro version that declares
+viewer support. The classic gallery, WordPress image integration and Gallery
+Loop with an older Pro version use the vendor chosen in Settings.
+
+An item carries the same `<template class="vp-portfolio__item-popup">` a classic
+item does, built by `Visual_Portfolio_Get::get_item_popup_output()` and filtered
+by `vpf_popup_output`. The filter receives the loop lightbox settings in
+`loop_lightbox`. Triggers are anchors with `data-vp-popup` and the full size
+image as `href`. The saved caption sources are `titleSource` and
+`descriptionSource` in the `lightbox` attribute. They default to `item_title`
+and `item_excerpt`. An item with no popup uses its own address.
+
+A loop has a gallery instance with `$item`, `uid`, `options`, `isPreview()` and
+`emitEvent()`. Its UID comes from the loop block ID. Events fire on the loop
+with the gallery instance first, plus the usual `.vpf` namespace. Reuse emits
+`beforeInitPopup`, `initPopup`, `beforeChangePopup`, `afterChangePopup`,
+`beforeClosePopup` and `destroyPopup`. Before initialization, a listener may
+change the viewer options or set `shareUrl(state)` to provide the active slide's
+sharing address. Before a slide change, the event identifies the
+upcoming index while the current slide is still active. Settings control
+whether users may open the thumbnail strip. Its button starts closed.
 
 The click actions of the item blocks are None, Open the item, Open in lightbox
 and Open its link, else in lightbox (`url-or-popup`): a post opens itself, an
@@ -1300,8 +1301,9 @@ template:
 | Event | Payload |
 |---|---|
 | `vp-carousel-go-to` | `detail.index` — scroll to that slide |
+| `vp-carousel-step` | a control requested a move; restart the autoplay countdown |
 | `vp-carousel-autoplay` | `detail.playing` — `false` holds autoplay, `true` releases it |
-| `vp-carousel-place` | `detail.position` — a place on the loop of a repeating carousel, scrolled to at once and kept off the seam the way a step is; written back as the scroll it came to rest at |
+| `vp-carousel-place` | `detail.position` — a scroll position on a repeating carousel, applied at once; written back as the resulting scroll position |
 | `vp-carousel-autoplay-take` | the autoplay stops moving the carousel and hands each frame to the script that took it |
 
 And announces itself on the same element, bubbling, so that a script outside
@@ -1311,16 +1313,16 @@ the module can run beside a carousel for as long as it runs:
 |---|---|
 | `vp-carousel-start` | the module has started the carousel, once per start — a Load More starts it again |
 | `vp-carousel-stop` | the module is about to let go of it |
-| `vp-carousel-travel-start` | the module has started drawing a step of a repeating carousel, snapping held off (not bubbling) |
-| `vp-carousel-travel-end` | the step has arrived or was stopped, and the snap is back (not bubbling) |
+| `vp-carousel-travel-start` | a command is about to move a repeating carousel; the marquee yields control (not bubbling) |
+| `vp-carousel-travel-end` | the move has settled and the marquee can resume (not bubbling) |
 | `vp-carousel-autoplay-frame` | a frame of a taken autoplay: `detail.elapsed` in milliseconds, `detail.held` (the visitor's stop, a script's hold, off the screen, the keyboard), `detail.pointer` and `detail.keyboard` (not bubbling) |
 
 A script that takes the autoplay moves the carousel itself and keeps the rest:
 the pauses, the play and pause button, and a visitor who asked for less
 motion, for whom no frame ever comes. It takes it again on every
-`vp-carousel-start`, since a Load More starts a new autoplay. Snapping is
-switched by the list's `--snap-type` custom property, which the carousel
-library reads; a step saves it and puts it back when it arrives.
+`vp-carousel-start`, since a Load More starts a new autoplay. The carousel
+controller suspends snapping while the marquee places the track. User input
+and control commands can take the track back.
 
 Holding autoplay is not the same as stopping it: the pause a pointer or a focus
 already applies keeps working underneath, and releasing the hold does not
