@@ -478,6 +478,8 @@ function getItemBlocks(legacy, queryType) {
  */
 function getCoverBlocks(legacy, skin, click, ratio, radius, queryType) {
 	const isEmerge = 'emerge' === legacy.items_style;
+	const showContent =
+		(isEmerge ? skin.show_caption : skin.show_overlay) || 'hover';
 	const textAlign = isEmerge
 		? skin.caption_text_align
 		: String(skin.overlay_text_align || 'center')
@@ -492,9 +494,11 @@ function getCoverBlocks(legacy, skin, click, ratio, radius, queryType) {
 			'visual-portfolio/item-cover',
 			{
 				effect: String(legacy.items_style).replace(/_/g, '-'),
-				showContent:
-					(isEmerge ? skin.show_caption : skin.show_overlay) ||
-					'hover',
+				showContent,
+				...('hover' === showContent &&
+				['fade', 'fly'].includes(legacy.items_style)
+					? { className: 'vp-legacy-hover-cover' }
+					: {}),
 				aspectRatio: ratio,
 				...(isEmerge
 					? {}
@@ -586,10 +590,13 @@ function getTemplateAttributes(legacy) {
 			break;
 		case 'slider': {
 			const autoplay = parseFloat(legacy.slider_autoplay) || 0;
+			const autoWidth = 'auto' === legacy.slider_slides_per_view_type;
+			const sizeAutoWidth = autoWidth && 'fade' !== legacy.slider_effect;
+			const heightType = legacy.slider_items_height_type;
 
 			Object.assign(attributes, {
 				carouselEffect: SLIDER_EFFECTS[legacy.slider_effect] || 'none',
-				...('auto' === legacy.slider_slides_per_view_type
+				...(autoWidth
 					? { carouselAutoWidth: true }
 					: {
 							layoutColumnCount: columns(
@@ -610,7 +617,7 @@ function getTemplateAttributes(legacy) {
 							),
 						}
 					: {}),
-				...('static' === legacy.slider_items_height_type
+				...('static' === heightType
 					? {
 							carouselSlideHeight: `${
 								parseFloat(legacy.slider_items_height_static) ||
@@ -618,7 +625,15 @@ function getTemplateAttributes(legacy) {
 							}px`,
 						}
 					: {}),
+				...(sizeAutoWidth && 'dynamic' === heightType
+					? {
+							carouselSlideHeight: `${parseFloat(legacy.slider_items_height_dynamic) || 80}cqw`,
+						}
+					: {}),
 			});
+			if (sizeAutoWidth && attributes.carouselSlideHeight) {
+				attributes.className = 'vp-legacy-sized-auto-width';
+			}
 			break;
 		}
 		// no default

@@ -337,6 +337,18 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 			width: auto;
 		}
 
+		&.vp-carousel-auto-width.vp-legacy-sized-auto-width {
+			> #{$item} {
+				height: auto;
+			}
+
+			.wp-block-visual-portfolio-item-cover,
+			.wp-block-visual-portfolio-item-image img {
+				width: auto;
+				height: var(--vp-carousel-slide-height, auto);
+			}
+		}
+
 		// A carousel whose arrows move a whole frame answers a finger the same
 		// way: the slides between one frame and the next are scrolled past
 		// rather than rested on, so a swipe lands where an arrow would.
