@@ -173,6 +173,10 @@ const vendorFiles = [
 		destination: 'assets/vendor/reuse-carousel/styles.css',
 	},
 	{
+		source: 'node_modules/@reuse-sh/carousel/LICENSE',
+		destination: 'assets/vendor/reuse-carousel/LICENSE',
+	},
+	{
 		source: 'node_modules/simplebar/dist/simplebar.min.js',
 		destination: 'assets/vendor/simplebar/dist/simplebar.min.js',
 	},

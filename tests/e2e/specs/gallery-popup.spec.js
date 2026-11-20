@@ -720,10 +720,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			},
 		});
 
-		await expect(page.locator(LIST)).toHaveAttribute(
-			'blossom-carousel',
-			'true'
-		);
+		await expect(page.locator(LIST)).toHaveClass(/\bre-carousel\b/);
 		const trigger = page.locator(TRIGGER).first();
 		await trigger.scrollIntoViewIfNeeded();
 		const { x, y, width, height } = await trigger.boundingBox();

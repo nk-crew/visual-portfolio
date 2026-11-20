@@ -14,7 +14,7 @@
  * back to a plain scroll container with a visible scrollbar.
  *
  * That is what shipped once. `assets/vendor/` was swallowed by an unanchored
- * `vendor` rule in `.gitignore`, and Blossom was never copied out of
+ * `vendor` rule in `.gitignore`, and the carousel was never copied out of
  * `node_modules` at all. It did not reach a checkout that had not run webpack -
  * which is every checkout of the Pro plugin, where this one is a git submodule.
  *
@@ -29,8 +29,8 @@ class ClassLoopVendoredAssets extends WP_UnitTestCase {
 	 */
 	public function data_vendored_files() {
 		return array(
-			'carousel script' => array( 'assets/vendor/blossom-carousel/dist/blossom-carousel-core.js' ),
-			'carousel styles' => array( 'assets/vendor/blossom-carousel/dist/blossom-carousel-core.css' ),
+			'carousel script' => array( 'assets/vendor/reuse-carousel/carousel.js' ),
+			'carousel styles' => array( 'assets/vendor/reuse-carousel/styles.css' ),
 		);
 	}
 

@@ -96,7 +96,7 @@ $card: ".wp-block-visual-portfolio-item-template__card";
 		// that does not depend on its own outcome.
 		--vp-coverflow-box-width: calc(50cqw / max(var(--vp-layout-current-columns), 2));
 
-		--vp-coverflow-loop-gap: 0px;
+		--vp-coverflow-loop-gap: 0;
 
 		gap: var(--vp-coverflow-loop-gap);
 
