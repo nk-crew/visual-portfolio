@@ -226,7 +226,9 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 			// A column's width plus a row gap per unit of height, less the one
 			// gap below the tile: a tile of two rows is then exactly two tiles of
 			// one and the gap between them.
-			height: calc(((100cqw + var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns) - var(--vp-layout-gap, 1.5rem) + #{$row-gap}) * var(--vp-tile-height, 1) * var(--vp-tile-span) - #{$row-gap});
+			--vp-tile-picture-height: calc(((100cqw + var(--vp-layout-gap, 1.5rem)) / var(--vp-layout-current-columns) - var(--vp-layout-gap, 1.5rem) + #{$row-gap}) * var(--vp-tile-height, 1) * var(--vp-tile-span) - #{$row-gap});
+
+			height: var(--vp-tile-picture-height);
 
 			// A tile is a cell of a fixed size, the way it has always been in
 			// this layout - what does not fit one is cut off rather than
