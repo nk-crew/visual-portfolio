@@ -1,189 +1,179 @@
 import { debounce } from '@wordpress/compose';
-import $ from 'jquery';
 import rafSchd from 'raf-schd';
 
 const { ajaxurl, VPAdminVariables } = window;
-const $body = $('body');
+const settingsForm = '.vpf-settings-form';
+const initialStates = new WeakMap();
 
-function serializeSettingsForm($form) {
-	return JSON.stringify($form.serializeArray());
+function getForm(form) {
+	return form instanceof HTMLFormElement ? form : form?.[0];
 }
 
-function storeSettingsFormState($form) {
-	$form.data('vpfInitialState', serializeSettingsForm($form));
-}
-
-function getStoredSettingsFormState($form) {
-	const initialState = $form.data('vpfInitialState');
-
-	if (typeof initialState === 'undefined') {
-		return [];
+function serializeSettingsForm(form) {
+	const fields = [];
+	for (const [name, value] of new FormData(form)) {
+		if (typeof value === 'string') {
+			fields.push({ name, value: value.replace(/\r?\n/g, '\r\n') });
+		}
 	}
-
-	try {
-		return JSON.parse(initialState);
-	} catch (_error) {
-		return [];
-	}
+	return JSON.stringify(fields);
 }
 
-function updateSettingsSubmitState($form) {
-	const initialState = $form.data('vpfInitialState');
-
-	if (typeof initialState === 'undefined') {
+function updateSettingsSubmitState(form) {
+	const initialState = initialStates.get(form);
+	if (initialState === undefined) {
 		return;
 	}
-
-	$form
-		.find('.vpf-settings-submit')
-		.prop('disabled', serializeSettingsForm($form) === initialState);
+	const disabled = serializeSettingsForm(form) === initialState;
+	for (const button of form.querySelectorAll('.vpf-settings-submit')) {
+		button.disabled = disabled;
+	}
 }
 
 window.VPAdminSettingsForms = {
-	getInitialState($form) {
-		return getStoredSettingsFormState($form);
+	getInitialState(form) {
+		return JSON.parse(initialStates.get(getForm(form)) || '[]');
 	},
-	setInitialState($form, initialState) {
-		$form.data('vpfInitialState', JSON.stringify(initialState));
-		updateSettingsSubmitState($form);
-	},
-	refresh($form) {
-		updateSettingsSubmitState($form);
-	},
-	persist($form) {
-		storeSettingsFormState($form);
-		updateSettingsSubmitState($form);
-	},
-};
-
-// WordPress prints Screen Options after the header of a framed list screen;
-// it belongs in the header, before the actions when there are some.
-const $screenOptions = $('body.vpf-admin-list-screen #screen-meta-links');
-const $headerActions = $('.vpf-admin-page__header .vpf-admin-page__actions');
-
-if ($headerActions.length) {
-	$screenOptions.prependTo($headerActions);
-} else {
-	$screenOptions.appendTo('.vpf-admin-page__header');
-}
-
-$('.vpf-settings-form').each(function () {
-	const $form = $(this);
-
-	storeSettingsFormState($form);
-	updateSettingsSubmitState($form);
-});
-
-$body.on('input change', '.vpf-settings-form :input', function () {
-	updateSettingsSubmitState($(this).closest('.vpf-settings-form'));
-});
-
-$body.on('vpf_settings_form_updated', '.vpf-settings-form', function () {
-	updateSettingsSubmitState($(this));
-});
-
-$body.on('vpf_settings_form_persisted', '.vpf-settings-form', function () {
-	const $form = $(this);
-
-	storeSettingsFormState($form);
-	updateSettingsSubmitState($form);
-});
-
-// select shortcode text in input
-$body.on(
-	'focus',
-	'[name="vp_list_shortcode"], [name="vp_filter_shortcode"], [name="vp_sort_shortcode"]',
-	function () {
-		this.select();
-	}
-);
-$body.on('click', '.vp-onclick-selection', function () {
-	// eslint-disable-next-line @wordpress/no-global-get-selection
-	window.getSelection().selectAllChildren(this);
-});
-// fix the problem with Gutenberg shortcode transform (allowed only plain text pasted).
-$body.on('copy cut', '.vp-onclick-selection', (e) => {
-	// eslint-disable-next-line @wordpress/no-global-get-selection
-	const copyText = window
-		.getSelection()
-		.toString()
-		.replace(/[\n\r]+/g, '');
-
-	e.originalEvent.clipboardData.setData('text/plain', copyText);
-	e.originalEvent.preventDefault();
-});
-
-// Post format metabox show/hide
-const $videoMetabox = $('#vp_format_video');
-const $videoFormatCheckbox = $('#post-format-video');
-let isVideoFormat = null;
-
-function toggleVideoMetabox(show) {
-	if (isVideoFormat === null || isVideoFormat !== show) {
-		isVideoFormat = show;
-		$videoMetabox[show ? 'show' : 'hide']();
-	}
-}
-
-if ($videoMetabox.length) {
-	if ($videoFormatCheckbox.length) {
-		toggleVideoMetabox($videoFormatCheckbox.is(':checked'));
-
-		$body.on('change', '[name=post_format]', () => {
-			toggleVideoMetabox($videoFormatCheckbox.is(':checked'));
-		});
-	}
-}
-
-let oembedAjax = null;
-let runAjaxVideoOembed = ($this) => {
-	oembedAjax = $.ajax({
-		url: ajaxurl,
-		method: 'POST',
-		dataType: 'json',
-		data: {
-			action: 'vp_find_oembed',
-			q: $this.val(),
-			nonce: VPAdminVariables.nonce,
-		},
-		complete(data) {
-			const json = data.responseJSON;
-			if (json && typeof json.html !== 'undefined') {
-				$this.next('.vp-oembed-preview').html(json.html);
-			}
-		},
-	});
-};
-runAjaxVideoOembed = debounce(300, rafSchd(runAjaxVideoOembed));
-
-$body.on('change input', '.vp-input[name="_vp_format_video_url"]', function () {
-	if (oembedAjax !== null) {
-		oembedAjax.abort();
-	}
-
-	const $this = $(this);
-	$this.next('.vp-oembed-preview').html('');
-
-	runAjaxVideoOembed($this);
-});
-
-/**
- * When attempting to disable registration of portfolio post type,
- * We inform the user of the possible consequences and provide them with the opportunity to cancel this operation.
- */
-$body.on(
-	'change',
-	"input[name='vp_general[register_portfolio_post_type]']",
-	function () {
-		// Does some stuff and logs the event to the console
-		if (!$(this).is(':checked')) {
-			// eslint-disable-next-line no-restricted-globals, no-alert, no-undef
-			const confirmation = confirm(
-				"Are you sure you want to turn off the Portfolio custom post type and related taxonomies? Make sure you don't use this post type on your site, otherwise you might see errors on the frontend."
-			);
-			if (!confirmation) {
-				$(this).prop('checked', true);
-			}
+	setInitialState(input, state) {
+		const form = getForm(input);
+		if (form) {
+			initialStates.set(form, JSON.stringify(state));
+			updateSettingsSubmitState(form);
 		}
-	}
+	},
+	refresh(form) {
+		updateSettingsSubmitState(getForm(form));
+	},
+	persist(input) {
+		const form = getForm(input);
+		if (form) {
+			initialStates.set(form, serializeSettingsForm(form));
+			updateSettingsSubmitState(form);
+		}
+	},
+};
+
+const screenOptions = document.querySelector(
+	'body.vpf-admin-list-screen #screen-meta-links'
 );
+const header = document.querySelector('.vpf-admin-page__header');
+const actions = header?.querySelector('.vpf-admin-page__actions');
+if (screenOptions) {
+	if (actions) {
+		actions.prepend(screenOptions);
+	} else {
+		header?.append(screenOptions);
+	}
+}
+
+for (const form of document.querySelectorAll(settingsForm)) {
+	window.VPAdminSettingsForms.persist(form);
+}
+
+for (const event of ['input', 'change', 'vpf_settings_form_updated']) {
+	document.body.addEventListener(event, ({ target }) => {
+		updateSettingsSubmitState(target.closest?.(settingsForm));
+	});
+}
+
+document.body.addEventListener('vpf_settings_form_persisted', ({ target }) => {
+	window.VPAdminSettingsForms.persist(target.closest?.(settingsForm));
+});
+
+// Older Pro releases emit synthetic form events through jQuery.
+window
+	.jQuery?.(document.body)
+	.on('input change', `${settingsForm} :input`, function (event) {
+		if (!event.originalEvent)
+			updateSettingsSubmitState(this.closest(settingsForm));
+	})
+	.on('vpf_settings_form_updated', settingsForm, function (event) {
+		if (!event.originalEvent) updateSettingsSubmitState(this);
+	})
+	.on('vpf_settings_form_persisted', settingsForm, function (event) {
+		if (!event.originalEvent) window.VPAdminSettingsForms.persist(this);
+	});
+
+const shortcode =
+	'[name="vp_list_shortcode"], [name="vp_filter_shortcode"], [name="vp_sort_shortcode"]';
+const selectable = '.vp-onclick-selection';
+document.body.addEventListener('focusin', ({ target }) => {
+	target.closest?.(shortcode)?.select();
+});
+document.body.addEventListener('click', ({ target }) => {
+	const field = target.closest?.(selectable);
+	if (field) window.getSelection().selectAllChildren(field);
+});
+for (const type of ['copy', 'cut']) {
+	document.body.addEventListener(type, (event) => {
+		if (!event.target.closest?.(selectable)) return;
+		const text = window
+			.getSelection()
+			.toString()
+			.replace(/[\n\r]+/g, '');
+		event.clipboardData.setData('text/plain', text);
+		event.preventDefault();
+	});
+}
+
+const videoMetabox = document.querySelector('#vp_format_video');
+const videoFormat = document.querySelector('#post-format-video');
+function updateVideoMetabox() {
+	videoMetabox.style.display = videoFormat.checked ? '' : 'none';
+}
+if (videoMetabox && videoFormat) updateVideoMetabox();
+
+let embedRequest;
+const requestEmbed = debounce(
+	300,
+	rafSchd(async (field, preview, request) => {
+		const data = await fetch(ajaxurl, {
+			method: 'POST',
+			body: new URLSearchParams({
+				action: 'vp_find_oembed',
+				q: field.value,
+				nonce: VPAdminVariables.nonce,
+			}),
+			signal: request.signal,
+		})
+			.then((response) => response.json())
+			.catch(() => null);
+
+		if (request === embedRequest && typeof data?.html === 'string') {
+			preview.innerHTML = data.html;
+		}
+	})
+);
+
+for (const event of ['change', 'input']) {
+	document.body.addEventListener(event, ({ target }) => {
+		if (!target.matches?.('.vp-input[name="_vp_format_video_url"]')) return;
+		const preview = target.nextElementSibling;
+		if (!preview?.matches('.vp-oembed-preview')) return;
+		embedRequest?.abort();
+		embedRequest = new AbortController();
+		preview.replaceChildren();
+		if (target.value) requestEmbed(target, preview, embedRequest);
+	});
+}
+
+document.body.addEventListener('change', ({ target }) => {
+	if (
+		videoMetabox &&
+		videoFormat &&
+		target.matches?.('[name="post_format"]')
+	) {
+		updateVideoMetabox();
+	}
+	if (
+		target.matches?.(
+			'input[name="vp_general[register_portfolio_post_type]"]'
+		) &&
+		!target.checked &&
+		!window.confirm(
+			"Are you sure you want to turn off the Portfolio custom post type and related taxonomies? Make sure you don't use this post type on your site, otherwise you might see errors on the frontend."
+		)
+	) {
+		target.checked = true;
+	}
+});

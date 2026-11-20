@@ -36,7 +36,6 @@ export default class ClassesTree extends Component {
 
 		this.onFrameLoad = this.onFrameLoad.bind(this);
 		this.maybeFindIframe = this.maybeFindIframe.bind(this);
-		this.updateTreeData = this.updateTreeData.bind(this);
 	}
 
 	componentDidMount() {
@@ -59,25 +58,9 @@ export default class ClassesTree extends Component {
 	 * On frame load event.
 	 */
 	onFrameLoad() {
-		if (!this.iframePreview.contentWindow) {
-			return;
-		}
-
-		// this.frameWindow = this.iframePreview.contentWindow;
-		// See the note in `iframe-preview`: under WordPress 7.1's `Document-Isolation-Policy`
-		// a frame without the same policy reads as cross-origin, so this throws. The
-		// `contentWindow` guard above does not cover it — that property is still readable.
-		try {
-			this.frameJQuery = this.iframePreview.contentWindow.jQuery;
-		} catch {
-			this.frameJQuery = null;
-		}
-
-		if (this.frameJQuery) {
-			this.$framePortfolio = this.frameJQuery('.vp-portfolio');
-		}
-
-		this.updateTreeData();
+		const gallery =
+			this.iframePreview.contentDocument?.querySelector('.vp-portfolio');
+		this.setState({ nodes: getNodeTree(gallery) });
 	}
 
 	maybeFindIframe() {
@@ -101,14 +84,6 @@ export default class ClassesTree extends Component {
 			this.iframePreview = iframePreview;
 			this.iframePreview.addEventListener('load', this.onFrameLoad);
 			this.onFrameLoad();
-		}
-	}
-
-	updateTreeData() {
-		if (this.$framePortfolio) {
-			this.setState({
-				nodes: getNodeTree(this.$framePortfolio[0]),
-			});
 		}
 	}
 

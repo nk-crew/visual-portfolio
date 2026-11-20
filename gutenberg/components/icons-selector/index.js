@@ -4,9 +4,7 @@ import { Button, Spinner } from '@wordpress/components';
 import { Component, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames/dedupe';
-import $ from 'jquery';
-
-const { ajaxurl, VPGutenbergVariables } = window;
+import requestDynamicControl from '../../utils/request-dynamic-control';
 
 const cachedOptions = {};
 
@@ -44,6 +42,11 @@ export default class IconsSelector extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		this.ajaxRequest?.abort();
+		this.ajaxRequest = null;
+	}
+
 	/**
 	 * Request AJAX dynamic data.
 	 *
@@ -51,18 +54,19 @@ export default class IconsSelector extends Component {
 	 * @param {Function} callback        - callback.
 	 * @param {boolean}  useStateLoading - use state change when loading.
 	 */
-	requestAjax(
+	async requestAjax(
 		additionalData = {},
 		callback = () => {},
 		useStateLoading = true
 	) {
 		const { controlName, attributes } = this.props;
 
-		if (this.isAJAXinProgress) {
+		if (this.ajaxRequest) {
 			return;
 		}
 
-		this.isAJAXinProgress = true;
+		const request = new AbortController();
+		this.ajaxRequest = request;
 
 		if (useStateLoading) {
 			this.setState({
@@ -70,42 +74,36 @@ export default class IconsSelector extends Component {
 			});
 		}
 
-		const ajaxData = {
-			action: 'vp_dynamic_control_callback',
-			nonce: VPGutenbergVariables.nonce,
-			vp_control_name: controlName,
-			vp_attributes: attributes,
-			...additionalData,
-		};
+		const response = await requestDynamicControl(
+			controlName,
+			attributes,
+			additionalData,
+			request.signal
+		);
 
-		$.ajax({
-			url: ajaxurl,
-			method: 'POST',
-			dataType: 'json',
-			data: ajaxData,
-			complete: (data) => {
-				const json = data.responseJSON;
+		if (this.ajaxRequest !== request) {
+			return;
+		}
 
-				if (callback && json.response) {
-					if (json.response.options) {
-						cachedOptions[controlName] = {
-							...cachedOptions[controlName],
-							...json.response.options,
-						};
-					}
-
-					callback(json.response);
+		try {
+			if (response) {
+				if (response.options) {
+					cachedOptions[controlName] = {
+						...cachedOptions[controlName],
+						...response.options,
+					};
 				}
 
+				callback(response);
+			}
+		} finally {
+			if (this.ajaxRequest === request) {
+				this.ajaxRequest = null;
 				if (useStateLoading) {
-					this.setState({
-						ajaxStatus: true,
-					});
+					this.setState({ ajaxStatus: true });
 				}
-
-				this.isAJAXinProgress = false;
-			},
-		});
+			}
+		}
 	}
 
 	render() {

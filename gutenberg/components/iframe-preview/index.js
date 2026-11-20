@@ -6,7 +6,6 @@ import { dispatch, select, subscribe, withSelect } from '@wordpress/data';
 import { Component, createRef } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import classnames from 'classnames/dedupe';
-import $ from 'jquery';
 import { isEqual, uniq } from 'lodash';
 import { debounce } from 'throttle-debounce';
 
@@ -28,6 +27,29 @@ let uniqueIdCount = 1;
 // This is deliberately longer than the CSS transition in `style.scss`, so every step finishes
 // easing before the next one starts and the movement reads as continuous rather than stepped.
 const PREVIEW_RESIZE_INTERVAL = 400;
+
+function getContentWidth(element) {
+	const style = element?.ownerDocument.defaultView.getComputedStyle(element);
+	const width = parseFloat(style?.width) || 0;
+
+	if (style?.boxSizing !== 'border-box') {
+		return width;
+	}
+
+	return Math.max(
+		0,
+		width -
+			[
+				'paddingLeft',
+				'paddingRight',
+				'borderLeftWidth',
+				'borderRightWidth',
+			].reduce(
+				(total, property) => total + (parseFloat(style[property]) || 0),
+				0
+			)
+	);
+}
 
 /**
  * Value the way PHP reads a form field: scalars as strings, `true` / `false` as
@@ -235,11 +257,8 @@ class IframePreview extends Component {
 			return;
 		}
 
-		if (this.frameJQuery) {
-			this.$framePortfolio = this.frameJQuery('.vp-portfolio');
-
-			this.maybeResizePreviews();
-		}
+		this.$framePortfolio = this.frameJQuery?.('.vp-portfolio');
+		this.maybeResizePreviews();
 
 		if (this.frameTimeout) {
 			clearTimeout(this.frameTimeout);
@@ -402,26 +421,21 @@ class IframePreview extends Component {
 	 * Resize frame to properly work with @media.
 	 */
 	maybeResizePreviews() {
-		const contentWidth = $(
-			'.editor-styles-wrapper, .edit-post-visual-editor__content-area',
-			this.getPreviewDocument()
-		)
-			.eq(0)
-			.width();
+		const contentWidth = getContentWidth(
+			this.getPreviewDocument().querySelector(
+				'.editor-styles-wrapper, .edit-post-visual-editor__content-area'
+			)
+		);
 
 		if (!contentWidth || !this.frameRef.current) {
 			return;
 		}
 
 		const frame = this.frameRef.current;
-		const $frame = $(frame);
-		const parentWidth = $frame
-			.closest('.visual-portfolio-gutenberg-preview')
-			.width();
-
-		$frame.css({
-			width: contentWidth,
-		});
+		const parentWidth = getContentWidth(
+			frame.closest('.visual-portfolio-gutenberg-preview')
+		);
+		frame.style.width = `${contentWidth}px`;
 
 		if (this.previewFrame) {
 			this.previewFrame.sendMessage({

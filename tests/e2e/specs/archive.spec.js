@@ -385,7 +385,13 @@ test.describe('archive pages', () => {
 		});
 
 		await expect(saveChangesButton).toBeEnabled();
-		await saveChangesButton.click();
+		await Promise.all([
+			page.waitForURL(/settings-updated=true/),
+			saveChangesButton.click(),
+		]);
+		await expect(
+			page.getByLabel('Archive Page Items Per Page')
+		).toHaveValue('2');
 	}
 
 	// This function ensures that the page is fully loaded before any data collection begins.
@@ -409,6 +415,21 @@ test.describe('archive pages', () => {
 			typePagination === 'paged'
 				? '.vp-pagination__item.vp-pagination__item-next > a'
 				: 'a.vp-pagination__load-more';
+		if (typePagination === 'paged') {
+			const items = page.locator(
+				'.vp-portfolio__ready .vp-portfolio__items article.vp-portfolio__item-wrap'
+			);
+			await items.evaluateAll((nodes) => {
+				for (const node of nodes) {
+					node.setAttribute('data-vpf-archive-previous-page', '');
+				}
+			});
+			await pagination.locator(button).click();
+			await expect(
+				page.locator('[data-vpf-archive-previous-page]')
+			).toHaveCount(0);
+			return;
+		}
 		await Promise.all([
 			page
 				.waitForSelector('.vp-portfolio__ready', {

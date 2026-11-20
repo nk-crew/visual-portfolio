@@ -5,7 +5,6 @@ import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
-import $ from 'jquery';
 import rafSchd from 'raf-schd';
 import { debounce } from 'throttle-debounce';
 
@@ -23,10 +22,8 @@ class VpVideoComponent extends Component {
 			oembedHTML: '',
 		};
 
-		this.maybePrepareOembed = debounce(
-			300,
-			rafSchd(this.maybePrepareOembed.bind(this))
-		);
+		this.prepareOembedFrame = rafSchd(this.maybePrepareOembed.bind(this));
+		this.maybePrepareOembed = debounce(300, this.prepareOembedFrame);
 	}
 
 	componentDidMount() {
@@ -37,58 +34,63 @@ class VpVideoComponent extends Component {
 		this.maybePrepareOembed();
 	}
 
+	componentWillUnmount() {
+		this.maybePrepareOembed.cancel();
+		this.prepareOembedFrame.cancel();
+		this.oembedRequest?.controller.abort();
+		this.oembedRequest = null;
+	}
+
 	/**
 	 * Prepare oEmbed HTML.
 	 */
-	maybePrepareOembed() {
+	async maybePrepareOembed() {
 		const { oembedQuery, oembedHTML } = this.state;
 
 		const { postFormat, videoUrl } = this.props;
 
-		if (postFormat !== 'video') {
+		if (postFormat !== 'video' || !videoUrl) {
+			this.oembedRequest?.controller.abort();
+			this.oembedRequest = null;
+			if (oembedQuery || oembedHTML) {
+				this.setState({ oembedQuery: '', oembedHTML: '' });
+			}
 			return;
 		}
 
-		if (oembedQuery === videoUrl) {
+		if (oembedQuery === videoUrl || this.oembedRequest?.url === videoUrl) {
 			return;
 		}
 
-		// Abort AJAX.
-		if (this.oembedAjax && this.oembedAjax.abort) {
-			this.oembedAjax.abort();
-		}
+		this.oembedRequest?.controller.abort();
+		const request = { url: videoUrl, controller: new AbortController() };
+		this.oembedRequest = request;
 
-		if (!oembedQuery && oembedHTML) {
-			this.setState({
-				oembedHTML: '',
-			});
-			return;
-		}
-
-		this.oembedAjax = $.ajax({
-			url: ajaxurl,
+		const data = await fetch(ajaxurl, {
 			method: 'POST',
-			dataType: 'json',
-			data: {
+			body: new URLSearchParams({
 				action: 'vp_find_oembed',
 				q: videoUrl,
 				nonce: VPGutenbergMetaVariables.nonce,
-			},
-			complete: (data) => {
-				const json = data.responseJSON;
-				const newState = {
-					oembedQuery: videoUrl,
-					oembedHTML: '',
-				};
+			}),
+			signal: request.controller.signal,
+		})
+			.then((response) => response.json())
+			.catch(() => null);
 
-				if (json && typeof json.html !== 'undefined') {
-					newState.oembedHTML = json.html;
-				}
-				this.setState(newState);
-
-				this.oembedAjax = null;
-			},
-		});
+		if (this.oembedRequest !== request) {
+			return;
+		}
+		this.oembedRequest = null;
+		if (
+			this.props.postFormat === 'video' &&
+			this.props.videoUrl === videoUrl
+		) {
+			this.setState({
+				oembedQuery: videoUrl,
+				oembedHTML: typeof data?.html === 'string' ? data.html : '',
+			});
+		}
 	}
 
 	render() {
