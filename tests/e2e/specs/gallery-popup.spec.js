@@ -686,7 +686,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			.toBe(false);
 	});
 
-	test('Free reserves space for long captions below photos and above thumbnails', async ({
+	test('Free reserves only the visible viewport caption above the bottom strip', async ({
 		page,
 		requestUtils,
 	}) => {
@@ -697,7 +697,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			pageTitle: 'Popup - caption spacing',
 			blockId: 'e2e-popup-caption-spacing',
 			queryId: 1,
-			images: [{ ...images[0], title }, images[1]],
+			images: [{ ...images[0], title }, images[1], images[2]],
 			clickAction: 'popup',
 			lightbox: {
 				titleSource: 'item_title',
@@ -705,35 +705,75 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			},
 		});
 		test.skip(await isPro(page), 'Free uses the Reuse viewer.');
+		await loadJQuery(page);
 		await page.evaluate(() => {
 			window.VPData.settingsPopupGallery.show_thumbs = true;
 			window.VPData.settingsPopupGallery.thumbs_auto_start = true;
+			window
+				.jQuery(document)
+				.on(
+					'beforeInitPopup.vpf',
+					(event, gallery, options, slides) => {
+						slides[2].caption = '';
+					}
+				);
 		});
 
 		await page.locator(TRIGGER).first().click();
+		const viewer = page.locator(REUSE);
 		const caption = page.locator(POPUP_CAPTION);
-		const strip = page.locator(`${REUSE} .re-lightbox-thumbnails`);
-		await expect(page.locator(REUSE)).toHaveAttribute('data-phase', 'open');
+		const strip = viewer.locator('.re-lightbox-thumbnails');
+		const viewport = viewer.locator('.re-lightbox-viewport');
+		const slide = viewer.locator('.re-lightbox-slide[aria-hidden="false"]');
+		const reservedRoom = () =>
+			slide.evaluate((node) =>
+				parseFloat(getComputedStyle(node).paddingBottom)
+			);
+		const captionRoom = async () => {
+			const view = await viewport.boundingBox();
+			const text = await caption.boundingBox();
+			return Math.ceil(view.y + view.height - text.y);
+		};
+		await expect(viewer).toHaveAttribute('data-phase', 'open');
 		await expect(caption).toContainText(title);
 		await expect(caption).toContainText(CAPTION_TEXT);
+		const longRoom = await captionRoom();
+		await expect.poll(reservedRoom).toBe(longRoom);
+		expect((await strip.boundingBox()).y).toBeGreaterThan(
+			(await caption.boundingBox()).y +
+				(await caption.boundingBox()).height
+		);
 
-		async function captionBelowImage() {
-			const image = await page.locator(POPUP_IMAGE).boundingBox();
-			const text = await caption.boundingBox();
-			return text.y - (image.y + image.height);
-		}
-		await expect.poll(captionBelowImage).toBeGreaterThan(0);
-		const text = await caption.boundingBox();
-		const thumbnails = await strip.boundingBox();
-		expect(thumbnails.y).toBeGreaterThan(text.y + text.height);
+		await page.keyboard.press('ArrowRight');
+		await expect(caption).toHaveText('Image 2');
+		const shortRoom = await captionRoom();
+		await expect.poll(reservedRoom).toBe(shortRoom);
+		expect(shortRoom).toBeLessThan(longRoom);
+
+		const thumbnails = viewer.getByRole('button', { name: 'Thumbnails' });
+		await thumbnails.click();
+		await expect(strip).toHaveCount(0);
+		const roomWithoutStrip = await captionRoom();
+		await expect.poll(reservedRoom).toBe(roomWithoutStrip);
+		expect(roomWithoutStrip).toBeLessThan(shortRoom);
+		await page.keyboard.press('ArrowRight');
+		await expect(caption).toBeHidden();
+		await expect.poll(reservedRoom).toBe(0);
+
+		await thumbnails.click();
+		await page.keyboard.press('Home');
+		await expect(caption).toContainText(title);
+		await page.setViewportSize({ width: 390, height: 844 });
+		await expect(strip).toBeVisible();
+		await expect.poll(reservedRoom).toBe(await captionRoom());
+		const image = await page.locator(POPUP_IMAGE).boundingBox();
+		expect(
+			(await caption.boundingBox()).y - image.y - image.height
+		).toBeGreaterThan(16);
 
 		await page.setViewportSize({ width: 680, height: 360 });
 		await expect(strip).toBeHidden();
-		await expect.poll(captionBelowImage).toBeGreaterThan(0);
-		await page.setViewportSize({ width: 390, height: 844 });
-		await expect.poll(captionBelowImage).toBeLessThanOrEqual(16);
-		await expect.poll(captionBelowImage).toBeGreaterThan(0);
-		await page.setViewportSize({ width: 680, height: 360 });
+		await expect.poll(reservedRoom).toBe(await captionRoom());
 		expect(
 			await caption.evaluate((node) => node.scrollHeight)
 		).toBeGreaterThan((await caption.boundingBox()).height);
@@ -742,7 +782,191 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await expect
 			.poll(() => caption.evaluate((node) => node.scrollTop))
 			.toBeGreaterThan(0);
+		await expectPosition(page, 1, 3);
+	});
+
+	test('Free keeps a tall photo pannable beside the side thumbnail strip', async ({
+		page,
+		requestUtils,
+	}) => {
+		test.skip(!!process.env.CORE, 'Free uses the Reuse viewer.');
+		await page.setViewportSize({ width: 900, height: 680 });
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - tall photo',
+			blockId: 'e2e-popup-tall',
+			queryId: 1,
+			images: images.slice(0, 2),
+			clickAction: 'popup',
+			lightbox: { titleSource: 'item_title' },
+		});
+		test.skip(await isPro(page), 'Free uses the Reuse viewer.');
+		await loadJQuery(page);
+		await page.evaluate(() => {
+			const image = document.createElement('canvas');
+			image.width = 500;
+			image.height = 1800;
+			const context = image.getContext('2d');
+			context.fillStyle = '#386c83';
+			context.fillRect(0, 0, 500, 900);
+			context.fillStyle = '#82ad76';
+			context.fillRect(0, 900, 500, 900);
+			const src = image.toDataURL();
+			window.VPData.settingsPopupGallery.show_thumbs = true;
+			window.VPData.settingsPopupGallery.thumbs_auto_start = true;
+			window
+				.jQuery(document)
+				.on(
+					'beforeInitPopup.vpf',
+					(event, gallery, options, slides) => {
+						options.thumbnails = 'side';
+						Object.assign(slides[0], {
+							src,
+							srcset: '',
+							width: image.width,
+							height: image.height,
+						});
+					}
+				);
+		});
+
+		await page.locator(TRIGGER).first().click();
+		const viewer = page.locator(REUSE);
+		await expect(viewer).toHaveAttribute('data-phase', 'open');
+		await expect(viewer).toHaveAttribute('data-thumbnails', 'side');
+		const strip = viewer.locator('.re-lightbox-thumbnails');
+		const caption = viewer.locator('.vp-loop-lightbox-caption');
+		const image = page.locator(POPUP_IMAGE);
+		await expect(caption).toHaveText(TITLE_TEXT);
+		const photo = await image.boundingBox();
+		expect(photo.height).toBe(1800);
+		expect(photo.y + 1).toBeGreaterThanOrEqual(
+			(await viewer.locator('.re-lightbox-stage').boundingBox()).y
+		);
+		expect(photo.x + photo.width).toBeLessThan(
+			(await strip.boundingBox()).x
+		);
+		await page.keyboard.press('ArrowDown');
+		await expect
+			.poll(async () => (await image.boundingBox()).y)
+			.toBeLessThan(photo.y);
 		await expectPosition(page, 1, 2);
+
+		await page.setViewportSize({ width: 390, height: 844 });
+		await expect(viewer).toHaveAttribute('data-thumbnails', 'bottom');
+		await expect(strip).toBeVisible();
+		expect((await strip.boundingBox()).y).toBeGreaterThan(
+			(await caption.boundingBox()).y +
+				(await caption.boundingBox()).height
+		);
+	});
+
+	test('Free keeps toolbar actions usable at zoom and disables real arrows at the ends', async ({
+		page,
+		requestUtils,
+	}) => {
+		test.skip(!!process.env.CORE, 'Free uses the Reuse viewer.');
+		await page.setViewportSize({ width: 960, height: 700 });
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - zoom and arrow controls',
+			blockId: 'e2e-popup-zoom-controls',
+			queryId: 1,
+			images: images.slice(0, 2),
+			clickAction: 'popup',
+		});
+		test.skip(await isPro(page), 'Free uses the Reuse viewer.');
+		await loadJQuery(page);
+		await page.evaluate(() => {
+			Object.assign(window.VPData.settingsPopupGallery, {
+				show_thumbs: true,
+				show_share_button: true,
+			});
+			window
+				.jQuery(document)
+				.on('beforeInitPopup.vpf', (event, gallery, options) => {
+					Object.assign(options.controls, {
+						arrows: true,
+						close: true,
+						download: true,
+						fullscreen: true,
+						slideshow: true,
+						zoom: true,
+					});
+					options.loop = false;
+				});
+		});
+
+		const trigger = page.locator(TRIGGER).first();
+		await trigger.click();
+		const viewer = page.locator(REUSE);
+		await expect(viewer).toHaveAttribute('data-phase', 'open');
+		const previous = viewer.getByRole('button', { name: /^Previous/ });
+		const next = viewer.getByRole('button', { name: /^Next/ });
+		const close = viewer.getByRole('button', { name: /^Close/ });
+		await expect(previous).toBeVisible();
+		await expect(previous).toBeDisabled();
+		await expect(previous).toHaveCSS('opacity', '0.3');
+		await expect(next).toBeEnabled();
+		await close.focus();
+		await page.keyboard.press('Tab');
+		await expect(next).toBeFocused();
+		const disabled = await previous.boundingBox();
+		await page.mouse.click(
+			disabled.x + disabled.width / 2,
+			disabled.y + disabled.height / 2
+		);
+		await expectPosition(page, 1, 2);
+		await next.click();
+		await expectPosition(page, 2, 2);
+		await expect(next).toBeVisible();
+		await expect(next).toBeDisabled();
+		await expect(next).toHaveCSS('opacity', '0.3');
+		await expect(previous).toBeEnabled();
+		await previous.click();
+		await expectPosition(page, 1, 2);
+
+		const toolbar = viewer.locator('.re-lightbox-toolbar-end');
+		const controls = toolbar.locator('.re-lightbox-button');
+		const geometry = () =>
+			controls.evaluateAll((nodes) =>
+				nodes.map((node) => {
+					const { x, y, width } = node.getBoundingClientRect();
+					const { visibility, pointerEvents } =
+						getComputedStyle(node);
+					return { x, y, width, visibility, pointerEvents };
+				})
+			);
+		const beforeZoom = await geometry();
+		expect(beforeZoom).toHaveLength(7);
+		const zoom = toolbar.locator('.re-lightbox-zoom');
+		await zoom.focus();
+		await page.keyboard.press('Enter');
+		await expect(viewer).toHaveAttribute('data-zoomed', 'true');
+		await expect(zoom).toBeFocused();
+		await expect.poll(geometry).toEqual(beforeZoom);
+
+		await page.setViewportSize({ width: 320, height: 240 });
+		const share = toolbar.getByRole('button', {
+			name: 'Share',
+			exact: true,
+		});
+		await share.click();
+		const panel = viewer.locator('.vp-loop-lightbox-share-links');
+		await expect(panel).toBeVisible();
+		const { x, y, width, height } = await panel.boundingBox();
+		expect(width).toBeGreaterThanOrEqual(176);
+		expect(x).toBeGreaterThanOrEqual(0);
+		expect(x + width).toBeLessThanOrEqual(320);
+		expect(y + height).toBeLessThanOrEqual(240);
+		await page.keyboard.press('Tab');
+		const facebook = panel.getByRole('link', { name: 'Facebook' });
+		await expect(facebook).toBeFocused();
+		await expect(facebook).toHaveCSS('outline-style', 'solid');
+		await page.keyboard.press('Escape');
+		await expect(share).toBeFocused();
+		await expect(panel).toBeHidden();
+		await page.keyboard.press('Escape');
+		await expect(viewer).toHaveCount(0);
+		await expect(trigger).toBeFocused();
 	});
 
 	test('Free opens a WordPress image with the configured vendor on the same page as Reuse', async ({

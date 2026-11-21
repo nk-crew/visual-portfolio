@@ -105,49 +105,64 @@ function captionSlot({ document: doc, lightbox }) {
 		}
 	});
 	let previous;
+	let room = 0;
+	let layoutPending = false;
 	let frame;
 	const win = doc.defaultView;
-	const placeCaption = () => {
-		if (!frame || !node.parentElement) return;
-		const bottom = frame.getBoundingClientRect().bottom;
-		const footerTop = node.parentElement.getBoundingClientRect().top;
-		node.style.setProperty(
-			'--vp-loop-lightbox-caption-offset',
-			`${Math.min(0, bottom + 12 - footerTop)}px`
-		);
+	const dialog = lightbox.getSlide(0).closest('dialog');
+	const stage = dialog.querySelector('.re-lightbox-stage');
+	const refreshLayout = () => {
+		if (!layoutPending || frame) return;
+		frame = win.requestAnimationFrame(() => {
+			frame = undefined;
+			if (
+				dialog.dataset.phase !== 'open' ||
+				lightbox.getState().isAnimating
+			) {
+				return;
+			}
+			layoutPending = false;
+			// Reuse 0.2 reads new bottom room on window resize. Remove this when it observes slot geometry.
+			win.dispatchEvent(new win.Event('resize'));
+		});
 	};
-	const observer = new win.ResizeObserver(placeCaption);
-	observer.observe(node);
-	const stopOpened = lightbox.on('opened', placeCaption);
+	const measureRoom = () => {
+		const nextRoom = node.hidden
+			? 0
+			: Math.ceil(
+					stage.getBoundingClientRect().bottom -
+						node.getBoundingClientRect().top
+				);
+		if (nextRoom !== room) {
+			room = nextRoom;
+			stage.style.setProperty(
+				'--vp-loop-lightbox-caption-room',
+				`${room}px`
+			);
+			layoutPending = true;
+		}
+		refreshLayout();
+	};
+	const observer = new win.ResizeObserver(measureRoom);
+	observer.observe(stage);
+	const stopOpened = lightbox.on('opened', measureRoom);
 
 	return {
 		node,
-		update({ item, index }) {
+		update({ item }) {
 			if (item !== previous) {
+				if (!previous) observer.observe(node.parentElement);
 				previous = item;
-				node.replaceChildren(item?.captionMarkup.cloneNode(true) ?? '');
+				node.replaceChildren(
+					item?.captionMarkup?.cloneNode(true) ?? item?.caption ?? ''
+				);
 				node.hidden = !item?.caption;
+				measureRoom();
 			}
-			const nextFrame =
-				!node.hidden && !item?.type
-					? lightbox
-							.getSlide(index)
-							?.querySelector('.re-lightbox-frame')
-					: null;
-			if (frame !== nextFrame) {
-				if (frame) observer.unobserve(frame);
-				frame = nextFrame;
-				if (frame) observer.observe(frame);
-				else
-					node.style.removeProperty(
-						'--vp-loop-lightbox-caption-offset'
-					);
-			}
-			const stage = node.closest('.re-lightbox-stage');
-			if (stage) observer.observe(stage);
-			placeCaption();
+			refreshLayout();
 		},
 		destroy() {
+			win.cancelAnimationFrame(frame);
 			observer.disconnect();
 			stopOpened();
 		},
@@ -228,7 +243,7 @@ function shareSlot({ document: doc, lightbox }, shareUrl) {
 	return {
 		node,
 		update(state) {
-			if (!links.hidden && (state.isClosing || state.zoom.scale > 1)) {
+			if (!links.hidden && state.isClosing) {
 				setOpen(false);
 			}
 
