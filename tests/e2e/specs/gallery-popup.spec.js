@@ -969,6 +969,110 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await expect(trigger).toBeFocused();
 	});
 
+	test('Free closes into the cropped picture and returns focus to its title', async ({
+		page,
+		requestUtils,
+	}) => {
+		test.skip(!!process.env.CORE, 'Free uses the Reuse viewer.');
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - picture origin',
+			blockId: 'e2e-popup-picture-origin',
+			queryId: 1,
+			images,
+			clickAction: 'popup',
+			title: true,
+		});
+		test.skip(await isPro(page), 'Free uses the Reuse viewer.');
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+		const first = page.locator(ITEM).first();
+		const picture = first.locator('img');
+		const title = first.locator(TRIGGER).last();
+		await picture.evaluate((node) => {
+			node.style.objectPosition = '100% 50%';
+		});
+		await title.focus();
+		await page.keyboard.press('Enter');
+		await expect(page.locator(REUSE)).toHaveAttribute('data-phase', 'open');
+		await page.evaluate(() => void window.VPPopupAPI.close());
+		const landing = page.locator('.re-lightbox-landing');
+		const clip = await landing.evaluate((node) =>
+			node
+				.getAnimations()
+				.map(
+					(animation) =>
+						animation.effect.getKeyframes().at(-1).clipPath
+				)
+				.find(Boolean)
+		);
+		expect(clip).toMatch(/^inset\(0px 0px 0px [1-9][\d.]*px/);
+		await expect(page.locator(REUSE)).toHaveCount(0);
+		await expect(title).toBeFocused();
+	});
+
+	test('Free Share uses the open image when no extension supplies an address', async ({
+		page,
+		requestUtils,
+	}) => {
+		test.skip(!!process.env.CORE, 'Free uses the Reuse viewer.');
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - share original photo',
+			blockId: 'e2e-popup-share-original',
+			queryId: 1,
+			images,
+			clickAction: 'popup',
+		});
+		test.skip(await isPro(page), 'Free uses the Reuse viewer.');
+		await page.evaluate(() => {
+			window.VPData.settingsPopupGallery.show_share_button = true;
+		});
+		await page.locator(TRIGGER).first().click();
+		const dialog = page.locator(REUSE);
+		await dialog.getByRole('button', { name: 'Share' }).click();
+		const address = await dialog
+			.getByRole('link', { name: 'Facebook' })
+			.getAttribute('href');
+		expect(new URL(address).searchParams.get('u')).toBe(images[0].url);
+	});
+
+	test('Free stops a non-looping slideshow at the last picture', async ({
+		page,
+		requestUtils,
+	}) => {
+		test.skip(!!process.env.CORE, 'Free uses the Reuse viewer.');
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - finite slideshow',
+			blockId: 'e2e-popup-finite-slideshow',
+			queryId: 1,
+			images,
+			clickAction: 'popup',
+		});
+		test.skip(await isPro(page), 'Free uses the Reuse viewer.');
+		await loadJQuery(page);
+		await page.evaluate(() => {
+			window
+				.jQuery(document)
+				.on('beforeInitPopup.vpf', (event, self, options) => {
+					options.loop = false;
+					options.slideshow = { interval: 100 };
+				});
+		});
+		await page.locator(TRIGGER).first().click();
+		await expect(page.locator(REUSE)).toHaveAttribute('data-phase', 'open');
+		await page.evaluate(() => {
+			window.VPPopupAPI.instance.goTo(2);
+			window.VPPopupAPI.instance.play();
+		});
+		await expect
+			.poll(() =>
+				page.evaluate(() => {
+					const { index, isPlaying } =
+						window.VPPopupAPI.instance.getState();
+					return { index, isPlaying };
+				})
+			)
+			.toEqual({ index: 3, isPlaying: false });
+	});
+
 	test('Free opens a WordPress image with the configured vendor on the same page as Reuse', async ({
 		admin,
 		page,

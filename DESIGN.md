@@ -34,4 +34,6 @@ In the editor, a setting a synced gallery changed shows a dot, "Changed on this 
 
 The caption sits at the bottom of the viewport, above bottom thumbnails and beside side thumbnails. Its rendered height determines how much space it takes from the photo. An empty caption takes no space. Long captions scroll, including from the keyboard. Tall photos remain pannable at their fitted width.
 
+Closing an image uses the crop of the rendered photo. When Restore Focus is enabled, the link that opened the photo receives focus again. A slideshow stops at the last photo when Loop is off.
+
 Available toolbar buttons keep their order and spacing while zoomed. When Loop is off, the previous and next buttons stay in place at the ends and use the native disabled state with a dimmed appearance. Share opens a dark panel at least 11rem wide when space allows, with a visible focus outline on each link.
