@@ -130,6 +130,138 @@ test.describe('Gallery Loop blocks', () => {
 			.toEqual(expect.arrayContaining(['All', ...CATEGORIES]));
 	});
 
+	test('Twenty Twenty shares gallery defaults between the editor and the page', async ({
+		admin,
+		editor,
+		page,
+		requestUtils,
+	}) => {
+		await requestUtils.activateTheme('twentytwenty');
+
+		try {
+			await admin.createNewPost({
+				title: 'Gallery Loop - shared styles',
+				postType: 'page',
+				showWelcomeGuide: false,
+			});
+
+			const loop = getLoopBlock(PAGED_PAGINATION);
+			const [filter, template, pagination] = loop.innerBlocks;
+			template.innerBlocks.push({
+				name: 'visual-portfolio/item-description',
+				attributes: {
+					style: {
+						typography: { fontSize: '23px', lineHeight: '1.6' },
+						spacing: { margin: { top: '17px' } },
+					},
+				},
+			});
+
+			await editor.insertBlock({
+				...loop,
+				innerBlocks: [
+					filter,
+					{ name: 'visual-portfolio/loop-search' },
+					{
+						name: 'visual-portfolio/loop-sort',
+						attributes: {
+							labels: {
+								'': 'Default sorting by original publication date and gallery order',
+							},
+						},
+					},
+					template,
+					pagination,
+				],
+			});
+
+			await editor.publishPost();
+			const published = await page.evaluate(() =>
+				window.wp.data.select('core/editor').getPermalink()
+			);
+			const frontend = await page.context().newPage();
+			await frontend.goto(published);
+
+			for (const surface of [frontend, editor.canvas]) {
+				const item = surface
+					.locator(
+						'.wp-block-visual-portfolio-item-template__item:visible'
+					)
+					.first();
+				const title = item.locator(
+					'.wp-block-visual-portfolio-item-title'
+				);
+				const description = item.locator(
+					'.wp-block-visual-portfolio-item-description'
+				);
+				const sort = surface.locator('.vp-block-loop-sort select');
+				const activeFilter = surface.locator(
+					'.vp-block-loop-filter-item.is-active'
+				);
+				const currentPage = surface.locator(
+					'.vp-block-loop-pagination-numbers .is-active'
+				);
+
+				await expect.soft(item).toHaveCSS('margin-inline-start', '0px');
+				await expect.soft(title).toHaveCSS('margin-block-end', '0px');
+				await expect.soft(description).toHaveCSS('font-size', '23px');
+				await expect
+					.soft(description)
+					.toHaveCSS('line-height', '36.8px');
+				await expect
+					.soft(description)
+					.toHaveCSS('margin-block-start', '17px');
+				await expect
+					.soft(activeFilter)
+					.toHaveCSS('text-decoration-line', 'underline');
+				await expect
+					.soft(currentPage)
+					.toHaveCSS('text-decoration-line', 'underline');
+				await expect.soft(sort).toHaveCSS('border-radius', '4px');
+				await expect.soft(sort).toHaveCSS('appearance', 'none');
+			}
+
+			await expect(
+				editor.canvas.locator('.vp-block-loop-search__input')
+			).toHaveCSS('border-radius', '4px');
+
+			const submit = frontend.locator('.vp-block-loop-sort__submit');
+			await expect(submit).toHaveAttribute('hidden', '');
+			await expect(submit).toBeHidden();
+
+			const sortGap = await frontend
+				.locator('.vp-block-loop-sort')
+				.evaluate((sort) => getComputedStyle(sort).marginBlockStart);
+			expect(Number.parseFloat(sortGap)).toBeGreaterThan(0);
+			await expect(
+				frontend.locator('.wp-block-visual-portfolio-item-template')
+			).toHaveCSS('margin-block-start', sortGap);
+
+			await frontend.setViewportSize({ width: 375, height: 740 });
+			const field = frontend.getByRole('combobox', {
+				name: 'Sort items',
+			});
+			await field.focus();
+			await expect.soft(field).toHaveCSS('outline-width', '2px');
+			await expect.soft(field).toHaveCSS('transition-duration', '0s');
+			expect(
+				await field.evaluate(
+					(select) =>
+						select.offsetWidth <= select.closest('form').offsetWidth
+				)
+			).toBe(true);
+			const nextPage = frontend.getByRole('link', {
+				name: 'Page 2',
+				exact: true,
+			});
+			await nextPage.focus();
+			await expect.soft(nextPage).toHaveCSS('outline-width', '2px');
+			await frontend.close();
+		} finally {
+			await requestUtils.activateTheme('empty-theme');
+		}
+	});
+
 	test('category links point at the published page and filter its items', async ({
 		page,
 		admin,

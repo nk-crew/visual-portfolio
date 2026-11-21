@@ -91,6 +91,7 @@
 			"type": "object"
 		}
 	},
+	"style": "visual-portfolio-block-loop",
 	"viewScriptModule": "visual-portfolio-block-loop-view",
 	"supports": {
 		"html": false,

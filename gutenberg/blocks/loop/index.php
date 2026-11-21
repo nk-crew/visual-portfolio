@@ -67,6 +67,9 @@ class Visual_Portfolio_Block_Loop {
 		Visual_Portfolio_Assets::register_style( 'visual-portfolio-loop-field', 'build/assets/css/loop-field' );
 		wp_style_add_data( 'visual-portfolio-loop-field', 'rtl', 'replace' );
 
+		Visual_Portfolio_Assets::register_style( 'visual-portfolio-block-loop', 'build/gutenberg/blocks/loop/style' );
+		wp_style_add_data( 'visual-portfolio-block-loop', 'rtl', 'replace' );
+
 		register_block_type_from_metadata(
 			visual_portfolio()->plugin_path . 'gutenberg/blocks/loop'
 		);

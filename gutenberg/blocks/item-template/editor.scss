@@ -118,6 +118,10 @@ $gray-700: var(--wp-components-color-gray-700, var(--wpds-color-foreground-conte
 	&[aria-busy="true"] > .wp-block-visual-portfolio-item-template__item {
 		opacity: 0.6;
 		transition: opacity 0.15s ease-in-out;
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
 	}
 }
 
