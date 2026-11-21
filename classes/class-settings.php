@@ -667,6 +667,7 @@ class Visual_Portfolio_Settings {
 				array(
 					'name'    => 'vendor',
 					'label'   => esc_html__( 'Vendor Script', 'visual-portfolio' ),
+					'desc'    => esc_html__( 'Choose the lightbox for classic galleries and WordPress images. Gallery Loop uses its own lightbox.', 'visual-portfolio' ),
 					'type'    => 'select',
 					'options' => array(
 						'fancybox'   => esc_html__( 'Fancybox', 'visual-portfolio' ),
@@ -795,23 +796,17 @@ class Visual_Portfolio_Settings {
 					'default' => 'on',
 				),
 
-				// Fancybox Popup Settings.
 				array(
-					'name'      => 'show_thumbs',
-					'label'     => esc_html__( 'Display Thumbnails', 'visual-portfolio' ),
-					'type'      => 'toggle',
-					'default'   => 'on',
-					'condition' => array(
-						array(
-							'control'  => '[name="vp_popup_gallery[vendor]"]',
-							'operator' => '===',
-							'value'    => 'fancybox',
-						),
-					),
+					'name'    => 'show_thumbs',
+					'label'   => esc_html__( 'Display Thumbnails', 'visual-portfolio' ),
+					'desc'    => esc_html__( 'Show thumbnail navigation in the Gallery Loop and Fancybox lightboxes.', 'visual-portfolio' ),
+					'type'    => 'toggle',
+					'default' => 'on',
 				),
 				array(
 					'name'      => 'thumbs_auto_start',
 					'label'     => esc_html__( 'Thumbnails Opened At Startup', 'visual-portfolio' ),
+					'desc'      => esc_html__( 'Open the thumbnail strip when the lightbox opens.', 'visual-portfolio' ),
 					'type'      => 'toggle',
 					'default'   => 'off',
 					'is_pro'    => true,
@@ -819,16 +814,12 @@ class Visual_Portfolio_Settings {
 						array(
 							'control' => '[type="checkbox"][name="vp_popup_gallery[show_thumbs]"]',
 						),
-						array(
-							'control'  => '[name="vp_popup_gallery[vendor]"]',
-							'operator' => '===',
-							'value'    => 'fancybox',
-						),
 					),
 				),
 				array(
 					'name'      => 'thumbs_position',
 					'label'     => esc_html__( 'Thumbnails Position', 'visual-portfolio' ),
+					'desc'      => esc_html__( 'Choose whether thumbnails appear beside or below the image.', 'visual-portfolio' ),
 					'type'      => 'select',
 					'default'   => 'vertical',
 					'options'   => array(
@@ -840,25 +831,14 @@ class Visual_Portfolio_Settings {
 						array(
 							'control' => '[type="checkbox"][name="vp_popup_gallery[show_thumbs]"]',
 						),
-						array(
-							'control'  => '[name="vp_popup_gallery[vendor]"]',
-							'operator' => '===',
-							'value'    => 'fancybox',
-						),
 					),
 				),
 				array(
-					'name'      => 'show_slideshow',
-					'label'     => esc_html__( 'Display Slideshow', 'visual-portfolio' ),
-					'type'      => 'toggle',
-					'default'   => 'off',
-					'condition' => array(
-						array(
-							'control'  => '[name="vp_popup_gallery[vendor]"]',
-							'operator' => '===',
-							'value'    => 'fancybox',
-						),
-					),
+					'name'    => 'show_slideshow',
+					'label'   => esc_html__( 'Display Slideshow', 'visual-portfolio' ),
+					'desc'    => esc_html__( 'Show the slideshow button in the Gallery Loop and Fancybox lightboxes.', 'visual-portfolio' ),
+					'type'    => 'toggle',
+					'default' => 'off',
 				),
 
 				// Albums settings.

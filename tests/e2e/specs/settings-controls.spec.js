@@ -218,64 +218,93 @@ test.describe('Contextual settings controls', () => {
 		expect(width.scroll).toBeLessThanOrEqual(width.client);
 	});
 
-	test('engine switches and collapsed thumbnails preserve popup values through save', async ({
+	test('PhotoSwipe selection leaves Gallery Loop thumbnail and slideshow settings available after save', async ({
 		admin,
 		page,
 	}) => {
 		let form = await openTab(admin, page, 'vp_popup_gallery');
 		await remember(form);
+		const isPro = await page.evaluate(
+			() => !!window.VPSettingsControls.isPro
+		);
+		if (process.env.CORE) expect(isPro).toBe(true);
 		const retained = {
 			'vp_popup_gallery[deep_linking]': 'on',
 			'vp_popup_gallery[deep_linking_url_to_share_images]': 'off',
-			'vp_popup_gallery[thumbs_auto_start]': 'on',
-			'vp_popup_gallery[thumbs_position]': 'horizontal',
 			'vp_popup_gallery[album_lazy_load_threshold]': '37',
 			'vp_popup_gallery[pages_iframe_custom_css]':
 				'.vp-popup-iframe header { display: none; }',
 		};
-		await page.request.post('/wp-admin/options.php', {
-			form: { ...original, ...retained },
+		const seeded = await page.request.post('/wp-admin/options.php', {
+			form: {
+				...original,
+				...retained,
+				'vp_popup_gallery[vendor]': 'photoswipe',
+				'vp_popup_gallery[show_thumbs]': 'off',
+				'vp_popup_gallery[thumbs_auto_start]': isPro ? 'off' : 'on',
+				'vp_popup_gallery[thumbs_position]': isPro
+					? 'vertical'
+					: 'horizontal',
+				'vp_popup_gallery[show_slideshow]': 'off',
+			},
 		});
+		expect(seeded.ok()).toBe(true);
 		await page.reload();
 		form = await openTab(admin, page, 'vp_popup_gallery');
+		const advanced = form
+			.locator('summary')
+			.filter({ hasText: 'Advanced' });
+		const disclosure = form.locator('summary').filter({
+			hasText: 'Thumbnails and slideshow',
+		});
+		const vendor = form.getByLabel('Vendor Script');
+		const thumbnails = form.getByRole('checkbox', {
+			name: 'Display Thumbnails',
+			exact: true,
+		});
+		const autoStart = form.getByLabel('Thumbnails Opened At Startup');
+		const position = form.getByLabel('Thumbnails Position');
+		const slideshow = form.getByRole('checkbox', {
+			name: 'Display Slideshow',
+		});
+
+		await advanced.click();
+		await expect(vendor).toHaveValue('photoswipe');
+		await expect(disclosure).toBeVisible();
+		await disclosure.click();
+		await expect(autoStart).toBeHidden();
+		await expect(position).toBeHidden();
+		await slideshow.check();
+		await thumbnails.check();
+		await expect(autoStart).toBeVisible();
+		await expect(position).toBeVisible();
+		if (isPro) {
+			await autoStart.check();
+			await position.selectOption('horizontal');
+		} else {
+			await expect(autoStart).toBeDisabled();
+			await expect(position).toBeDisabled();
+		}
+		await thumbnails.uncheck();
+		await expect(autoStart).toBeHidden();
+		await expect(position).toBeHidden();
+		await thumbnails.check();
+		await disclosure.click();
 		await form
 			.getByRole('checkbox', { name: 'Display Download Button' })
 			.check();
-		await form
-			.locator('summary')
-			.filter({ hasText: 'Thumbnails and slideshow' })
-			.click();
-		await form
-			.getByRole('checkbox', { name: 'Display Thumbnails', exact: true })
-			.uncheck();
-		await expect(form.getByLabel('Thumbnails Position')).toBeHidden();
-		await form.getByRole('checkbox', { name: 'Display Slideshow' }).check();
-		await form.locator('summary').filter({ hasText: 'Advanced' }).click();
-		await form.getByLabel('Vendor Script').selectOption('photoswipe');
-		await expect(form.locator('[data-group="show_thumbs"]')).toBeHidden();
 		await save(page, form);
 		form = await openTab(admin, page, 'vp_popup_gallery');
 		await expect(
 			form.getByRole('checkbox', { name: 'Display Download Button' })
 		).toBeChecked();
-		await form.locator('summary').filter({ hasText: 'Advanced' }).click();
-		await expect(form.getByLabel('Vendor Script')).toHaveValue(
-			'photoswipe'
-		);
-		await form.getByLabel('Vendor Script').selectOption('fancybox');
-		await form
-			.locator('summary')
-			.filter({ hasText: 'Thumbnails and slideshow' })
-			.click();
-		await expect(
-			form.getByRole('checkbox', {
-				name: 'Display Thumbnails',
-				exact: true,
-			})
-		).not.toBeChecked();
-		await expect(
-			form.getByRole('checkbox', { name: 'Display Slideshow' })
-		).toBeChecked();
+		await advanced.click();
+		await expect(vendor).toHaveValue('photoswipe');
+		await disclosure.click();
+		await expect(thumbnails).toBeChecked();
+		await expect(slideshow).toBeChecked();
+		await expect(autoStart).toBeChecked();
+		await expect(position).toHaveValue('horizontal');
 		const submitted = await form.evaluate((element) =>
 			Object.fromEntries(new FormData(element))
 		);

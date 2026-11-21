@@ -382,16 +382,6 @@ $(() => {
 				'deep_linking_url_to_share_images',
 				read('deep_linking') === 'on'
 			);
-			const fancybox = read('vendor') === 'fancybox';
-			const thumbs = read('show_thumbs') === 'on';
-			show('thumbs_auto_start', fancybox && thumbs);
-			show('thumbs_position', fancybox && thumbs);
-			if (section === 'vp_popup_gallery') {
-				const thumbnails = content.querySelector(
-					'[data-group="show_thumbs"]'
-				);
-				if (thumbnails) thumbnails.hidden = !fancybox;
-			}
 			invalidFields.forEach((field) => {
 				if (
 					field.querySelector(':invalid') ||
