@@ -754,6 +754,8 @@ class Visual_Portfolio_Assets {
 
 				'pswp_close'           => esc_attr__( 'Close (Esc)', 'visual-portfolio' ),
 				'pswp_share'           => esc_attr__( 'Share', 'visual-portfolio' ),
+				'loop_share_fb'        => esc_attr__( 'Facebook', 'visual-portfolio' ),
+				'loop_share_pin'       => esc_attr__( 'Pinterest', 'visual-portfolio' ),
 				'pswp_fs'              => esc_attr__( 'Toggle fullscreen', 'visual-portfolio' ),
 				'pswp_zoom'            => esc_attr__( 'Zoom in/out', 'visual-portfolio' ),
 				'pswp_prev'            => esc_attr__( 'Previous (arrow left)', 'visual-portfolio' ),

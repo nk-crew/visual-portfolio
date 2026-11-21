@@ -91,9 +91,10 @@ function toSlide(item) {
 	return { ...slide, src, srcset };
 }
 
-function captionSlot({ document: doc }) {
+function captionSlot({ document: doc, lightbox }) {
 	const node = doc.createElement('div');
 	node.className = 're-lightbox-caption vp-loop-lightbox-caption';
+	node.hidden = true;
 	node.tabIndex = 0;
 	node.addEventListener('keydown', (event) => {
 		if (
@@ -104,14 +105,51 @@ function captionSlot({ document: doc }) {
 		}
 	});
 	let previous;
+	let frame;
+	const win = doc.defaultView;
+	const placeCaption = () => {
+		if (!frame || !node.parentElement) return;
+		const bottom = frame.getBoundingClientRect().bottom;
+		const footerTop = node.parentElement.getBoundingClientRect().top;
+		node.style.setProperty(
+			'--vp-loop-lightbox-caption-offset',
+			`${Math.min(0, bottom + 12 - footerTop)}px`
+		);
+	};
+	const observer = new win.ResizeObserver(placeCaption);
+	observer.observe(node);
+	const stopOpened = lightbox.on('opened', placeCaption);
 
 	return {
 		node,
-		update({ item }) {
+		update({ item, index }) {
 			if (item !== previous) {
 				previous = item;
 				node.replaceChildren(item?.captionMarkup.cloneNode(true) ?? '');
+				node.hidden = !item?.caption;
 			}
+			const nextFrame =
+				!node.hidden && !item?.type
+					? lightbox
+							.getSlide(index)
+							?.querySelector('.re-lightbox-frame')
+					: null;
+			if (frame !== nextFrame) {
+				if (frame) observer.unobserve(frame);
+				frame = nextFrame;
+				if (frame) observer.observe(frame);
+				else
+					node.style.removeProperty(
+						'--vp-loop-lightbox-caption-offset'
+					);
+			}
+			const stage = node.closest('.re-lightbox-stage');
+			if (stage) observer.observe(stage);
+			placeCaption();
+		},
+		destroy() {
+			observer.disconnect();
+			stopOpened();
 		},
 	};
 }
@@ -132,7 +170,7 @@ function shareSlot({ document: doc, lightbox }, shareUrl) {
 	links.hidden = true;
 	button.setAttribute('aria-controls', links.id);
 	const services = [
-		[__.pswp_share_fb, 'https://www.facebook.com/sharer/sharer.php', 'u'],
+		[__.loop_share_fb, 'https://www.facebook.com/sharer/sharer.php', 'u'],
 		[__.pswp_share_x, 'https://x.com/intent/tweet', 'url'],
 		[
 			__.pswp_share_li,
@@ -140,7 +178,7 @@ function shareSlot({ document: doc, lightbox }, shareUrl) {
 			'url',
 		],
 		[
-			__.pswp_share_pin,
+			__.loop_share_pin,
 			'https://www.pinterest.com/pin/create/button/',
 			'url',
 		],

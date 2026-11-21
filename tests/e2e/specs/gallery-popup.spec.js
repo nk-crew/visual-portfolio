@@ -638,7 +638,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await expect(share).toBeFocused();
 		await page.keyboard.press('Space');
 		await expect(share).toHaveAttribute('aria-expanded', 'true');
-		const facebook = page.getByRole('link', { name: 'Share on Facebook' });
+		const facebook = page.getByRole('link', { name: 'Facebook' });
 		await page.keyboard.press('Tab');
 		await expect(facebook).toBeFocused();
 		expect(
@@ -730,6 +730,10 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await page.setViewportSize({ width: 680, height: 360 });
 		await expect(strip).toBeHidden();
 		await expect.poll(captionBelowImage).toBeGreaterThan(0);
+		await page.setViewportSize({ width: 390, height: 844 });
+		await expect.poll(captionBelowImage).toBeLessThanOrEqual(16);
+		await expect.poll(captionBelowImage).toBeGreaterThan(0);
+		await page.setViewportSize({ width: 680, height: 360 });
 		expect(
 			await caption.evaluate((node) => node.scrollHeight)
 		).toBeGreaterThan((await caption.boundingBox()).height);
