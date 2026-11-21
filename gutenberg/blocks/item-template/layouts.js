@@ -19,8 +19,8 @@ import { createJustifiedGallery, createMasonry } from '@reuse-sh/gallery';
  * means them: left is left there too.
  *
  * @param {HTMLElement} list    - item template list.
- * @param {string}      lastRow - left, center, right or hide.
- * @return {string} start, center, end or hide.
+ * @param {string}      lastRow - left, center, right, justify or hide.
+ * @return {string} start, center, end, justify or hide.
  */
 function getLastRow(list, lastRow) {
 	const view = list.ownerDocument.defaultView || window;
@@ -28,6 +28,7 @@ function getLastRow(list, lastRow) {
 
 	switch (lastRow) {
 		case 'center':
+		case 'justify':
 		case 'hide':
 			return lastRow;
 		case 'right':

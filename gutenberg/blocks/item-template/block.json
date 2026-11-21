@@ -69,7 +69,7 @@
 		"justifiedLastRow": {
 			"type": "string",
 			"default": "left",
-			"enum": ["left", "center", "right", "hide"]
+			"enum": ["left", "center", "right", "justify", "hide"]
 		},
 		"carouselAutoWidth": {
 			"type": "boolean",

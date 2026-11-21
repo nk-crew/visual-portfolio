@@ -519,82 +519,205 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect.poll(isFilled, { timeout: 20000 }).toBe(true);
 	});
 
-	// 800px wide, a 10px gap and a 200px row: the first three pictures make a
-	// full row, and the two left over fit the target height, so they are the
-	// last row, which is not full.
-	[
-		{ lastRow: 'left', edge: 'left' },
-		{ lastRow: 'right', edge: 'right' },
-		{ lastRow: 'center', edge: 'center' },
-		{ lastRow: 'left', edge: 'left', dir: 'rtl' },
-		{ lastRow: 'hide', visible: 3 },
-		{ lastRow: 'left', maxRows: 1, count: 6, visible: 3 },
-	].forEach(({ lastRow, edge, dir, visible, maxRows = 0, count = 5 }) => {
-		test(`justified lays the last row out as ${lastRow}${dir ? ` in ${dir}` : ''}${maxRows ? ` with ${maxRows} row` : ''}`, async ({
-			page,
-			requestUtils,
-		}) => {
-			const created = await requestUtils.rest({
-				path: '/wp/v2/pages',
-				method: 'POST',
-				data: {
-					title: `Layouts - justified last row ${lastRow}`,
-					status: 'publish',
-					content: `<div dir="${dir || 'ltr'}" style="width:800px;max-width:none">${getLoopMarkup(
-						{
-							blockId: `e2e-justified-${lastRow}-${dir || 'ltr'}-${maxRows}`,
-							images: images.slice(0, count),
-							perPage: count,
-							layout: {
-								layoutType: 'justified',
-								justifiedRowHeight: 200,
-								justifiedLastRow: lastRow,
-								justifiedMaxRowsCount: maxRows,
-								style: { spacing: { blockGap: '10px' } },
-							},
-						}
-					)}</div>`,
-				},
-			});
+	test.describe('Justified last row', () => {
+		const rowImages = [];
 
-			pageIds.push(created.id);
-			await page.goto(created.link);
+		test.beforeAll(async ({ requestUtils }) => {
+			for (const fixture of [
+				'image-600x600.png',
+				'image-800x600.png',
+				'image-800x600.png',
+				'image-800x600.png',
+				'image-1200x600.png',
+				'image-800x600.png',
+			]) {
+				const { id } = await requestUtils.uploadMedia(
+					getFixturePath(fixture)
+				);
 
-			const list = page.locator(LIST);
-
-			await expect(list).toHaveAttribute('data-re-justified', /.+/);
-
-			const shown = (await getItemBoxes(page)).filter(
-				(item) => item.width > 0
-			);
-			const rows = [...new Set(shown.map((item) => item.y))];
-
-			if (visible) {
-				expect(shown).toHaveLength(visible);
-				expect(rows).toHaveLength(1);
-
-				return;
-			}
-
-			expect(rows).toHaveLength(2);
-
-			const last = shown.filter((item) => item.y === rows[1]);
-			const left = Math.min(...last.map((item) => item.x));
-			const right =
-				800 - Math.max(...last.map((item) => item.x + item.width));
-
-			expect(last).toHaveLength(2);
-			// Room enough to tell the edges apart.
-			expect(left + right).toBeGreaterThan(20);
-
-			if ('left' === edge) {
-				expect(left).toBeLessThan(2);
-			} else if ('right' === edge) {
-				expect(right).toBeLessThan(2);
-			} else {
-				expect(Math.abs(left - right)).toBeLessThan(2);
+				rowImages.push({ id });
 			}
 		});
+
+		test.afterAll(async ({ requestUtils }) => {
+			await Promise.all(
+				rowImages.map(({ id }) =>
+					requestUtils.rest({
+						path: `/wp/v2/media/${id}`,
+						method: 'DELETE',
+						params: { force: true },
+					})
+				)
+			);
+		});
+
+		// 800px wide, a 10px gap and a 200px row: the first three pictures make a
+		// full row, and the two left over fit the target height, so they are the
+		// last row, which is not full.
+		[
+			{ lastRow: 'left', edge: 'left' },
+			{ lastRow: 'right', edge: 'right' },
+			{ lastRow: 'center', edge: 'center' },
+			{ lastRow: 'justify', edge: 'justify' },
+			{ lastRow: 'left', edge: 'left', dir: 'rtl' },
+			{ lastRow: 'hide', visible: 3 },
+			{ lastRow: 'left', maxRows: 1, count: 6, visible: 3 },
+		].forEach(({ lastRow, edge, dir, visible, maxRows = 0, count = 5 }) => {
+			test(`justified lays the last row out as ${lastRow}${dir ? ` in ${dir}` : ''}${maxRows ? ` with ${maxRows} row` : ''}`, async ({
+				page,
+				requestUtils,
+			}) => {
+				const created = await requestUtils.rest({
+					path: '/wp/v2/pages',
+					method: 'POST',
+					data: {
+						title: `Layouts - justified last row ${lastRow}`,
+						status: 'publish',
+						content: `<div dir="${dir || 'ltr'}" style="width:min(800px, calc(100vw - 10px));max-width:none">${getLoopMarkup(
+							{
+								blockId: `e2e-justified-${lastRow}-${dir || 'ltr'}-${maxRows}`,
+								images: rowImages.slice(0, count),
+								perPage: count,
+								layout: {
+									layoutType: 'justified',
+									justifiedRowHeight: 200,
+									justifiedLastRow: lastRow,
+									justifiedMaxRowsCount: maxRows,
+									style: { spacing: { blockGap: '10px' } },
+								},
+							}
+						)}</div>`,
+					},
+				});
+
+				pageIds.push(created.id);
+				await page.goto(created.link);
+
+				const list = page.locator(LIST);
+
+				await expect(list).toHaveAttribute('data-re-justified', /.+/);
+
+				if (visible) {
+					const shown = (await getItemBoxes(page)).filter(
+						(item) => item.width > 0
+					);
+
+					expect(shown).toHaveLength(visible);
+					expect(new Set(shown.map((item) => item.y)).size).toBe(1);
+
+					return;
+				}
+
+				const responsive =
+					'justify' === edge || ('left' === edge && !dir);
+
+				for (const width of responsive ? [800, 440] : [800]) {
+					if (440 === width) {
+						await page.setViewportSize({ width: 450, height: 700 });
+					}
+
+					await expect(async () => {
+						expect(
+							await list.evaluate((node) => node.clientWidth)
+						).toBe(width);
+
+						const shown = (await getItemBoxes(page)).filter(
+							(item) => item.width > 0
+						);
+						const rows = [
+							...new Set(shown.map((item) => item.y)),
+						].map((y) => shown.filter((item) => item.y === y));
+
+						expect(rows.map((row) => row.length)).toEqual(
+							800 === width ? [3, 2] : [2, 2, 1]
+						);
+
+						for (const [index, row] of rows.entries()) {
+							const left = Math.min(...row.map((item) => item.x));
+							const right =
+								width -
+								Math.max(
+									...row.map((item) => item.x + item.width)
+								);
+
+							if (index < rows.length - 1 || 'justify' === edge) {
+								expect(Math.abs(left)).toBeLessThan(2);
+								expect(Math.abs(right)).toBeLessThan(2);
+							} else {
+								expect(left + right).toBeGreaterThan(20);
+
+								if ('left' === edge) {
+									expect(left).toBeLessThan(2);
+								} else if ('right' === edge) {
+									expect(right).toBeLessThan(2);
+								} else {
+									expect(Math.abs(left - right)).toBeLessThan(
+										2
+									);
+								}
+							}
+						}
+					}).toPass({ timeout: 5000 });
+				}
+			});
+		});
+	});
+
+	test('the editor previews and saves the justified last row setting', async ({
+		admin,
+		editor,
+		page,
+	}) => {
+		await admin.createNewPost({
+			title: 'Layouts - editor justified last row',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+		await editor.insertBlock({
+			name: 'visual-portfolio/loop',
+			attributes: { queryType: 'images', imagesQuery: { images } },
+			innerBlocks: [
+				{
+					name: 'visual-portfolio/item-template',
+					attributes: { layoutType: 'justified' },
+					innerBlocks: [{ name: 'visual-portfolio/item-image' }],
+				},
+			],
+		});
+
+		const canvas = getEditorCanvas(page, editor);
+		const list = canvas.locator(LIST);
+
+		await editor.selectBlocks(
+			canvas.locator('[data-type="visual-portfolio/item-template"]')
+		);
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole('button', { name: 'Justified options' }).click();
+		await page
+			.getByRole('menuitemcheckbox', {
+				name: /^(Show Last row|Last row, show)$/,
+			})
+			.click();
+		await page.keyboard.press('Escape');
+
+		const lastRow = page.getByRole('combobox', {
+			name: 'Last row',
+			exact: true,
+		});
+
+		await expect(lastRow).toHaveValue('left');
+		await expect(list).toHaveAttribute('data-re-justified', 'start');
+		await lastRow.selectOption({ label: 'Justify' });
+		await expect(list).toHaveAttribute('data-re-justified', 'justify');
+
+		await editor.publishPost();
+		const frontend = await openPublishedPage(page);
+
+		await expect(frontend.locator(LIST)).toHaveAttribute(
+			'data-re-justified',
+			'justify'
+		);
 	});
 
 	test('masonry that fills the available space packs its columns', async ({
