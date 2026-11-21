@@ -93,7 +93,16 @@ function toSlide(item) {
 
 function captionSlot({ document: doc }) {
 	const node = doc.createElement('div');
-	node.className = 're-lightbox-caption';
+	node.className = 're-lightbox-caption vp-loop-lightbox-caption';
+	node.tabIndex = 0;
+	node.addEventListener('keydown', (event) => {
+		if (
+			['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key) &&
+			node.scrollHeight > node.clientHeight
+		) {
+			event.stopPropagation();
+		}
+	});
 	let previous;
 
 	return {
@@ -107,13 +116,21 @@ function captionSlot({ document: doc }) {
 	};
 }
 
-function shareSlot({ document: doc }, shareUrl) {
-	const node = doc.createElement('details');
+function shareSlot({ document: doc, lightbox }, shareUrl) {
+	const node = doc.createElement('div');
 	node.className = 'vp-loop-lightbox-share';
-	const button = doc.createElement('summary');
+	const button = doc.createElement('button');
+	button.type = 'button';
 	button.className = 're-lightbox-button';
-	button.textContent = __.pswp_share;
+	button.title = __.pswp_share;
+	button.setAttribute('aria-label', __.pswp_share);
+	button.setAttribute('aria-expanded', 'false');
+	button.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3m-4 4 4-4 4 4M7 11H6a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-1"/></svg>`;
 	const links = doc.createElement('div');
+	links.className = 'vp-loop-lightbox-share-links';
+	links.id = 'vp-loop-lightbox-share-links';
+	links.hidden = true;
+	button.setAttribute('aria-controls', links.id);
 	const services = [
 		[__.pswp_share_fb, 'https://www.facebook.com/sharer/sharer.php', 'u'],
 		[__.pswp_share_x, 'https://x.com/intent/tweet', 'url'],
@@ -137,9 +154,46 @@ function shareSlot({ document: doc }, shareUrl) {
 	});
 	node.append(button, links);
 
+	const setOpen = (open) => {
+		links.hidden = !open;
+		button.setAttribute('aria-expanded', String(open));
+	};
+	const dismiss = () => {
+		setOpen(false);
+		button.focus({ preventScroll: true });
+	};
+	const onEscape = (event) => {
+		if (event.key === 'Escape' && !links.hidden) {
+			event.preventDefault();
+			dismiss();
+		}
+	};
+	const dialog = lightbox.getSlide(0)?.closest('dialog');
+	dialog?.addEventListener('keydown', onEscape, true);
+	button.addEventListener('click', () => setOpen(links.hidden));
+	node.addEventListener('pointerdown', (event) => {
+		if (event.target === node) {
+			event.preventDefault();
+		}
+	});
+	node.addEventListener('click', (event) => {
+		if (event.target === node) {
+			dismiss();
+		}
+	});
+	node.addEventListener('focusout', ({ relatedTarget }) => {
+		if (!links.hidden && relatedTarget && !node.contains(relatedTarget)) {
+			setOpen(false);
+		}
+	});
+
 	return {
 		node,
 		update(state) {
+			if (!links.hidden && (state.isClosing || state.zoom.scale > 1)) {
+				setOpen(false);
+			}
+
 			const { item } = state;
 			const destination =
 				(typeof shareUrl === 'function' && shareUrl(state)) ||
@@ -156,6 +210,9 @@ function shareSlot({ document: doc }, shareUrl) {
 				}
 				link.href = url.href;
 			}
+		},
+		destroy() {
+			dialog?.removeEventListener('keydown', onEscape, true);
 		},
 	};
 }
@@ -199,6 +256,7 @@ function toolbarSlot(context, shareUrl) {
 		},
 		destroy() {
 			button?.removeEventListener('click', toggle);
+			share?.destroy();
 		},
 	};
 }

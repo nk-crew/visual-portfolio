@@ -9,6 +9,54 @@
 		display: none;
 	}
 
+	.re-lightbox-stage:has(> .re-lightbox-footer > .vp-loop-lightbox-caption) {
+		--vp-loop-lightbox-caption-height: min(4rem, 20vh);
+		--re-lightbox-bottom-room: calc(
+			var(--vp-loop-lightbox-caption-height) + var(--re-lightbox-gap) +
+			max(var(--re-lightbox-inset), env(safe-area-inset-bottom))
+		);
+	}
+
+	@media (min-height: 480px) {
+		&[data-thumbnails="bottom"] .re-lightbox-stage:has(> .re-lightbox-footer > .vp-loop-lightbox-caption) {
+			// Reuse takes the larger of bottom room and strip height. Include its strip padding in the combined reservation.
+			--re-lightbox-bottom-room: calc(
+				var(--vp-loop-lightbox-caption-height) + 2 * var(--re-lightbox-gap) +
+				12px + var(--re-lightbox-thumbnail-size) +
+				max(14px, env(safe-area-inset-bottom))
+			);
+		}
+	}
+
+	&[data-zoomed="false"] .re-lightbox-stage:has(> .re-lightbox-footer > .vp-loop-lightbox-caption) .re-lightbox-slide {
+		// Reuse fits tall photos to the viewport width and pans them at scale 1.
+		clip-path: inset(0 0 var(--re-lightbox-bottom-room, 0) 0);
+	}
+
+	.vp-loop-lightbox-caption {
+		box-sizing: border-box;
+		max-height: var(--vp-loop-lightbox-caption-height);
+		padding: 0;
+		background: none;
+		overscroll-behavior: contain;
+		touch-action: pan-y;
+
+		:where(h3, p) {
+			margin-block: 0;
+		}
+
+		h3 {
+			font-size: inherit;
+			font-weight: 600;
+			line-height: inherit;
+		}
+
+		&:focus-visible {
+			outline: 2px solid currentColor;
+			outline-offset: 3px;
+		}
+	}
+
 	.re-lightbox-caption {
 		a,
 		h3 {
@@ -36,25 +84,78 @@
 	.vp-loop-lightbox-share {
 		position: relative;
 
-		summary {
-			width: auto;
-			padding-inline: 0.75em;
-			cursor: pointer;
-			list-style: none;
+		&:has(> button[aria-expanded="true"]) {
+			z-index: 1;
+
+			&::before {
+				position: fixed;
+				inset: 0;
+				content: "";
+			}
 		}
 
-		div {
-			position: absolute;
-			inset-inline-end: 0;
-			padding: 0.5em 0.75em;
-			background: var(--re-lightbox-background);
+		button {
+			position: relative;
+
+			&[aria-expanded="true"] {
+				background: var(--re-lightbox-control-hover);
+			}
 		}
+	}
+
+	@media (max-width: 479.98px) {
+		.re-lightbox-toolbar:has(.vp-loop-lightbox-share) {
+			--re-lightbox-button-size: 36px;
+			--re-lightbox-button-padding: 6px;
+			--re-lightbox-gap: 6px;
+		}
+
+		.re-lightbox-toolbar-end:has(> .vp-loop-lightbox-share) {
+			flex-wrap: wrap;
+			justify-content: flex-end;
+		}
+	}
+
+	.vp-loop-lightbox-share-links {
+		position: absolute;
+		inset-block-start: calc(100% + var(--re-lightbox-gap) / 2);
+		inset-inline-end: 0;
+		box-sizing: border-box;
+		inline-size: max-content;
+		max-inline-size: min(14rem, calc(100vw - 2 * var(--re-lightbox-inset)));
+		max-block-size: calc(
+			100dvh - var(--wp-admin--admin-bar--height, 0px) -
+			var(--re-lightbox-button-size) - var(--re-lightbox-gap) -
+			max(var(--re-lightbox-inset), env(safe-area-inset-top)) -
+			max(var(--re-lightbox-inset), env(safe-area-inset-bottom))
+		);
+		padding: calc(var(--re-lightbox-gap) / 2);
+		overflow: auto;
+		overscroll-behavior: contain;
+		border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+		border-radius: var(--re-lightbox-gap);
+		background: var(--re-lightbox-panel);
+		box-shadow: 0 6px 20px rgb(0 0 0 / 25%);
+		font-size: var(--re-lightbox-font-size);
+		line-height: 1.5;
+		text-align: start;
+		overflow-wrap: anywhere;
 
 		a {
 			display: block;
-			padding: 0.25em 0;
+			padding: 0.5em 0.75em;
+			border-radius: var(--re-lightbox-caption-radius);
 			color: inherit;
-			white-space: nowrap;
+			text-decoration: none;
+
+			&:is(:hover, :focus-visible) {
+				background: var(--re-lightbox-control-hover);
+			}
+
+			&:focus-visible {
+				outline: 2px solid currentColor;
+				outline-offset: -2px;
+			}
 		}
 	}
 }

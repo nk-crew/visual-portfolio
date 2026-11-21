@@ -579,6 +579,7 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await page.evaluate(() => {
 			window.VPData.settingsPopupGallery.background_color = '#345678';
 			window.VPData.settingsPopupGallery.show_thumbs = true;
+			window.VPData.settingsPopupGallery.show_share_button = true;
 			window.vpfChangeEvents = [];
 			const api = window.VPPopupAPI;
 			const open = api.open;
@@ -629,9 +630,17 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		await expect(strip).toHaveCount(0);
 		await expectPosition(page, 2, IMAGES_COUNT);
 
-		await page.getByText('Share', { exact: true }).click();
+		const share = page.getByRole('button', { name: 'Share', exact: true });
+		expect((await share.boundingBox()).width).toBe(
+			(await thumbnails.boundingBox()).width
+		);
+		await page.keyboard.press('Tab');
+		await expect(share).toBeFocused();
+		await page.keyboard.press('Space');
+		await expect(share).toHaveAttribute('aria-expanded', 'true');
 		const facebook = page.getByRole('link', { name: 'Share on Facebook' });
-		await expect(facebook).toBeVisible();
+		await page.keyboard.press('Tab');
+		await expect(facebook).toBeFocused();
 		expect(
 			new URL(await facebook.getAttribute('href')).searchParams.get('u')
 		).toBe('https://example.org/gallery/2');
@@ -654,12 +663,82 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 		]);
 		await page.keyboard.press('ArrowRight');
 		await expectPosition(page, 1, IMAGES_COUNT);
+		await page.keyboard.press('Escape');
+		await expect(share).toHaveAttribute('aria-expanded', 'false');
+		await expect(share).toBeFocused();
+		await expect(facebook).toBeHidden();
+		await expect(page.locator(REUSE)).toBeVisible();
+
+		await page.keyboard.press('Enter');
+		await expect(facebook).toBeVisible();
+		const viewport = await page
+			.locator(`${REUSE} .re-lightbox-viewport`)
+			.boundingBox();
+		await page.mouse.click(viewport.x + 4, viewport.y + 100);
+		await expect(facebook).toBeHidden();
+		await expect(share).toBeFocused();
+		await expect(page.locator(REUSE)).toBeVisible();
 
 		await page.evaluate(() => window.VPPopupAPI.close());
 		await expect(page.locator(REUSE)).toHaveCount(0);
 		await expect
 			.poll(() => page.evaluate(() => window.VPPopupAPI.instance))
 			.toBe(false);
+	});
+
+	test('Free reserves space for long captions below photos and above thumbnails', async ({
+		page,
+		requestUtils,
+	}) => {
+		test.skip(!!process.env.CORE, 'Free uses the Reuse viewer.');
+		await page.setViewportSize({ width: 680, height: 560 });
+		const title = 'A long title with words that wrap. '.repeat(24).trim();
+		await publishLoop(requestUtils, page, {
+			pageTitle: 'Popup - caption spacing',
+			blockId: 'e2e-popup-caption-spacing',
+			queryId: 1,
+			images: [{ ...images[0], title }, images[1]],
+			clickAction: 'popup',
+			lightbox: {
+				titleSource: 'item_title',
+				descriptionSource: 'caption',
+			},
+		});
+		test.skip(await isPro(page), 'Free uses the Reuse viewer.');
+		await page.evaluate(() => {
+			window.VPData.settingsPopupGallery.show_thumbs = true;
+			window.VPData.settingsPopupGallery.thumbs_auto_start = true;
+		});
+
+		await page.locator(TRIGGER).first().click();
+		const caption = page.locator(POPUP_CAPTION);
+		const strip = page.locator(`${REUSE} .re-lightbox-thumbnails`);
+		await expect(page.locator(REUSE)).toHaveAttribute('data-phase', 'open');
+		await expect(caption).toContainText(title);
+		await expect(caption).toContainText(CAPTION_TEXT);
+
+		async function captionBelowImage() {
+			const image = await page.locator(POPUP_IMAGE).boundingBox();
+			const text = await caption.boundingBox();
+			return text.y - (image.y + image.height);
+		}
+		await expect.poll(captionBelowImage).toBeGreaterThan(0);
+		const text = await caption.boundingBox();
+		const thumbnails = await strip.boundingBox();
+		expect(thumbnails.y).toBeGreaterThan(text.y + text.height);
+
+		await page.setViewportSize({ width: 680, height: 360 });
+		await expect(strip).toBeHidden();
+		await expect.poll(captionBelowImage).toBeGreaterThan(0);
+		expect(
+			await caption.evaluate((node) => node.scrollHeight)
+		).toBeGreaterThan((await caption.boundingBox()).height);
+		await caption.focus();
+		await page.keyboard.press('End');
+		await expect
+			.poll(() => caption.evaluate((node) => node.scrollTop))
+			.toBeGreaterThan(0);
+		await expectPosition(page, 1, 2);
 	});
 
 	test('Free opens a WordPress image with the configured vendor on the same page as Reuse', async ({
