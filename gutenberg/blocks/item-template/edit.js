@@ -99,6 +99,7 @@ const LAST_ROW_OPTIONS = [
 	{ label: __('Left', 'visual-portfolio'), value: 'left' },
 	{ label: __('Center', 'visual-portfolio'), value: 'center' },
 	{ label: __('Right', 'visual-portfolio'), value: 'right' },
+	{ label: __('Justify', 'visual-portfolio'), value: 'justify' },
 	{ label: __('Hide', 'visual-portfolio'), value: 'hide' },
 ];
 

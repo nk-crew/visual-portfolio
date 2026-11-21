@@ -58,6 +58,21 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Register the Saved Layout post type after the test case resets it.
+	 */
+	private function register_saved_layout_post_type() {
+		if ( ! post_type_exists( Visual_Portfolio_Saved_Layouts::POST_TYPE ) ) {
+			register_post_type(
+				Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				array(
+					'map_meta_cap' => true,
+					'show_in_rest' => true,
+				)
+			);
+		}
+	}
+
+	/**
 	 * Run an ability as a user.
 	 *
 	 * @param string $name - ability name without the namespace.
@@ -158,6 +173,37 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 		$content = get_post( $post_id )->post_content;
 		$this->assertStringStartsWith( self::SURROUNDINGS . "\n\n<!-- wp:visual-portfolio/loop ", $content );
 		$this->assertSame( $gallery, $this->run_ability( 'get-gallery', array( 'post_id' => $post_id, 'gallery_id' => $gallery['gallery_id'] ) ) );
+	}
+
+	/**
+	 * A gallery created with a Saved Layout inherits the justified last row.
+	 */
+	public function test_gallery_inherits_justified_last_row_from_saved_layout() {
+		$this->register_saved_layout_post_type();
+
+		$layout = $this->create_post(
+			'<!-- wp:visual-portfolio/loop {"queryType":"images"} -->'
+			. '<div class="vp-block-loop">'
+			. '<!-- wp:visual-portfolio/item-template {"layoutType":"justified","justifiedLastRow":"justify"} -->'
+			. '<!-- wp:visual-portfolio/item-image /-->'
+			. '<!-- /wp:visual-portfolio/item-template -->'
+			. '</div><!-- /wp:visual-portfolio/loop -->',
+			array(
+				'post_type'   => Visual_Portfolio_Saved_Layouts::POST_TYPE,
+				'post_status' => 'publish',
+			)
+		);
+		$gallery = $this->run_ability(
+			'create-gallery',
+			array(
+				'layout'       => 'visual-portfolio/gallery-grid-classic',
+				'source'       => $this->images_source( array( 0 ) ),
+				'saved_layout' => $layout,
+			)
+		);
+
+		$this->assertIsArray( $gallery );
+		$this->assertStringContainsString( 'data-vp-justified-last-row="justify"', do_blocks( get_post( $gallery['post_id'] )->post_content ) );
 	}
 
 	/**
@@ -293,16 +339,7 @@ class Test_Class_Abilities extends WP_UnitTestCase {
 	 * detaches it; a layout it may not read is refused.
 	 */
 	public function test_galleries_sync_with_saved_layouts() {
-		// The test case resets the post types after every test.
-		if ( ! post_type_exists( Visual_Portfolio_Saved_Layouts::POST_TYPE ) ) {
-			register_post_type(
-				Visual_Portfolio_Saved_Layouts::POST_TYPE,
-				array(
-					'map_meta_cap' => true,
-					'show_in_rest' => true,
-				)
-			);
-		}
+		$this->register_saved_layout_post_type();
 
 		wp_set_current_user( self::$users['administrator'] );
 
