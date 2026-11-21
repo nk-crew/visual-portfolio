@@ -36,6 +36,7 @@
 	.vp-loop-lightbox-caption {
 		box-sizing: border-box;
 		max-height: var(--vp-loop-lightbox-caption-height);
+		translate: 0 var(--vp-loop-lightbox-caption-offset, 0);
 		padding: 0;
 		background: none;
 		overscroll-behavior: contain;
@@ -49,6 +50,10 @@
 			font-size: inherit;
 			font-weight: 600;
 			line-height: inherit;
+		}
+
+		&[hidden] {
+			display: none;
 		}
 
 		&:focus-visible {
