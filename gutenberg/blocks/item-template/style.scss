@@ -129,6 +129,10 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 	margin: 0;
 	list-style: none;
 
+	:where(.vp-block-loop) > * + & {
+		margin-block-start: var(--wp--style--block-gap, var(--wp--preset--spacing--40, 1.25em));
+	}
+
 	// Rows that cannot be filled collapse their empty tracks instead of
 	// keeping them - the "fill available space" of the core grid.
 	&.vp-layout-auto-fit {
@@ -619,6 +623,7 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 
 .wp-block-visual-portfolio-item-template__item {
 	min-width: 0;
+	margin: 0;
 }
 
 // The blocks of an item are spaced the way core's flow layout spaces a group,
@@ -631,6 +636,29 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 
 :root :where(#{$item}, #{$card}, .wp-block-visual-portfolio-item-template__preview) > * + * {
 	margin-block-start: var(--wp--style--block-gap, 1.5rem);
+}
+
+$caption: ":is(.wp-block-visual-portfolio-item-title, .wp-block-visual-portfolio-item-description, .wp-block-visual-portfolio-item-categories, .wp-block-visual-portfolio-item-date, .wp-block-visual-portfolio-item-author, .wp-block-visual-portfolio-item-meta, .wp-block-visual-portfolio-item-read-more)";
+
+:is(#{$item}, #{$card}, .wp-block-visual-portfolio-item-template__preview) {
+	> #{$caption} {
+		margin-block: 0;
+		font-size: var(--wp--preset--font-size--small, 0.875em);
+		line-height: 1.5;
+	}
+
+	> .wp-block-visual-portfolio-item-title {
+		font-size: var(--wp--preset--font-size--medium, 1.125em);
+		line-height: 1.25;
+	}
+
+	> * + #{$caption} {
+		margin-block-start: var(--wp--style--block-gap, var(--wp--preset--spacing--20, 0.375em));
+	}
+
+	> :is(.wp-block-visual-portfolio-item-image, .wp-block-visual-portfolio-item-cover) + :where(#{$caption}) {
+		margin-block-start: var(--wp--style--block-gap, var(--wp--preset--spacing--30, 0.75em));
+	}
 }
 
 // The one box of a carousel that stays put while the list inside it scrolls.
@@ -665,6 +693,10 @@ $carousel-peek: min(var(--vp-carousel-peek, 0px), 25cqw);
 .vp-is-loading .wp-block-visual-portfolio-item-template {
 	opacity: 0.6;
 	transition: opacity 0.15s ease-in-out;
+
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+	}
 }
 
 // The announcement of a Load More append. Nothing else on a loop page reaches

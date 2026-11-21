@@ -1,6 +1,5 @@
 // Pagination block.
 .vp-block-loop-pagination {
-	font-size: var(--wp--preset--font-size--medium, 1rem);
 	font-weight: 500;
 }
 
@@ -52,6 +51,10 @@
 		border-radius: 50%;
 		animation: vp-block-loop-spinner var(--vp-spinner__speed) infinite linear;
 
+		@media (prefers-reduced-motion: reduce) {
+			animation: none;
+		}
+
 		&::after {
 			position: absolute;
 			top: calc(-1 * var(--vp-spinner__border-size));
@@ -90,6 +93,15 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.4ch;
+	align-items: center;
+	font-variant-numeric: tabular-nums;
+
+	> :where(a, .is-active) {
+		display: inline-grid;
+		min-inline-size: 24px;
+		min-block-size: 24px;
+		place-items: center;
+	}
 }
 
 // Fill style.
@@ -113,7 +125,6 @@
 	}
 
 	.vp-block-loop-pagination-numbers {
-		align-items: center;
 		font-weight: 400;
 		gap: 0.6ch;
 

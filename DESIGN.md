@@ -35,3 +35,9 @@ In the editor, a setting a synced gallery changed shows a dot, "Changed on this 
 The caption sits at the bottom of the viewport, above bottom thumbnails and beside side thumbnails. Its rendered height determines how much space it takes from the photo. An empty caption takes no space. Long captions scroll, including from the keyboard. Tall photos remain pannable at their fitted width.
 
 Available toolbar buttons keep their order and spacing while zoomed. When Loop is off, the previous and next buttons stay in place at the ends and use the native disabled state with a dimmed appearance. Share opens a dark panel at least 11rem wide when space allows, with a visible focus outline on each link.
+
+# Gallery Loop
+
+The item layout sets the space between cards. Inside a card, use the theme's block gap when it defines one. Otherwise, the media has a small gap before the caption, and the caption's title and details sit closer together. Use the theme's font size and spacing presets for these defaults. Keep the theme's fonts and colors, and let block settings set the layout, spacing and typography for each gallery.
+
+Gallery controls use the same defaults on the page and in the editor canvas. Filter, sort and page links show the current choice visibly. Search and select fields share the same field styling. Controls wrap when space runs out, show a visible keyboard focus ring, and keep loading feedback visible when reduced motion is enabled.
