@@ -83,6 +83,8 @@ const RELAYOUT_EVENT = 'vp-relayout';
 // and holds its autoplay while it is open.
 //
 // `vp-carousel-go-to`     `detail.index`   slide to rest on.
+//                         `detail.behavior: 'instant'` moves there before
+//                                          the command returns.
 // `vp-carousel-autoplay`  `detail.playing` false holds autoplay, true releases
 //                                          it. A hold, not a play button: the
 //                                          pointer of the visitor still pauses
@@ -1335,11 +1337,12 @@ function slide(list, direction) {
 /**
  * Scroll a carousel to one of its slides.
  *
- * @param {HTMLElement} list    Item template list.
- * @param {number}      index   Slide to rest on.
- * @param {number[]}    targets Resting places of the slides.
+ * @param {HTMLElement} list     Item template list.
+ * @param {number}      index    Slide to rest on.
+ * @param {number[]}    targets  Resting places of the slides.
+ * @param {string}      behavior Optional scroll behavior.
  */
-function goToSlide(list, index, targets) {
+function goToSlide(list, index, targets, behavior) {
 	const carousel = carousels.get(list);
 
 	if (carousel) {
@@ -1348,7 +1351,7 @@ function goToSlide(list, index, targets) {
 			index >= 0 &&
 			index < carousel.getState().count
 		) {
-			travel.get(list)(() => carousel.goTo(index));
+			travel.get(list)(() => carousel.goTo(index, behavior));
 		}
 
 		return;
@@ -1369,7 +1372,7 @@ function goToSlide(list, index, targets) {
 	});
 	syncNav(list);
 
-	scrollListTo(list, targets[wanted]);
+	scrollListTo(list, targets[wanted], behavior);
 }
 
 /**
@@ -2213,7 +2216,13 @@ function initCarousel(list, restore) {
 	);
 	list.addEventListener(
 		GO_TO_EVENT,
-		(event) => goToSlide(list, event.detail?.index),
+		({ detail }) =>
+			goToSlide(
+				list,
+				detail?.index,
+				undefined,
+				detail?.behavior === 'instant' ? 'instant' : undefined
+			),
 		{ signal }
 	);
 	list.addEventListener(PLACE_EVENT, onPlace, { signal });

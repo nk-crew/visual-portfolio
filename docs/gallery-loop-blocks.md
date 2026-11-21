@@ -1300,7 +1300,7 @@ template:
 
 | Event | Payload |
 |---|---|
-| `vp-carousel-go-to` | `detail.index` — scroll to that slide |
+| `vp-carousel-go-to` | `detail.index` selects a zero-based slide index. Optional `detail.behavior: 'instant'` moves the carousel to that slide's resting position before `dispatchEvent()` returns and cancels any smooth move in progress. Omit `behavior` for the default smooth scroll, which respects reduced motion. |
 | `vp-carousel-step` | a control requested a move; restart the autoplay countdown |
 | `vp-carousel-autoplay` | `detail.playing` — `false` holds autoplay, `true` releases it |
 | `vp-carousel-place` | `detail.position` — a scroll position on a repeating carousel, applied at once; written back as the resulting scroll position |
