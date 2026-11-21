@@ -25,7 +25,14 @@ function toSlide(item) {
 		alt: image?.alt,
 		caption: caption.content.textContent.trim(),
 		captionMarkup: caption.content,
-		origin: settings.restore_focus ? () => item.linkEl : null,
+		origin: settings.restore_focus
+			? () =>
+					item.type === 'image' &&
+					!item.isAlbumImage &&
+					image?.naturalWidth
+						? image
+						: item.linkEl
+			: null,
 		previewSrc: poster || image?.currentSrc || item.srcSmall,
 		thumbnailSrc: item.srcSmall,
 		raw: item,
@@ -250,6 +257,7 @@ function shareSlot({ document: doc, lightbox }, shareUrl) {
 			const { item } = state;
 			const destination =
 				(typeof shareUrl === 'function' && shareUrl(state)) ||
+				(!item?.type && item?.src) ||
 				doc.location.href;
 
 			for (const { link, href, key } of services) {
@@ -375,6 +383,14 @@ export function openReuse(items, index, gallery) {
 	const viewerOptions = { ...options };
 	delete viewerOptions.shareUrl;
 	const lightbox = createLightbox(viewerOptions);
+	const stopsSlideshowAtEnd = window.VPData.pro
+		? settings.loop === false
+		: options.loop === false;
+	if (stopsSlideshowAtEnd) {
+		lightbox.subscribe((state) => {
+			if (state.isPlaying && !state.canNext) lightbox.pause();
+		});
+	}
 	const rawItems = slides.map(({ raw }) => raw);
 	const { close, append } = api;
 	const closeReuse = () => lightbox.close();
@@ -420,6 +436,15 @@ export function openReuse(items, index, gallery) {
 		gallery.emitEvent('beforeClosePopup', [lightbox, event])
 	);
 	lightbox.on('closed', (event) => {
+		const item = lightbox.getState().item?.raw;
+		const focused = document.activeElement;
+		if (
+			settings.restore_focus &&
+			item?.linkEl?.isConnected &&
+			(focused === document.body || item.el?.contains(focused))
+		) {
+			item.linkEl.focus({ preventScroll: true });
+		}
 		clear();
 		gallery.emitEvent('destroyPopup', [lightbox, event]);
 	});
