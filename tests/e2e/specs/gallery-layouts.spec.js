@@ -1692,6 +1692,92 @@ test.describe('Gallery Item Template layouts', () => {
 		await expect(page.locator(NEXT_ARROW)).toBeDisabled();
 	});
 
+	for (const mode of ['bounded', 'repeating', 'fallback']) {
+		test(`an instant carousel command replaces smooth travel in ${mode} mode`, async ({
+			page,
+			requestUtils,
+		}) => {
+			await page.emulateMedia({ reducedMotion: 'no-preference' });
+			if (mode === 'fallback') {
+				await page.route('**/reuse-carousel/carousel.js?*', (route) =>
+					route.abort()
+				);
+			}
+
+			await publishLoop(requestUtils, page, {
+				title: `Layouts - instant carousel command (${mode})`,
+				blockId: `e2e-carousel-instant-${mode}`,
+				images,
+				layout: {
+					layoutType: 'carousel',
+					layoutColumnsMode: 'manual',
+					layoutColumnCount: 1,
+					carouselRepeat: mode === 'repeating',
+				},
+				carousel: ['loop-carousel-next'],
+			});
+
+			const list = page.locator(LIST);
+			if (mode === 'fallback') {
+				await expect(page.locator(NEXT_ARROW)).toBeEnabled();
+				await expect(list).not.toHaveClass(/\bre-carousel\b/);
+			} else {
+				await expect(list).toHaveClass(/\bre-carousel\b/);
+			}
+			if (mode === 'repeating') {
+				await expect(list).toHaveAttribute(
+					'data-vp-carousel-repeat',
+					'true'
+				);
+			}
+			await settle(list);
+
+			const positions = await list.evaluate(async (node, selector) => {
+				const items = node.querySelectorAll(selector);
+				const offset = (index) =>
+					items[index].getBoundingClientRect().left -
+					node.getBoundingClientRect().left;
+				const start = node.scrollLeft;
+				const moving = new Promise((resolve) => {
+					const onScroll = () => {
+						if (node.scrollLeft !== start) {
+							node.removeEventListener('scroll', onScroll);
+							resolve();
+						}
+					};
+					node.addEventListener('scroll', onScroll);
+				});
+
+				node.dispatchEvent(
+					new CustomEvent('vp-carousel-go-to', {
+						detail: { index: 1 },
+					})
+				);
+				const afterSmooth = node.scrollLeft;
+				await moving;
+				const smoothOffset = offset(1);
+				node.dispatchEvent(
+					new CustomEvent('vp-carousel-go-to', {
+						detail: { index: 2, behavior: 'instant' },
+					})
+				);
+				return {
+					start,
+					afterSmooth,
+					smoothOffset,
+					instantOffset: offset(2),
+				};
+			}, ITEM);
+
+			expect(positions.afterSmooth).toBe(positions.start);
+			expect(Math.abs(positions.smoothOffset)).toBeGreaterThan(1);
+			expect(positions.instantOffset).toBe(0);
+			await settle(list);
+			const boxes = await getItemBoxes(page);
+			expect(boxes[2].x).toBe(0);
+		});
+	}
+
 	test('carousel controls work when its enhancement cannot load', async ({
 		page,
 		requestUtils,
