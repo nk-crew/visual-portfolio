@@ -260,18 +260,24 @@ function getItems(list) {
 
 // The bar of a repeating carousel counts slides, so a fraction of it lies
 // between two slides' resting places, whatever widths the slides have.
+// The first slide always starts a page, so it carries the alignment the
+// library writes; the others carry `none` when a press moves several.
 function getLoopPlace(list, fraction) {
 	const items = getItems(list);
+
+	if (!items.length) {
+		return 0;
+	}
+
+	const centred = 'center' === items[0].style.scrollSnapAlign;
 	const padding =
 		parseFloat(window.getComputedStyle(list).scrollPaddingInlineStart) || 0;
 	const rest = (item) =>
 		item.offsetLeft -
-		('center' === item.style.scrollSnapAlign
-			? (list.clientWidth - item.offsetWidth) / 2
-			: padding);
+		(centred ? (list.clientWidth - item.offsetWidth) / 2 : padding);
 
 	if (items.length < 2) {
-		return items[0] ? rest(items[0]) : 0;
+		return rest(items[0]);
 	}
 
 	const at = fraction * (items.length - 1);

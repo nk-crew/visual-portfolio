@@ -226,6 +226,20 @@ test.describe('Gallery Item Template layouts', () => {
 		);
 
 		pageIds = [];
+
+		// The next run takes the newest images as its own, and these would
+		// give it slides of four shapes.
+		await Promise.all(
+			shapedImages.map(({ id }) =>
+				requestUtils.rest({
+					path: `/wp/v2/media/${id}`,
+					method: 'DELETE',
+					params: { force: true },
+				})
+			)
+		);
+
+		shapedImages.length = 0;
 	});
 
 	/**
@@ -1400,58 +1414,82 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(measured.seam).toBeCloseTo(measured.gap, 0);
 	});
 
-	test('a drag on the bar of own-width slides that repeat lets go where it showed', async ({
-		page,
-		requestUtils,
-	}) => {
-		const shaped = await getShapedImages(requestUtils);
+	for (const { align, group } of [
+		{ align: 'start', group: 1 },
+		{ align: 'center', group: 2 },
+	]) {
+		test(`a drag on the bar of own-width slides that repeat lets go where it showed (${align}, ${group} per press)`, async ({
+			page,
+			requestUtils,
+		}) => {
+			const shaped = await getShapedImages(requestUtils);
 
-		await publishLoop(requestUtils, page, {
-			title: 'Layouts - carousel repeat own width scrub',
-			blockId: 'e2e-carousel-repeat-own-width-scrub',
-			images: shaped,
-			layout: {
-				layoutType: 'carousel',
-				carouselAutoWidth: true,
-				carouselSlideHeight: '400px',
-				carouselRepeat: true,
-			},
-			carousel: [['loop-carousel-indicator', { indicator: 'progress' }]],
+			await publishLoop(requestUtils, page, {
+				title: 'Layouts - carousel repeat own width scrub',
+				blockId: `e2e-carousel-repeat-own-width-scrub-${align}`,
+				images: shaped,
+				layout: {
+					layoutType: 'carousel',
+					carouselAutoWidth: true,
+					carouselSlideHeight: '400px',
+					carouselSnapAlign: align,
+					carouselSlidesPerGroup: group,
+					carouselRepeat: true,
+				},
+				carousel: [
+					['loop-carousel-indicator', { indicator: 'progress' }],
+				],
+			});
+
+			const list = page.locator(LIST);
+			const bar = page.locator(`${NAV} [role="slider"]`);
+			// How far a slide is from where it rests.
+			const offset = (index) =>
+				list.evaluate(
+					(node, [item, at, centred]) => {
+						const slide = node
+							.querySelectorAll(`:scope > ${item}`)
+							[at].getBoundingClientRect();
+						const frame = node.getBoundingClientRect();
+
+						return centred
+							? slide.left +
+									slide.width / 2 -
+									(frame.left + frame.width / 2)
+							: slide.left - frame.left;
+					},
+					[ITEM, index, 'center' === align]
+				);
+
+			await expect(list).toHaveAttribute(
+				'data-vp-carousel-repeat',
+				'true',
+				{
+					timeout: 15000,
+				}
+			);
+
+			// Three fifths of six slides is the fourth one, which starts no page
+			// at two per press and is still held where it would rest.
+			const box = await bar.boundingBox();
+			const y = box.y + box.height / 2;
+
+			await page.mouse.move(box.x + 1, y);
+			await page.mouse.down();
+			await page.mouse.move(box.x + box.width * 0.6, y, { steps: 8 });
+			await settle(list);
+
+			expect(Math.abs(await offset(3))).toBeLessThan(2);
+
+			// Four fifths is the fifth one, a page start at either step, so it
+			// is where the drag lets go.
+			await page.mouse.move(box.x + box.width * 0.8, y, { steps: 4 });
+			await page.mouse.up();
+			await settle(list);
+
+			expect(Math.abs(await offset(4))).toBeLessThan(2);
 		});
-
-		const list = page.locator(LIST);
-		const bar = page.locator(`${NAV} [role="slider"]`);
-
-		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true', {
-			timeout: 15000,
-		});
-
-		// Three fifths of six slides is the fourth one, so the drag holds it
-		// at the start of the frame, not somewhere between two slides.
-		const box = await bar.boundingBox();
-		const y = box.y + box.height / 2;
-
-		await page.mouse.move(box.x + 1, y);
-		await page.mouse.down();
-		await page.mouse.move(box.x + box.width * 0.6, y, { steps: 8 });
-		await settle(list);
-
-		const offset = await list.evaluate(
-			(node, item) =>
-				node
-					.querySelectorAll(`:scope > ${item}`)[3]
-					.getBoundingClientRect().left -
-				node.getBoundingClientRect().left,
-			ITEM
-		);
-
-		expect(Math.abs(offset)).toBeLessThan(2);
-
-		await page.mouse.up();
-		await settle(list);
-
-		expect(await getRestingSlide(list)).toBe(3);
-	});
+	}
 
 	test('a repeating carousel steps round its seam and its dots name every slide', async ({
 		page,
