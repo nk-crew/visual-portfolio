@@ -1,1 +1,6 @@
-<?php return array('dependencies' => array('jquery', 'wp-compose'), 'version' => '59a988e3ed39077904f0');
+<?php return array(
+	'dependencies' => array(
+		'wp-compose'
+	),
+	'version' => 'd8cfb51aa276fb8510a0'
+);
