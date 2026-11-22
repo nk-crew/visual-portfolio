@@ -1,1 +1,26 @@
-<?php return array('dependencies' => array('react', 'react-dom', 'react-jsx-runtime', 'wp-a11y', 'wp-api-fetch', 'wp-components', 'wp-compose', 'wp-core-data', 'wp-data', 'wp-date', 'wp-deprecated', 'wp-dom-ready', 'wp-element', 'wp-html-entities', 'wp-i18n', 'wp-keycodes', 'wp-notices', 'wp-primitives', 'wp-private-apis', 'wp-url', 'wp-warning'), 'version' => '6968e761f36740a368aa');
+<?php return array(
+	'dependencies' => array(
+		'react',
+		'react-dom',
+		'react-jsx-runtime',
+		'wp-a11y',
+		'wp-api-fetch',
+		'wp-components',
+		'wp-compose',
+		'wp-core-data',
+		'wp-data',
+		'wp-date',
+		'wp-deprecated',
+		'wp-dom-ready',
+		'wp-element',
+		'wp-html-entities',
+		'wp-i18n',
+		'wp-keycodes',
+		'wp-notices',
+		'wp-primitives',
+		'wp-private-apis',
+		'wp-url',
+		'wp-warning'
+	),
+	'version' => '6c4d6330349d765fa80e'
+);

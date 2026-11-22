@@ -2,5 +2,5 @@
 	'dependencies' => array(
 		'jquery'
 	),
-	'version' => 'cf244a283daff73cffa6'
+	'version' => '3f7acb0417795fe38a33'
 );

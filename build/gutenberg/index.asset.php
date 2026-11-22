@@ -1,1 +1,30 @@
-<?php return array('dependencies' => array('jquery', 'lodash', 'react', 'react-dom', 'react-jsx-runtime', 'wp-api-fetch', 'wp-blob', 'wp-block-editor', 'wp-blocks', 'wp-components', 'wp-compose', 'wp-core-data', 'wp-data', 'wp-date', 'wp-editor', 'wp-element', 'wp-escape-html', 'wp-hooks', 'wp-html-entities', 'wp-i18n', 'wp-is-shallow-equal', 'wp-notices', 'wp-plugins', 'wp-primitives', 'wp-rich-text', 'wp-url'), 'version' => 'a2fa1c527d9e90e84f07');
+<?php return array(
+	'dependencies' => array(
+		'lodash',
+		'react',
+		'react-dom',
+		'react-jsx-runtime',
+		'wp-api-fetch',
+		'wp-blob',
+		'wp-block-editor',
+		'wp-blocks',
+		'wp-components',
+		'wp-compose',
+		'wp-core-data',
+		'wp-data',
+		'wp-date',
+		'wp-editor',
+		'wp-element',
+		'wp-escape-html',
+		'wp-hooks',
+		'wp-html-entities',
+		'wp-i18n',
+		'wp-is-shallow-equal',
+		'wp-notices',
+		'wp-plugins',
+		'wp-primitives',
+		'wp-rich-text',
+		'wp-url'
+	),
+	'version' => 'fe265b6aaa4b7f654e50'
+);
