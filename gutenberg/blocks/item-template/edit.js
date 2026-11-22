@@ -255,21 +255,16 @@ function getCarouselInset(attributes) {
 /**
  * Whether the repeat control does something for these settings.
  *
- * Two things the loop cannot carry: an effect that pins its slides, and
- * slides of their own width - the loop is counted a step per slide, and
- * slides of different widths have no step. The server leaves the loop out
- * for both, and the control says so rather than promising one.
+ * Two things the loop cannot carry: an effect that pins its slides, and an
+ * RTL site. The server leaves the loop out for both, and the control says so
+ * rather than promising one.
  *
  * @param {Object} attributes - block attributes.
  *
  * @return {boolean} True when Repeat can be switched on.
  */
 function canRepeat(attributes) {
-	return (
-		effectRepeats(attributes.carouselEffect) &&
-		!attributes.carouselAutoWidth &&
-		!isSiteRtl
-	);
+	return effectRepeats(attributes.carouselEffect) && !isSiteRtl;
 }
 
 /**
@@ -280,13 +275,6 @@ function canRepeat(attributes) {
  * @return {string} The reason, or the help of a control that works.
  */
 function getRepeatHelp(attributes) {
-	if (attributes.carouselAutoWidth) {
-		return __(
-			'Slides of their own width have no step to count the loop in, so the carousel cannot run round.',
-			'visual-portfolio'
-		);
-	}
-
 	if (!effectRepeats(attributes.carouselEffect)) {
 		return __(
 			'This effect pins its slides in place, so the carousel cannot run round.',

@@ -1111,12 +1111,10 @@ class Visual_Portfolio_Block_Item_Template {
 		// loop moves the slides one end has run out of to the other, and a
 		// pinned slide stays where it is - so the loop was drawn as an empty
 		// list. The setting is kept and comes back with an effect that moves.
-		// Slides of their own width cannot either: the loop is counted a step
-		// per slide, and slides of different widths have no step. Nor can an
-		// RTL site's: the carousel library carries its loop in the scroll
-		// positions of LTR only. A block made RTL on an LTR page is left to
-		// the module.
-		if ( ( $effect && ! $this->effect_repeats( $effect ) ) || ! empty( $attributes['carouselAutoWidth'] ) || is_rtl() ) {
+		// Nor can an RTL site's: the carousel library carries its loop in the
+		// scroll positions of LTR only. A block made RTL on an LTR page is left
+		// to the module.
+		if ( ( $effect && ! $this->effect_repeats( $effect ) ) || is_rtl() ) {
 			$attributes['carouselRepeat'] = false;
 		}
 

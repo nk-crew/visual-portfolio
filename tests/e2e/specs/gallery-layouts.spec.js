@@ -1349,6 +1349,57 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(measured.seam).toBeCloseTo(measured.gap, 0);
 	});
 
+	test('slides of their own width repeat and keep the gap at the seam', async ({
+		page,
+		requestUtils,
+	}) => {
+		const shaped = await getShapedImages(requestUtils);
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel repeat own width',
+			blockId: 'e2e-carousel-repeat-own-width',
+			images: shaped,
+			layout: {
+				layoutType: 'carousel',
+				carouselAutoWidth: true,
+				carouselSlideHeight: '400px',
+				carouselRepeat: true,
+			},
+			carousel: ['loop-carousel-next'],
+		});
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true', {
+			timeout: 15000,
+		});
+
+		const widths = await list
+			.locator(`:scope > ${ITEM}`)
+			.evaluateAll((items) => items.map((item) => item.offsetWidth));
+
+		expect(new Set(widths).size).toBeGreaterThan(1);
+
+		for (let index = 1; index < shaped.length; index += 1) {
+			await page.locator(NEXT_ARROW).click();
+		}
+		await expect.poll(() => getRestingSlide(list)).toBe(shaped.length - 1);
+		await settle(list);
+
+		const measured = await list
+			.locator(`:scope > ${ITEM}`)
+			.evaluateAll((items) => ({
+				gap: parseFloat(
+					window.getComputedStyle(items[0].parentElement).gap
+				),
+				seam:
+					items[0].getBoundingClientRect().left -
+					items.at(-1).getBoundingClientRect().right,
+			}));
+
+		expect(measured.seam).toBeCloseTo(measured.gap, 0);
+	});
+
 	test('a repeating carousel steps round its seam and its dots name every slide', async ({
 		page,
 		requestUtils,

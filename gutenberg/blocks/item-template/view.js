@@ -1990,10 +1990,7 @@ function initCarousel(list, restore) {
 		askedToRepeat.add(list);
 	}
 	delete list.dataset.vpCarouselRepeat;
-	const canRepeat = () =>
-		askedToRepeat.has(list) &&
-		!isRtl(list) &&
-		!list.classList.contains('vp-carousel-auto-width');
+	const canRepeat = () => askedToRepeat.has(list) && !isRtl(list);
 
 	const setRepeat = (looping) => {
 		if (looping === isRepeating(list)) {
