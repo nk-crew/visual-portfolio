@@ -868,9 +868,9 @@ export default function BlockEdit({
 		() => ('tiles' === layoutType ? getTilesColumns(previewTiles) : 0),
 		[layoutType, previewTiles]
 	);
-	// A carousel that cannot run round - an effect that pins its slides,
-	// slides of their own width - keeps the repeat control in place but
-	// greyed, the way the container control is.
+	// A carousel that cannot run round - an effect that pins its slides, an
+	// RTL site - keeps the repeat control in place but greyed, the way the
+	// container control is.
 	const repeatable = canRepeat(attributes);
 
 	// A marquee is Pro's. The choice of it lives here, beside the delay it

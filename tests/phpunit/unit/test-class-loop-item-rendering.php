@@ -1122,7 +1122,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	 *
 	 * @return void
 	 */
-	public function test_the_loop_is_left_out_where_nothing_can_move_round() {
+	public function test_the_loop_request_is_printed_whatever_the_slides() {
 		$fits = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
 			array(

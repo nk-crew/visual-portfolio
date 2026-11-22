@@ -1400,6 +1400,59 @@ test.describe('Gallery Item Template layouts', () => {
 		expect(measured.seam).toBeCloseTo(measured.gap, 0);
 	});
 
+	test('a drag on the bar of own-width slides that repeat lets go where it showed', async ({
+		page,
+		requestUtils,
+	}) => {
+		const shaped = await getShapedImages(requestUtils);
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel repeat own width scrub',
+			blockId: 'e2e-carousel-repeat-own-width-scrub',
+			images: shaped,
+			layout: {
+				layoutType: 'carousel',
+				carouselAutoWidth: true,
+				carouselSlideHeight: '400px',
+				carouselRepeat: true,
+			},
+			carousel: [['loop-carousel-indicator', { indicator: 'progress' }]],
+		});
+
+		const list = page.locator(LIST);
+		const bar = page.locator(`${NAV} [role="slider"]`);
+
+		await expect(list).toHaveAttribute('data-vp-carousel-repeat', 'true', {
+			timeout: 15000,
+		});
+
+		// Three fifths of six slides is the fourth one, so the drag holds it
+		// at the start of the frame, not somewhere between two slides.
+		const box = await bar.boundingBox();
+		const y = box.y + box.height / 2;
+
+		await page.mouse.move(box.x + 1, y);
+		await page.mouse.down();
+		await page.mouse.move(box.x + box.width * 0.6, y, { steps: 8 });
+		await settle(list);
+
+		const offset = await list.evaluate(
+			(node, item) =>
+				node
+					.querySelectorAll(`:scope > ${item}`)[3]
+					.getBoundingClientRect().left -
+				node.getBoundingClientRect().left,
+			ITEM
+		);
+
+		expect(Math.abs(offset)).toBeLessThan(2);
+
+		await page.mouse.up();
+		await settle(list);
+
+		expect(await getRestingSlide(list)).toBe(3);
+	});
+
 	test('a repeating carousel steps round its seam and its dots name every slide', async ({
 		page,
 		requestUtils,
@@ -4068,6 +4121,37 @@ test.describe('Gallery Item Template layouts', () => {
 		await page.emulateMedia({ reducedMotion: 'reduce' });
 
 		expect(await offCentre()).toBeLessThan(2);
+	});
+
+	test('coverflow of own-width slides that fit its columns does not repeat', async ({
+		page,
+		requestUtils,
+	}) => {
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+		await publishLoop(requestUtils, page, {
+			title: 'Layouts - carousel coverflow own width',
+			blockId: 'e2e-carousel-coverflow-own-width',
+			images: images.slice(0, 2),
+			layout: {
+				layoutType: 'carousel',
+				layoutColumnsMode: 'manual',
+				layoutColumnCount: 3,
+				carouselAutoWidth: true,
+				carouselEffect: 'coverflow',
+				carouselRepeat: true,
+			},
+		});
+
+		const list = page.locator(LIST);
+
+		await expect(list).toHaveClass(/re-carousel/, { timeout: 15000 });
+		await expect(list).not.toHaveAttribute('data-vp-carousel-repeat');
+		expect(
+			await list.evaluate((node) =>
+				node.style.getPropertyValue('--vp-coverflow-loop-gap')
+			)
+		).toBe('');
 	});
 
 	test('coverflow keeps the size of its cards when the carousel repeats', async ({

@@ -258,30 +258,27 @@ function getItems(list) {
 	);
 }
 
-function getLoopRange(list) {
+// The bar of a repeating carousel counts slides, so a fraction of it lies
+// between two slides' resting places, whatever widths the slides have.
+function getLoopPlace(list, fraction) {
 	const items = getItems(list);
-	const first = items[0];
-	const last = items.at(-1);
+	const padding =
+		parseFloat(window.getComputedStyle(list).scrollPaddingInlineStart) || 0;
+	const rest = (item) =>
+		item.offsetLeft -
+		('center' === item.style.scrollSnapAlign
+			? (list.clientWidth - item.offsetWidth) / 2
+			: padding);
 
-	if (!first || !last) {
-		return { start: 0, length: 0 };
+	if (items.length < 2) {
+		return items[0] ? rest(items[0]) : 0;
 	}
 
-	const style = window.getComputedStyle(list);
-	const length = last.offsetLeft - first.offsetLeft;
-	const lead =
-		'center' === first.style.scrollSnapAlign
-			? (list.clientWidth - first.offsetWidth) / 2
-			: parseFloat(style.scrollPaddingInlineStart) || 0;
+	const at = fraction * (items.length - 1);
+	const index = Math.min(items.length - 2, Math.floor(at));
+	const from = rest(items[index]);
 
-	return {
-		start: first.offsetLeft - lead,
-		length:
-			length +
-			('center' === first.style.scrollSnapAlign
-				? (last.offsetWidth - first.offsetWidth) / 2
-				: 0),
-	};
+	return from + (at - index) * (rest(items[index + 1]) - from);
 }
 
 function isRepeating(list) {
@@ -1184,6 +1181,17 @@ function getSlidesOnScreen(list, targets) {
 		return getScreenful(list, targets, 0);
 	}
 
+	return getColumnCount(list);
+}
+
+/**
+ * The column count the layout is drawn with.
+ *
+ * @param {HTMLElement} list Item template list.
+ *
+ * @return {number} Columns, at least one.
+ */
+function getColumnCount(list) {
 	const view = list.ownerDocument.defaultView || window;
 	const columns = parseInt(
 		view
@@ -1456,10 +1464,9 @@ function initScrub(list) {
 	// Following a finger, frame by frame: the carousel is put where the finger
 	// is and nowhere else, so it never lags behind or overshoots it.
 	const scrubTo = (fraction) => {
-		const { start, length } = isRepeating(list)
-			? getLoopRange(list)
-			: { start: 0, length: list.scrollWidth - list.clientWidth };
-		const position = start + fraction * length;
+		const position = isRepeating(list)
+			? getLoopPlace(list, fraction)
+			: fraction * (list.scrollWidth - list.clientWidth);
 
 		if (driver) {
 			driver.setPosition(position - base);
@@ -2103,7 +2110,9 @@ function initCarousel(list, restore) {
 			const count = getItems(list).length;
 			const property = '--vp-coverflow-loop-gap';
 
-			if (canRepeat() && count > getSlidesOnScreen(list, [])) {
+			// Cover flow sizes its cards by the columns, even for slides of
+			// their own width.
+			if (canRepeat() && count > getColumnCount(list)) {
 				// Reuse needs the viewport and a spare slide in one cycle.
 				// Two pixels cover rounding in its offset-based measurements.
 				const box = 'var(--vp-coverflow-box-width)';
