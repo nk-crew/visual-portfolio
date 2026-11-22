@@ -6,7 +6,7 @@
 * Requires at least: 6.2
 * Tested up to: 7.2
 * Requires PHP: 8.3
-* Stable tag: 3.11.0
+* Stable tag: 3.12.0
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -335,6 +335,28 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.12.0 - Nov 23, 2026 =
+
+* improved the experimental Gallery Loop blocks:
+  * updated Justified and Masonry layouts to reflow as the window resizes
+  * added an option to stretch the last row of a Justified gallery across the full width
+  * enabled Repeat for carousel slides of different widths
+  * added instant slide navigation for extensions that control the carousel
+  * added a lightbox with thumbnail navigation, zoom and slideshow controls for Gallery Loop in Free and compatible Pro versions
+  * kept lightbox captions visible at the bottom of the screen and restored keyboard focus to the gallery when the lightbox closes
+  * made the lightbox slideshow stop at the final image when Loop is off
+  * made thumbnail and slideshow settings available even when classic galleries use PhotoSwipe
+  * made gallery filters, search, sorting and pagination look consistent in the editor and on the page
+  * fixed captions below images in Tiles galleries
+  * preserved cover and slide sizing when converting classic galleries to Gallery Loop
+* changed the plugin's admin pages to show their contents in white cards on the WordPress background
+* fixed Save Changes blocking clicks on nearby settings
+* fixed admin pages loading left-to-right styles on right-to-left sites
+* fixed Settings section descriptions failing on PHP 8
+* fixed classic Saved Layouts failing to load when an old single-choice setting stored more than one value
+* **Pro:**
+* new license screen with license status, expiry date and clear steps to find your key; clearer update messages in the plugins list.
 
 = 3.11.0 - Nov 17, 2026 =
 
