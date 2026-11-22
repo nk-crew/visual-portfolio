@@ -1052,6 +1052,12 @@
          "Share": [
             ""
          ],
+         "Facebook": [
+            ""
+         ],
+         "Pinterest": [
+            ""
+         ],
          "Toggle fullscreen": [
             ""
          ],
@@ -1616,6 +1622,9 @@
          "Vendor Script": [
             ""
          ],
+         "Choose the lightbox for classic galleries and WordPress images. Gallery Loop uses its own lightbox.": [
+            ""
+         ],
          "Fancybox": [
             ""
          ],
@@ -1682,10 +1691,19 @@
          "Display Close Button": [
             ""
          ],
+         "Show thumbnail navigation in the Gallery Loop and Fancybox lightboxes.": [
+            ""
+         ],
          "Thumbnails Opened At Startup": [
             ""
          ],
+         "Open the thumbnail strip when the lightbox opens.": [
+            ""
+         ],
          "Thumbnails Position": [
+            ""
+         ],
+         "Choose whether thumbnails appear beside or below the image.": [
             ""
          ],
          "Vertical": [
@@ -1695,6 +1713,9 @@
             ""
          ],
          "Display Slideshow": [
+            ""
+         ],
+         "Show the slideshow button in the Gallery Loop and Fancybox lightboxes.": [
             ""
          ],
          "Albums": [
@@ -2469,6 +2490,9 @@
          "“Read more” link text": [
             ""
          ],
+         "Justify": [
+            ""
+         ],
          "Wide width": [
             ""
          ],
@@ -2482,9 +2506,6 @@
             ""
          ],
          "Slides that rest in the middle have no edge to start from.": [
-            ""
-         ],
-         "Slides of their own width have no step to count the loop in, so the carousel cannot run round.": [
             ""
          ],
          "This effect pins its slides in place, so the carousel cannot run round.": [
