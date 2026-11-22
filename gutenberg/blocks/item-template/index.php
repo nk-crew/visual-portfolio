@@ -239,7 +239,7 @@ class Visual_Portfolio_Block_Item_Template {
 			self::CAROUSEL_STYLE,
 			visual_portfolio()->plugin_url . 'assets/vendor/reuse-carousel/styles.css',
 			array(),
-			'0.2.0'
+			'0.2.1'
 		);
 
 		// A classic script rather than a part of the view module, so it runs
@@ -1339,7 +1339,7 @@ class Visual_Portfolio_Block_Item_Template {
 				$extra['tabindex']   = '0';
 				$extra['aria-label'] = __( 'Gallery carousel', 'visual-portfolio' );
 
-				$extra['data-vp-carousel-src'] = visual_portfolio()->plugin_url . 'assets/vendor/reuse-carousel/carousel.js?ver=0.2.0';
+				$extra['data-vp-carousel-src'] = visual_portfolio()->plugin_url . 'assets/vendor/reuse-carousel/carousel.js?ver=0.2.1';
 
 				$init = self::VIEW_MODULE_STORE . '::callbacks.initLayout';
 

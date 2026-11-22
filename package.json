@@ -93,7 +93,7 @@
 		"@dnd-kit/sortable": "^7.0.1",
 		"@dnd-kit/utilities": "^3.2.0",
 		"@fancyapps/fancybox": "^3.5.7",
-		"@reuse-sh/carousel": "0.2.0",
+		"@reuse-sh/carousel": "0.2.1",
 		"@reuse-sh/gallery": "^0.0.7",
 		"@reuse-sh/lightbox": "0.2.0",
 		"@wordpress/base-styles": "^6.13.0",
@@ -123,7 +123,7 @@
 		]
 	},
 	"overrides": {
-		"@reuse-sh/carousel@0.2.0": {
+		"@reuse-sh/carousel": {
 			"react": "18.3.1"
 		},
 		"@reuse-sh/lightbox@0.2.0": {
