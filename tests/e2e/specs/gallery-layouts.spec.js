@@ -3140,25 +3140,38 @@ test.describe('Gallery Item Template layouts', () => {
 		const dots = page.locator(`${NAV} ${DOT}`);
 		await expect(list).toHaveClass(/\bre-carousel\b/);
 		await expect(dots).toHaveCount(IMAGES_COUNT);
-		const box = await list.boundingBox();
-		await page.mouse.move(box.x + box.width - 40, box.y + 80);
-		await page.mouse.down();
-		await page.mouse.move(box.x + 40, box.y + 80, { steps: 20 });
-		await page.mouse.up();
-		const released = await list.evaluate((node) => {
+		const release = await list.evaluateHandle((node) => {
 			const dots = Array.from(
 				node
 					.closest('.vp-block-loop')
 					.querySelectorAll('.vp-block-loop-carousel-dot')
 			);
-			return {
-				active: dots.findIndex(
+			const snapshot = {};
+			const recordRelease = () => {
+				snapshot.active = dots.findIndex(
 					(dot) => dot.getAttribute('aria-current') === 'true'
-				),
-				remaining:
-					node.scrollWidth - node.clientWidth - node.scrollLeft,
+				);
+				snapshot.remaining =
+					node.scrollWidth - node.clientWidth - node.scrollLeft;
 			};
+			window.addEventListener(
+				'pointerdown',
+				() => {
+					// Reuse registers its window pointerup listener on first input.
+					window.addEventListener('pointerup', recordRelease, {
+						once: true,
+					});
+				},
+				{ once: true }
+			);
+			return snapshot;
 		});
+		const box = await list.boundingBox();
+		await page.mouse.move(box.x + box.width - 40, box.y + 80);
+		await page.mouse.down();
+		await page.mouse.move(box.x + 40, box.y + 80, { steps: 20 });
+		await page.mouse.up();
+		const released = await release.jsonValue();
 		expect(released.active).toBe(3);
 		expect(released.remaining).toBeGreaterThan(20);
 		await settle(list);
