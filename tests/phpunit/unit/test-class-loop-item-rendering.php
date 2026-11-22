@@ -1116,14 +1116,13 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Slides of their own width have no step the loop could be counted in,
-	 * so the loop is left out for them. Whether the slides fit the frame is
-	 * the frame's to say, so five slides at six across still carry the
-	 * request: three columns on a desktop are one on a phone.
+	 * Whether the slides fit the frame is the frame's to say, so five slides
+	 * at six across still carry the request: three columns on a desktop are
+	 * one on a phone. Slides of their own width carry it too.
 	 *
 	 * @return void
 	 */
-	public function test_the_loop_is_left_out_where_nothing_can_move_round() {
+	public function test_the_loop_request_is_printed_whatever_the_slides() {
 		$fits = $this->render_loop(
 			'<!-- wp:visual-portfolio/item-image /-->',
 			array(
@@ -1147,7 +1146,7 @@ class ClassLoopItemRendering extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertStringNotContainsString( 'data-vp-carousel-repeat', $own_width );
+		$this->assertStringContainsString( 'data-vp-carousel-repeat="true"', $own_width );
 		$this->assertStringContainsString( 'vp-carousel-auto-width', $own_width );
 
 		$loops = $this->render_loop(

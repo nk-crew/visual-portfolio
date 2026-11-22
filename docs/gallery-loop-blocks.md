@@ -867,12 +867,13 @@ it, and it keeps the control.
 unless the effect says otherwise. The loop is carried by moving the slides one
 end has run out of to the other, so an effect that pins its slides in place —
 a deck — has nothing to move: with `repeat: false` on both sides the *Repeat*
-setting is left out of the page and the control is greyed with the reason. Two
-carousels are left out of the loop whatever the effect: one whose slides are
-their own width, and one whose slides all fit the frame. The server excludes
-the first. Reuse Carousel measures the second again when the viewport or slide
-dimensions change. RTL galleries keep bounded navigation. On an RTL site the
-server leaves Repeat out and greys out the control. The view module also
+setting is left out of the page and the control is greyed with the reason. A
+carousel whose slides all fit the frame is left out of the loop whatever the
+effect. Reuse Carousel measures that again when the viewport or slide
+dimensions change. Slides of their own width repeat too: the library measures
+the loop from where each slide sits, so the slides need no common width. RTL
+galleries keep bounded navigation. On an RTL site the server leaves Repeat out
+and greys out the control. The view module also
 leaves Repeat out when the block itself is RTL on an LTR page.
 
 `peek` says whether the effect leaves an edge for a slide of the next one to
