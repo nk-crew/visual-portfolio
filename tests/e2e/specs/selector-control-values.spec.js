@@ -360,6 +360,62 @@ test.describe('selector control attribute values validation', () => {
 		await expect.poll(() => previous.failure()?.errorText).toBeTruthy();
 	});
 
+	test('Portfolio tag search works in the debug editor', async ({
+		admin,
+		editor,
+		page,
+		requestUtils,
+	}) => {
+		const name = 'Test Portfolio Studio';
+		const term = await requestUtils.rest({
+			path: '/wp/v2/portfolio_tag',
+			method: 'POST',
+			data: { name },
+		});
+
+		try {
+			await page.route(
+				/\/wp-includes\/js\/dist\/vendor\/react(?:-dom|-jsx-runtime)?\.min\.js(?:\?|$)/,
+				async (route) => {
+					const response = await route.fetch({
+						url: route.request().url().replace('.min.js', '.js'),
+					});
+					await route.fulfill({ response });
+				}
+			);
+			await admin.createNewPost({
+				postType: 'post',
+				showWelcomeGuide: false,
+			});
+			await editor.insertBlock({
+				name: 'visual-portfolio/block',
+				attributes: {
+					setup_wizard: 'false',
+					content_source: 'post-based',
+					posts_source: 'portfolio',
+				},
+			});
+			await editor.openDocumentSettingsSidebar();
+			await page
+				.locator('.vpf-control-wrap-name-posts_taxonomies')
+				.getByRole('combobox')
+				.fill(name);
+			await page
+				.getByRole('option', { name: /^Test Portfolio Studio/ })
+				.click();
+			const [block] = await editor.getBlocks();
+			expect(block.attributes.posts_taxonomies).toEqual([
+				String(term.id),
+			]);
+		} finally {
+			await requestUtils.rest({
+				path: `/wp/v2/portfolio_tag/${term.id}`,
+				method: 'DELETE',
+				params: { force: true },
+			});
+		}
+	});
+
 	// =========================================================================
 	// Test Case 4: Block rendering with invalid and valid values.
 	// =========================================================================
