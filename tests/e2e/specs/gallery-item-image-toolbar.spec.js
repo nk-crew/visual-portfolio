@@ -847,6 +847,11 @@ test.describe('Gallery Item Image toolbar', () => {
 		// The cropper takes the place of the picture, and its tools the place
 		// of the block's own.
 		await expect(canvas.locator(CROP_AREA)).toBeVisible();
+		await expect(canvas.locator(CROP_AREA)).toHaveCSS(
+			'position',
+			'relative'
+		);
+		await expect(canvas.locator(CROP_AREA)).toHaveCSS('overflow', 'hidden');
 		await expect(
 			toolbar.getByRole('button', { name: 'Zoom' })
 		).toBeVisible();
