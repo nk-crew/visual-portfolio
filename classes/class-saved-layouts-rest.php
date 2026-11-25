@@ -20,7 +20,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 	/**
 	 * Route namespace.
 	 */
-	const NAMESPACE = 'visual-portfolio/v1';
+	const REST_NAMESPACE = 'visual-portfolio/v1';
 
 	/**
 	 * Type of an exported file.
@@ -180,7 +180,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 		);
 
 		register_rest_route(
-			self::NAMESPACE,
+			self::REST_NAMESPACE,
 			'/saved-layouts/(?P<id>\d+)/usage',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -191,7 +191,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 		);
 
 		register_rest_route(
-			self::NAMESPACE,
+			self::REST_NAMESPACE,
 			'/saved-layouts/choices',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -201,7 +201,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 		);
 
 		register_rest_route(
-			self::NAMESPACE,
+			self::REST_NAMESPACE,
 			'/saved-layouts/(?P<id>\d+)/sync-source',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -212,7 +212,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 		);
 
 		register_rest_route(
-			self::NAMESPACE,
+			self::REST_NAMESPACE,
 			'/saved-layouts/(?P<id>\d+)/restore',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -223,7 +223,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 		);
 
 		register_rest_route(
-			self::NAMESPACE,
+			self::REST_NAMESPACE,
 			'/saved-layouts/(?P<id>\d+)/duplicate',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -234,7 +234,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 		);
 
 		register_rest_route(
-			self::NAMESPACE,
+			self::REST_NAMESPACE,
 			'/saved-layouts/export',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -251,7 +251,7 @@ class Visual_Portfolio_Saved_Layouts_REST {
 		);
 
 		register_rest_route(
-			self::NAMESPACE,
+			self::REST_NAMESPACE,
 			'/saved-layouts/import',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,

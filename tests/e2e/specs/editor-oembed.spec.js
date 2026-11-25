@@ -13,6 +13,15 @@ test('replacing a Video URL cancels the previous preview request', async ({
 	editor,
 	page,
 }) => {
+	await page.route(
+		/\/wp-includes\/js\/dist\/vendor\/react(?:-dom|-jsx-runtime)?\.min\.js(?:\?|$)/,
+		async (route) => {
+			const response = await route.fetch({
+				url: route.request().url().replace('.min.js', '.js'),
+			});
+			await route.fulfill({ response });
+		}
+	);
 	await admin.createNewPost({ postType: 'post', showWelcomeGuide: false });
 	await editor.openDocumentSettingsSidebar();
 	await page.evaluate(() =>

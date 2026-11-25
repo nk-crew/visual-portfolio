@@ -16,6 +16,20 @@
 		border-radius: inherit;
 	}
 
+
+	// WordPress 7.2 keeps the image editor stylesheet outside the canvas iframe.
+	.wp-block-image__crop-area {
+		position: relative;
+		width: 100%;
+		max-width: 100%;
+		overflow: hidden;
+
+		img {
+			border: none;
+			border-radius: 0;
+		}
+	}
+
 	// The link is the box the overlay is positioned against.
 	> a {
 		position: relative;
