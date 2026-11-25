@@ -749,9 +749,11 @@ test.describe('Gallery Loop from the legacy block', () => {
 			editor.canvas.locator('[data-type="visual-portfolio/saved"]')
 		);
 		await expect(
-			page.getByText('Visual Portfolio Saved Layout (Legacy)', {
-				exact: true,
-			})
+			page
+				.locator('.block-editor-block-card')
+				.getByText('Visual Portfolio Saved Layout (Legacy)', {
+					exact: true,
+				})
 		).toBeVisible();
 		await editor.showBlockToolbar();
 		await page

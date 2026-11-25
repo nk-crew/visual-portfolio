@@ -508,10 +508,6 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 				return $cached;
 			}
 
-			if ( function_exists( '_wp_oembed_get_object' ) ) {
-				require_once ABSPATH . WPINC . '/class-oembed.php';
-			}
-
 			$args = array();
 			if ( $width ) {
 				$args['width'] = $width;
