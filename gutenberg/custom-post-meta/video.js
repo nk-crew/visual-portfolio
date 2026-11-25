@@ -35,7 +35,7 @@ class VpVideoComponent extends Component {
 	}
 
 	componentWillUnmount() {
-		this.maybePrepareOembed.cancel();
+		this.maybePrepareOembed.cancel({ upcomingOnly: true });
 		this.prepareOembedFrame.cancel();
 		this.oembedRequest?.controller.abort();
 		this.oembedRequest = null;
