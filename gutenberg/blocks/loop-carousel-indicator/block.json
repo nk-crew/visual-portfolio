@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/loop-carousel-indicator",
-	"title": "Carousel Indicator (Experimental)",
+	"title": "Carousel Indicator",
 	"category": "media",
-	"description": "Says which slide of a carousel gallery is on screen, as dots or as a bar. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Says which slide of a carousel gallery is on screen, as dots or as a bar.",
 	"keywords": [
 		"carousel",
 		"slider",

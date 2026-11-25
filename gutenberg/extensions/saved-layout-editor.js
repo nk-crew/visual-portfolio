@@ -239,7 +239,7 @@ function SavedLayoutPanels({ postId, isSaving, locked }) {
 				</div>
 				<p className="vpf-saved-layout-panel__help">
 					{__(
-						'Or add the Saved Layout block to a page, or sync a Gallery Loop with it from the block’s menu.',
+						'Insert Visual Portfolio Saved Layout (Legacy) on a page or sync a Gallery Loop with this layout from the block menu.',
 						'visual-portfolio'
 					)}
 				</p>

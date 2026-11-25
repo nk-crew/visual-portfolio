@@ -8,9 +8,9 @@ export default [
 	{
 		name: 'paged',
 		scope: ['inserter', 'block'],
-		title: __('Pagination Paged (Experimental)', 'visual-portfolio'),
+		title: __('Pagination Paged', 'visual-portfolio'),
 		description: __(
-			'Displays paged pagination for Gallery Loop. Block is experimental and will change in future releases. Please use with caution.',
+			'Displays paged pagination for Gallery Loop.',
 			'visual-portfolio'
 		),
 		attributes: {
@@ -29,9 +29,9 @@ export default [
 	{
 		name: 'load-more',
 		scope: ['inserter', 'block'],
-		title: __('Pagination Load More (Experimental)', 'visual-portfolio'),
+		title: __('Pagination Load More', 'visual-portfolio'),
 		description: __(
-			'Displays a load more button for pagination. Block is experimental and will change in future releases. Please use with caution.',
+			'Displays a load more button for pagination.',
 			'visual-portfolio'
 		),
 		attributes: { layout: { type: 'flex', justifyContent: 'center' } },
@@ -47,9 +47,9 @@ export default [
 	{
 		name: 'infinite',
 		scope: ['inserter', 'block'],
-		title: __('Pagination Infinite (Experimental)', 'visual-portfolio'),
+		title: __('Pagination Infinite', 'visual-portfolio'),
 		description: __(
-			'Displays an infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution.',
+			'Displays an infinite scroll pagination.',
 			'visual-portfolio'
 		),
 		attributes: { layout: { type: 'flex', justifyContent: 'center' } },

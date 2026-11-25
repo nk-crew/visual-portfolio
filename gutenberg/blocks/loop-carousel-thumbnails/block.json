@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/loop-carousel-thumbnails",
-	"title": "Carousel Thumbnails (Experimental)",
+	"title": "Carousel Thumbnails",
 	"category": "media",
-	"description": "A strip of small pictures a carousel gallery can be steered by. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "A strip of small pictures a carousel gallery can be steered by.",
 	"keywords": ["carousel", "slider", "thumbnails", "filmstrip"],
 	"parent": [
 		"visual-portfolio/loop",

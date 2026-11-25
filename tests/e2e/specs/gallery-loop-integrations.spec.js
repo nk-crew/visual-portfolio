@@ -11,7 +11,7 @@ import { getPluginSlug } from '../utils/plugin-slug';
 const LOOP = '.vp-block-loop';
 const ITEM = '.wp-block-visual-portfolio-item-template__item';
 const TITLE = '.wp-block-visual-portfolio-item-title';
-const LOOP_TITLE = 'Gallery Loop (Experimental)';
+const LOOP_TITLE = 'Gallery Loop';
 
 const PER_PAGE = 2;
 const IMAGES_COUNT = 6;
@@ -32,7 +32,9 @@ async function transformToLoop(page, editor, from) {
 		.getByRole('toolbar', { name: 'Block tools' })
 		.getByRole('button', { name: from, exact: true })
 		.press('Enter');
-	await page.getByRole('menuitem', { name: LOOP_TITLE }).press('Enter');
+	await page
+		.getByRole('menuitem', { name: LOOP_TITLE, exact: true })
+		.press('Enter');
 }
 
 test.describe('Gallery Loop integrations', () => {
@@ -89,7 +91,7 @@ test.describe('Gallery Loop integrations', () => {
 			const body = (await response.text())
 				.split(`"title":"${LOOP_TITLE}"`)
 				.join('"title":"Galerie-Schleife"')
-				.split('"title":"Gallery Item Title (Experimental)"')
+				.split('"title":"Gallery Item Title"')
 				.join('"title":"Galerie-Titel"');
 
 			await route.fulfill({ response, body });

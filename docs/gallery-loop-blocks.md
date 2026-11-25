@@ -6,13 +6,11 @@ a query, a `visual-portfolio/item-template` inside it lays the items out, and
 `loop-search`, `loop-query-total`, `loop-pagination` and the `loop-carousel-*`
 blocks are the controls around them.
 
-Every block of the family, apart from the children of the filter and the
-pagination, is marked **(Experimental)**. Every one is registered only on
-**WordPress 7.1 and newer**. Below it a saved loop, and any block of the family
-saved outside one, prints nothing on the page. The legacy `visual-portfolio/block`
-and legacy Saved Layouts are a separate world and are not affected by anything on
-this page. Saved Layouts built from these blocks are described under
-[Saved Layouts](#saved-layouts).
+Gallery Loop blocks are available on **WordPress 7.1 and newer**. On older
+versions, saved Gallery Loop blocks render no output. The plugin requires
+**WordPress 6.2 or newer**. The legacy blocks are **Visual Portfolio (Legacy)**
+and **Visual Portfolio Saved Layout (Legacy)**. See [Saved Layouts](#saved-layouts)
+for layouts built with Gallery Loop.
 
 - [For users](#for-users)
 - [Anatomy](#anatomy)
@@ -424,10 +422,10 @@ the focus moves to the first link of the first item that arrived, or to that
 item itself when it holds none. A last page the infinite scroll loads by itself
 leaves the focus where it is.
 
-**From the legacy block.** A Visual Portfolio block and a Saved Layout block
-turn into a Gallery Loop from the block switcher, the way a core Gallery or
-Query Loop does: *Gallery Loop* in the list of blocks to transform to, with a
-preview of the result. The loop keeps the source and its query, the number of
+**From the legacy blocks.** Visual Portfolio (Legacy) and Visual Portfolio Saved
+Layout (Legacy) turn into a Gallery Loop from the block switcher, the way a
+core Gallery or Query Loop does: *Gallery Loop* in the list of blocks to
+transform to, with a preview of the result. The loop keeps the source and its query, the number of
 items per page, the layout with its columns, tiles pattern or carousel
 settings, the gap, the skin, the click action and the lightbox captions, the
 filter, the sort and the search above the items, the pagination below them, the notice
@@ -1367,7 +1365,7 @@ the archive page, its pages are /page/N/ under the current address, and its
 filter lists the categories of the whole archive with the one of the address
 active. With plain permalinks the archive has no paths of its own, and the loop's
 parameters address it the way they address any page. The page the plugin creates
-for the archive still holds the classic block while the family is experimental.
+for the archive uses Visual Portfolio (Legacy).
 
 ### What a page cache sees
 
@@ -1442,8 +1440,9 @@ editor. A layout is block-based when its content holds a
 `visual-portfolio/loop`; every other layout, an empty one included, is legacy
 and keeps its settings in `vp_*` meta. Legacy layouts are never converted.
 
-**Inserting.** The Saved Layout block and `[visual_portfolio id="…"]` render a
-block-based layout's content through `Visual_Portfolio_Saved_Layouts::render()`.
+**Inserting.** Visual Portfolio Saved Layout (Legacy) and
+`[visual_portfolio id="…"]` render a block-based layout's content through
+`Visual_Portfolio_Saved_Layouts::render()`.
 A layout reached again while it renders, directly or through another layout,
 renders nothing at that level. A draft renders only for users who can edit it.
 

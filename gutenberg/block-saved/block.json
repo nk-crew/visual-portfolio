@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "visual-portfolio/saved",
 	"category": "media",
-	"title": "Visual Portfolio Saved Layout",
+	"title": "Visual Portfolio Saved Layout (Legacy)",
 	"description": "Display saved Visual Portfolio layouts.",
 	"keywords": ["saved", "portfolio", "vpf"],
 	"textdomain": "visual-portfolio",

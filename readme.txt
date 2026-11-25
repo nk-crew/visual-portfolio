@@ -67,7 +67,7 @@ The gallery block with live preview includes a lot of design settings that are p
 
 ### 📁 Portfolio Post Type ###
 
-Optional custom post type `portfolio` will ensure all your portfolios to keep in a single post type. In this way, you can distinguish your portfolios from other post types. Taxonomies are used to categorize your portfolio types, it will help you to group and sort your portfolios. Moreover, you can use these portfolios as a source for your showcase gallery using Visual Portfolio block.
+Optional custom post type `portfolio` will ensure all your portfolios to keep in a single post type. In this way, you can distinguish your portfolios from other post types. Taxonomies are used to categorize your portfolio types, it will help you to group and sort your portfolios. Moreover, you can use these portfolios as a source for your showcase gallery using the Visual Portfolio (Legacy) block.
 
 Customize and rename Portfolio archive templates using the gallery block and page builders: [https://www.visualportfolio.com/docs/portfolio-archive/](https://www.visualportfolio.com/docs/portfolio-archive/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=archive)
 
@@ -338,7 +338,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 = 3.12.0 - Nov 23, 2026 =
 
-* improved the experimental Gallery Loop blocks:
+* improved the Gallery Loop blocks:
   * updated Justified and Masonry layouts to reflow as the window resizes
   * added an option to stretch the last row of a Justified gallery across the full width
   * enabled Repeat for carousel slides of different widths
@@ -360,7 +360,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 = 3.11.0 - Nov 17, 2026 =
 
-* improved the experimental Gallery Loop blocks:
+* improved the Gallery Loop blocks:
   * added Saved Layouts built from Gallery Loop blocks. A gallery syncs with one from its block menu, takes the layout's item design and lightbox, and keeps its own images or posts. A setting changed on the page is marked and can be reset to the layout, and a locked layout allows no changes
   * added the Saved Layouts library, with live previews, the pages each layout is used on, filters, duplicate, copy shortcode, export and import. A layout deleted for good leaves the galleries synced with it looking as they did
   * added Gallery Loop to the block switcher of the Visual Portfolio and Saved Layout blocks, which converts a legacy gallery with its source, layout, skin, filter, sort, search and pagination
@@ -413,7 +413,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 = 3.10.0 - Nov 9, 2026 =
 
-* improved the experimental Gallery Loop blocks:
+* improved the Gallery Loop blocks:
   * changed the start of a new gallery: add its images first, by upload, Media Library or a drop, then pick a layout from previews drawn with those images. Posts, Taxonomies and Social sit in an "Other sources" menu
   * changed a new image gallery to show all its images on one page and open a picture larger
   * changed "Change layout" in the toolbar to show on every loop with blocks. Picking a layout replaces the blocks, and undo works
@@ -469,7 +469,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 * added WordPress 7.2 compatibility
 * raised the minimum PHP requirement to 8.3
-* improved the experimental Gallery Loop blocks:
+* improved the Gallery Loop blocks:
   * added Carousel Navigation, Previous, Next, Indicator, Autoplay and Thumbnails blocks, placed anywhere inside the loop
   * added Query Total and End of List blocks, and a Gallery Search block whose search comes with Pro
   * added the Fade carousel effect, and carousel effects in browsers without scroll-driven animations
@@ -492,7 +492,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed the block editor preview breaking on galleries with a few hundred images
 * fixed the welcome screen being skipped right after activation
 * **Pro:**
-* improved the experimental Gallery Loop blocks:
+* improved the Gallery Loop blocks:
   * added albums, image effects, tilt, caption move, hover media, video thumbnails, deep links, right-click protection, watermarks and Quick View
   * added a marquee mode to the carousel autoplay
   * added the Cover, Reveal, Warp, Drop and Stack carousel effects, with more transitions and rows
@@ -522,7 +522,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 = 3.8.0 - Aug 26, 2026 =
 
-* added Gallery Item blocks for building the item template inside the experimental Gallery Loop: Image, Title, Description, Date, Author, Categories, Read More, Cover and Meta
+* added Gallery Item blocks for building the item template inside the Gallery Loop: Image, Title, Description, Date, Author, Categories, Read More, Cover and Meta
 * added WordPress 7.1 compatibility
 * improved gallery loading speed on portfolios with many images
 * fixed Load More fetching the next page and adding nothing, on sites whose markup contains `<body` inside inline CSS or JavaScript
@@ -645,7 +645,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 * fixed RSS feed generation for portfolio archives
 * fixed controls persistence and rendering in Saved Layouts
 * fixed taxonomy filter counts to use actual query results
-* fixed experimental filter block to work with nested loop blocks
+* fixed the filter block to work with nested loop blocks
 * skip lazy loading from applying to images with fetchpriority="high" attribute
 * **Pro:**
 * migrated VK to new api domain
@@ -655,8 +655,7 @@ For more information, feel free to visit [Visual Portfolio official website](htt
 
 = 3.3.16 - Jun 26, 2025 =
 
-* started our way to transition to modern blocks. Added new **experimental** blocks:
-  * DON'T USE THESE BLOCKS ON PRODUCTION! Development is still in progress and we may break these blocks.
+* started our way to transition to modern blocks. Added these blocks:
   * Gallery Loop
   * Filter by Category
   * Pagination Wrapper

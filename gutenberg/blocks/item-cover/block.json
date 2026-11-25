@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/item-cover",
-	"title": "Gallery Item Cover (Experimental)",
+	"title": "Gallery Item Cover",
 	"category": "media",
-	"description": "Displays the image of a gallery item as a background, with blocks on top of it. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Displays the image of a gallery item as a background, with blocks on top of it.",
 	"ancestor": ["visual-portfolio/item-template"],
 	"textdomain": "visual-portfolio",
 	"usesContext": [

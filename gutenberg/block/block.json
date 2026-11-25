@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "visual-portfolio/block",
 	"category": "media",
-	"title": "Visual Portfolio",
+	"title": "Visual Portfolio (Legacy)",
 	"description": "Display galleries, posts and portfolio grids.",
 	"keywords": ["gallery", "images", "posts", "portfolio", "vpf"],
 	"textdomain": "visual-portfolio",

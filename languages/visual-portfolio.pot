@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-22T21:19:24+00:00\n"
+"POT-Creation-Date: 2026-11-25T08:28:45+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: visual-portfolio\n"
@@ -4023,27 +4023,27 @@ msgid "Link to comments"
 msgstr ""
 
 #: gutenberg/blocks/item-meta/variations.js:55
-msgid "Gallery Item Comments (Experimental)"
+msgid "Gallery Item Comments"
 msgstr ""
 
 #: gutenberg/blocks/item-meta/variations.js:56
-msgid "Displays the number of comments of a gallery item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays the number of comments of a gallery item."
 msgstr ""
 
 #: gutenberg/blocks/item-meta/variations.js:65
-msgid "Gallery Item Views (Experimental)"
+msgid "Gallery Item Views"
 msgstr ""
 
 #: gutenberg/blocks/item-meta/variations.js:66
-msgid "Displays the number of views of a gallery item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays the number of views of a gallery item."
 msgstr ""
 
 #: gutenberg/blocks/item-meta/variations.js:73
-msgid "Gallery Item Reading Time (Experimental)"
+msgid "Gallery Item Reading Time"
 msgstr ""
 
 #: gutenberg/blocks/item-meta/variations.js:74
-msgid "Displays the reading time of a gallery item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays the reading time of a gallery item."
 msgstr ""
 
 #: gutenberg/blocks/item-read-more/edit.js:51
@@ -4467,27 +4467,27 @@ msgid "The bar answers a drag, and the arrow keys, Home and End when focused. Sw
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-indicator/variations.js:11
-msgid "Carousel Dots (Experimental)"
+msgid "Carousel Dots"
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-indicator/variations.js:12
-msgid "One dot per slide, filled as the carousel moves. Block is experimental and will change in future releases. Please use with caution."
+msgid "One dot per slide, filled as the carousel moves."
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-indicator/variations.js:26
-msgid "Carousel Progress Bar (Experimental)"
+msgid "Carousel Progress Bar"
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-indicator/variations.js:27
-msgid "A single bar that fills as the carousel scrolls. Block is experimental and will change in future releases. Please use with caution."
+msgid "A single bar that fills as the carousel scrolls."
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-indicator/variations.js:41
-msgid "Carousel Counter (Experimental)"
+msgid "Carousel Counter"
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-indicator/variations.js:42
-msgid "The slide on screen and how many there are, as a pair of numbers. Block is experimental and will change in future releases. Please use with caution."
+msgid "The slide on screen and how many there are, as a pair of numbers."
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-nav/edit.js:93
@@ -4689,27 +4689,27 @@ msgid "Show label text"
 msgstr ""
 
 #: gutenberg/blocks/loop-pagination/variations.js:11
-msgid "Pagination Paged (Experimental)"
+msgid "Pagination Paged"
 msgstr ""
 
 #: gutenberg/blocks/loop-pagination/variations.js:12
-msgid "Displays paged pagination for Gallery Loop. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays paged pagination for Gallery Loop."
 msgstr ""
 
 #: gutenberg/blocks/loop-pagination/variations.js:32
-msgid "Pagination Load More (Experimental)"
+msgid "Pagination Load More"
 msgstr ""
 
 #: gutenberg/blocks/loop-pagination/variations.js:33
-msgid "Displays a load more button for pagination. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays a load more button for pagination."
 msgstr ""
 
 #: gutenberg/blocks/loop-pagination/variations.js:50
-msgid "Pagination Infinite (Experimental)"
+msgid "Pagination Infinite"
 msgstr ""
 
 #: gutenberg/blocks/loop-pagination/variations.js:51
-msgid "Displays an infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays an infinite scroll pagination."
 msgstr ""
 
 #: gutenberg/blocks/loop-query-total/edit.js:38
@@ -5237,7 +5237,7 @@ msgid "Copy"
 msgstr ""
 
 #: gutenberg/extensions/saved-layout-editor.js:241
-msgid "Or add the Saved Layout block to a page, or sync a Gallery Loop with it from the block’s menu."
+msgid "Insert Visual Portfolio Saved Layout (Legacy) on a page or sync a Gallery Loop with this layout from the block menu."
 msgstr ""
 
 #: gutenberg/extensions/saved-layout-editor.js:256
@@ -5873,7 +5873,7 @@ msgstr ""
 
 #: gutenberg/block-saved/block.json
 msgctxt "block title"
-msgid "Visual Portfolio Saved Layout"
+msgid "Visual Portfolio Saved Layout (Legacy)"
 msgstr ""
 
 #: gutenberg/block-saved/block.json
@@ -5902,7 +5902,7 @@ msgstr ""
 
 #: gutenberg/block/block.json
 msgctxt "block title"
-msgid "Visual Portfolio"
+msgid "Visual Portfolio (Legacy)"
 msgstr ""
 
 #: gutenberg/block/block.json
@@ -5930,82 +5930,82 @@ msgstr ""
 
 #: gutenberg/blocks/item-author/block.json
 msgctxt "block title"
-msgid "Gallery Item Author (Experimental)"
+msgid "Gallery Item Author"
 msgstr ""
 
 #: gutenberg/blocks/item-author/block.json
 msgctxt "block description"
-msgid "Displays the author of a gallery item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays the author of a gallery item."
 msgstr ""
 
 #: gutenberg/blocks/item-categories/block.json
 msgctxt "block title"
-msgid "Gallery Item Categories (Experimental)"
+msgid "Gallery Item Categories"
 msgstr ""
 
 #: gutenberg/blocks/item-categories/block.json
 msgctxt "block description"
-msgid "Displays the categories of a gallery item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays the categories of a gallery item."
 msgstr ""
 
 #: gutenberg/blocks/item-cover/block.json
 msgctxt "block title"
-msgid "Gallery Item Cover (Experimental)"
+msgid "Gallery Item Cover"
 msgstr ""
 
 #: gutenberg/blocks/item-cover/block.json
 msgctxt "block description"
-msgid "Displays the image of a gallery item as a background, with blocks on top of it. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays the image of a gallery item as a background, with blocks on top of it."
 msgstr ""
 
 #: gutenberg/blocks/item-date/block.json
 msgctxt "block title"
-msgid "Gallery Item Date (Experimental)"
+msgid "Gallery Item Date"
 msgstr ""
 
 #: gutenberg/blocks/item-date/block.json
 msgctxt "block description"
-msgid "Displays the publish or last modified date of a gallery item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays the publish or last modified date of a gallery item."
 msgstr ""
 
 #: gutenberg/blocks/item-description/block.json
 msgctxt "block title"
-msgid "Gallery Item Description (Experimental)"
+msgid "Gallery Item Description"
 msgstr ""
 
 #: gutenberg/blocks/item-description/block.json
 msgctxt "block description"
-msgid "Displays the description of a gallery item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays the description of a gallery item."
 msgstr ""
 
 #: gutenberg/blocks/item-image/block.json
 msgctxt "block title"
-msgid "Gallery Item Image (Experimental)"
+msgid "Gallery Item Image"
 msgstr ""
 
 #: gutenberg/blocks/item-image/block.json
 msgctxt "block description"
-msgid "Displays the image of a gallery item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays the image of a gallery item."
 msgstr ""
 
 #: gutenberg/blocks/item-meta/block.json
 msgctxt "block title"
-msgid "Gallery Item Meta (Experimental)"
+msgid "Gallery Item Meta"
 msgstr ""
 
 #: gutenberg/blocks/item-meta/block.json
 msgctxt "block description"
-msgid "Displays a meta value of a gallery item, such as its comments, views or reading time. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays a meta value of a gallery item, such as its comments, views or reading time."
 msgstr ""
 
 #: gutenberg/blocks/item-read-more/block.json
 msgctxt "block title"
-msgid "Gallery Item Read More (Experimental)"
+msgid "Gallery Item Read More"
 msgstr ""
 
 #: gutenberg/blocks/item-read-more/block.json
 msgctxt "block description"
-msgid "Displays a link to the gallery item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays a link to the gallery item."
 msgstr ""
 
 #: gutenberg/blocks/item-read-more/block.json
@@ -6022,32 +6022,32 @@ msgstr ""
 
 #: gutenberg/blocks/item-template/block.json
 msgctxt "block title"
-msgid "Gallery Item Template (Experimental)"
+msgid "Gallery Item Template"
 msgstr ""
 
 #: gutenberg/blocks/item-template/block.json
 msgctxt "block description"
-msgid "Contains the block elements used to render a gallery item, like the image, title, description and more. Block is experimental and will change in future releases. Please use with caution."
+msgid "Contains the block elements used to render a gallery item, like the image, title, description and more."
 msgstr ""
 
 #: gutenberg/blocks/item-title/block.json
 msgctxt "block title"
-msgid "Gallery Item Title (Experimental)"
+msgid "Gallery Item Title"
 msgstr ""
 
 #: gutenberg/blocks/item-title/block.json
 msgctxt "block description"
-msgid "Displays the title of a gallery item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays the title of a gallery item."
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-autoplay/block.json
 msgctxt "block title"
-msgid "Carousel Play and Pause (Experimental)"
+msgid "Carousel Play and Pause"
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-autoplay/block.json
 msgctxt "block description"
-msgid "Stops a carousel gallery that moves on its own, and starts it again. Block is experimental and will change in future releases. Please use with caution."
+msgid "Stops a carousel gallery that moves on its own, and starts it again."
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-autoplay/block.json
@@ -6112,12 +6112,12 @@ msgstr ""
 
 #: gutenberg/blocks/loop-carousel-indicator/block.json
 msgctxt "block title"
-msgid "Carousel Indicator (Experimental)"
+msgid "Carousel Indicator"
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-indicator/block.json
 msgctxt "block description"
-msgid "Says which slide of a carousel gallery is on screen, as dots or as a bar. Block is experimental and will change in future releases. Please use with caution."
+msgid "Says which slide of a carousel gallery is on screen, as dots or as a bar."
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-indicator/block.json
@@ -6143,12 +6143,12 @@ msgstr ""
 
 #: gutenberg/blocks/loop-carousel-nav/block.json
 msgctxt "block title"
-msgid "Carousel Navigation (Experimental)"
+msgid "Carousel Navigation"
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-nav/block.json
 msgctxt "block description"
-msgid "Holds the controls of a carousel gallery in one row. Block is experimental and will change in future releases. Please use with caution."
+msgid "Holds the controls of a carousel gallery in one row."
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-nav/block.json
@@ -6163,12 +6163,12 @@ msgstr ""
 
 #: gutenberg/blocks/loop-carousel-next/block.json
 msgctxt "block title"
-msgid "Carousel Next Slide (Experimental)"
+msgid "Carousel Next Slide"
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-next/block.json
 msgctxt "block description"
-msgid "Moves a carousel gallery on one slide. Block is experimental and will change in future releases. Please use with caution."
+msgid "Moves a carousel gallery on one slide."
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-next/block.json
@@ -6184,12 +6184,12 @@ msgstr ""
 
 #: gutenberg/blocks/loop-carousel-previous/block.json
 msgctxt "block title"
-msgid "Carousel Previous Slide (Experimental)"
+msgid "Carousel Previous Slide"
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-previous/block.json
 msgctxt "block description"
-msgid "Moves a carousel gallery back one slide. Block is experimental and will change in future releases. Please use with caution."
+msgid "Moves a carousel gallery back one slide."
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-previous/block.json
@@ -6199,12 +6199,12 @@ msgstr ""
 
 #: gutenberg/blocks/loop-carousel-thumbnails/block.json
 msgctxt "block title"
-msgid "Carousel Thumbnails (Experimental)"
+msgid "Carousel Thumbnails"
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-thumbnails/block.json
 msgctxt "block description"
-msgid "A strip of small pictures a carousel gallery can be steered by. Block is experimental and will change in future releases. Please use with caution."
+msgid "A strip of small pictures a carousel gallery can be steered by."
 msgstr ""
 
 #: gutenberg/blocks/loop-carousel-thumbnails/block.json
@@ -6229,27 +6229,27 @@ msgstr ""
 
 #: gutenberg/blocks/loop-filter-item/block.json
 msgctxt "block description"
-msgid "Displays individual filter item. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays individual filter item."
 msgstr ""
 
 #: gutenberg/blocks/loop-filter/block.json
 msgctxt "block title"
-msgid "Gallery Filter (Experimental)"
+msgid "Gallery Filter"
 msgstr ""
 
 #: gutenberg/blocks/loop-filter/block.json
 msgctxt "block description"
-msgid "Displays category filter buttons for the gallery loop. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays category filter buttons for the gallery loop."
 msgstr ""
 
 #: gutenberg/blocks/loop-no-results/block.json
 msgctxt "block title"
-msgid "No Results (Experimental)"
+msgid "No Results"
 msgstr ""
 
 #: gutenberg/blocks/loop-no-results/block.json
 msgctxt "block description"
-msgid "Contains the block elements used to render content when no gallery items are found. Block is experimental and will change in future releases. Please use with caution."
+msgid "Contains the block elements used to render content when no gallery items are found."
 msgstr ""
 
 #: gutenberg/blocks/loop-pagination-end/block.json
@@ -6304,52 +6304,52 @@ msgstr ""
 
 #: gutenberg/blocks/loop-pagination/block.json
 msgctxt "block title"
-msgid "Gallery Pagination (Experimental)"
+msgid "Gallery Pagination"
 msgstr ""
 
 #: gutenberg/blocks/loop-pagination/block.json
 msgctxt "block description"
-msgid "Displays pagination wrapper which can include paged, load more and infinite scroll pagination. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays pagination wrapper which can include paged, load more and infinite scroll pagination."
 msgstr ""
 
 #: gutenberg/blocks/loop-query-total/block.json
 msgctxt "block title"
-msgid "Gallery Query Total (Experimental)"
+msgid "Gallery Query Total"
 msgstr ""
 
 #: gutenberg/blocks/loop-query-total/block.json
 msgctxt "block description"
-msgid "Displays how many items the gallery found, or which of them are on screen. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays how many items the gallery found, or which of them are on screen."
 msgstr ""
 
 #: gutenberg/blocks/loop-search/block.json
 msgctxt "block title"
-msgid "Gallery Search (Experimental)"
+msgid "Gallery Search"
 msgstr ""
 
 #: gutenberg/blocks/loop-search/block.json
 msgctxt "block description"
-msgid "Lets visitors search the items of Gallery Loop. Block is experimental and will change in future releases. Please use with caution."
+msgid "Lets visitors search the items of Gallery Loop."
 msgstr ""
 
 #: gutenberg/blocks/loop-sort/block.json
 msgctxt "block title"
-msgid "Gallery Sort (Experimental)"
+msgid "Gallery Sort"
 msgstr ""
 
 #: gutenberg/blocks/loop-sort/block.json
 msgctxt "block description"
-msgid "Displays sort options for Gallery Loop. Block is experimental and will change in future releases. Please use with caution."
+msgid "Displays sort options for Gallery Loop."
 msgstr ""
 
 #: gutenberg/blocks/loop/block.json
 msgctxt "block title"
-msgid "Gallery Loop (Experimental)"
+msgid "Gallery Loop"
 msgstr ""
 
 #: gutenberg/blocks/loop/block.json
 msgctxt "block description"
-msgid "Display gallery loop. Block is experimental and will change in future releases. Please use with caution."
+msgid "Display gallery loop."
 msgstr ""
 
 #: gutenberg/blocks/loop/block.json
