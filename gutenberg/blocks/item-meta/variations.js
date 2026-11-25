@@ -52,9 +52,9 @@ export default [
 	{
 		...getVariation(
 			'comments',
-			__('Gallery Item Comments (Experimental)', 'visual-portfolio'),
+			__('Gallery Item Comments', 'visual-portfolio'),
 			__(
-				'Displays the number of comments of a gallery item. Block is experimental and will change in future releases. Please use with caution.',
+				'Displays the number of comments of a gallery item.',
 				'visual-portfolio'
 			)
 		),
@@ -62,18 +62,15 @@ export default [
 	},
 	getVariation(
 		'views',
-		__('Gallery Item Views (Experimental)', 'visual-portfolio'),
+		__('Gallery Item Views', 'visual-portfolio'),
 		__(
-			'Displays the number of views of a gallery item. Block is experimental and will change in future releases. Please use with caution.',
+			'Displays the number of views of a gallery item.',
 			'visual-portfolio'
 		)
 	),
 	getVariation(
 		'reading-time',
-		__('Gallery Item Reading Time (Experimental)', 'visual-portfolio'),
-		__(
-			'Displays the reading time of a gallery item. Block is experimental and will change in future releases. Please use with caution.',
-			'visual-portfolio'
-		)
+		__('Gallery Item Reading Time', 'visual-portfolio'),
+		__('Displays the reading time of a gallery item.', 'visual-portfolio')
 	),
 ];

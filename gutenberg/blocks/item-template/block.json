@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/item-template",
-	"title": "Gallery Item Template (Experimental)",
+	"title": "Gallery Item Template",
 	"category": "media",
-	"description": "Contains the block elements used to render a gallery item, like the image, title, description and more. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Contains the block elements used to render a gallery item, like the image, title, description and more.",
 	"ancestor": ["visual-portfolio/loop"],
 	"textdomain": "visual-portfolio",
 	"attributes": {

@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/loop-carousel-autoplay",
-	"title": "Carousel Play and Pause (Experimental)",
+	"title": "Carousel Play and Pause",
 	"category": "media",
-	"description": "Stops a carousel gallery that moves on its own, and starts it again. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Stops a carousel gallery that moves on its own, and starts it again.",
 	"keywords": ["carousel", "slider", "autoplay", "pause", "play"],
 	"parent": [
 		"visual-portfolio/loop",

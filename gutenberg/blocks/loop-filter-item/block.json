@@ -4,7 +4,7 @@
 	"name": "visual-portfolio/loop-filter-item",
 	"title": "Filter Item",
 	"category": "media",
-	"description": "Displays individual filter item. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Displays individual filter item.",
 	"ancestor": ["visual-portfolio/loop-filter"],
 	"textdomain": "visual-portfolio",
 	"usesContext": [

@@ -8,7 +8,7 @@ import { createRegularPosts } from '../utils/create-posts';
 import { getFixturePath } from '../utils/fixture-path';
 import { getPluginSlug } from '../utils/plugin-slug';
 
-const LOOP_TITLE = 'Gallery Loop (Experimental)';
+const LOOP_TITLE = 'Gallery Loop';
 const LEGACY_TITLE = '.vp-portfolio__item-meta-title';
 const LOOP_TITLE_SELECTOR =
 	'.wp-block-visual-portfolio-item-template__item .wp-block-visual-portfolio-item-title';
@@ -207,17 +207,24 @@ test.describe('Gallery Loop from the legacy block', () => {
 		await editor.showBlockToolbar();
 		await page
 			.getByRole('toolbar', { name: 'Block tools' })
-			.getByRole('button', { name: 'Visual Portfolio', exact: true })
+			.getByRole('button', {
+				name: 'Visual Portfolio (Legacy)',
+				exact: true,
+			})
 			.press('Enter');
 
 		// The switcher previews the loop while the entry has focus, and the
 		// preview leaves the post alone.
-		await page.getByRole('menuitem', { name: LOOP_TITLE }).focus();
+		await page
+			.getByRole('menuitem', { name: LOOP_TITLE, exact: true })
+			.focus();
 		expect(await editor.getBlocks()).toMatchObject([
 			{ name: 'visual-portfolio/block' },
 		]);
 
-		await page.getByRole('menuitem', { name: LOOP_TITLE }).press('Enter');
+		await page
+			.getByRole('menuitem', { name: LOOP_TITLE, exact: true })
+			.press('Enter');
 
 		const [loop] = await editor.getBlocks();
 
@@ -741,15 +748,23 @@ test.describe('Gallery Loop from the legacy block', () => {
 		await editor.selectBlocks(
 			editor.canvas.locator('[data-type="visual-portfolio/saved"]')
 		);
+		await expect(
+			page.getByText('Visual Portfolio Saved Layout (Legacy)', {
+				exact: true,
+			})
+		).toBeVisible();
 		await editor.showBlockToolbar();
 		await page
 			.getByRole('toolbar', { name: 'Block tools' })
 			.getByRole('button', {
-				name: 'Visual Portfolio Saved Layout',
+				// WordPress limits toolbar button labels to 35 characters.
+				name: 'Visual Portfolio Saved Layout (L...',
 				exact: true,
 			})
 			.press('Enter');
-		await page.getByRole('menuitem', { name: LOOP_TITLE }).press('Enter');
+		await page
+			.getByRole('menuitem', { name: LOOP_TITLE, exact: true })
+			.press('Enter');
 
 		await expect
 			.poll(async () => (await editor.getBlocks())[0].name)

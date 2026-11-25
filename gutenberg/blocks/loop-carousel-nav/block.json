@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/loop-carousel-nav",
-	"title": "Carousel Navigation (Experimental)",
+	"title": "Carousel Navigation",
 	"category": "media",
-	"description": "Holds the controls of a carousel gallery in one row. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Holds the controls of a carousel gallery in one row.",
 	"keywords": ["carousel", "slider", "arrows", "dots", "navigation"],
 	"parent": ["visual-portfolio/loop", "visual-portfolio/item-template"],
 	"allowedBlocks": [

@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "visual-portfolio/loop-carousel-previous",
-	"title": "Carousel Previous Slide (Experimental)",
+	"title": "Carousel Previous Slide",
 	"category": "media",
-	"description": "Moves a carousel gallery back one slide. Block is experimental and will change in future releases. Please use with caution.",
+	"description": "Moves a carousel gallery back one slide.",
 	"keywords": ["carousel", "slider", "arrow", "previous"],
 	"parent": [
 		"visual-portfolio/loop",

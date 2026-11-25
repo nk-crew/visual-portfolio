@@ -8,9 +8,9 @@ export default [
 		name: 'dots',
 		scope: ['inserter', 'block', 'transform'],
 		isDefault: true,
-		title: __('Carousel Dots (Experimental)', 'visual-portfolio'),
+		title: __('Carousel Dots', 'visual-portfolio'),
 		description: __(
-			'One dot per slide, filled as the carousel moves. Block is experimental and will change in future releases. Please use with caution.',
+			'One dot per slide, filled as the carousel moves.',
 			'visual-portfolio'
 		),
 		attributes: { indicator: 'dots' },
@@ -23,9 +23,9 @@ export default [
 	{
 		name: 'progress',
 		scope: ['inserter', 'block', 'transform'],
-		title: __('Carousel Progress Bar (Experimental)', 'visual-portfolio'),
+		title: __('Carousel Progress Bar', 'visual-portfolio'),
 		description: __(
-			'A single bar that fills as the carousel scrolls. Block is experimental and will change in future releases. Please use with caution.',
+			'A single bar that fills as the carousel scrolls.',
 			'visual-portfolio'
 		),
 		attributes: { indicator: 'progress' },
@@ -38,9 +38,9 @@ export default [
 	{
 		name: 'counter',
 		scope: ['inserter', 'block', 'transform'],
-		title: __('Carousel Counter (Experimental)', 'visual-portfolio'),
+		title: __('Carousel Counter', 'visual-portfolio'),
 		description: __(
-			'The slide on screen and how many there are, as a pair of numbers. Block is experimental and will change in future releases. Please use with caution.',
+			'The slide on screen and how many there are, as a pair of numbers.',
 			'visual-portfolio'
 		),
 		attributes: { indicator: 'counter' },

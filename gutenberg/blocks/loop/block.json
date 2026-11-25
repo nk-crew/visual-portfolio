@@ -3,8 +3,8 @@
 	"apiVersion": 3,
 	"name": "visual-portfolio/loop",
 	"category": "media",
-	"title": "Gallery Loop (Experimental)",
-	"description": "Display gallery loop. Block is experimental and will change in future releases. Please use with caution.",
+	"title": "Gallery Loop",
+	"description": "Display gallery loop.",
 	"keywords": [
 		"gallery",
 		"images",
