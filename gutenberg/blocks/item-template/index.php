@@ -456,6 +456,56 @@ class Visual_Portfolio_Block_Item_Template {
 	}
 
 	/**
+	 * Core post context for an item in a rendered or editor gallery.
+	 *
+	 * @param array $item    - resolved item data.
+	 * @param array $options - portfolio options the item was resolved with.
+	 * @return array
+	 */
+	public static function get_item_post_context( $item, $options ) {
+		$post_id   = (int) ( $item['post_id'] ?? 0 );
+		$post_type = $item['post_type'] ?? '';
+
+		if ( ! $post_id && 'images' === ( $options['content_source'] ?? '' ) ) {
+			$image_id = (int) ( $item['image_id'] ?? 0 );
+
+			if ( $image_id > 0 && 'attachment' === get_post_type( $image_id ) ) {
+				$post_id   = $image_id;
+				$post_type = 'attachment';
+			}
+		}
+
+		if ( $post_id > 0 && ! $post_type ) {
+			$post_type = get_post_type( $post_id );
+		}
+
+		return array(
+			'postId'   => $post_id > 0 ? $post_id : null,
+			'postType' => $post_id > 0 && $post_type ? $post_type : null,
+		);
+	}
+
+	/**
+	 * Whether the template includes a block that consumes core post context.
+	 *
+	 * @param array $blocks - parsed inner blocks.
+	 * @return bool
+	 */
+	private static function uses_post_context( $blocks ) {
+		$registry = WP_Block_Type_Registry::get_instance();
+
+		foreach ( $blocks as $block ) {
+			$type = $registry->get_registered( $block['blockName'] ?? '' );
+
+			if ( array_intersect( array( 'postId', 'postType' ), $type->uses_context ?? array() ) || self::uses_post_context( $block['innerBlocks'] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Every context key a gallery item can carry.
 	 *
 	 * Written out rather than read off `map_item_to_context()`: the block
@@ -1056,6 +1106,8 @@ class Visual_Portfolio_Block_Item_Template {
 	 * @return string
 	 */
 	public function block_render( $attributes, $content, $block ) {
+		global $post;
+
 		$atts = Visual_Portfolio_Gutenberg::transform_context_to_attributes( $block->context );
 
 		// Options are resolved before the query so that a gallery whose output is
@@ -1147,6 +1199,7 @@ class Visual_Portfolio_Block_Item_Template {
 		// The controls are rendered once, after the list, with the context of
 		// the gallery rather than of an item.
 		list( $template, $controls ) = self::split_controls( $block->parsed_block );
+		$uses_post_context           = self::uses_post_context( $template['innerBlocks'] );
 
 		$controls_content = '';
 
@@ -1156,8 +1209,10 @@ class Visual_Portfolio_Block_Item_Template {
 
 		foreach ( $items as $item ) {
 			$popup        = $with_popup ? Visual_Portfolio_Popup::get_item_popup( $item, $result['options'], $sources, $lightbox ) : array();
+			$post_context = self::get_item_post_context( $item, $result['options'] );
 			$item_context = array_merge(
 				self::map_item_to_context( $item, $result['options'], 'vp/', $popup ),
+				$post_context,
 				array( 'vp/itemImageLoading' => $this->get_image_loading_attributes( $index, $first_row, $warm && $index > $last - $warm ) )
 			);
 
@@ -1177,12 +1232,21 @@ class Visual_Portfolio_Block_Item_Template {
 			// the item values.
 			add_filter( 'render_block_context', $filter_block_context, 1 );
 
-			// `dynamic` off renders the inner blocks only, without calling this
-			// callback again and without a wrapper of their own. The loop's
-			// context goes along, as it does in the editor.
-			$item_content = ( new WP_Block( $block_instance, $block->context ) )->render( array( 'dynamic' => false ) );
+			// Core's Post Title still gets its text from the global post.
+			$previous_post = $post;
+			if ( $uses_post_context ) {
+				$post = $post_context['postId'] ? get_post( $post_context['postId'] ) : null;
+			}
 
-			remove_filter( 'render_block_context', $filter_block_context, 1 );
+			try {
+				// `dynamic` off renders the inner blocks only, without calling this
+				// callback again and without a wrapper of their own. The loop's
+				// context goes along, as it does in the editor.
+				$item_content = ( new WP_Block( $block_instance, $block->context ) )->render( array( 'dynamic' => false ) );
+			} finally {
+				$post = $previous_post;
+				remove_filter( 'render_block_context', $filter_block_context, 1 );
+			}
 
 			// A child of the item, where the lightbox looks first, and the last
 			// one, so no `:first-child` rule of an item block meets it.

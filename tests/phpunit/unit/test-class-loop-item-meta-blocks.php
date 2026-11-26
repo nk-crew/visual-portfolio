@@ -123,6 +123,85 @@ class ClassLoopItemMetaBlocks extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Core blocks render the queried post through a nested Group.
+	 * @return void
+	 */
+	public function test_core_post_blocks_render_the_item_post() {
+		$page = self::factory()->post->create( array( 'post_title' => 'Gallery host page', 'post_type' => 'page' ) );
+		$post = self::factory()->post->create(
+			array(
+				'post_title'   => 'Gallery post title',
+				'post_excerpt' => 'Gallery post excerpt',
+				'post_date'    => '2024-03-05 12:00:00',
+			)
+		);
+		$image = self::factory()->attachment->create_upload_object( dirname( __DIR__ ) . '/fixtures/image.png', $post );
+		set_post_thumbnail( $post, $image );
+		$this->go_to( get_permalink( $page ) );
+		$wp_query = $GLOBALS['wp_query'];
+		$wp_query->the_post();
+
+		$output = $this->render_loop(
+			$this->posts_loop( array( $post ) ),
+			'<!-- wp:group --><div class="wp-block-group"><!-- wp:post-title /--><!-- wp:post-date {"format":"Y/m/d"} /--><!-- wp:post-excerpt /--><!-- wp:post-featured-image /--></div><!-- /wp:group -->'
+		);
+
+		$this->assertStringContainsString( '>Gallery post title</h2>', $output );
+		$this->assertStringContainsString( '>2024/03/05</time>', $output );
+		$this->assertStringContainsString( 'Gallery post excerpt', $output );
+		$this->assertStringContainsString( wp_get_attachment_image_url( $image, 'full' ), $output );
+		$this->assertStringNotContainsString( 'Gallery host page', $output );
+		$this->assertSame( $page, get_the_ID() );
+	}
+
+	/**
+	 * Media Library images have an attachment post while URL images have none.
+	 * @return void
+	 */
+	public function test_core_post_title_renders_only_for_the_attachment() {
+		$loop  = $this->images_loop();
+		$image = $loop['imagesQuery']['images'][0]['id'];
+		wp_update_post( array( 'ID' => $image, 'post_title' => 'Attachment title' ) );
+		$loop['imagesQuery']['images'][] = array(
+			'imgUrl' => 'https://example.org/external.jpg',
+			'title'  => 'URL image title',
+		);
+
+		$output = $this->render_loop( $loop, '<!-- wp:post-title /--><!-- wp:visual-portfolio/item-title /-->' );
+
+		$this->assertSame( 1, substr_count( $output, 'wp-block-post-title' ) );
+		$this->assertStringContainsString( '>Attachment title</h2>', $output );
+		$this->assertStringContainsString( '>Image</h3>', $output );
+		$this->assertStringContainsString( '>URL image title</h3>', $output );
+	}
+
+	/**
+	 * A VP-only template keeps the page post available to content shortcodes.
+	 * @return void
+	 */
+	public function test_item_description_keeps_the_page_post_for_shortcodes() {
+		$page = self::factory()->post->create( array( 'post_title' => 'Gallery host page', 'post_type' => 'page' ) );
+		$post = self::factory()->post->create( array( 'post_content' => '[vpf_test_current_title]' ) );
+		$this->go_to( get_permalink( $page ) );
+		$wp_query = $GLOBALS['wp_query'];
+		$wp_query->the_post();
+
+		add_shortcode( 'vpf_test_current_title', static function () {
+			return get_the_title();
+		} );
+		try {
+			$output = $this->render_loop(
+				$this->posts_loop( array( $post ) ),
+				'<!-- wp:visual-portfolio/item-description {"source":"content"} /-->'
+			);
+		} finally {
+			remove_shortcode( 'vpf_test_current_title' );
+		}
+
+		$this->assertStringContainsString( 'Gallery host page', $output );
+	}
+
+	/**
 	 * The relative format core's date picker offers reads as a time ago.
 	 *
 	 * @return void

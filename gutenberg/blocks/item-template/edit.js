@@ -485,16 +485,15 @@ const TEMPLATE = [
 /**
  * Turn a REST item into the block context of a single gallery item.
  *
- * The endpoint answers with the same map the render callback injects, minus the
- * `vp/` namespace. `imageSizes` is the one addition: the front end resolves the
- * size on the server, the editor has to pick a URL on its own.
+ * The endpoint leaves the `vp/` namespace off gallery keys and adds image sizes
+ * for the editor to pick from. Core post context keeps its original keys.
  *
  * @param {Object} item - item from the REST response.
  * @return {Object} block context.
  */
 function getItemContext(item) {
-	const { imageSizes, ...values } = item;
-	const context = { 'vp/itemImageSizes': imageSizes || {} };
+	const { imageSizes, postId = null, postType = null, ...values } = item;
+	const context = { postId, postType, 'vp/itemImageSizes': imageSizes || {} };
 
 	Object.keys(values).forEach((key) => {
 		context[`vp/${key}`] = values[key];

@@ -693,6 +693,55 @@ test.describe('Gallery Item Template', () => {
 			.toBe(true);
 	});
 
+	test('core Post Title shows each item in the editor and on the front end', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		const posts = createdPosts.slice(0, 2);
+
+		await admin.createNewPost({
+			title: 'Gallery with core Post Title',
+			postType: 'page',
+			showWelcomeGuide: false,
+			legacyCanvas: true,
+		});
+		await editor.insertBlock(
+			getLoopBlock({
+				query: {
+					...postsSource,
+					postsQuery: {
+						...postsSource.postsQuery,
+						ids: posts.map(({ id }) => id),
+					},
+				},
+				itemBlocks: [{ name: 'core/post-title' }],
+			})
+		);
+
+		const editorTitles = getEditorCanvas(page, editor).locator(
+			`${LIST} ${ITEM}:visible .wp-block-post-title`
+		);
+		await expect(editorTitles).toHaveCount(2);
+		for (const post of posts) {
+			await expect(
+				editorTitles.filter({ hasText: post.title.rendered })
+			).toBeVisible();
+		}
+
+		await editor.publishPost();
+		const frontend = await openPublishedPage(page);
+		const frontendTitles = frontend.locator(
+			`${LIST} ${ITEM} .wp-block-post-title`
+		);
+		await expect(frontendTitles).toHaveCount(2);
+		for (const post of posts) {
+			await expect(
+				frontendTitles.filter({ hasText: post.title.rendered })
+			).toBeVisible();
+		}
+	});
+
 	test('the images source renders in the editor preview and on the front end', async ({
 		page,
 		admin,

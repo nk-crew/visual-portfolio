@@ -355,6 +355,8 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 			'itemCommentsUrl',
 			'itemViewsCount',
 			'itemReadingTime',
+			'postId',
+			'postType',
 			'imageSizes',
 		);
 
@@ -369,6 +371,8 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 		}
 
 		$this->assertSame( $post_id, $items[0]['itemPostId'] );
+		$this->assertSame( $post_id, $items[0]['postId'] );
+		$this->assertSame( 'post', $items[0]['postType'] );
 		$this->assertSame( 'Context post', $items[0]['itemTitle'] );
 		// Every size the editor's picker offers, the plugin's own included.
 		$this->assertSame(
@@ -390,6 +394,9 @@ class ClassRestLoopItems extends WP_UnitTestCase {
 		$this->assertCount( 2, $items );
 		$this->assertSame( 'Image 1', $items[0]['itemTitle'] );
 		$this->assertSame( self::$attachment_id, $items[0]['itemImgId'] );
+		$this->assertSame( '', $items[0]['itemPostId'] );
+		$this->assertSame( self::$attachment_id, $items[0]['postId'] );
+		$this->assertSame( 'attachment', $items[0]['postType'] );
 
 		$sizes = $items[0]['imageSizes'];
 
