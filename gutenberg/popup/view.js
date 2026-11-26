@@ -40,6 +40,17 @@ function getGallery(loop) {
 				const $item = window.jQuery?.(loop);
 				$item?.trigger(`${event}.vpf`, args);
 				$item?.trigger(`${event}.vpf-uid-${gallery.uid}`, args);
+
+				const name = event.replace(
+					/[A-Z]/g,
+					(letter) => `-${letter.toLowerCase()}`
+				);
+				loop.dispatchEvent(
+					new window.CustomEvent(`vp-${name}`, {
+						bubbles: true,
+						detail: args,
+					})
+				);
 			},
 		};
 
