@@ -1,7 +1,7 @@
 {
 	"name": "visual-portfolio",
 	"title": "Visual Portfolio",
-	"version": "3.12.0",
+	"version": "3.12.1",
 	"description": "Portfolio post type with visual editor",
 	"license": "GPL-2.0",
 	"author": "Visual Portfolio Team <https://www.visualportfolio.com>",
@@ -93,6 +93,8 @@
 		"@dnd-kit/core": "^6.0.5",
 		"@dnd-kit/sortable": "^7.0.1",
 		"@dnd-kit/utilities": "^3.2.0",
+		"@emotion/cache": "11.14.0",
+		"@emotion/react": "11.14.0",
 		"@fancyapps/fancybox": "^3.5.7",
 		"@reuse-sh/carousel": "0.2.1",
 		"@reuse-sh/gallery": "^0.0.7",

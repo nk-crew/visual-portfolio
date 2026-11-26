@@ -2,7 +2,8 @@
 /**
  * Plugin Name:  Visual Portfolio
  * Description:  Gallery and portfolio plugin with gallery blocks and layouts for the editor.
- * Version:      3.12.0
+ * Version:      3.12.1
+ * Requires at least: 6.6
  * Plugin URI:   https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline
  * Author:       Visual Portfolio Team
  * Author URI:   https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline
@@ -79,7 +80,7 @@ if (
 unset( $vpf_active_plugins );
 
 if ( ! defined( 'VISUAL_PORTFOLIO_VERSION' ) ) {
-	define( 'VISUAL_PORTFOLIO_VERSION', '3.12.0' );
+	define( 'VISUAL_PORTFOLIO_VERSION', '3.12.1' );
 }
 
 if ( ! class_exists( 'Visual_Portfolio' ) ) :
@@ -506,10 +507,6 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 
 			if ( $cached ) {
 				return $cached;
-			}
-
-			if ( function_exists( '_wp_oembed_get_object' ) ) {
-				require_once ABSPATH . WPINC . '/class-oembed.php';
 			}
 
 			$args = array();

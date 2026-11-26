@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+= 3.12.1 - Nov 26, 2026 =
+
+* fixed editor compatibility with WordPress 7.2, including video previews and the image cropper
+* fixed tag search after the tag selector reloads
+* raised the minimum WordPress version to 6.6
+
 = 3.12.0 - Nov 23, 2026 =
 
 * improved the experimental Gallery Loop blocks:

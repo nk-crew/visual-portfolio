@@ -167,9 +167,6 @@ class Test_Visual_Portfolio_Security_Ajax_Capabilities extends WP_Ajax_UnitTestC
 	 * @return void
 	 */
 	public function test_find_oembed_allows_contributor() {
-		// `get_oembed_data()` loads the deprecated `class-oembed.php` on its first call.
-		$this->setExpectedDeprecated( 'class-oembed.php' );
-
 		$this->login_as( 'contributor' );
 		add_filter( 'pre_http_request', array( $this, 'fake_oembed_response' ), 10, 3 );
 

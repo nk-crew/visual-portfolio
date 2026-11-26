@@ -351,7 +351,7 @@ export default class SelectControl extends Component {
 	}
 
 	componentWillUnmount() {
-		this.requestAjaxDebounce.cancel();
+		this.requestAjaxDebounce.cancel({ upcomingOnly: true });
 		this.scheduleRequest.cancel();
 		this.ajaxRequest?.abort();
 		this.ajaxRequest = null;
