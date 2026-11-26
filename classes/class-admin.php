@@ -102,7 +102,8 @@ class Visual_Portfolio_Admin {
 
 			Visual_Portfolio_Assets::enqueue_script( 'visual-portfolio-saved-layouts', 'build/gutenberg/layouts-editor' );
 
-			$block_data = Visual_Portfolio_Get::get_options( array( 'id' => get_the_ID() ) );
+			$post_id    = get_the_ID();
+			$block_data = Visual_Portfolio_Get::get_options( array( 'id' => $post_id ) );
 			$data_init  = array(
 				'nonce' => wp_create_nonce( 'vp-ajax-nonce' ),
 			);
@@ -111,8 +112,9 @@ class Visual_Portfolio_Admin {
 				'visual-portfolio-saved-layouts',
 				'VPSavedLayoutVariables',
 				array(
-					'nonce' => $data_init['nonce'],
-					'data'  => $block_data,
+					'nonce'            => $data_init['nonce'],
+					'data'             => $block_data,
+					'hasSavedSettings' => metadata_exists( 'post', $post_id, 'vp_content_source' ),
 				)
 			);
 		}
