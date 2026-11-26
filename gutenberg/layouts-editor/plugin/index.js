@@ -1,11 +1,12 @@
 import apiFetch from '@wordpress/api-fetch';
 import { createBlock } from '@wordpress/blocks';
-import { select, useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { addFilter, removeFilter } from '@wordpress/hooks';
 import { registerPlugin } from '@wordpress/plugins';
 
 function UpdateEditor() {
+	const registry = useRegistry();
 	const {
 		isSavingPost,
 		selectedBlock,
@@ -149,6 +150,17 @@ function UpdateEditor() {
 	useEffect(() => {
 		const hook = 'editor.__unstableSavePost';
 		const namespace = 'visual-portfolio/save-legacy-layout';
+		const editor = registry.select('core/editor');
+		const layout = registry.select('visual-portfolio/saved-layout-data');
+		let layoutAtSave;
+
+		const unsubscribe = registry.subscribe(() => {
+			if (editor.isSavingPost() && !editor.isAutosavingPost()) {
+				layoutAtSave ??= layout.getBlockData();
+			} else {
+				layoutAtSave = undefined;
+			}
+		}, 'core/editor');
 
 		// WordPress 6.6 awaits this filter before it reports the save result.
 		addFilter(hook, namespace, (save, { isAutosave }) => {
@@ -156,10 +168,8 @@ function UpdateEditor() {
 				return save;
 			}
 
-			const postId = select('core/editor').getCurrentPostId();
-			const layoutData = select(
-				'visual-portfolio/saved-layout-data'
-			).getBlockData();
+			const postId = editor.getCurrentPostId();
+			const layoutData = layoutAtSave;
 
 			if (!postId || !layoutData) {
 				return save;
@@ -183,8 +193,11 @@ function UpdateEditor() {
 			});
 		});
 
-		return () => removeFilter(hook, namespace);
-	}, []);
+		return () => {
+			removeFilter(hook, namespace);
+			unsubscribe();
+		};
+	}, [registry]);
 
 	return null;
 }
