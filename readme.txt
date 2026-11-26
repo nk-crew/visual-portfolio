@@ -3,7 +3,7 @@
 * Contributors: visualportfolio, nko
 * Tags: gallery, photo gallery, image gallery, portfolio, video gallery
 * Donate link: https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
-* Requires at least: 6.2
+* Requires at least: 6.6
 * Tested up to: 7.2
 * Requires PHP: 8.3
 * Stable tag: 3.12.0
