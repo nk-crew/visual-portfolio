@@ -546,7 +546,7 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 			$request_state[ $name ] = $request->get_param( $name );
 		}
 
-		$cache_key = 'vpf_loop_preview_' . md5( (string) wp_json_encode( array( $options, $query_id, $request_state, get_current_user_id() ) ) );
+		$cache_key = 'vpf_loop_preview_v2_' . md5( (string) wp_json_encode( array( $options, $query_id, $request_state, get_current_user_id() ) ) );
 
 		// A refresh asks because the items changed on the server while the
 		// options stayed the same, so the cached answer is the one it replaces.
@@ -600,7 +600,10 @@ class Visual_Portfolio_Rest extends WP_REST_Controller {
 					continue;
 				}
 
-				$item_data = Visual_Portfolio_Block_Item_Template::map_item_to_context( $item, $result['options'], '' );
+				$item_data = array_merge(
+					Visual_Portfolio_Block_Item_Template::map_item_to_context( $item, $result['options'], '' ),
+					Visual_Portfolio_Block_Item_Template::get_item_post_context( $item, $result['options'] )
+				);
 
 				$item_data['imageSizes'] = $this->get_item_image_sizes(
 					$item['image_id'] ?? '',

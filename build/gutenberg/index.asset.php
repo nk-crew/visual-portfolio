@@ -26,5 +26,5 @@
 		'wp-rich-text',
 		'wp-url'
 	),
-	'version' => '7f1549964cc0c9ce27e7'
+	'version' => '49f9e5ff6ac4ef7a68ce'
 );
