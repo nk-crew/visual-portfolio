@@ -87,6 +87,7 @@ class ClassLoopIntegrations extends WP_UnitTestCase {
 
 		$this->assertSame(
 			array(
+				'visual-portfolio/saved'                    => array( 'ghostkit.attributes.*.value' ),
 				'visual-portfolio/loop'                     => array(
 					'imagesQuery.images.*.title',
 					'imagesQuery.images.*.description',
@@ -125,19 +126,16 @@ class ClassLoopIntegrations extends WP_UnitTestCase {
 			$configured[] = (string) $block['type'];
 		}
 
-		$missing = array();
+		// The legacy name of the saved layout block is registered in PHP and has no block.json.
+		$names = array( 'nk/visual-portfolio' );
 
 		foreach ( new RecursiveIteratorIterator( new RecursiveDirectoryIterator( visual_portfolio()->plugin_path . 'gutenberg', FilesystemIterator::SKIP_DOTS ) ) as $file ) {
-			if ( 'block.json' !== $file->getFilename() ) {
-				continue;
-			}
-
-			$name = json_decode( file_get_contents( $file->getPathname() ), true )['name'] ?? '';
-
-			if ( ! in_array( $name, $configured, true ) ) {
-				$missing[] = $name;
+			if ( 'block.json' === $file->getFilename() ) {
+				$names[] = json_decode( file_get_contents( $file->getPathname() ), true )['name'] ?? '';
 			}
 		}
+
+		$missing = array_values( array_diff( $names, $configured ) );
 
 		$this->assertSame( array(), $missing );
 	}

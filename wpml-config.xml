@@ -22,6 +22,31 @@
 			<key name="pagination_load_more_text_load" />
 			<key name="pagination_load_more_text_loading" />
 			<key name="pagination_load_more_text_end_list" />
+			<key name="ghostkit">
+				<key name="attributes">
+					<key name="*">
+						<key name="value" />
+					</key>
+				</key>
+			</key>
+		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/saved" translate="1">
+			<key name="ghostkit">
+				<key name="attributes">
+					<key name="*">
+						<key name="value" />
+					</key>
+				</key>
+			</key>
+		</gutenberg-block>
+		<gutenberg-block type="nk/visual-portfolio" translate="1">
+			<key name="ghostkit">
+				<key name="attributes">
+					<key name="*">
+						<key name="value" />
+					</key>
+				</key>
+			</key>
 		</gutenberg-block>
 		<gutenberg-block type="visual-portfolio/loop" translate="1">
 			<key name="imagesQuery">
@@ -77,7 +102,6 @@
 		<gutenberg-block type="visual-portfolio/item-date" translate="1">
 			<key name="format" />
 		</gutenberg-block>
-		<gutenberg-block type="visual-portfolio/saved" translate="0" />
 		<gutenberg-block type="visual-portfolio/saved-editor" translate="0" />
 		<gutenberg-block type="visual-portfolio/item-template" translate="0" />
 		<gutenberg-block type="visual-portfolio/item-image" translate="0" />
