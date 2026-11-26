@@ -8,7 +8,7 @@ blocks are the controls around them.
 
 Gallery Loop blocks are available on **WordPress 7.1 and newer**. On older
 versions, saved Gallery Loop blocks render no output. The plugin requires
-**WordPress 6.2 or newer**. The legacy blocks are **Visual Portfolio (Legacy)**
+**WordPress 6.6 or newer**. The legacy blocks are **Visual Portfolio (Legacy)**
 and **Visual Portfolio Saved Layout (Legacy)**. See [Saved Layouts](#saved-layouts)
 for layouts built with Gallery Loop.
 

@@ -3,6 +3,7 @@
  * Plugin Name:  Visual Portfolio
  * Description:  Gallery and portfolio plugin with gallery blocks and layouts for the editor.
  * Version:      3.12.0
+ * Requires at least: 6.6
  * Plugin URI:   https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline
  * Author:       Visual Portfolio Team
  * Author URI:   https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=byline
@@ -176,9 +177,6 @@ if ( ! class_exists( 'Visual_Portfolio' ) ) :
 		 *
 		 * One gate for the whole family, so no file inside it needs a version
 		 * branch or a `function_exists` guard of its own.
-		 *
-		 * The plugin minimum stays where it is - the legacy blocks hold it, and
-		 * they keep working on every version they always did.
 		 *
 		 * @return bool
 		 */
