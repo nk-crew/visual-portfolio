@@ -1231,6 +1231,22 @@ the order shown.
 | `vp-before-close-popup` | `beforeClosePopup` | `[gallery, lightbox, close]` |
 | `vp-destroy-popup` | `destroyPopup` | `[gallery, lightbox, closed]` |
 
+Gallery Loop with an older Pro version uses the events of the viewer selected
+in Settings.
+
+| DOM event | jQuery event | Arguments |
+| --- | --- | --- |
+| `vp-before-init-fancybox` | `beforeInitFancybox` | `[gallery, options, items, start]` |
+| `vp-init-fancybox` | `initFancybox` | `[gallery, options, items, start, fancybox]` |
+| `vp-before-show-fancybox` | `beforeShowFancybox` | `[gallery, fancybox, slide]` |
+| `vp-after-show-fancybox` | `afterShowFancybox` | `[gallery, fancybox, slide]` |
+| `vp-before-close-fancybox` | `beforeCloseFancybox` | `[gallery, options, rawItems, fancybox]` |
+| `vp-before-init-photo-swipe` | `beforeInitPhotoSwipe` | `[gallery, options, items, start, photoSwipe]` |
+| `vp-init-photo-swipe` | `initPhotoSwipe` | `[gallery, options, items, start, photoSwipe]` |
+| `vp-before-change-photo-swipe` | `beforeChangePhotoSwipe` | `[gallery, slideContext, photoSwipe]` |
+| `vp-after-change-photo-swipe` | `afterChangePhotoSwipe` | `[gallery, slideContext, photoSwipe]` |
+| `vp-before-close-photo-swipe` | `beforeClosePhotoSwipe` | `[gallery, options, rawItems, photoSwipe]` |
+
 When jQuery is present, the loop triggers the corresponding `.vpf` and
 `.vpf-uid-<uid>` events with the same arguments before dispatching the DOM event.
 
