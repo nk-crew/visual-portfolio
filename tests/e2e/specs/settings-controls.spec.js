@@ -218,6 +218,61 @@ test.describe('Contextual settings controls', () => {
 		expect(width.scroll).toBeLessThanOrEqual(width.client);
 	});
 
+	test('archive search and conditional fields work without removed jQuery APIs', async ({
+		admin,
+		page,
+		requestUtils,
+	}) => {
+		const title = `Archive jQuery compatibility ${Date.now()}`;
+		const archive = await requestUtils.rest({
+			path: '/wp/v2/pages',
+			method: 'POST',
+			data: { title, status: 'publish' },
+		});
+		archivePageId = archive.id;
+
+		await page.route(
+			/\/assets\/vendor\/(?:conditionize\/conditionize|select2\/select2)\.min\.js(?:\?|$)/,
+			async (route) => {
+				const response = await route.fetch();
+				const removedApis = [
+					'isArray',
+					'trim',
+					'camelCase',
+					'isFunction',
+					'isNumeric',
+				];
+				await route.fulfill({
+					response,
+					body:
+						removedApis
+							.map((api) => `delete window.jQuery.${api};`)
+							.join('\n') +
+						'\n' +
+						(await response.text()),
+				});
+			}
+		);
+		const errors = [];
+		page.on('pageerror', (error) => errors.push(error.message));
+
+		const form = await openTab(admin, page, 'vp_general');
+		expect(errors).toEqual([]);
+		const register = form.getByRole('checkbox', {
+			name: 'Register Portfolio Post Type',
+		});
+		const field = form.locator('.portfolio_archive_page');
+		page.once('dialog', (dialog) => dialog.accept());
+		await register.uncheck();
+		await expect(field).toBeHidden();
+		await register.check();
+		await field.locator('.select2-selection').click();
+		await page.locator('.select2-search__field').fill(title);
+		await page.getByRole('option', { name: title, exact: true }).click();
+		await expect(field.locator('select')).toHaveValue(String(archive.id));
+		expect(errors).toEqual([]);
+	});
+
 	test('PhotoSwipe selection leaves Gallery Loop thumbnail and slideshow settings available after save', async ({
 		admin,
 		page,
