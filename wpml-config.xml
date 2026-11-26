@@ -36,6 +36,9 @@
 				</key>
 			</key>
 		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/loop-filter" translate="1">
+			<key name="label" />
+		</gutenberg-block>
 		<gutenberg-block type="visual-portfolio/loop-filter-item" translate="1">
 			<key name="text" />
 		</gutenberg-block>
@@ -74,6 +77,24 @@
 		<gutenberg-block type="visual-portfolio/item-date" translate="1">
 			<key name="format" />
 		</gutenberg-block>
+		<gutenberg-block type="visual-portfolio/saved" translate="0" />
+		<gutenberg-block type="visual-portfolio/saved-editor" translate="0" />
+		<gutenberg-block type="visual-portfolio/item-template" translate="0" />
+		<gutenberg-block type="visual-portfolio/item-image" translate="0" />
+		<gutenberg-block type="visual-portfolio/item-cover" translate="0" />
+		<gutenberg-block type="visual-portfolio/item-title" translate="0" />
+		<gutenberg-block type="visual-portfolio/item-description" translate="0" />
+		<gutenberg-block type="visual-portfolio/loop-no-results" translate="0" />
+		<gutenberg-block type="visual-portfolio/loop-query-total" translate="0" />
+		<gutenberg-block type="visual-portfolio/loop-pagination" translate="0" />
+		<gutenberg-block type="visual-portfolio/loop-pagination-numbers" translate="0" />
+		<gutenberg-block type="visual-portfolio/loop-pagination-end" translate="0" />
+		<gutenberg-block type="visual-portfolio/loop-carousel-autoplay" translate="0" />
+		<gutenberg-block type="visual-portfolio/loop-carousel-indicator" translate="0" />
+		<gutenberg-block type="visual-portfolio/loop-carousel-nav" translate="0" />
+		<gutenberg-block type="visual-portfolio/loop-carousel-next" translate="0" />
+		<gutenberg-block type="visual-portfolio/loop-carousel-previous" translate="0" />
+		<gutenberg-block type="visual-portfolio/loop-carousel-thumbnails" translate="0" />
 	</gutenberg-blocks>
 
 	<custom-types>
