@@ -476,6 +476,108 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			.toBe(true);
 	});
 
+	for (const withJQuery of [false, true]) {
+		test(`Reuse emits all popup events ${withJQuery ? 'with' : 'without'} jQuery`, async ({
+			page,
+			requestUtils,
+		}) => {
+			await publishLoop(requestUtils, page, {
+				pageTitle: 'Popup - events',
+				blockId: 'e2e-popup-events',
+				queryId: 1,
+				images,
+				clickAction: 'popup',
+			});
+			test.skip(
+				!(await usesReuse(page)),
+				'This test uses the Reuse viewer.'
+			);
+			test.skip(
+				!withJQuery && (await isPro(page)),
+				'The installed Pro version may enqueue jQuery.'
+			);
+
+			if (withJQuery) {
+				await loadJQuery(page);
+			} else {
+				expect(
+					await page.evaluate(() => window.jQuery)
+				).toBeUndefined();
+			}
+
+			const events = [
+				['vp-before-init-popup', 'beforeInitPopup', 4],
+				['vp-init-popup', 'initPopup', 5],
+				['vp-before-change-popup', 'beforeChangePopup', 3],
+				['vp-after-change-popup', 'afterChangePopup', 3],
+				['vp-before-close-popup', 'beforeClosePopup', 3],
+				['vp-destroy-popup', 'destroyPopup', 3],
+			];
+
+			await page.evaluate((pairs) => {
+				const loop = document.querySelector('.vp-block-loop');
+				const gallery = window.VPPopupAPI.getLoopGallery(loop);
+				window.vpfPopupEvents = [];
+
+				for (const [nativeName, jqueryName] of pairs) {
+					const jqueryCalls = [];
+					for (const namespace of ['vpf', `vpf-uid-${gallery.uid}`]) {
+						window
+							.jQuery?.(document)
+							.on(
+								`${jqueryName}.${namespace}`,
+								(event, ...args) =>
+									jqueryCalls.push({ event, args })
+							);
+					}
+
+					document.addEventListener(nativeName, (event) => {
+						const { detail } = event;
+						window.vpfPopupEvents.push([
+							event.type,
+							detail.length,
+							event.target === loop && detail[0] === gallery,
+							jqueryCalls
+								.splice(0)
+								.map(({ event: jqueryEvent, args }) => [
+									jqueryEvent.namespace,
+									jqueryEvent.target === loop &&
+										args.length === detail.length &&
+										args.every(
+											(arg, index) =>
+												arg === detail[index]
+										),
+								]),
+						]);
+					});
+				}
+			}, events);
+
+			await page.locator(TRIGGER).first().click();
+			await expectPosition(page, 1, IMAGES_COUNT);
+			await page.keyboard.press('ArrowRight');
+			await expectPosition(page, 2, IMAGES_COUNT);
+			await page.keyboard.press('Escape');
+			await expect(page.locator(REUSE)).toBeHidden();
+
+			await expect
+				.poll(() => page.evaluate(() => window.vpfPopupEvents))
+				.toEqual(
+					events.map(([name, , length]) => [
+						name,
+						length,
+						true,
+						withJQuery
+							? [
+									['vpf', true],
+									['vpf-uid-e2e-popup-events', true],
+								]
+							: [],
+					])
+				);
+		});
+	}
+
 	[
 		['a grid', { layoutType: 'grid', layoutColumns: 2 }],
 		[

@@ -1218,10 +1218,23 @@ image as `href`. The saved caption sources are `titleSource` and
 and `item_excerpt`. An item with no popup uses its own address.
 
 A loop has a gallery instance with `$item`, `uid`, `options`, `isPreview()` and
-`emitEvent()`. Its UID comes from the loop block ID. Events fire on the loop
-with the gallery instance first, plus the usual `.vpf` namespace. Reuse emits
-`beforeInitPopup`, `initPopup`, `beforeChangePopup`, `afterChangePopup`,
-`beforeClosePopup` and `destroyPopup`. Before initialization, a listener may
+`emitEvent()`. Its UID comes from the loop block ID. Reuse emits these bubbling DOM events
+on the loop wrapper. Each event's `detail` array contains the arguments in
+the order shown.
+
+| DOM event | jQuery event | Arguments |
+| --- | --- | --- |
+| `vp-before-init-popup` | `beforeInitPopup` | `[gallery, options, slides, start]` |
+| `vp-init-popup` | `initPopup` | `[gallery, options, slides, start, lightbox]` |
+| `vp-before-change-popup` | `beforeChangePopup` | `[gallery, lightbox, change]` |
+| `vp-after-change-popup` | `afterChangePopup` | `[gallery, lightbox, change]` |
+| `vp-before-close-popup` | `beforeClosePopup` | `[gallery, lightbox, close]` |
+| `vp-destroy-popup` | `destroyPopup` | `[gallery, lightbox, closed]` |
+
+When jQuery is present, the loop triggers the corresponding `.vpf` and
+`.vpf-uid-<uid>` events with the same arguments before dispatching the DOM event.
+
+Before initialization, a listener may
 change the viewer options or set `shareUrl(state)` to provide the active slide's
 sharing address. Before a slide change, the event identifies the
 upcoming index while the current slide is still active. Settings control
