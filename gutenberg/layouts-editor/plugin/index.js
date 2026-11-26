@@ -1,26 +1,22 @@
 import apiFetch from '@wordpress/api-fetch';
 import { createBlock } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 import { registerPlugin } from '@wordpress/plugins';
 
 function UpdateEditor() {
+	const registry = useRegistry();
 	const {
 		isSavingPost,
-		isAutosavingPost,
 		selectedBlock,
 		editorSettings,
 		editorMode,
 		blocks,
-		postId,
 		blockData,
 	} = useSelect((select) => {
-		const {
-			isSavingPost: checkIsSavingPost,
-			isAutosavingPost: checkIsAutosavingPost,
-			getCurrentPostId,
-			getEditorSettings,
-		} = select('core/editor');
+		const { isSavingPost: checkIsSavingPost, getEditorSettings } =
+			select('core/editor');
 
 		const { getSelectedBlock, getBlocks } = select('core/block-editor');
 
@@ -34,12 +30,10 @@ function UpdateEditor() {
 
 		return {
 			isSavingPost: checkIsSavingPost(),
-			isAutosavingPost: checkIsAutosavingPost(),
 			selectedBlock: getSelectedBlock(),
 			editorSettings: getEditorSettings(),
 			editorMode: getEditorMode(),
 			blocks: getBlocks(),
-			postId: getCurrentPostId(),
 			blockData: getBlockData(),
 		};
 	}, []);
@@ -133,63 +127,101 @@ function UpdateEditor() {
 	/**
 	 * Check if post meta data edited and allow to update the post.
 	 */
-	const defaultBlockData = useRef(false);
-	const editorRefreshTimeout = useRef(false);
+	const savedBlockData = useRef(null);
 	useEffect(() => {
 		if (!blockData || !Object.keys(blockData).length) {
 			return;
 		}
 
-		if (isSavingPost || isAutosavingPost || !defaultBlockData.current) {
-			defaultBlockData.current = JSON.stringify(blockData);
+		const serializedBlockData = JSON.stringify(blockData);
+
+		if (savedBlockData.current === null) {
+			savedBlockData.current = serializedBlockData;
+		}
+
+		if (isSavingPost || savedBlockData.current === serializedBlockData) {
 			return;
 		}
 
-		clearTimeout(editorRefreshTimeout.current);
-		editorRefreshTimeout.current = setTimeout(() => {
-			if (defaultBlockData.current !== JSON.stringify(blockData)) {
-				editPost({ edited: new Date() });
-			}
-		}, 150);
-	}, [isSavingPost, isAutosavingPost, blockData, editPost]);
+		const refresh = setTimeout(() => editPost({ edited: new Date() }), 150);
+		return () => clearTimeout(refresh);
+	}, [isSavingPost, blockData, editPost]);
 
-	/**
-	 * Save meta data when the post starts saving so layout data is persisted
-	 * in parallel with the WordPress post save (avoids losing settings on
-	 * immediate reload/navigation after Publish).
-	 */
-	const wasSavingPost = useRef(false);
-	const wasAutosavingPost = useRef(false);
 	useEffect(() => {
-		const startedSaving =
-			!wasSavingPost.current && isSavingPost && !isAutosavingPost;
+		const hook = 'editor.__unstableSavePost';
+		const namespace = 'visual-portfolio/save-legacy-layout';
+		const editor = registry.select('core/editor');
+		const layout = registry.select('visual-portfolio/saved-layout-data');
+		let hasSavedSettings = Boolean(
+			window.VPSavedLayoutVariables.hasSavedSettings
+		);
+		let layoutAtSave;
 
-		// Save current state for next inspection.
-		wasSavingPost.current = isSavingPost;
-		wasAutosavingPost.current = isAutosavingPost;
+		const unsubscribe = registry.subscribe(() => {
+			if (editor.isSavingPost() && !editor.isAutosavingPost()) {
+				layoutAtSave ??= layout.getBlockData();
+			} else {
+				layoutAtSave = undefined;
+			}
+		}, 'core/editor');
 
-		if (!startedSaving || !blockData || !postId) {
-			return;
-		}
+		// WordPress 6.6 awaits this filter before it reports the save result.
+		addFilter(hook, namespace, (save, { isAutosave }) => {
+			if (isAutosave) {
+				return save;
+			}
 
-		const prefixedBlockData = {};
+			const postId = editor.getCurrentPostId();
+			const layoutData = layoutAtSave;
 
-		Object.keys(blockData).forEach((name) => {
-			prefixedBlockData[`vp_${name}`] = blockData[name];
+			if (!postId || !layoutData) {
+				return save;
+			}
+
+			const serializedLayoutData = JSON.stringify(layoutData);
+			if (
+				hasSavedSettings &&
+				savedBlockData.current === serializedLayoutData
+			) {
+				return save;
+			}
+
+			return save.then((result) => {
+				const prefixedBlockData = Object.fromEntries(
+					Object.entries(layoutData).map(([name, value]) => [
+						`vp_${name}`,
+						value,
+					])
+				);
+
+				return apiFetch({
+					path: '/visual-portfolio/v1/update_layout/',
+					method: 'POST',
+					data: { data: prefixedBlockData, post_id: postId },
+				}).then(
+					() => {
+						hasSavedSettings = true;
+						savedBlockData.current = serializedLayoutData;
+						return result;
+					},
+					(error) => {
+						if (
+							!hasSavedSettings &&
+							savedBlockData.current === serializedLayoutData
+						) {
+							editPost({ edited: new Date() });
+						}
+						throw error;
+					}
+				);
+			});
 		});
 
-		apiFetch({
-			path: '/visual-portfolio/v1/update_layout/',
-			method: 'POST',
-			data: {
-				data: prefixedBlockData,
-				post_id: postId,
-			},
-		}).catch((response) => {
-			// eslint-disable-next-line no-console
-			console.log(response);
-		});
-	}, [isSavingPost, isAutosavingPost, postId, blockData]);
+		return () => {
+			removeFilter(hook, namespace);
+			unsubscribe();
+		};
+	}, [editPost, registry]);
 
 	return null;
 }

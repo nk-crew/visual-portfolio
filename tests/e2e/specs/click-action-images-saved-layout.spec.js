@@ -15,6 +15,30 @@ import { openPublishedPage } from '../utils/open-published-page';
 import { getPluginSlug } from '../utils/plugin-slug';
 import { waitForPortfolioPreview } from '../utils/portfolio-preview';
 
+function getRestRoute(url) {
+	return url.searchParams.get('rest_route') || url.pathname;
+}
+
+function isLayoutSettingsRoute(url) {
+	return getRestRoute(url).endsWith('/visual-portfolio/v1/update_layout/');
+}
+
+function waitForLayoutPostSave(page, postID) {
+	return page.waitForResponse(
+		(response) =>
+			response.request().method() === 'POST' &&
+			getRestRoute(new URL(response.url())).endsWith(
+				`/wp/v2/vp_lists/${postID}`
+			)
+	);
+}
+
+function getSaveButton(page) {
+	return page
+		.getByRole('region', { name: 'Editor top bar' })
+		.getByRole('button', { name: 'Save', exact: true });
+}
+
 /**
  * TODO: The test needs to be redone in the future.
  * Currently, saved layouts cannot be modified using Gutenberg methods
@@ -204,7 +228,7 @@ test.describe('click action gallery images (saved layout)', () => {
 		editor,
 		requestUtils,
 	}) => {
-		const { postID, postLink } = await createSavedLayoutWithImages(
+		const { postID, postLink, images } = await createSavedLayoutWithImages(
 			page,
 			admin,
 			editor,
@@ -228,27 +252,41 @@ test.describe('click action gallery images (saved layout)', () => {
 			)
 			.click();
 
-		const [saved] = await Promise.all([
-			page.waitForResponse((response) => {
-				const url = new URL(response.url());
-				const route =
-					url.searchParams.get('rest_route') || url.pathname;
-				return (
-					response.request().method() === 'POST' &&
-					route.endsWith(`/wp/v2/vp_lists/${postID}`)
-				);
-			}),
-			page
-				.locator(
-					'button.components-button.editor-post-publish-button',
-					{
-						hasText: 'Save',
-					}
+		const layoutSave = Promise.withResolvers();
+		await page.route(
+			isLayoutSettingsRoute,
+			async (route) => {
+				await layoutSave.promise;
+				await route.continue();
+			},
+			{ times: 1 }
+		);
+
+		try {
+			const [saved] = await Promise.all([
+				waitForLayoutPostSave(page, postID),
+				getSaveButton(page).click(),
+			]);
+			expect(saved.ok()).toBe(true);
+			await page.waitForFunction(
+				(id) =>
+					!window.wp.data
+						.select('core')
+						.isSavingEntityRecord('postType', 'vp_lists', id),
+				postID
+			);
+			expect(
+				await page.evaluate(() =>
+					window.wp.data.select('core/editor').isSavingPost()
 				)
-				.first()
-				.click(),
-		]);
-		expect(saved.ok()).toBe(true);
+			).toBe(true);
+		} finally {
+			layoutSave.resolve();
+		}
+
+		await page.waitForFunction(
+			() => !window.wp.data.select('core/editor').isSavingPost()
+		);
 
 		await admin.createNewPost({
 			title: 'Click Action (with saved layout)',
@@ -270,8 +308,182 @@ test.describe('click action gallery images (saved layout)', () => {
 		// Go to published post.
 		const frontendPage = await openPublishedPage(page);
 
+		await expect(
+			frontendPage.locator('.vp-portfolio__item-wrap')
+		).toHaveCount(images.filter((image) => image.imgUrl).length);
 		const link = frontendPage.locator('a.vp-portfolio__item-meta');
 
 		await expect(link).toBeHidden();
+	});
+
+	test('keeps later edits pending and retries a failed save', async ({
+		page,
+		admin,
+		editor,
+		requestUtils,
+	}) => {
+		const { postID, postLink } = await createSavedLayoutWithImages(
+			page,
+			admin,
+			editor,
+			requestUtils
+		);
+		await page.goto(postLink);
+
+		await page
+			.getByRole('button', { name: 'Click Action', exact: true })
+			.click();
+		const clickAction = (name) =>
+			page
+				.locator('button.vpf-component-icon-selector-item')
+				.getByText(name, {
+					exact: true,
+				});
+		await clickAction('Disabled').click();
+
+		const saveButton = getSaveButton(page);
+		const isLayoutWrite = (response) =>
+			isLayoutSettingsRoute(new URL(response.url()));
+		const coreRequest = Promise.withResolvers();
+		const coreSave = Promise.withResolvers();
+		await page.route(
+			(url) => getRestRoute(url).endsWith(`/wp/v2/vp_lists/${postID}`),
+			async (route) => {
+				coreRequest.resolve();
+				await coreSave.promise;
+				await route.continue();
+			},
+			{ times: 1 }
+		);
+
+		const settingsSaved = page.waitForResponse(isLayoutWrite);
+		try {
+			await saveButton.click();
+			await coreRequest.promise;
+			await clickAction('URL').click();
+		} finally {
+			coreSave.resolve();
+		}
+		const first = await settingsSaved;
+		expect(first.ok()).toBe(true);
+		expect(first.request().postDataJSON().data.vp_items_click_action).toBe(
+			'false'
+		);
+		await expect(saveButton).toBeEnabled();
+
+		await page.route(
+			isLayoutSettingsRoute,
+			(route) =>
+				route.fulfill({
+					status: 500,
+					json: {
+						code: 'layout_save_failed',
+						message: 'The layout settings could not be saved.',
+					},
+				}),
+			{ times: 1 }
+		);
+		await saveButton.click();
+		await expect(
+			page.getByText('The layout settings could not be saved.').first()
+		).toBeVisible();
+		await expect(saveButton).toBeEnabled();
+
+		const [retry] = await Promise.all([
+			page.waitForResponse(isLayoutWrite),
+			saveButton.click(),
+		]);
+		expect(retry.ok()).toBe(true);
+		expect(retry.request().postDataJSON().data.vp_items_click_action).toBe(
+			'url'
+		);
+		await expect(
+			page
+				.getByRole('button', { name: 'Dismiss this notice' })
+				.filter({ hasText: 'updated' })
+		).toBeVisible();
+
+		await page.goto(postLink);
+
+		let settingsWrites = 0;
+		await page.route(isLayoutSettingsRoute, async (route) => {
+			settingsWrites++;
+			await route.fulfill({ status: 500 });
+		});
+		const title = 'Renamed Legacy Layout';
+		await getEditorCanvas(page, editor)
+			.getByRole('textbox', { name: 'Add title' })
+			.fill(title);
+		const [renamed] = await Promise.all([
+			waitForLayoutPostSave(page, postID),
+			saveButton.click(),
+		]);
+		expect(renamed.ok()).toBe(true);
+		expect((await renamed.json()).title.rendered).toBe(title);
+		await page.waitForFunction(
+			() => !window.wp.data.select('core/editor').isSavingPost()
+		);
+		expect(settingsWrites).toBe(0);
+	});
+
+	test('retries a first settings write after reopening the layout', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await createLegacySavedLayout(admin, editor, {
+			title: 'Legacy Layout With Defaults',
+		});
+		const postID = Number(
+			await page.locator('input[name="post_ID"]').inputValue()
+		);
+		await page.route(
+			isLayoutSettingsRoute,
+			(route) =>
+				route.fulfill({
+					status: 500,
+					json: {
+						code: 'layout_initial_save_failed',
+						message: 'The first settings write failed.',
+					},
+				}),
+			{ times: 1 }
+		);
+
+		await page
+			.getByRole('region', { name: 'Editor top bar' })
+			.getByRole('button', { name: 'Publish', exact: true })
+			.click();
+		await page
+			.getByRole('region', { name: 'Editor publish' })
+			.getByRole('button', { name: 'Publish', exact: true })
+			.click();
+		await expect(
+			page.getByText('The first settings write failed.').first()
+		).toBeVisible();
+		await expect(getSaveButton(page)).toBeEnabled();
+
+		await admin.visitAdminPage('post.php', `post=${postID}&action=edit`);
+		const writes = [];
+		page.on('response', (response) => {
+			if (isLayoutSettingsRoute(new URL(response.url())))
+				writes.push(response);
+		});
+		await getEditorCanvas(page, editor)
+			.getByRole('textbox', { name: 'Add title' })
+			.fill('Reopened Legacy Layout');
+		const [saved] = await Promise.all([
+			waitForLayoutPostSave(page, postID),
+			getSaveButton(page).click(),
+		]);
+		expect(saved.ok()).toBe(true);
+		await page.waitForFunction(
+			() => !window.wp.data.select('core/editor').isSavingPost()
+		);
+		expect(writes).toHaveLength(1);
+		expect(writes[0].ok()).toBe(true);
+		expect(
+			writes[0].request().postDataJSON().data.vp_items_click_action
+		).toBe('url');
 	});
 });

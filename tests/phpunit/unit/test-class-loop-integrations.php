@@ -66,6 +66,12 @@ class ClassLoopIntegrations extends WP_UnitTestCase {
 				continue;
 			}
 
+			if ( '0' === (string) $block['translate'] ) {
+				$this->assertCount( 0, $block->xpath( './/key' ), $type );
+
+				continue;
+			}
+
 			$this->assertSame( '1', (string) $block['translate'], $type );
 
 			foreach ( $block->xpath( './/key[not(key)]' ) as $leaf ) {
@@ -81,6 +87,7 @@ class ClassLoopIntegrations extends WP_UnitTestCase {
 
 		$this->assertSame(
 			array(
+				'visual-portfolio/saved'                    => array( 'ghostkit.attributes.*.value' ),
 				'visual-portfolio/loop'                     => array(
 					'imagesQuery.images.*.title',
 					'imagesQuery.images.*.description',
@@ -88,6 +95,7 @@ class ClassLoopIntegrations extends WP_UnitTestCase {
 					'imagesQuery.images.*.author',
 					'imagesQuery.images.*.categories',
 				),
+				'visual-portfolio/loop-filter'              => array( 'label' ),
 				'visual-portfolio/loop-filter-item'         => array( 'text' ),
 				'visual-portfolio/loop-sort'                => array( 'labels.*' ),
 				'visual-portfolio/loop-search'              => array( 'placeholder', 'label' ),
@@ -102,6 +110,34 @@ class ClassLoopIntegrations extends WP_UnitTestCase {
 			),
 			$keys
 		);
+	}
+
+	/**
+	 * Every block has an entry, because WPML guesses the translatable attributes of a block
+	 * without one and sends values such as `popup` or `300px` to translators.
+	 *
+	 * @return void
+	 */
+	public function test_wpml_config_has_an_entry_for_every_block() {
+		$xml        = simplexml_load_file( visual_portfolio()->plugin_path . 'wpml-config.xml' );
+		$configured = array();
+
+		foreach ( $xml->xpath( '/wpml-config/gutenberg-blocks/gutenberg-block' ) as $block ) {
+			$configured[] = (string) $block['type'];
+		}
+
+		// The legacy name of the saved layout block is registered in PHP and has no block.json.
+		$names = array( 'nk/visual-portfolio' );
+
+		foreach ( new RecursiveIteratorIterator( new RecursiveDirectoryIterator( visual_portfolio()->plugin_path . 'gutenberg', FilesystemIterator::SKIP_DOTS ) ) as $file ) {
+			if ( 'block.json' === $file->getFilename() ) {
+				$names[] = json_decode( file_get_contents( $file->getPathname() ), true )['name'] ?? '';
+			}
+		}
+
+		$missing = array_values( array_diff( $names, $configured ) );
+
+		$this->assertSame( array(), $missing );
 	}
 
 	/**
