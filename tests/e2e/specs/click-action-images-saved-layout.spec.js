@@ -403,6 +403,8 @@ test.describe('click action gallery images (saved layout)', () => {
 				.filter({ hasText: 'updated' })
 		).toBeVisible();
 
+		await page.goto(postLink);
+
 		let settingsWrites = 0;
 		await page.route(isLayoutSettingsRoute, async (route) => {
 			settingsWrites++;
@@ -422,5 +424,66 @@ test.describe('click action gallery images (saved layout)', () => {
 			() => !window.wp.data.select('core/editor').isSavingPost()
 		);
 		expect(settingsWrites).toBe(0);
+	});
+
+	test('retries a first settings write after reopening the layout', async ({
+		page,
+		admin,
+		editor,
+	}) => {
+		await createLegacySavedLayout(admin, editor, {
+			title: 'Legacy Layout With Defaults',
+		});
+		const postID = Number(
+			await page.locator('input[name="post_ID"]').inputValue()
+		);
+		await page.route(
+			isLayoutSettingsRoute,
+			(route) =>
+				route.fulfill({
+					status: 500,
+					json: {
+						code: 'layout_initial_save_failed',
+						message: 'The first settings write failed.',
+					},
+				}),
+			{ times: 1 }
+		);
+
+		await page
+			.getByRole('region', { name: 'Editor top bar' })
+			.getByRole('button', { name: 'Publish', exact: true })
+			.click();
+		await page
+			.getByRole('region', { name: 'Editor publish' })
+			.getByRole('button', { name: 'Publish', exact: true })
+			.click();
+		await expect(
+			page.getByText('The first settings write failed.').first()
+		).toBeVisible();
+		await expect(getSaveButton(page)).toBeEnabled();
+
+		await admin.visitAdminPage('post.php', `post=${postID}&action=edit`);
+		const writes = [];
+		page.on('response', (response) => {
+			if (isLayoutSettingsRoute(new URL(response.url())))
+				writes.push(response);
+		});
+		await getEditorCanvas(page, editor)
+			.getByRole('textbox', { name: 'Add title' })
+			.fill('Reopened Legacy Layout');
+		const [saved] = await Promise.all([
+			waitForLayoutPostSave(page, postID),
+			getSaveButton(page).click(),
+		]);
+		expect(saved.ok()).toBe(true);
+		await page.waitForFunction(
+			() => !window.wp.data.select('core/editor').isSavingPost()
+		);
+		expect(writes).toHaveLength(1);
+		expect(writes[0].ok()).toBe(true);
+		expect(
+			writes[0].request().postDataJSON().data.vp_items_click_action
+		).toBe('url');
 	});
 });

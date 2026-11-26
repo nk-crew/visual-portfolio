@@ -152,7 +152,9 @@ function UpdateEditor() {
 		const namespace = 'visual-portfolio/save-legacy-layout';
 		const editor = registry.select('core/editor');
 		const layout = registry.select('visual-portfolio/saved-layout-data');
-		let hasSavedLayout = !editor.isEditedPostNew();
+		let hasSavedSettings = Boolean(
+			window.VPSavedLayoutVariables.hasSavedSettings
+		);
 		let layoutAtSave;
 
 		const unsubscribe = registry.subscribe(() => {
@@ -178,7 +180,7 @@ function UpdateEditor() {
 
 			const serializedLayoutData = JSON.stringify(layoutData);
 			if (
-				hasSavedLayout &&
+				hasSavedSettings &&
 				savedBlockData.current === serializedLayoutData
 			) {
 				return save;
@@ -198,13 +200,13 @@ function UpdateEditor() {
 					data: { data: prefixedBlockData, post_id: postId },
 				}).then(
 					() => {
-						hasSavedLayout = true;
+						hasSavedSettings = true;
 						savedBlockData.current = serializedLayoutData;
 						return result;
 					},
 					(error) => {
 						if (
-							!hasSavedLayout &&
+							!hasSavedSettings &&
 							savedBlockData.current === serializedLayoutData
 						) {
 							editPost({ edited: new Date() });
