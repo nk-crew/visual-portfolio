@@ -204,7 +204,7 @@ test.describe('click action gallery images (saved layout)', () => {
 		editor,
 		requestUtils,
 	}) => {
-		const { postID, postLink } = await createSavedLayoutWithImages(
+		const { postID, postLink, images } = await createSavedLayoutWithImages(
 			page,
 			admin,
 			editor,
@@ -228,27 +228,60 @@ test.describe('click action gallery images (saved layout)', () => {
 			)
 			.click();
 
-		const [saved] = await Promise.all([
-			page.waitForResponse((response) => {
-				const url = new URL(response.url());
-				const route =
-					url.searchParams.get('rest_route') || url.pathname;
-				return (
-					response.request().method() === 'POST' &&
-					route.endsWith(`/wp/v2/vp_lists/${postID}`)
-				);
-			}),
-			page
-				.locator(
-					'button.components-button.editor-post-publish-button',
-					{
-						hasText: 'Save',
-					}
+		const layoutSave = Promise.withResolvers();
+		await page.route(
+			(url) =>
+				(url.searchParams.get('rest_route') || url.pathname).endsWith(
+					'/visual-portfolio/v1/update_layout/'
+				),
+			async (route) => {
+				await layoutSave.promise;
+				await route.continue();
+			},
+			{ times: 1 }
+		);
+
+		try {
+			const [saved] = await Promise.all([
+				page.waitForResponse((response) => {
+					const url = new URL(response.url());
+					const route =
+						url.searchParams.get('rest_route') || url.pathname;
+					return (
+						response.request().method() === 'POST' &&
+						route.endsWith(`/wp/v2/vp_lists/${postID}`)
+					);
+				}),
+				page
+					.locator(
+						'button.components-button.editor-post-publish-button',
+						{
+							hasText: 'Save',
+						}
+					)
+					.first()
+					.click(),
+			]);
+			expect(saved.ok()).toBe(true);
+			await page.waitForFunction(
+				(id) =>
+					!window.wp.data
+						.select('core')
+						.isSavingEntityRecord('postType', 'vp_lists', id),
+				postID
+			);
+			expect(
+				await page.evaluate(() =>
+					window.wp.data.select('core/editor').isSavingPost()
 				)
-				.first()
-				.click(),
-		]);
-		expect(saved.ok()).toBe(true);
+			).toBe(true);
+		} finally {
+			layoutSave.resolve();
+		}
+
+		await page.waitForFunction(
+			() => !window.wp.data.select('core/editor').isSavingPost()
+		);
 
 		await admin.createNewPost({
 			title: 'Click Action (with saved layout)',
@@ -270,6 +303,9 @@ test.describe('click action gallery images (saved layout)', () => {
 		// Go to published post.
 		const frontendPage = await openPublishedPage(page);
 
+		await expect(
+			frontendPage.locator('.vp-portfolio__item-wrap')
+		).toHaveCount(images.filter((image) => image.imgUrl).length);
 		const link = frontendPage.locator('a.vp-portfolio__item-meta');
 
 		await expect(link).toBeHidden();
