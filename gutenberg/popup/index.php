@@ -251,10 +251,7 @@ class Visual_Portfolio_Popup {
 	 * @return void
 	 */
 	public static function enqueue() {
-		if ( visual_portfolio()->is_pro() ) {
-			// Pro extensions still consume the legacy vendor events and instance.
-			Visual_Portfolio_Assets::enqueue_popup_assets();
-		} else {
+		if ( ! visual_portfolio()->is_pro() ) {
 			wp_enqueue_style( self::SCRIPT );
 		}
 

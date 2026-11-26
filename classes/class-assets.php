@@ -32,6 +32,13 @@ class Visual_Portfolio_Assets {
 	private static $head_css_included = false;
 
 	/**
+	 * Whether the frontend data selects Reuse for Gallery Loop.
+	 *
+	 * @var bool
+	 */
+	private $loop_popup_uses_reuse = false;
+
+	/**
 	 * Visual_Portfolio_Assets constructor.
 	 */
 	public function __construct() {
@@ -815,6 +822,9 @@ class Visual_Portfolio_Assets {
 
 		$data = apply_filters( 'vpf_global_data', $data );
 
+		$loop_data                   = (array) $data;
+		$this->loop_popup_uses_reuse = empty( $loop_data['pro'] ) || 'reuse' === ( $loop_data['loopLightbox'] ?? null );
+
 		echo "<script type='text/javascript'>\n";
 		echo "/* <![CDATA[ */\n";
 		echo 'var VPData = ' . wp_json_encode( $data ) . ';';
@@ -836,6 +846,10 @@ class Visual_Portfolio_Assets {
 	 * Enqueue scripts and styles in foot.
 	 */
 	public function wp_enqueue_foot_assets() {
+		if ( did_action( 'vpf_loop_popup_enqueue' ) && visual_portfolio()->is_pro() && ! $this->loop_popup_uses_reuse ) {
+			self::enqueue_popup_assets();
+		}
+
 		self::enqueue_stored_assets( 'style' );
 		self::enqueue_stored_assets( 'template_style' );
 		self::enqueue_stored_assets( 'script' );
