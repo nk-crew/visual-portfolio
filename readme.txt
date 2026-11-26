@@ -3,10 +3,10 @@
 * Contributors: visualportfolio, nko
 * Tags: gallery, photo gallery, image gallery, portfolio, video gallery
 * Donate link: https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=donate
-* Requires at least: 6.2
+* Requires at least: 6.6
 * Tested up to: 7.2
 * Requires PHP: 8.3
-* Stable tag: 3.12.0
+* Stable tag: 3.12.1
 * License: GPLv2 or later
 * License URI: <http://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -335,6 +335,12 @@ Yes, Visual Portfolio has full translation and localization support via the `vis
 For more information, feel free to visit [Visual Portfolio official website](https://www.visualportfolio.com/?utm_source=wordpress.org&utm_medium=faq&utm_campaign=docs).
 
 ## Changelog ##
+
+= 3.12.1 - Nov 26, 2026 =
+
+* fixed editor compatibility with WordPress 7.2, including video previews and the image cropper
+* fixed tag search after the tag selector reloads
+* raised the minimum WordPress version to 6.6
 
 = 3.12.0 - Nov 23, 2026 =
 
