@@ -152,6 +152,7 @@ function UpdateEditor() {
 		const namespace = 'visual-portfolio/save-legacy-layout';
 		const editor = registry.select('core/editor');
 		const layout = registry.select('visual-portfolio/saved-layout-data');
+		let hasSavedLayout = !editor.isEditedPostNew();
 		let layoutAtSave;
 
 		const unsubscribe = registry.subscribe(() => {
@@ -175,7 +176,15 @@ function UpdateEditor() {
 				return save;
 			}
 
-			return save.then(async (result) => {
+			const serializedLayoutData = JSON.stringify(layoutData);
+			if (
+				hasSavedLayout &&
+				savedBlockData.current === serializedLayoutData
+			) {
+				return save;
+			}
+
+			return save.then((result) => {
 				const prefixedBlockData = Object.fromEntries(
 					Object.entries(layoutData).map(([name, value]) => [
 						`vp_${name}`,
@@ -183,13 +192,26 @@ function UpdateEditor() {
 					])
 				);
 
-				await apiFetch({
+				return apiFetch({
 					path: '/visual-portfolio/v1/update_layout/',
 					method: 'POST',
 					data: { data: prefixedBlockData, post_id: postId },
-				});
-				savedBlockData.current = JSON.stringify(layoutData);
-				return result;
+				}).then(
+					() => {
+						hasSavedLayout = true;
+						savedBlockData.current = serializedLayoutData;
+						return result;
+					},
+					(error) => {
+						if (
+							!hasSavedLayout &&
+							savedBlockData.current === serializedLayoutData
+						) {
+							editPost({ edited: new Date() });
+						}
+						throw error;
+					}
+				);
 			});
 		});
 
@@ -197,7 +219,7 @@ function UpdateEditor() {
 			removeFilter(hook, namespace);
 			unsubscribe();
 		};
-	}, [registry]);
+	}, [editPost, registry]);
 
 	return null;
 }
