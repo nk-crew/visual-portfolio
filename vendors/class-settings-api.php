@@ -717,9 +717,9 @@ class Visual_Portfolio_Settings_API {
                 else {
                     $('.nav-tab-wrapper a:first').addClass('nav-tab-active');
                 }
-                $('.nav-tab-wrapper a').click(function(evt) {
+                $('.nav-tab-wrapper a').on('click', function(evt) {
                     $('.nav-tab-wrapper a').removeClass('nav-tab-active');
-                    $(this).addClass('nav-tab-active').blur();
+                    $(this).addClass('nav-tab-active').trigger('blur');
                     var clicked_group = $(this).attr('href');
                     if (typeof(localStorage) != 'undefined' ) {
                         localStorage.setItem("activetab", $(this).attr('href'));

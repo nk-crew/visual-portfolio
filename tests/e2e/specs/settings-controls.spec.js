@@ -592,6 +592,17 @@ test.describe('Contextual settings controls', () => {
 		admin,
 		page,
 	}) => {
+		const warnings = [];
+		page.on('console', (message) => {
+			if (
+				/JQMIGRATE:.*jQuery\.fn\.(click|blur)\(\) event shorthand/.test(
+					message.text()
+				)
+			) {
+				warnings.push(message.text());
+			}
+		});
+
 		await openTab(admin, page, 'vp_general');
 		await page.evaluate(() => {
 			window.location.hash = 'vp_images';
@@ -602,5 +613,6 @@ test.describe('Contextual settings controls', () => {
 		await expect(
 			page.locator('#vp_watermarks .vpf-settings-modern')
 		).toHaveCount(0);
+		expect(warnings).toEqual([]);
 	});
 });
