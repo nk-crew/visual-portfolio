@@ -9,6 +9,8 @@
  * Pages are published straight through REST: every test here is about the front
  * end, and one of them runs with JavaScript switched off.
  */
+import { execFileSync } from 'node:child_process';
+
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import { getFixturePath } from '../utils/fixture-path';
@@ -1174,6 +1176,128 @@ test.describe('Gallery Loop click actions and lightbox', () => {
 			)
 			.toEqual({ index: 3, isPlaying: false });
 	});
+
+	for (const vendor of ['fancybox', 'photoswipe']) {
+		test(`Reuse loads only what the page needs with ${vendor} selected`, async ({
+			admin,
+			page,
+			requestUtils,
+		}) => {
+			test.skip(
+				!!process.env.CORE,
+				'This test supplies the Pro viewer hooks.'
+			);
+			const loader = 'wp-content/mu-plugins/vpf-loop-vendor-assets.php';
+			const runPHP = (code) =>
+				execFileSync('npm', [
+					'run',
+					'wp-env',
+					'--',
+					'run',
+					'tests-cli',
+					'php',
+					'-r',
+					code,
+				]);
+			const proViewer = `<?php
+add_action( 'template_redirect', static function () {
+	define( 'VISUAL_PORTFOLIO_PRO', true );
+} );
+add_filter( 'vpf_global_data', static function ( $data ) {
+	$data['loopLightbox'] = 'reuse';
+	return $data;
+} );
+add_action( 'vpf_loop_popup_enqueue', static function () {
+	wp_enqueue_style( 'visual-portfolio-loop-popup' );
+} );
+`;
+			const legacy = `<!-- wp:visual-portfolio/block ${JSON.stringify({
+				block_id: 'e2e-legacy-vendor',
+				setup_wizard: 'false',
+				content_source: 'images',
+				images: [{ id: images[0].id }],
+				items_click_action: 'popup_gallery',
+				layout: 'grid',
+			})} /-->`;
+			const loop = getLoopMarkup({
+				blockId: 'e2e-reuse-vendor',
+				queryId: 1,
+				images,
+				clickAction: 'popup',
+			});
+
+			await setVendor(admin, page, vendor);
+			try {
+				runPHP(
+					`if (!is_dir('wp-content/mu-plugins')) mkdir('wp-content/mu-plugins'); file_put_contents('${loader}', base64_decode('${Buffer.from(proViewer).toString('base64')}'));`
+				);
+
+				for (const [name, content] of [
+					['legacy', legacy],
+					[
+						'mixed',
+						vendor === 'fancybox' ? loop + legacy : legacy + loop,
+					],
+					['reuse', loop],
+				]) {
+					const created = await requestUtils.rest({
+						path: '/wp/v2/pages',
+						method: 'POST',
+						data: {
+							title: `Popup assets - ${vendor} - ${name}`,
+							status: 'publish',
+							content,
+						},
+					});
+					pageIds.push(created.id);
+					await page.goto(created.link);
+					expect(await isPro(page)).toBe(true);
+
+					const loadsVendor = name !== 'reuse';
+					await expect(
+						page.locator('script[id="jquery-core-js"]')
+					).toHaveCount(Number(loadsVendor));
+					for (const candidate of ['fancybox', 'photoswipe']) {
+						await expect(
+							page.locator(
+								`script[id="visual-portfolio-plugin-${candidate}-js"]`
+							)
+						).toHaveCount(
+							Number(loadsVendor && vendor === candidate)
+						);
+					}
+					expect(
+						await page.evaluate(() => typeof window.jQuery)
+					).toBe(loadsVendor ? 'function' : 'undefined');
+
+					if (name !== 'legacy') {
+						await page.locator(TRIGGER).first().click();
+						await expect(page.locator(REUSE)).toBeVisible();
+						await page.keyboard.press('Escape');
+						await expect(page.locator(REUSE)).toHaveCount(0);
+					}
+					if (loadsVendor) {
+						await page
+							.locator(
+								'.vp-portfolio__item a.vp-portfolio__item-meta'
+							)
+							.first()
+							.click();
+						await expect(
+							page.locator(
+								vendor === 'fancybox'
+									? '.fancybox-container'
+									: PHOTOSWIPE
+							)
+						).toBeVisible();
+					}
+				}
+			} finally {
+				runPHP(`if (is_file('${loader}')) unlink('${loader}');`);
+				await setVendor(admin, page, 'fancybox');
+			}
+		});
+	}
 
 	test('Free opens a WordPress image with the configured vendor on the same page as Reuse', async ({
 		admin,
