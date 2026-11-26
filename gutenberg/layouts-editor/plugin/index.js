@@ -1,26 +1,21 @@
 import apiFetch from '@wordpress/api-fetch';
 import { createBlock } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { select, useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 import { registerPlugin } from '@wordpress/plugins';
 
 function UpdateEditor() {
 	const {
 		isSavingPost,
-		isAutosavingPost,
 		selectedBlock,
 		editorSettings,
 		editorMode,
 		blocks,
-		postId,
 		blockData,
 	} = useSelect((select) => {
-		const {
-			isSavingPost: checkIsSavingPost,
-			isAutosavingPost: checkIsAutosavingPost,
-			getCurrentPostId,
-			getEditorSettings,
-		} = select('core/editor');
+		const { isSavingPost: checkIsSavingPost, getEditorSettings } =
+			select('core/editor');
 
 		const { getSelectedBlock, getBlocks } = select('core/block-editor');
 
@@ -34,12 +29,10 @@ function UpdateEditor() {
 
 		return {
 			isSavingPost: checkIsSavingPost(),
-			isAutosavingPost: checkIsAutosavingPost(),
 			selectedBlock: getSelectedBlock(),
 			editorSettings: getEditorSettings(),
 			editorMode: getEditorMode(),
 			blocks: getBlocks(),
-			postId: getCurrentPostId(),
 			blockData: getBlockData(),
 		};
 	}, []);
@@ -133,63 +126,65 @@ function UpdateEditor() {
 	/**
 	 * Check if post meta data edited and allow to update the post.
 	 */
-	const defaultBlockData = useRef(false);
-	const editorRefreshTimeout = useRef(false);
+	const savedBlockData = useRef(null);
 	useEffect(() => {
 		if (!blockData || !Object.keys(blockData).length) {
 			return;
 		}
 
-		if (isSavingPost || isAutosavingPost || !defaultBlockData.current) {
-			defaultBlockData.current = JSON.stringify(blockData);
+		const serializedBlockData = JSON.stringify(blockData);
+
+		if (savedBlockData.current === null) {
+			savedBlockData.current = serializedBlockData;
+		}
+
+		if (isSavingPost || savedBlockData.current === serializedBlockData) {
 			return;
 		}
 
-		clearTimeout(editorRefreshTimeout.current);
-		editorRefreshTimeout.current = setTimeout(() => {
-			if (defaultBlockData.current !== JSON.stringify(blockData)) {
-				editPost({ edited: new Date() });
-			}
-		}, 150);
-	}, [isSavingPost, isAutosavingPost, blockData, editPost]);
+		const refresh = setTimeout(() => editPost({ edited: new Date() }), 150);
+		return () => clearTimeout(refresh);
+	}, [isSavingPost, blockData, editPost]);
 
-	/**
-	 * Save meta data when the post starts saving so layout data is persisted
-	 * in parallel with the WordPress post save (avoids losing settings on
-	 * immediate reload/navigation after Publish).
-	 */
-	const wasSavingPost = useRef(false);
-	const wasAutosavingPost = useRef(false);
 	useEffect(() => {
-		const startedSaving =
-			!wasSavingPost.current && isSavingPost && !isAutosavingPost;
+		const hook = 'editor.__unstableSavePost';
+		const namespace = 'visual-portfolio/save-legacy-layout';
 
-		// Save current state for next inspection.
-		wasSavingPost.current = isSavingPost;
-		wasAutosavingPost.current = isAutosavingPost;
+		// WordPress 6.6 awaits this filter before it reports the save result.
+		addFilter(hook, namespace, (save, { isAutosave }) => {
+			if (isAutosave) {
+				return save;
+			}
 
-		if (!startedSaving || !blockData || !postId) {
-			return;
-		}
+			const postId = select('core/editor').getCurrentPostId();
+			const layoutData = select(
+				'visual-portfolio/saved-layout-data'
+			).getBlockData();
 
-		const prefixedBlockData = {};
+			if (!postId || !layoutData) {
+				return save;
+			}
 
-		Object.keys(blockData).forEach((name) => {
-			prefixedBlockData[`vp_${name}`] = blockData[name];
+			return save.then(async (result) => {
+				const prefixedBlockData = Object.fromEntries(
+					Object.entries(layoutData).map(([name, value]) => [
+						`vp_${name}`,
+						value,
+					])
+				);
+
+				await apiFetch({
+					path: '/visual-portfolio/v1/update_layout/',
+					method: 'POST',
+					data: { data: prefixedBlockData, post_id: postId },
+				});
+				savedBlockData.current = JSON.stringify(layoutData);
+				return result;
+			});
 		});
 
-		apiFetch({
-			path: '/visual-portfolio/v1/update_layout/',
-			method: 'POST',
-			data: {
-				data: prefixedBlockData,
-				post_id: postId,
-			},
-		}).catch((response) => {
-			// eslint-disable-next-line no-console
-			console.log(response);
-		});
-	}, [isSavingPost, isAutosavingPost, postId, blockData]);
+		return () => removeFilter(hook, namespace);
+	}, []);
 
 	return null;
 }
