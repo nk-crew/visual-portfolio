@@ -1471,6 +1471,7 @@ test.describe('Gallery Item Template layouts', () => {
 
 			// Three fifths of six slides is the fourth one, which starts no page
 			// at two per press and is still held where it would rest.
+			await bar.scrollIntoViewIfNeeded();
 			const box = await bar.boundingBox();
 			const y = box.y + box.height / 2;
 
