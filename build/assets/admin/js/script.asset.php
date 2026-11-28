@@ -2,5 +2,5 @@
 	'dependencies' => array(
 		'wp-compose'
 	),
-	'version' => 'd8cfb51aa276fb8510a0'
+	'version' => '71845f9e1bca85d3bc4f'
 );
