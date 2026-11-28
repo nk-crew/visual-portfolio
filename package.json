@@ -63,8 +63,8 @@
 		"@wordpress/scripts": "^37.2.0",
 		"@wordpress/stylelint-config": "^23.29.0",
 		"@wordpress/url": "5.1.0",
-		"@wp-playground/cli": "^3.1.48",
-		"ajv": "8.18.0",
+		"@wp-playground/cli": "3.1.54",
+		"ajv": "8.20.0",
 		"concurrently": "^8.2.0",
 		"cross-env": "^7.0.3",
 		"del": "^6.1.1",
@@ -78,20 +78,20 @@
 		"gulp-zip": "^4.2.0",
 		"husky": "^9.1.7",
 		"json-file": "^0.1.0",
-		"lint-staged": "^16.2.7",
+		"lint-staged": "^17.6.3",
 		"md5": "^2.3.0",
 		"micromatch": "^4.0.8",
 		"npm-run-all": "^4.1.5",
 		"parse-version-string": "^1.0.1",
 		"path": "^0.12.7",
-		"webpack-remove-empty-scripts": "^1.0.3",
-		"yargs": "^17.7.2",
 		"postcss": "^8.5.33",
-		"postcss-selector-parser": "^7.2.1"
+		"postcss-selector-parser": "^7.2.1",
+		"webpack-remove-empty-scripts": "^1.0.3",
+		"yargs": "^17.7.2"
 	},
 	"dependencies": {
 		"@dnd-kit/core": "^6.0.5",
-		"@dnd-kit/sortable": "^7.0.1",
+		"@dnd-kit/sortable": "^10.0.0",
 		"@dnd-kit/utilities": "^3.2.0",
 		"@emotion/cache": "11.14.0",
 		"@emotion/react": "11.14.0",
@@ -103,7 +103,6 @@
 		"@wordpress/icons": "^11.4.0",
 		"ace-builds": "^1.22.0",
 		"classnames": "^2.3.2",
-		"copy-webpack-plugin": "^11.0.0",
 		"flickr-justified-gallery": "^2.3.0",
 		"gutenberg-react-select-styles": "^0.1.1",
 		"is-number": "^7.0.0",
@@ -132,8 +131,11 @@
 		"@reuse-sh/lightbox@0.2.0": {
 			"react": "18.3.1"
 		},
-		"copy-webpack-plugin": {
-			"serialize-javascript": "^7.1.4"
+		"@wordpress/scripts": {
+			"markdownlint-cli": "0.50.1"
+		},
+		"@wordpress/env": {
+			"rimraf": "6.1.4"
 		},
 		"@wp-playground/storage": {
 			"isomorphic-git": "1.38.6"
@@ -141,14 +143,11 @@
 		"@wp-playground/cli": {
 			"express": "4.22.3"
 		},
-		"@wordpress/scripts": {
-			"markdownlint-cli": "0.50.1"
-		},
 		"micromark-extension-math": {
 			"katex": "0.18.2"
 		},
-		"@wordpress/env": {
-			"rimraf": "6.1.4"
+		"copy-webpack-plugin@10": {
+			"serialize-javascript": "^7.1.4"
 		}
 	}
 }
